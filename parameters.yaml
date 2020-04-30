@@ -13,6 +13,25 @@ seir-groups:
       beta: 0
       sigma: 0
       mu: 0
+    # Number of contacts with other groups
+    contacts:
+      adult: 2
+      old: 2
+
+  adult:
+    name: "adult"
+    initial-conditions:
+      S: 10
+      E: 0
+      I: 0
+      R: 0
+    parameters:
+      beta: 0
+      sigma: 0
+      mu: 0
+    contacts:
+      young: 2
+      old: 2
 
   old:
     name: "old"
@@ -25,6 +44,8 @@ seir-groups:
       beta: 0
       sigma: 0
       mu: 0
+    contacts:
+      old: 2
 
 # Parameters unspecific to any group
 global-parameters:
