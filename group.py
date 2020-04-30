@@ -113,7 +113,7 @@ class SEIR_group:
 		for n,g in self.all_groups:
 			beds-=g.H[self.t]
 
-		delta_H = entering[self.name]*(1-(summ_entering-beds)/summ_entering)
+		delta_H = entering[self.name]*(1-(summ_entering-beds if summ_entering-beds>0 else 0)/summ_entering)
 
 
 
