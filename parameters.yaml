@@ -1,0 +1,30 @@
+# Dictionary of each group from the SEIR point of view
+seir-groups:
+  young: 
+    name: "young"
+    # Initial conditions for dynamics
+    initial-conditions:
+      S: 10
+      E: 0
+      I: 0
+      R: 0
+    # Parameters specific to the group
+    parameters:
+      beta: 0
+      sigma: 0
+      mu: 0
+
+  old:
+    name: "old"
+    initial-conditions:
+      S: 10
+      E: 0
+      I: 0
+      R: 0
+    parameters:
+      beta: 0
+      sigma: 0
+      mu: 0
+
+# Parameters unspecific to any group
+global-parameters:
