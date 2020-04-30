@@ -103,18 +103,63 @@ class SEIR_group:
 
 	def update_H(self, m_tests, a_tests):
 		# For each group, calculate the entering amount
-		entering = {}
-		summ_entering = 0
+		entering_h = {}
+		summ_entering_h = 0
 		for n,g in self.all_groups:
-			entering[g] = parameters['mu']*parameters['p_H']*(g.I[self.t]+g.I_ss[self.t])
-			summ_entering += entering[g]
+			entering_h[g] = parameters['mu']*parameters['p_H']*(g.I[self.t]+g.I_ss[self.t])
+			summ_entering_h += entering[g]
 		# Calculate number of beds
 		beds = self.parameters['C_H']
 		for n,g in self.all_groups:
 			beds-=g.H[self.t]
 
-		delta_H = entering[self.name]*(1-(summ_entering-beds if summ_entering-beds>0 else 0)/summ_entering)
+		delta_H = entering_h[self.name]*(1-(summ_entering_h-beds if summ_entering_h-beds>0 else 0)/summ_entering_h)
+		self.H += [self.H[self.t]+delta_H*dt]
 
+	def update_ICU(self, m_tests, a_tests):
+		# For each group, calculate the entering amount
+		entering_icu = {}
+		summ_entering_icu = 0
+		for n,g in self.all_groups:
+			entering_icu[g] = parameters['mu']*parameters['p_ICU']*(g.I[self.t]+g.I_ss[self.t])
+			summ_entering_icu += entering_icu[g]
+		# Calculate number of ICUs
+		icus = self.parameters['C_ICU']
+		for n,g in self.all_groups:
+			icus-=g.H[self.t]
+
+		delta_ICU = entering_icu[self.name]*(1-(summ_entering_icu-icus if summ_entering_icu-icus>0 else 0)/summ_entering_icu)
+		self.ICU += [self.ICU[self.t]+delta_ICU*dt]
+
+	def update_D(self, m_tests, a_tests):
+		# For each group, calculate the entering amount
+		entering_h = {}
+		summ_entering_h = 0
+		for n,g in self.all_groups:
+			entering_h[g] = parameters['mu']*parameters['p_H']*(g.I[self.t]+g.I_ss[self.t])
+			summ_entering_h += entering[g]
+		# Calculate number of beds
+		beds = self.parameters['C_H']
+		for n,g in self.all_groups:
+			beds-=g.H[self.t]
+
+		entering_icu = {}
+		summ_entering_icu = 0
+		for n,g in self.all_groups:
+			entering_icu[g] = parameters['mu']*parameters['p_ICU']*(g.I[self.t]+g.I_ss[self.t])
+			summ_entering_icu += entering_icu[g]
+		# Calculate number of ICUs
+		icus = self.parameters['C_ICU']
+		for n,g in self.all_groups:
+			icus-=g.H[self.t]
+
+		delta_D = (entering_icu[self.name]*((summ_entering_icu-icus if summ_entering_icu-icus>0 else 0)/summ_entering_icu)
+			+ entering_h[self.name]*((summ_entering_h-beds if summ_entering_h-beds>0 else 0)/summ_entering_h)
+			+ self.parameters['q_H'] * self.H[self.t]
+			+ self.parameters['q_ICU'] * self.ICU[self.t]
+		)
+
+		self.D += [self.D[self.t]+delta_D*dt]
 
 
 
