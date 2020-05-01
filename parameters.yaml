@@ -8,14 +8,52 @@ seir-groups:
       E: 0
       I: 0
       R: 0
+      Ia: 0
+      Ips: 0
+      Ims: 0
+      Iss: 0
+      Rq: 0
+      H: 0
+      ICU: 0
+      D: 0
+
     # Parameters specific to the group
     parameters:
+      # Probability of exposition
       beta: 0
+      # Rate of infection
       sigma: 0
+      # Rate of infection moving to next state (either recovery, hospital bed or ICU)
       mu: 0
+      # Prob of moving to hospital bed from infection
+      p_H: 0
+      # Prob of moving to ICU from infection
+      p_ICU: 0
+      # Prob of moving to asymptomatic infection
+      p_Ia: 0
+      # Prob of moving to ps infection
+      p_Ips: 0
+      # Prob of moving to ms infection
+      p_Ims: 0
+      # Prob of moving to ss infection
+      p_Iss: 0
+      # Rate of recovery from Hospital Bed
+      lambda_H: 0
+      # Rate of recovery from ICU
+      lambda_ICU: 0
+      # Hospitals capacity
+      C_H: 0
+      # ICU capacity
+      C_ICU: 0
+      # Rate of death in Hospital bed
+      q_H: 0
+      # Rate of death in ICU
+      q_ICU: 0
+
     # Number of contacts with other groups
     contacts:
       adult: 2
+      young: 2
       old: 2
 
   adult:
@@ -25,11 +63,32 @@ seir-groups:
       E: 0
       I: 0
       R: 0
+      Ia: 0
+      Ips: 0
+      Ims: 0
+      Iss: 0
+      Rq: 0
+      H: 0
+      ICU: 0
+      D: 0
     parameters:
       beta: 0
       sigma: 0
       mu: 0
+      p_H: 0
+      p_ICU: 0
+      p_Ia: 0
+      p_Ips: 0
+      p_Ims: 0
+      p_Iss: 0
+      lambda_H: 0
+      lambda_ICU: 0
+      C_H: 0
+      C_ICU: 0
+      q_H: 0
+      q_ICU: 0
     contacts:
+      adult: 2
       young: 2
       old: 2
 
@@ -40,11 +99,33 @@ seir-groups:
       E: 0
       I: 0
       R: 0
+      Ia: 0
+      Ips: 0
+      Ims: 0
+      Iss: 0
+      Rq: 0
+      H: 0
+      ICU: 0
+      D: 0
     parameters:
       beta: 0
       sigma: 0
       mu: 0
+      p_H: 0
+      p_ICU: 0
+      p_Ia: 0
+      p_Ips: 0
+      p_Ims: 0
+      p_Iss: 0
+      lambda_H: 0
+      lambda_ICU: 0
+      C_H: 0
+      C_ICU: 0
+      q_H: 0
+      q_ICU: 0
     contacts:
+      adult: 2
+      young: 2
       old: 2
 
 # Parameters unspecific to any group
