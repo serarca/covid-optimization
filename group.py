@@ -17,7 +17,7 @@ class SEIR_group:
 		# Infected (unquarantined)
 		self.I = [float(parameters['initial-conditions']['I'])]
 		# Unquarantined patients 
-		self.N = [self.S + self.E + self.I]
+		self.N = [self.S[0] + self.E[0] + self.I[0]]
 		# Recovered (unquarantined)
 		self.R = [float(parameters['initial-conditions']['R'])]
 
@@ -46,6 +46,20 @@ class SEIR_group:
 	# Advances one time step, given the m_tests and a_tests variable
 	def take_time_step(self, m_tests, a_tests):
 		self.update_N(m_tests, a_tests)
+		self.update_E(m_tests, a_tests)
+		self.update_I(m_tests, a_tests)
+		self.update_R(m_tests, a_tests)
+		self.update_Ia(m_tests, a_tests)
+		self.update_Ips(m_tests, a_tests)
+		self.update_Ims(m_tests, a_tests)
+		self.update_Iss(m_tests, a_tests)
+		self.update_Rq(m_tests, a_tests)
+		self.update_H(m_tests, a_tests)
+		self.update_ICU(m_tests, a_tests)
+		self.update_D(m_tests, a_tests)
+
+		self.t += 1
+
 
 	# Updates N
 	def update_N(self, m_tests, a_tests):
