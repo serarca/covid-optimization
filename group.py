@@ -1,42 +1,69 @@
+class DynamicalModel:
+	def __init__(self, parameters):
+
+		self.t = 0
+
+		# Create groups from parameters
+		self.groups = {}
+		for n in parameters['seir-groups']:
+			self.groups[n] = SEIR_group(parameters['seir-groups'][n], dt)
+
+		# Attach other groups to each group
+		for n in self.groups:
+			self.groups[n].attach_other_groups(self.groups)
+
+	# Simulates the dynamics given a vector of molecular and atomic tests
+	def simulate(time_steps, m_tests_vec, a_tests_vec):
+
+		for t in range(time_steps):
+			for n in self.groups:
+				self.groups[n].take_time_step(self, m_tests_vec[self.t], a_tests_vec[self.t])
+			self.t + =1
+
+
+
 class SEIR_group:
 	# Time step
-	def __init__(self, parameters, dt):
+	def __init__(self, group_parameters, dt):
 		# Group name
-		self.name = parameters['name']
-		self.parameters = parameters['parameters']
-		self.contacts = parameters['contacts']
+		self.name = group_parameters['name']
+		self.parameters = group_parameters['parameters']
+		self.contacts = group_parameters['contacts']
+		self.initial_conditions = group_parameters['initial-conditions']
+		self.initialize_vars(self.initial_conditions)
 
 		# Time step
 		self.t = 0
 		self.dt = 1
 
+
+	def initialize_vars(self, initial_conditions):
 		# Susceptible 
-		self.S = [float(parameters['initial-conditions']['S'])]
+		self.S = [float(initial_conditions['S'])]
 		# Exposed (unquarantined)
-		self.E = [float(parameters['initial-conditions']['E'])]
+		self.E = [float(initial_conditions['E'])]
 		# Infected (unquarantined)
-		self.I = [float(parameters['initial-conditions']['I'])]
+		self.I = [float(initial_conditions['I'])]
 		# Unquarantined patients 
 		self.N = [self.S[0] + self.E[0] + self.I[0]]
 		# Recovered (unquarantined)
-		self.R = [float(parameters['initial-conditions']['R'])]
+		self.R = [float(initial_conditions['R'])]
 
 		# Infected quarantined with different degrees of severity
-		self.Ia = [float(parameters['initial-conditions']['Ia'])]
-		self.Ips = [float(parameters['initial-conditions']['Ips'])]
-		self.Ims = [float(parameters['initial-conditions']['Ims'])]
-		self.Iss = [float(parameters['initial-conditions']['Iss'])]
+		self.Ia = [float(initial_conditions['Ia'])]
+		self.Ips = [float(initial_conditions['Ips'])]
+		self.Ims = [float(initial_conditions['Ims'])]
+		self.Iss = [float(initial_conditions['Iss'])]
 
 		# Recovered quanrantined
-		self.Rq = [float(parameters['initial-conditions']['Rq'])]
+		self.Rq = [float(initial_conditions['Rq'])]
 
 		# In hospital bed
-		self.H = [float(parameters['initial-conditions']['H'])]
+		self.H = [float(initial_conditions['H'])]
 		# In ICU
-		self.ICU = [float(parameters['initial-conditions']['ICU'])]
+		self.ICU = [float(initial_conditions['ICU'])]
 		# Dead
-		self.D = [float(parameters['initial-conditions']['D'])]
-
+		self.D = [float(initial_conditions['D'])]
 
 
 	# Attach other groups to make it easier to find variables of other groups
