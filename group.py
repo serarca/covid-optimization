@@ -91,7 +91,11 @@ class SEIR_group:
 
 	# Updates N
 	def update_N(self, m_tests, a_tests):
-		delta_N = -m_tests*self.I[self.t]/self.N[self.t] - a_tests*self.R[self.t]/self.N[self.t]
+		delta_N = (
+			- m_tests*self.I[self.t]/self.N[self.t] 
+			- a_tests*self.R[self.t]/self.N[self.t] 
+			- self.parameters['mu']*(self.parameters['p_H'] + self.parameters['p_ICU'])*self.I[self.t]
+		)
 		self.N += [self.N[self.t]+delta_N*self.dt]
 
 	# Updates S
@@ -148,7 +152,7 @@ class SEIR_group:
 		entering_h = {}
 		summ_entering_h = 0
 		for n,g in self.all_groups.iteritems():
-			entering_h[n] = self.parameters['mu']*self.parameters['p_H']*(g.I[self.t]+g.Iss[self.t])
+			entering_h[n] = self.parameters['mu']*self.parameters['p_H']*(g.I[self.t]+g.Iss[self.t]/(self.parameters['p_H']+self.parameters['p_ICU']))
 			summ_entering_h += entering_h[n]
 		# Calculate number of beds
 		beds = self.parameters['C_H']
@@ -163,7 +167,7 @@ class SEIR_group:
 		entering_icu = {}
 		summ_entering_icu = 0
 		for n,g in self.all_groups.iteritems():
-			entering_icu[n] = self.parameters['mu']*self.parameters['p_ICU']*(g.I[self.t]+g.Iss[self.t])
+			entering_icu[n] = self.parameters['mu']*self.parameters['p_ICU']*(g.I[self.t]+g.Iss[self.t]/(self.parameters['p_H']+self.parameters['p_ICU']))
 			summ_entering_icu += entering_icu[n]
 		# Calculate number of ICUs
 		icus = self.parameters['C_ICU']
@@ -178,7 +182,7 @@ class SEIR_group:
 		entering_h = {}
 		summ_entering_h = 0
 		for n,g in self.all_groups.iteritems():
-			entering_h[n] = self.parameters['mu']*self.parameters['p_H']*(g.I[self.t]+g.Iss[self.t])
+			entering_h[n] = self.parameters['mu']*self.parameters['p_H']*(g.I[self.t]+g.Iss[self.t]/(self.parameters['p_H']+self.parameters['p_ICU']))
 			summ_entering_h += entering_h[n]
 		# Calculate number of beds
 		beds = self.parameters['C_H']
@@ -188,7 +192,7 @@ class SEIR_group:
 		entering_icu = {}
 		summ_entering_icu = 0
 		for n,g in self.all_groups.iteritems():
-			entering_icu[n] = self.parameters['mu']*self.parameters['p_ICU']*(g.I[self.t]+g.Iss[self.t])
+			entering_icu[n] = self.parameters['mu']*self.parameters['p_ICU']*(g.I[self.t]+g.Iss[self.t]/(self.parameters['p_H']+self.parameters['p_ICU']))
 			summ_entering_icu += entering_icu[n]
 		# Calculate number of ICUs
 		icus = self.parameters['C_ICU']
