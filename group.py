@@ -1,12 +1,13 @@
 class DynamicalModel:
-	def __init__(self, parameters):
+	def __init__(self, parameters, dt):
 
 		self.t = 0
+		self.dt = dt
 
 		# Create groups from parameters
 		self.groups = {}
 		for n in parameters['seir-groups']:
-			self.groups[n] = SEIR_group(parameters['seir-groups'][n], dt)
+			self.groups[n] = SEIR_group(parameters['seir-groups'][n], self.dt)
 
 		# Attach other groups to each group
 		for n in self.groups:
@@ -18,7 +19,7 @@ class DynamicalModel:
 		for t in range(time_steps):
 			for n in self.groups:
 				self.groups[n].take_time_step(self, m_tests_vec[self.t], a_tests_vec[self.t])
-			self.t + =1
+			self.t +=1
 
 
 
