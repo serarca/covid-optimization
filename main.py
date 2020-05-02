@@ -9,4 +9,6 @@ with open("parameters.yaml") as file:
 # Set up parameters of simulation
 dt = 1
 
-Model = DynamicalModel(parameters, dt)
+DynamicalModel = DynamicalModel(parameters, dt)
+
+DynamicalModel.upper_bound(2,[1,1],[1,1])

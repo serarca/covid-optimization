@@ -26,9 +26,9 @@ seir-groups:
       # Rate of infection moving to next state (either recovery, hospital bed or ICU)
       mu: 0
       # Prob of moving to hospital bed from infection
-      p_H: 0
+      p_H: 0.1
       # Prob of moving to ICU from infection
-      p_ICU: 0
+      p_ICU: 0.1
       # Prob of moving to asymptomatic infection
       p_Ia: 0
       # Prob of moving to ps infection
@@ -75,8 +75,8 @@ seir-groups:
       beta: 0
       sigma: 0
       mu: 0
-      p_H: 0
-      p_ICU: 0
+      p_H: 0.1
+      p_ICU: 0.1
       p_Ia: 0
       p_Ips: 0
       p_Ims: 0
@@ -111,8 +111,8 @@ seir-groups:
       beta: 0
       sigma: 0
       mu: 0
-      p_H: 0
-      p_ICU: 0
+      p_H: 0.1
+      p_ICU: 0.1
       p_Ia: 0
       p_Ips: 0
       p_Ims: 0

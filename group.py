@@ -1,3 +1,6 @@
+from gurobipy import *
+
+
 class DynamicalModel:
 	def __init__(self, parameters, dt):
 
@@ -14,12 +17,74 @@ class DynamicalModel:
 			self.groups[n].attach_other_groups(self.groups)
 
 	# Simulates the dynamics given a vector of molecular and atomic tests
-	def simulate(time_steps, m_tests_vec, a_tests_vec):
+	def simulate(self, time_steps, m_tests_vec, a_tests_vec):
 
 		for t in range(time_steps):
 			for n in self.groups:
-				self.groups[n].take_time_step(self, m_tests_vec[self.t], a_tests_vec[self.t])
+				self.groups[n].take_time_step(m_tests_vec[self.t], a_tests_vec[self.t])
 			self.t +=1
+
+	# Simulates the dynamics of the upper bound
+	def simulate_upper(self, time_steps, m_tests_vec, a_tests_vec, rho, B_ICU, B_H):
+
+		for t in range(time_steps):
+			for n in self.groups:
+				self.groups[n].take_time_step_upper(m_tests_vec[self.t], a_tests_vec[self.t], rho[self.t], B_ICU[self.t], B_H[self.t])
+			self.t +=1
+
+	def get_rho_bounds(self, time_steps):
+		rho_lb_vector = []
+		rho_ub_vector = []
+		for t in range(time_steps):
+			rho_lb_vector.append(0.0)
+			rho_ub_vector.append(float('inf'))
+		return (rho_lb_vector,rho_ub_vector)
+
+	# Calculates Upper Bound
+	def upper_bound(self, time_steps, A_tests_capacity, M_tests_capacity):
+		# Create gurobi model
+		M = Model()
+
+		# Add variables to model
+		B_ICU_vector = []
+		B_H_vector = []
+		A_tests_vector = []
+		M_tests_vector = []
+		rho_vector = []
+		for t in range(time_steps):
+			B_ICU_vector.append(M.addVar(vtype=GRB.CONTINUOUS, name="B_ICU_"+str(self.t)))
+			B_H_vector.append(M.addVar(vtype=GRB.CONTINUOUS, name="B_H_"+str(self.t)))
+			A_tests_vector.append(M.addVar(lb=0.0,vtype=GRB.CONTINUOUS, name="A_tests_"+str(self.t)))
+			M_tests_vector.append(M.addVar(lb=0.0,vtype=GRB.CONTINUOUS, name="M_tests_"+str(self.t)))
+			rho_vector.append(M.addVar(lb=0.0,vtype=GRB.CONTINUOUS, name="rho_"+str(self.t)))
+		M.update()
+
+		# Run simulation
+		self.simulate_upper(time_steps, M_tests_vector, A_tests_vector, rho_vector, B_ICU_vector, B_H_vector)
+
+		# Get bounds on rho
+		rho_lb_vector,rho_ub_vector = self.get_rho_bounds(time_steps)
+
+
+		# Add constraints
+		for t in range(time_steps):
+			# Molecular tests capacity
+			M.addConstr(
+				M_tests_vector[t] + 
+				self.parameters["mu"]*(self.parameters["p_H"]+self.parameters["p_ICU"])*self.I[t]+
+				self.parameters["mu"]*(self.Ia[t]+self.Ips[t]+self.Ims[t])+
+				self.parameters['lambda_H']*self.H[t] +
+				self.parameters['lambda_ICU']*self.ICU[t] 
+				<= M_tests_capacity[t]
+			)
+			# Atomic tests capacity
+			M.addConstr(A_tests_vector[t] <= M_tests_capacity[t])
+			# TODO Constraints on B
+
+			# Constraints on rho
+			M.addConstr(rho_vector[t]<=rho_ub_vector[t])
+			M.addConstr(rho_vector[t]>=rho_lb_vector[t])
+
 
 
 
@@ -90,20 +155,20 @@ class SEIR_group:
 		self.t += 1
 
 	# Advances one time step, given the m_tests and a_tests variable
-	def take_time_step(self, m_tests, a_tests, rho, B_ICU, B_H):
-		self.update_N(m_tests, a_tests)
+	def take_time_step_upper(self, m_tests, a_tests, rho, B_ICU, B_H):
+		self.update_N_upper(m_tests, a_tests, rho, B_ICU, B_H)
 		self.update_S_upper(m_tests, a_tests, rho, B_ICU, B_H)
 		self.update_E_upper(m_tests, a_tests, rho, B_ICU, B_H)
-		self.update_I_upper(m_tests, a_tests)
-		self.update_R_upper(m_tests, a_tests)
-		self.update_Ia_upper(m_tests, a_tests)
-		self.update_Ips_upper(m_tests, a_tests)
-		self.update_Ims_upper(m_tests, a_tests)
-		self.update_Iss_upper(m_tests, a_tests)
-		self.update_Rq_upper(m_tests, a_tests)
-		self.update_H(m_tests, a_tests)
-		self.update_ICU(m_tests, a_tests)
-		self.update_D(m_tests, a_tests)
+		self.update_I_upper(m_tests, a_tests, rho, B_ICU, B_H)
+		self.update_R_upper(m_tests, a_tests, rho, B_ICU, B_H)
+		self.update_Ia_upper(m_tests, a_tests, rho, B_ICU, B_H)
+		self.update_Ips_upper(m_tests, a_tests, rho, B_ICU, B_H)
+		self.update_Ims_upper(m_tests, a_tests, rho, B_ICU, B_H)
+		self.update_Iss_upper(m_tests, a_tests, rho, B_ICU, B_H)
+		self.update_Rq_upper(m_tests, a_tests, rho, B_ICU, B_H)
+		self.update_H_upper(m_tests, a_tests, rho, B_ICU, B_H)
+		self.update_ICU_upper(m_tests, a_tests, rho, B_ICU, B_H)
+		self.update_D_upper(m_tests, a_tests, rho, B_ICU, B_H)
 
 		self.t += 1
 
@@ -113,6 +178,14 @@ class SEIR_group:
 		delta_N = (
 			- m_tests*self.I[self.t]/self.N[self.t] 
 			- a_tests*self.R[self.t]/self.N[self.t] 
+			- self.parameters['mu']*(self.parameters['p_H'] + self.parameters['p_ICU'])*self.I[self.t]
+		)
+		self.N += [self.N[self.t]+delta_N*self.dt]
+
+	def update_N_upper(self, m_tests, a_tests, rho, B_ICU, B_H):
+		delta_N = (
+			- m_tests 
+			- a_tests 
 			- self.parameters['mu']*(self.parameters['p_H'] + self.parameters['p_ICU'])*self.I[self.t]
 		)
 		self.N += [self.N[self.t]+delta_N*self.dt]
@@ -159,7 +232,7 @@ class SEIR_group:
 		delta_R = self.parameters['mu']*(1-self.parameters["p_H"]+self.parameters["p_ICU"])*self.I[self.t] - a_tests*self.R[self.t]/self.N[self.t]
 		self.R += [self.R[self.t]+delta_R*self.dt]
 
-	def update_R_upper(self, m_tests, a_tests):
+	def update_R_upper(self, m_tests, a_tests, rho, B_ICU, B_H):
 		delta_R = self.parameters['mu']*(1-self.parameters["p_H"]+self.parameters["p_ICU"])*self.I[self.t] - a_tests
 		self.R += [self.R[self.t]+delta_R*self.dt]
 
@@ -208,7 +281,7 @@ class SEIR_group:
 		)
 		self.Rq += [self.Rq[self.t]+delta_Rq*self.dt]
 
-	def update_Rq(self, m_tests, a_tests, rho, B_ICU, B_H):
+	def update_Rq_upper(self, m_tests, a_tests, rho, B_ICU, B_H):
 		delta_Rq = (
 			self.parameters['mu']*(self.Ia[self.t]+self.Ips[self.t]+self.Ims[self.t]) + 
 			self.parameters['lambda_H']*self.H[self.t] +
