@@ -38,17 +38,13 @@ seir-groups:
       # Prob of moving to ss infection
       p_Iss: 0
       # Rate of recovery from Hospital Bed
-      lambda_H: 0
+      lambda_H_R: 0
       # Rate of recovery from ICU
-      lambda_ICU: 0
-      # Hospitals capacity
-      C_H: 0
-      # ICU capacity
-      C_ICU: 0
+      lambda_ICU_R: 0
       # Rate of death in Hospital bed
-      q_H: 0
+      lambda_H_D: 0
       # Rate of death in ICU
-      q_ICU: 0
+      lambda_ICU_D: 0
 
     # Number of contacts with other groups
     contacts:
@@ -81,12 +77,11 @@ seir-groups:
       p_Ips: 0
       p_Ims: 0
       p_Iss: 0
-      lambda_H: 0
-      lambda_ICU: 0
-      C_H: 0
-      C_ICU: 0
-      q_H: 0
-      q_ICU: 0
+      lambda_H_R: 0
+      lambda_ICU_R: 0
+      lambda_H_D: 0
+      lambda_ICU_D: 0
+
     contacts:
       adult: 2
       young: 2
@@ -117,12 +112,10 @@ seir-groups:
       p_Ips: 0
       p_Ims: 0
       p_Iss: 0
-      lambda_H: 0
-      lambda_ICU: 0
-      C_H: 0
-      C_ICU: 0
-      q_H: 0
-      q_ICU: 0
+      lambda_H_R: 0
+      lambda_ICU_R: 0
+      lambda_H_D: 0
+      lambda_ICU_D: 0
     contacts:
       adult: 2
       young: 2
@@ -130,3 +123,7 @@ seir-groups:
 
 # Parameters unspecific to any group
 global-parameters:
+      # Hospitals capacity
+      C_H: 10
+      # ICU capacity
+      C_ICU: 10
