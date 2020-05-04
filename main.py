@@ -8,5 +8,18 @@ with open("parameters.yaml") as file:
 
 # Set up parameters of simulation
 dt = 1
+time_periods = 20
+h_cap_vec = [parameters['global-parameters']['C_H'] for t in range(time_periods)]
+icu_cap_vec = [parameters['global-parameters']['C_ICU'] for t in range(time_periods)]
 
-Model = DynamicalModel(parameters, dt)
+m_tests_vec = [10 for t in range(time_periods)]
+a_tests_vec = [10 for t in range(time_periods)]
+
+
+# Simulate model
+dynModel = DynamicalModel(parameters, dt)
+dynModel.simulate(time_periods, m_tests_vec, a_tests_vec, h_cap_vec, icu_cap_vec)
+
+# Calculate upper bound
+# dynModel = DynamicalModel(parameters, dt)
+# dynModel.upper_bound(time_periods, m_tests_vec, a_tests_vec, h_cap_vec, icu_cap_vec)
