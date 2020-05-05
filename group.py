@@ -160,10 +160,10 @@ class SEIR_group:
 		self.E = [float(initial_conditions['E'])]
 		# Infected (unquarantined)
 		self.I = [float(initial_conditions['I'])]
-		# Unquarantined patients
-		self.N = [self.S[0] + self.E[0] + self.I[0]]
 		# Recovered (unquarantined)
 		self.R = [float(initial_conditions['R'])]
+		# Unquarantined patients 
+		self.N = [self.S[0] + self.E[0] + self.I[0]+ self.R[0]]
 
 		# Infected quarantined with different degrees of severity
 		self.Ia = [float(initial_conditions['Ia'])]
@@ -287,11 +287,12 @@ class SEIR_group:
 
 	# Updates recovered
 	def update_R(self, m_tests, a_tests):
-		delta_R = self.parameters['mu']*(1-self.parameters["p_H"]+self.parameters["p_ICU"])*self.I[self.t] - a_tests*self.R[self.t]/self.N[self.t]
+		delta_R = self.parameters['mu']*(1-self.parameters["p_H"]-self.parameters["p_ICU"])*self.I[self.t] - a_tests*self.R[self.t]/self.N[self.t]
 		self.R += [self.R[self.t]+delta_R*self.dt]
 
+
 	def update_R_upper(self, m_tests, a_tests, rho, B_ICU, B_H):
-		delta_R = self.parameters['mu']*(1-self.parameters["p_H"]+self.parameters["p_ICU"])*self.I[self.t] - a_tests
+		delta_R = self.parameters['mu']*(1-self.parameters["p_H"]-self.parameters["p_ICU"])*self.I[self.t] - a_tests
 		self.R += [self.R[self.t]+delta_R*self.dt]
 
 
@@ -339,6 +340,7 @@ class SEIR_group:
 		)
 		self.Rq += [self.Rq[self.t]+delta_Rq*self.dt]
 
+
 	def update_Rq_upper(self, m_tests, a_tests, rho, B_ICU, B_H):
 		delta_Rq = (
 			self.parameters['mu']*(self.Ia[self.t]+self.Ips[self.t]+self.Ims[self.t]) +
@@ -361,14 +363,9 @@ class SEIR_group:
 			summ_entering_h += entering_h[n]
 			summ_staying_h += (1-g.parameters['lambda_H_R']-g.parameters['lambda_H_D'])*g.H[self.t]
 
-		# Calculate number of beds
-		beds = h_cap
-		for n,g in self.all_groups.iteritems():
-			beds-=g.H[self.t]
-
 		delta_H = (
 			- (self.parameters["lambda_H_R"] + self.parameters["lambda_H_D"])*self.H[self.t]
-			+ entering_h[self.name]*(1-(summ_entering_h-beds+summ_staying_h if summ_entering_h-beds+summ_staying_h>0 else 0)/(summ_entering_h if summ_entering_h!=0 else 10e-6))
+			+ entering_h[self.name]*(1-(summ_entering_h-h_cap+summ_staying_h if summ_entering_h-h_cap+summ_staying_h>0 else 0)/(summ_entering_h if summ_entering_h!=0 else 10e-6))
 		)
 		self.H += [self.H[self.t]+delta_H*self.dt]
 
@@ -393,14 +390,9 @@ class SEIR_group:
 			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[self.t]
 
 
-		# Calculate number of ICUs
-		icus = icu_cap
-		for n,g in self.all_groups.iteritems():
-			icus-=g.H[self.t]
-
 		delta_ICU = (
 			- (self.parameters["lambda_ICU_R"] + self.parameters["lambda_ICU_D"])*self.ICU[self.t]
-			+ entering_icu[self.name]*(1-(summ_entering_icu-icus+summ_staying_icu if summ_entering_icu-icus+summ_staying_icu>0 else 0)/(summ_entering_icu if summ_entering_icu!=0 else 10e-6))
+			+ entering_icu[self.name]*(1-(summ_entering_icu-icu_cap+summ_staying_icu if summ_entering_icu-icu_cap+summ_staying_icu>0 else 0)/(summ_entering_icu if summ_entering_icu!=0 else 10e-6))
 		)
 		self.ICU += [self.ICU[self.t]+delta_ICU*self.dt]
 
@@ -428,10 +420,6 @@ class SEIR_group:
 			entering_h[n] = self.all_groups[n].flow_H(self.t)
 			summ_entering_h += entering_h[n]
 			summ_staying_h += (1-g.parameters['lambda_H_R']-g.parameters['lambda_H_D'])*g.H[self.t]
-		# Calculate number of beds
-		beds = h_cap
-		for n,g in self.all_groups.iteritems():
-			beds-=g.H[self.t]
 
 		entering_icu = {}
 		summ_entering_icu = 0
@@ -439,17 +427,14 @@ class SEIR_group:
 		for n,g in self.all_groups.iteritems():
 			entering_icu[n] = self.all_groups[n].flow_ICU(self.t)
 			summ_entering_icu += entering_icu[n]
-			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[self.t]
-		# Calculate number of ICUs
-		icus = icu_cap
-		for n,g in self.all_groups.iteritems():
-			icus-=g.H[self.t]
+			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[self.t]	
+
 
 		delta_D = (
 			self.parameters["lambda_H_D"]*self.H[self.t]
 			+ self.parameters["lambda_ICU_D"]*self.ICU[self.t]
-			+ entering_icu[self.name]*((summ_entering_icu-icus+summ_staying_icu if summ_entering_icu-icus+summ_staying_icu>0 else 0)/(summ_entering_icu if summ_entering_icu!=0 else 10e-6))
-			+ entering_h[self.name]*((summ_entering_h-beds+summ_staying_h if summ_entering_h-beds+summ_staying_h>0 else 0)/(summ_entering_h if summ_entering_h!=0 else 10e-6))
+			+ entering_icu[self.name]*((summ_entering_icu-icu_cap+summ_staying_icu if summ_entering_icu-icu_cap+summ_staying_icu>0 else 0)/(summ_entering_icu if summ_entering_icu!=0 else 10e-6))
+			+ entering_h[self.name]*((summ_entering_h-h_cap+summ_staying_h if summ_entering_h-h_cap+summ_staying_h>0 else 0)/(summ_entering_h if summ_entering_h!=0 else 10e-6))
 		)
 
 		self.D += [self.D[self.t]+delta_D*self.dt]
