@@ -21,3 +21,8 @@ Case 3
 
 Case 4
 * Same as Case 2, but each day, 10 antibody tests are applied to each group
+
+Case 4
+* Same as Case 2, but each day, 10 antibody tests and 10 molecular tests are applied to each group
+
+To run a test on rho use ```python test_rho.py -data case4.yaml```

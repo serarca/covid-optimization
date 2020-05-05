@@ -161,22 +161,22 @@ class Bounds_SEIR_group:
 		return self.S_lower[self.t + 1] * min_infected_contacts
 
 	def compositions(t,s):
-    q = [0] * t
-    r = 0
-    q[0] = s
-    while True:
-        yield q
-        if q[0] == 0:
-            if r==t-1:
-                break
-            else:
-                q[0] = q[r] - 1
-                q[r] = 0
-                r = r + 1
-        else:
-            q[0] = q[0] - 1
-            r = 1
-        q[r] = q[r] + 1
+	    q = [0] * t
+	    r = 0
+	    q[0] = s
+	    while True:
+	        yield q
+	        if q[0] == 0:
+	            if r==t-1:
+	                break
+	            else:
+	                q[0] = q[r] - 1
+	                q[r] = 0
+	                r = r + 1
+	        else:
+	            q[0] = q[0] - 1
+	            r = 1
+	        q[r] = q[r] + 1
 
 
 	def generateMTests(k, all_groups, testingLimitsM):
