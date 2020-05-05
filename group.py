@@ -4,7 +4,7 @@ from collections import defaultdict
 
 class DynamicalModel:
 	def __init__(self, parameters, dt):
-
+		self.parameters = parameters
 		self.t = 0
 		self.dt = dt
 
@@ -33,13 +33,15 @@ class DynamicalModel:
 			self.t +=1
 
 	def get_rho_bounds(self, time_steps):
+		boundsModel = Bounds(self.parameters, self.dt)
+		boundsModel.obtainBounds(self.time_steps)
+
 		rho_lb_vector = defaultdict(list)
 		rho_ub_vector = defaultdict(list)
 		for n in self.groups:
-			for t in range(time_steps):
-				rho_lb_vector[n].append(0.0)
-				rho_ub_vector[n].append(float('inf'))
-		return (rho_lb_vector,rho_ub_vector)
+			rho_lb_vector[n] = boundsModel.groups[n].rho_lower
+			rho_ub_vector[n] = boundsModel.groups[n].rho_upper
+		return (rho_lb_vector, rho_ub_vector)
 
 	# Calculates Upper Bound
 	def upper_bound(self, time_steps, A_tests_capacity, M_tests_capacity, h_cap_vec, icu_cap_vec):
@@ -96,8 +98,8 @@ class DynamicalModel:
 		# Add upper bound on molecular tests
 		for t in range(time_steps):
 			M.addConstr(
-				quicksum(M_tests_vector[n][t] for n in self.groups) 
-				+ quicksum(self.applied_M_tests[n][t] for n in self.groups) 
+				quicksum(M_tests_vector[n][t] for n in self.groups)
+				+ quicksum(self.applied_M_tests[n][t] for n in self.groups)
 				<= M_tests_capacity[t]
 			)
 
@@ -109,7 +111,7 @@ class DynamicalModel:
 		# Upper bounds
 		for t in range(time_steps):
 			M.addConstr(
-				quicksum(A_tests_vector[n][t] for n in self.groups) 
+				quicksum(A_tests_vector[n][t] for n in self.groups)
 				<= A_tests_capacity[t]
 			)
 
@@ -152,7 +154,7 @@ class SEIR_group:
 
 
 	def initialize_vars(self, initial_conditions):
-		# Susceptible 
+		# Susceptible
 		self.S = [float(initial_conditions['S'])]
 		# Exposed (unquarantined)
 		self.E = [float(initial_conditions['E'])]
@@ -232,16 +234,16 @@ class SEIR_group:
 	# Updates N
 	def update_N(self, m_tests, a_tests):
 		delta_N = (
-			- m_tests*self.I[self.t]/self.N[self.t] 
-			- a_tests*self.R[self.t]/self.N[self.t] 
+			- m_tests*self.I[self.t]/self.N[self.t]
+			- a_tests*self.R[self.t]/self.N[self.t]
 			- self.parameters['mu']*(self.parameters['p_H'] + self.parameters['p_ICU'])*self.I[self.t]
 		)
 		self.N += [self.N[self.t]+delta_N*self.dt]
 
 	def update_N_upper(self, m_tests, a_tests, rho, B_ICU, B_H):
 		delta_N = (
-			- m_tests 
-			- a_tests 
+			- m_tests
+			- a_tests
 			- self.parameters['mu']*(self.parameters['p_H'] + self.parameters['p_ICU'])*self.I[self.t]
 		)
 		self.N += [self.N[self.t]+delta_N*self.dt]
@@ -331,7 +333,7 @@ class SEIR_group:
 	# Update recovered in quarentine
 	def update_Rq(self, m_tests, a_tests):
 		delta_Rq = (
-			self.parameters['mu']*(self.Ia[self.t]+self.Ips[self.t]+self.Ims[self.t]) + 
+			self.parameters['mu']*(self.Ia[self.t]+self.Ips[self.t]+self.Ims[self.t]) +
 			self.parameters['lambda_H_R']*self.H[self.t] +
 			self.parameters['lambda_ICU_R']*self.ICU[self.t] +
 			a_tests*self.R[self.t]/self.N[self.t]
@@ -341,7 +343,7 @@ class SEIR_group:
 
 	def update_Rq_upper(self, m_tests, a_tests, rho, B_ICU, B_H):
 		delta_Rq = (
-			self.parameters['mu']*(self.Ia[self.t]+self.Ips[self.t]+self.Ims[self.t]) + 
+			self.parameters['mu']*(self.Ia[self.t]+self.Ips[self.t]+self.Ims[self.t]) +
 			self.parameters['lambda_H_R']*self.H[self.t] +
 			self.parameters['lambda_ICU_R']*self.ICU[self.t] +
 			a_tests
@@ -360,7 +362,6 @@ class SEIR_group:
 			entering_h[n] = self.all_groups[n].flow_H(self.t)
 			summ_entering_h += entering_h[n]
 			summ_staying_h += (1-g.parameters['lambda_H_R']-g.parameters['lambda_H_D'])*g.H[self.t]
-		
 
 		delta_H = (
 			- (self.parameters["lambda_H_R"] + self.parameters["lambda_H_D"])*self.H[self.t]
@@ -371,7 +372,7 @@ class SEIR_group:
 	def update_H_upper(self, m_tests, a_tests, rho, B_ICU, B_H):
 		delta_H = (
 			- (self.parameters["lambda_H_R"] + self.parameters["lambda_H_D"])*self.H[self.t]
-			+ self.parameters['mu']*self.parameters['p_H']*(self.I[self.t]+self.Iss[self.t]/(self.parameters['p_H']+self.parameters['p_ICU'])) 
+			+ self.parameters['mu']*self.parameters['p_H']*(self.I[self.t]+self.Iss[self.t]/(self.parameters['p_H']+self.parameters['p_ICU']))
 			- B_H
 		)
 		self.H += [self.H[self.t]+delta_H*self.dt]
@@ -386,7 +387,7 @@ class SEIR_group:
 		for n,g in self.all_groups.iteritems():
 			entering_icu[n] = self.all_groups[n].flow_ICU(self.t)
 			summ_entering_icu += entering_icu[n]
-			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[self.t]			
+			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[self.t]
 
 
 		delta_ICU = (
@@ -404,7 +405,7 @@ class SEIR_group:
 	def update_ICU_upper(self, m_tests, a_tests, rho, B_ICU, B_H):
 		delta_ICU = (
 			- (self.parameters["lambda_ICU_R"] + self.parameters["lambda_ICU_D"])*self.ICU[self.t]
-			+ self.parameters['mu']*self.parameters['p_ICU']*(self.I[self.t]+self.Iss[self.t]/(self.parameters['p_H']+self.parameters['p_ICU'])) 
+			+ self.parameters['mu']*self.parameters['p_ICU']*(self.I[self.t]+self.Iss[self.t]/(self.parameters['p_H']+self.parameters['p_ICU']))
 			- B_ICU
 		)
 		self.ICU += [self.ICU[self.t]+delta_ICU*self.dt]
@@ -430,7 +431,7 @@ class SEIR_group:
 
 
 		delta_D = (
-			self.parameters["lambda_H_D"]*self.H[self.t] 
+			self.parameters["lambda_H_D"]*self.H[self.t]
 			+ self.parameters["lambda_ICU_D"]*self.ICU[self.t]
 			+ entering_icu[self.name]*((summ_entering_icu-icu_cap+summ_staying_icu if summ_entering_icu-icu_cap+summ_staying_icu>0 else 0)/(summ_entering_icu if summ_entering_icu!=0 else 10e-6))
 			+ entering_h[self.name]*((summ_entering_h-h_cap+summ_staying_h if summ_entering_h-h_cap+summ_staying_h>0 else 0)/(summ_entering_h if summ_entering_h!=0 else 10e-6))
@@ -442,20 +443,10 @@ class SEIR_group:
 		# For each group, calculate the entering amount
 
 		delta_D = (
-			self.parameters["lambda_H_D"]*self.H[self.t] 
+			self.parameters["lambda_H_D"]*self.H[self.t]
 			+ self.parameters["lambda_ICU_D"]*self.ICU[self.t]
-			+ B_H 
+			+ B_H
 			+ B_ICU
 		)
 
 		self.D += [self.D[self.t]+delta_D*self.dt]
-
-
-
-
-
-
-
-
-
-
