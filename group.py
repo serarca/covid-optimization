@@ -1,5 +1,6 @@
 from gurobipy import *
 from collections import defaultdict
+from bound import Bounds
 
 
 class DynamicalModel:
@@ -17,12 +18,20 @@ class DynamicalModel:
 		for n in self.groups:
 			self.groups[n].attach_other_groups(self.groups)
 
+		# Initialize rho
+		for n in self.groups:
+			self.groups[n].initialize_rho()
+
 	# Simulates the dynamics given a vector of molecular and atomic tests
 	def simulate(self, time_steps, m_tests_vec, a_tests_vec, h_cap_vec, icu_cap_vec):
 		for t in range(time_steps):
 			for n in self.groups:
-				self.groups[n].take_time_step(m_tests_vec[self.t], a_tests_vec[self.t], h_cap_vec[self.t], icu_cap_vec[self.t])
+				self.groups[n].take_time_step(m_tests_vec[n][self.t], a_tests_vec[n][self.t], h_cap_vec[self.t], icu_cap_vec[self.t])
 			self.t +=1
+
+			for n in self.groups:
+				# Update rho
+				self.groups[n].update_rho(self.t)
 
 	# Simulates the dynamics of the upper bound
 	def simulate_upper(self, time_steps, m_tests_vec, a_tests_vec, rho, B_ICU, B_H):
@@ -180,6 +189,21 @@ class SEIR_group:
 		self.ICU = [float(initial_conditions['ICU'])]
 		# Dead
 		self.D = [float(initial_conditions['D'])]
+
+		# Rho
+		self.rho = []
+
+	def initialize_rho(self):
+		self.update_rho(0)
+
+	def update_rho(self, t):
+		if (len(self.rho) == t):
+			summ_infections = 0
+			for n,g in self.all_groups.iteritems():
+				summ_infections+=self.contacts[n]*g.I[t]/g.N[t]
+			self.rho.append(summ_infections*self.S[t])
+		else:
+			assert(False)
 
 
 	# Attach other groups to make it easier to find variables of other groups

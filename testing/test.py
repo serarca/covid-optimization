@@ -35,13 +35,15 @@ time_periods = int(round(total_time/dt))
 h_cap_vec = [parameters['global-parameters']['C_H'] for t in range(time_periods)]
 icu_cap_vec = [parameters['global-parameters']['C_ICU'] for t in range(time_periods)]
 
-m_tests_vec = [parameters['global-parameters']['M_tests'] for t in range(time_periods)]
-a_tests_vec = [parameters['global-parameters']['A_tests'] for t in range(time_periods)]
+m_tests_vec = {n:[parameters['global-parameters']['M_tests'] for t in range(time_periods)] for n in parameters['seir-groups']}
+a_tests_vec = {n:[parameters['global-parameters']['A_tests'] for t in range(time_periods)] for n in parameters['seir-groups']}
+
 
 
 # Simulate model
 dynModel = DynamicalModel(parameters, dt)
 dynModel.simulate(time_periods, m_tests_vec, a_tests_vec, h_cap_vec, icu_cap_vec)
+
 
 # Draw plots
 time_axis = [i*dt for i in range(time_periods+1)]
@@ -110,11 +112,8 @@ plt.axhline(y=parameters['global-parameters']['C_ICU'], color='g', linestyle='da
 plt.legend(loc='upper right')
 plt.xlabel('Time')
 
-
-
 figure = plt.gcf() # get current figure
 figure.set_size_inches(12, 12)
 plt.savefig(args.data.split(".")[0]+".png", dpi = 100)
 
-# print([dynModel.groups['old'].ICU[i] + dynModel.groups['young'].ICU[i] for i in range(len(time_axis))])
 
