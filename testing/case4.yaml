@@ -56,7 +56,7 @@ seir-groups:
     initial-conditions:
       S: 1000
       E: 0
-      I: 0
+      I: 100
       R: 0
       Ia: 0
       Ips: 0
@@ -94,7 +94,7 @@ seir-groups:
       # Rate of recovery from ICU
       lambda_ICU_R: 0.1
       # Rate of death in ICU
-      lambda_ICU_D: 0.05
+      lambda_ICU_D: 0.3
     contacts:
       young: 2
       old: 2
