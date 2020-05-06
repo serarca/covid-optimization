@@ -4,10 +4,11 @@ from bound import Bounds
 
 
 class DynamicalModel:
-	def __init__(self, parameters, dt):
+	def __init__(self, parameters, dt, time_steps):
 		self.parameters = parameters
 		self.t = 0
 		self.dt = dt
+		self.time_steps = time_steps
 
 		# Create groups from parameters
 		self.groups = {}
@@ -23,8 +24,8 @@ class DynamicalModel:
 			self.groups[n].initialize_rho()
 
 	# Simulates the dynamics given a vector of molecular and atomic tests
-	def simulate(self, time_steps, m_tests_vec, a_tests_vec, h_cap_vec, icu_cap_vec):
-		for t in range(time_steps):
+	def simulate(self, m_tests_vec, a_tests_vec, h_cap_vec, icu_cap_vec):
+		for t in range(self.time_steps):
 			for n in self.groups:
 				self.groups[n].take_time_step(m_tests_vec[n][self.t], a_tests_vec[n][self.t], h_cap_vec[self.t], icu_cap_vec[self.t])
 			self.t +=1
@@ -34,14 +35,14 @@ class DynamicalModel:
 				self.groups[n].update_rho(self.t)
 
 	# Simulates the dynamics of the upper bound
-	def simulate_upper(self, time_steps, m_tests_vec, a_tests_vec, rho, B_ICU, B_H):
+	def simulate_upper(self, m_tests_vec, a_tests_vec, rho, B_ICU, B_H):
 
-		for t in range(time_steps):
+		for t in range(self.time_steps):
 			for n in self.groups:
 				self.groups[n].take_time_step_upper(m_tests_vec[n][self.t], a_tests_vec[n][self.t], rho[n][self.t], B_ICU[n][self.t], B_H[n][self.t])
 			self.t +=1
 
-	def get_rho_bounds(self, time_steps):
+	def get_rho_bounds(self):
 		boundsModel = Bounds(self.parameters, self.dt)
 		boundsModel.obtainBounds(self.time_steps)
 
@@ -53,7 +54,7 @@ class DynamicalModel:
 		return (rho_lb_vector, rho_ub_vector)
 
 	# Calculates Upper Bound
-	def upper_bound(self, time_steps, A_tests_capacity, M_tests_capacity, h_cap_vec, icu_cap_vec):
+	def upper_bound(self, A_tests_capacity, M_tests_capacity, h_cap_vec, icu_cap_vec):
 		# Create gurobi model
 		M = Model()
 
@@ -65,7 +66,7 @@ class DynamicalModel:
 		rho_vector = defaultdict(list)
 
 		for n in self.groups:
-			for t in range(time_steps):
+			for t in range(self.time_steps):
 				B_ICU_vector[n].append(M.addVar(vtype=GRB.CONTINUOUS, name="B_ICU_"+str(self.t)))
 				B_H_vector[n].append(M.addVar(vtype=GRB.CONTINUOUS, name="B_H_"+str(self.t)))
 				A_tests_vector[n].append(M.addVar(vtype=GRB.CONTINUOUS, name="A_tests_"+str(self.t)))
@@ -76,28 +77,28 @@ class DynamicalModel:
 		print("Created variables")
 
 		# Run simulation
-		self.simulate_upper(time_steps, M_tests_vector, A_tests_vector, rho_vector, B_ICU_vector, B_H_vector)
+		self.simulate_upper(self.time_steps, M_tests_vector, A_tests_vector, rho_vector, B_ICU_vector, B_H_vector)
 
 		print("Ran simulation")
 
 		# Add constraints on rho
-		rho_lb_vector,rho_ub_vector = self.get_rho_bounds(time_steps)
+		rho_lb_vector,rho_ub_vector = self.get_rho_bounds(self.time_steps)
 		for n in self.groups:
-			for t in range(time_steps):
+			for t in range(self.time_steps):
 				M.addConstr(rho_vector[n][t]<=rho_ub_vector[n][t])
 				M.addConstr(rho_vector[n][t]>=rho_lb_vector[n][t])
 
 
 		# Add nonnegativity constraints on the molecular tests
 		for n in self.groups:
-			for t in range(time_steps):
+			for t in range(self.time_steps):
 				# Nonnegativity
 				M.addConstr(M_tests_vector[n][t] >= 0)
 
 		# Calculate applied molecular tests apart from the randomized testing
 		self.applied_M_tests = defaultdict(list)
 		for n in self.groups:
-			for t in range(time_steps):
+			for t in range(self.time_steps):
 				self.applied_M_tests[n].append(
 					self.groups[n].parameters['mu']*(self.groups[n].parameters['p_H']+self.groups[n].parameters['p_ICU'])*self.groups[n].I[t]
 					+ self.groups[n].parameters['mu']*(self.groups[n].Ia[t]+self.groups[n].Ips[t]+self.groups[n].Ims[t])
@@ -105,7 +106,7 @@ class DynamicalModel:
 					+ self.groups[n].parameters['lambda_ICU_R']*self.groups[n].ICU[t]
 				)
 		# Add upper bound on molecular tests
-		for t in range(time_steps):
+		for t in range(self.time_steps):
 			M.addConstr(
 				quicksum(M_tests_vector[n][t] for n in self.groups)
 				+ quicksum(self.applied_M_tests[n][t] for n in self.groups)
@@ -114,11 +115,11 @@ class DynamicalModel:
 
 		# Add bounds on antibody tests
 		for n in self.groups:
-			for t in range(time_steps):
+			for t in range(self.time_steps):
 				# Nonnegativity
 				M.addConstr(A_tests_vector[n][t] >= 0)
 		# Upper bounds
-		for t in range(time_steps):
+		for t in range(self.time_steps):
 			M.addConstr(
 				quicksum(A_tests_vector[n][t] for n in self.groups)
 				<= A_tests_capacity[t]
@@ -126,12 +127,12 @@ class DynamicalModel:
 
 		# Add upper bounds on B_ICU and B_H
 		for n in self.groups:
-			for t in range(time_steps):
+			for t in range(self.time_steps):
 				M.addConstr(B_H_vector[n][t] <= self.groups[n].flow_H(t))
 				M.addConstr(B_ICU_vector[n][t] <= self.groups[n].flow_ICU(t))
 
 		# Add lower bounds on B_ICU and B_H
-		for t in range(time_steps):
+		for t in range(self.time_steps):
 			M.addConstr(
 				quicksum(self.groups[n].flow_H(t) - B_H_vector[n][t] for n in self.groups)
 				<= h_cap_vec[t]
@@ -145,6 +146,18 @@ class DynamicalModel:
 
 		M.update()
 
+	def get_objective_value(self):
+		value = 0
+		for t in range(self.time_steps):
+			for name,group in self.groups.iteritems():
+				value += (
+					group.parameters['v_unconf']*(group.S[t] + group.E[t] + group.R[t])
+					+ group.parameters['v_conf']*group.Rq[t]
+				)
+		for name,group in self.groups.iteritems():
+			value+=group.D[self.time_steps - 1]
+
+		return value
 
 
 class SEIR_group:
