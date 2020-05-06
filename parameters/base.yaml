@@ -45,6 +45,12 @@ seir-groups:
       lambda_H_D: 0
       # Rate of death in ICU
       lambda_ICU_D: 0
+      # Weight of unconfirmed numbers
+      v_unconf: 0
+      # Weight of confirmed numbers
+      v_conf: 0
+      # Weight of deaths
+      v_deaths: 1
 
     # Number of contacts with other groups
     contacts:
@@ -116,6 +122,9 @@ seir-groups:
       lambda_ICU_R: 0
       lambda_H_D: 0
       lambda_ICU_D: 0
+      v_unconf: 0
+      v_conf: 0
+      v_deaths: 1
     contacts:
       adult: 2
       young: 2
