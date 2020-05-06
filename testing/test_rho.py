@@ -20,7 +20,7 @@ parser.add_argument("-data", "--data", help="Source file for data")
 args = parser.parse_args()
 
 
-with open(args.data) as file:
+with open("../parameters/"+args.data) as file:
     # The FullLoader parameter handles the conversion from YAML
     # scalar values to Python the dictionary format
     parameters = yaml.load(file, Loader=yaml.FullLoader)
