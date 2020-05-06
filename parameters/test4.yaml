@@ -94,7 +94,7 @@ seir-groups:
       # Rate of recovery from ICU
       lambda_ICU_R: 0.1
       # Rate of death in ICU
-      lambda_ICU_D: 0.3
+      lambda_ICU_D: 0.05
     contacts:
       young: 2
       old: 2
@@ -108,4 +108,4 @@ global-parameters:
       # Daily antibody tests
       A_tests: 10
       # Daily molecular test
-      M_tests: 10
+      M_tests: 0
