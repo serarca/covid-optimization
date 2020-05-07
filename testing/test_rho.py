@@ -42,7 +42,7 @@ max_a_tests_vec = [parameters['global-parameters']['A_tests'] for t in range(tim
 
 
 def sample_rho_trejectory_uniform(time_periods, parameters, dt, max_m_tests_vec, max_a_tests_vec, h_cap_vec, icu_cap_vec):
-	dynModel = DynamicalModel(parameters, dt)
+	dynModel = DynamicalModel(parameters, dt, time_periods)
 	a_sample = defaultdict(list)
 	m_sample = defaultdict(list)
 	# Sample dictionary of A tests for all groups at all times uniformly from the simplex boundary
@@ -65,7 +65,7 @@ def sample_rho_trejectory_uniform(time_periods, parameters, dt, max_m_tests_vec,
 			m_sample[n][t] = m_sample[n][t]/sample_sum*max_m_tests_vec[t]
 
 	# Simulate with the given samples
-	dynModel.simulate(time_periods, m_sample, a_sample, h_cap_vec, icu_cap_vec)
+	dynModel.simulate(m_sample, a_sample, h_cap_vec, icu_cap_vec)
 
 	result = {
 		n:dynModel.groups[n].rho for n in dynModel.groups
@@ -83,9 +83,9 @@ for i in range(10):
 
 
 # Calculate bounds on rho
-dynModel = DynamicalModel(parameters, dt)
+dynModel = DynamicalModel(parameters, dt, time_periods)
 rho = dynModel.groups[group]
-rho_lb_vector, rho_ub_vector = dynModel.get_rho_bounds(time_periods)
+rho_lb_vector, rho_ub_vector = dynModel.get_rho_bounds()
 plt.plot(time_axis, rho_lb_vector[group], linestyle='dashed', label="upper bound")
 plt.plot(time_axis, rho_ub_vector[group], linestyle='dashed', label="lower bound")
 
