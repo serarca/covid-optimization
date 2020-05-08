@@ -15,13 +15,15 @@ class Bounds:
 		for n in self.groups:
 			self.groups[n].attach_other_groups(self.groups)
 
+		for n in self.groups:
+			self.groups[n].initialize_rhos()
 	# Obtains bounds for rho. Runs the simulation with bounded
 	# states to obtain rho_lower and rho_upper
 	def obtainBounds(self, time_steps):
 
 		for t in range(time_steps):
 			for n in self.groups:
-				self.groups[n].take_time_step(self)
+				self.groups[n].take_time_step()
 			self.t +=1
 
 
@@ -37,7 +39,6 @@ class Bounds_SEIR_group:
 		self.testingLimitsA = global_parameters['A_tests']
 		self.testingLimitsM = global_parameters['M_tests']
 		self.initialize_vars(self.initial_conditions)
-		self.initialize_rhos()
 		# Time step
 		self.t = 0
 		self.dt = 1
@@ -69,6 +70,7 @@ class Bounds_SEIR_group:
 
 	def initialize_rhos(self):
 		# rho ~ (Sg sum_h(c_{gh} (Ih/Nh))
+
 		self.rho_upper = [self.S_upper[0]
 		 				  * sum([self.contacts[name]
 						  		 * group.I_upper[0]
@@ -81,7 +83,7 @@ class Bounds_SEIR_group:
 						  		 * group.I_lower[0]
 								 / group.N_lower[0]
 								 for name,group in self.all_groups.iteritems()])]
-
+		
 
 
 	# Attach other groups to make it easier to find variables of other groups
@@ -95,10 +97,10 @@ class Bounds_SEIR_group:
 		self.update_E_lower()
 		self.update_I_lower()
 
-		self.update_N_lower()
-		self.update_S_lower()
-		self.update_E_lower()
-		self.update_I_lower()
+		self.update_N_upper()
+		self.update_S_upper()
+		self.update_E_upper()
+		self.update_I_upper()
 
 		self.update_rho_lower()
 		self.update_rho_upper()
@@ -118,8 +120,10 @@ class Bounds_SEIR_group:
 
 	# Updates S
 	def update_S_lower(self):
+
 		delta_S_lower = (-self.parameters['beta']
-				   		 * self.rho_upper(self.t))
+				   		 * self.rho_upper[self.t])
+
 		self.S_lower += [self.S_lower[self.t]
 						 + delta_S_lower * self.dt]
 
@@ -149,48 +153,28 @@ class Bounds_SEIR_group:
 	# each group. In this first aprox, we simply sample in the
 	# simplex and keep the lowest rho we find.
 	def update_rho_lower(self):
-		sample_M_tests = generateMTests(k, self.all_groups, self.testingLimitsM)
+		extreme_M_tests = self.generateMTests()
 		min_infected_contacts = float("inf")
-		for M_tests in sample_M_tests:
+		for M_tests in extreme_M_tests:
 			infected_contacts_lower = 0
 			for name,group in self.all_groups.iteritems():
 				infected_contacts_lower += (self.contacts[name]
-									* (group.I_lower[self.t] * (1 - group.parameters['mu']) + group.parameters['sigma'] * group.E_lower[self.t] - M_tests_vector[group.name])
-									/(group.N_upper[self.t] - M_tests_vector[group.name] - group.parameters['mu'] * (group.parameters['p_H'] + group.parameters['p_ICU']) * group.I_lower[self.t]))
+									* (group.I_lower[self.t] * (1 - group.parameters['mu']) + group.parameters['sigma'] * group.E_lower[self.t] - M_tests[group.name])
+									/(group.N_upper[self.t] - M_tests[group.name] - group.parameters['mu'] * (group.parameters['p_H'] + group.parameters['p_ICU']) * group.I_lower[self.t]))
 			min_infected_contacts = min(min_infected_contacts, infected_contacts_lower)
-		return self.S_lower[self.t + 1] * min_infected_contacts
+		self.rho_lower += [self.S_lower[self.t + 1] * min_infected_contacts]
 
-	def compositions(t,s):
-	    q = [0] * t
-	    r = 0
-	    q[0] = s
-	    while True:
-	        yield q
-	        if q[0] == 0:
-	            if r==t-1:
-	                break
-	            else:
-	                q[0] = q[r] - 1
-	                q[r] = 0
-	                r = r + 1
-	        else:
-	            q[0] = q[0] - 1
-	            r = 1
-	        q[r] = q[r] + 1
+	def generateMTests(self):
+		M_tests =[]
+		for name1, group1 in self.all_groups.iteritems():
+			extreme_tests = {}
+			extreme_tests[name1] = group1.testingLimitsM
+			for name2, group2 in self.all_groups.iteritems():
+				if name2 is not name1:
+					extreme_tests[name2] = 0
+			M_tests.append(extreme_tests)
 
-
-	def generateMTests(k, all_groups, testingLimitsM):
-		arr = []
-		for c in compositions(len(all_groups), testingLimitsM):
-			arr.append(list(c))
-		sample_arr = random.sample(arr, k)
-		sample_M_tests = []
-		for random_tests in sample_arr:
-			M_tests = {}
-			for group in all_groups:
-				M_tests[group.name] = random_tests.pop()
-			sample_M_tests.append(M_tests)
-		return sample_M_tests
+		return M_tests
 
 
 
@@ -206,7 +190,7 @@ class Bounds_SEIR_group:
 	# Updates S
 	def update_S_upper(self):
 		delta_S_upper = (-self.parameters['beta']
-				   		 * self.rho_lower(self.t))
+				   		 * self.rho_lower[self.t])
 		self.S_upper += [self.S_upper[self.t]
 						 + delta_S_upper * self.dt]
 
@@ -233,26 +217,25 @@ class Bounds_SEIR_group:
 	# do any molecular tests. Thus, the function to optimize
 	# becomes a function only of the A tests (which reduce N).
 	def update_rho_upper(self):
-		sample_A_tests = generateATests(k, self.all_groups, self.testingLimitsA)
-		min_infected_contacts = float("inf")
+		sample_A_tests = self.generateATests()
+		max_infected_contacts = 0
 		for A_tests in sample_A_tests:
-			infected_contacts_lower = 0
+			infected_contacts_upper = 0
 			for name,group in self.all_groups.iteritems():
 				infected_contacts_upper += (self.contacts[name]
 									* (group.I_upper[self.t] * (1 - group.parameters['mu']) + group.parameters['sigma'] * group.E_upper[self.t])
 									/(group.N_lower[self.t] - A_tests[group.name] - group.parameters['mu'] * (group.parameters['p_H'] + group.parameters['p_ICU']) * group.I_upper[self.t]))
 			max_infected_contacts = max(max_infected_contacts, infected_contacts_upper)
-		return self.S_upper[self.t + 1] * max_infected_contacts
+		self.rho_upper += [self.S_upper[self.t + 1] * max_infected_contacts]
 
-	def generateATests(k, all_groups, testingLimitsA):
-		arr = []
-		for c in compositions(len(all_groups), testingLimitsA):
-			arr.append(list(c))
-		sample_arr = random.sample(arr, k)
-		sample_M_tests = []
-		for random_tests in sample_arr:
-			M_tests = {}
-			for group in all_groups:
-				M_tests[group.name] = random_tests.pop()
-			sample_A_tests.append(M_tests)
-		return sample_A_tests
+	def generateATests(self):
+		A_tests =[]
+		for name1, group1 in self.all_groups.iteritems():
+			extreme_tests = {}
+			extreme_tests[name1] = group1.testingLimitsA
+			for name2, group2 in self.all_groups.iteritems():
+				if name2 is not name1:
+					extreme_tests[name2] = 0
+			A_tests.append(extreme_tests)
+
+		return A_tests
