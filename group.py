@@ -155,10 +155,32 @@ class DynamicalModel:
 					+ group.parameters['v_conf']*group.Rq[t]
 				)
 		for name,group in self.groups.iteritems():
+			value+=group.D[self.time_steps - 1]*group.parameters['v_deaths']
+
+		return value
+
+
+	def get_economic_value(self):
+		value = 0
+		for t in range(self.time_steps):
+			for name,group in self.groups.iteritems():
+				value += (
+					group.parameters['v_unconf']*(group.S[t] + group.E[t] + group.R[t])
+					+ group.parameters['v_conf']*group.Rq[t]
+				)
+
+		return value
+
+	def get_deaths(self):
+		value = 0
+		for name,group in self.groups.iteritems():
 			value+=group.D[self.time_steps - 1]
 
 		return value
 
+	def print_stats(self):
+		print("Economic Value: "+str(self.get_economic_value()))
+		print("Deaths "+str(self.get_deaths()))
 
 class SEIR_group:
 	# Time step
@@ -213,7 +235,7 @@ class SEIR_group:
 		if (len(self.rho) == t):
 			summ_infections = 0
 			for n,g in self.all_groups.iteritems():
-				summ_infections+=self.contacts[n]*g.I[t]/g.N[t]
+				summ_infections+=self.contacts[n]*g.I[t]/(g.N[t] if g.N[t]!=0 else 10e-6)
 			self.rho.append(summ_infections*self.S[t])
 		else:
 			assert(False)
@@ -261,18 +283,23 @@ class SEIR_group:
 
 	# Gives flow of how many people flowing to H
 	def flow_H(self, t):
-		return self.parameters['mu']*self.parameters['p_H']*(self.I[self.t]+self.Iss[self.t]/(self.parameters['p_H']+self.parameters['p_ICU']))
+		if self.parameters['p_H'] != 0.0:
+			return self.parameters['mu']*self.parameters['p_H']*(self.I[self.t]+self.Iss[self.t]/(self.parameters['p_H']+self.parameters['p_ICU']))
+		else:
+			return 0.0
 
 	# Gives flow of how many people flowing to ICU
 	def flow_ICU(self, t):
-		return self.parameters['mu']*self.parameters['p_ICU']*(self.I[self.t]+self.Iss[self.t]/(self.parameters['p_H']+self.parameters['p_ICU']))
-
+		if self.parameters['p_ICU'] != 0.0:
+			return self.parameters['mu']*self.parameters['p_ICU']*(self.I[self.t]+self.Iss[self.t]/(self.parameters['p_H']+self.parameters['p_ICU']))
+		else:
+			return 0.0
 
 	# Updates N
 	def update_N(self, m_tests, a_tests):
 		delta_N = (
-			- m_tests*self.I[self.t]/self.N[self.t]
-			- a_tests*self.R[self.t]/self.N[self.t]
+			- m_tests*self.I[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6)
+			- a_tests*self.R[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6)
 			- self.parameters['mu']*(self.parameters['p_H'] + self.parameters['p_ICU'])*self.I[self.t]
 		)
 		self.N += [self.N[self.t]+delta_N*self.dt]
@@ -289,7 +316,7 @@ class SEIR_group:
 	def update_S(self, m_tests, a_tests):
 		infections = 0
 		for name,group in self.all_groups.iteritems():
-			infections += self.contacts[name]*group.I[self.t]/group.N[self.t]
+			infections += self.contacts[name]*group.I[self.t]/(group.N[self.t] if group.N[self.t]!=0 else 10e-6)
 
 		delta_S = -self.parameters['beta']*self.S[self.t]*infections
 		self.S += [self.S[self.t]+delta_S*self.dt]
@@ -303,9 +330,10 @@ class SEIR_group:
 	def update_E(self, m_tests, a_tests):
 		infections = 0
 		for name,group in self.all_groups.iteritems():
-			infections += self.contacts[name]*group.I[self.t]/group.N[self.t]
+			infections += self.contacts[name]*group.I[self.t]/(group.N[self.t] if group.N[self.t]!=0 else 10e-6)
 		delta_E = self.parameters['beta']*self.S[self.t]*infections - self.parameters['sigma']*self.E[self.t]
 		self.E += [self.E[self.t]+delta_E*self.dt]
+
 
 	def update_E_upper(self, m_tests, a_tests, rho, B_ICU, B_H):
 		delta_E = self.parameters['beta']*rho - self.parameters['sigma']*self.E[self.t]
@@ -314,7 +342,7 @@ class SEIR_group:
 
 	# Updates infected
 	def update_I(self, m_tests, a_tests):
-		delta_I = self.parameters['sigma']*self.E[self.t] - self.parameters['mu']*self.I[self.t] - m_tests*self.I[self.t]/self.N[self.t]
+		delta_I = self.parameters['sigma']*self.E[self.t] - self.parameters['mu']*self.I[self.t] - m_tests*self.I[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6)
 		self.I += [self.I[self.t]+delta_I*self.dt]
 
 	def update_I_upper(self, m_tests, a_tests, rho, B_ICU, B_H):
@@ -324,9 +352,8 @@ class SEIR_group:
 
 	# Updates recovered
 	def update_R(self, m_tests, a_tests):
-		delta_R = self.parameters['mu']*(1-self.parameters["p_H"]-self.parameters["p_ICU"])*self.I[self.t] - a_tests*self.R[self.t]/self.N[self.t]
+		delta_R = self.parameters['mu']*(1-self.parameters["p_H"]-self.parameters["p_ICU"])*self.I[self.t] - a_tests*self.R[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6)
 		self.R += [self.R[self.t]+delta_R*self.dt]
-
 
 	def update_R_upper(self, m_tests, a_tests, rho, B_ICU, B_H):
 		delta_R = self.parameters['mu']*(1-self.parameters["p_H"]-self.parameters["p_ICU"])*self.I[self.t] - a_tests
@@ -335,19 +362,19 @@ class SEIR_group:
 
 	# Updates infected in quarantine
 	def update_Ia(self, m_tests, a_tests):
-		delta_Ia = self.parameters['p_Ia']*m_tests*self.I[self.t]/self.N[self.t] - self.parameters['mu']*self.Ia[self.t]
+		delta_Ia = self.parameters['p_Ia']*m_tests*self.I[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6) - self.parameters['mu']*self.Ia[self.t]
 		self.Ia += [self.Ia[self.t]+delta_Ia*self.dt]
 
 	def update_Ips(self, m_tests, a_tests):
-		delta_Ips = self.parameters['p_Ips']*m_tests*self.I[self.t]/self.N[self.t] - self.parameters['mu']*self.Ips[self.t]
+		delta_Ips = self.parameters['p_Ips']*m_tests*self.I[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6) - self.parameters['mu']*self.Ips[self.t]
 		self.Ips += [self.Ips[self.t]+delta_Ips*self.dt]
 
 	def update_Ims(self, m_tests, a_tests):
-		delta_Ims = self.parameters['p_Ims']*m_tests*self.I[self.t]/self.N[self.t] - self.parameters['mu']*self.Ims[self.t]
+		delta_Ims = self.parameters['p_Ims']*m_tests*self.I[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6) - self.parameters['mu']*self.Ims[self.t]
 		self.Ims += [self.Ims[self.t]+delta_Ims*self.dt]
 
 	def update_Iss(self, m_tests, a_tests):
-		delta_Iss = self.parameters['p_Iss']*m_tests*self.I[self.t]/self.N[self.t] - self.parameters['mu']*self.Iss[self.t]
+		delta_Iss = self.parameters['p_Iss']*m_tests*self.I[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6) - self.parameters['mu']*self.Iss[self.t]
 		self.Iss += [self.Iss[self.t]+delta_Iss*self.dt]
 
 	def update_Ia_upper(self, m_tests, a_tests, rho, B_ICU, B_H):
@@ -373,7 +400,7 @@ class SEIR_group:
 			self.parameters['mu']*(self.Ia[self.t]+self.Ips[self.t]+self.Ims[self.t]) +
 			self.parameters['lambda_H_R']*self.H[self.t] +
 			self.parameters['lambda_ICU_R']*self.ICU[self.t] +
-			a_tests*self.R[self.t]/self.N[self.t]
+			a_tests*self.R[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6)
 		)
 		self.Rq += [self.Rq[self.t]+delta_Rq*self.dt]
 
@@ -409,7 +436,7 @@ class SEIR_group:
 	def update_H_upper(self, m_tests, a_tests, rho, B_ICU, B_H):
 		delta_H = (
 			- (self.parameters["lambda_H_R"] + self.parameters["lambda_H_D"])*self.H[self.t]
-			+ self.parameters['mu']*self.parameters['p_H']*(self.I[self.t]+self.Iss[self.t]/(self.parameters['p_H']+self.parameters['p_ICU']))
+			+ self.flow_H(self.t)
 			- B_H
 		)
 		self.H += [self.H[self.t]+delta_H*self.dt]
@@ -442,7 +469,7 @@ class SEIR_group:
 	def update_ICU_upper(self, m_tests, a_tests, rho, B_ICU, B_H):
 		delta_ICU = (
 			- (self.parameters["lambda_ICU_R"] + self.parameters["lambda_ICU_D"])*self.ICU[self.t]
-			+ self.parameters['mu']*self.parameters['p_ICU']*(self.I[self.t]+self.Iss[self.t]/(self.parameters['p_H']+self.parameters['p_ICU']))
+			+ self.flow_ICU(self.t)
 			- B_ICU
 		)
 		self.ICU += [self.ICU[self.t]+delta_ICU*self.dt]
