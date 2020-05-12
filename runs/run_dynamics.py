@@ -6,6 +6,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import argparse
 
+
 current_path = os.path.abspath(getsourcefile(lambda:0))
 current_dir = os.path.dirname(current_path)
 parent_dir = current_dir[:current_dir.rfind(os.path.sep)]
