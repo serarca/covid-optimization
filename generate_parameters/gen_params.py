@@ -15,8 +15,6 @@ data_dict = pickle.load( open( "data_dict.p", "rb" ) )
 
 # Choose default parameters
 region = args.region
-tests_A = 3000
-tests_M = 3000
 
 
 
@@ -83,15 +81,15 @@ for group in data_dict['age_groups']:
 			},
 			"contacts":{
 				group2+"_lp_"+str(p2): float(data_dict["all_contacts"][(region,group,p,region,group2,p2)]) for group2 in data_dict['age_groups'] for p2 in patterns_percentages[group2]
-			}
+			},
+			"same_biomarkers":[group+"_lp_"+str(p_aux) for p_aux in patterns_percentages[group]]
+
 		}
 
 # Add ICUS, beds and test capacities
 yaml_dict['global-parameters'] = {
 	'C_H': float(data_dict['hospital_icu']["Hospital"][region]),
 	'C_ICU':float(data_dict['hospital_icu']["ICU"][region]),
-	'A_tests':float(data_dict['testing'][region]['antibodies']),
-	'M_tests':float(data_dict['testing'][region]['molecular']),
 }
 
 
