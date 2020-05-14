@@ -27,7 +27,7 @@ with open("../parameters/"+args.data) as file:
 # Set up parameters of simulation
 dt = 0.1
 total_time = 100
-# Choose 
+# Choose
 
 # Total time periods
 time_periods = int(round(total_time/dt))
