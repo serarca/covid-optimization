@@ -20,7 +20,8 @@ def all_to_one(dyn_model, group, max_a_tests, max_m_tests):
 
 
 # A heuristic that assigns random testing at each point in time among all groups in 'groups' variable
-def random_partition(dyn_model, groups, max_a_tests, max_m_tests):
+def random_partition(dyn_model, max_a_tests, max_m_tests):
+	groups = dyn_model.groups
 	a_sample = defaultdict(list)
 	m_sample = defaultdict(list)
 	# Sample dictionary of A tests for all groups at all times uniformly from the simplex boundary
@@ -51,7 +52,8 @@ def random_partition(dyn_model, groups, max_a_tests, max_m_tests):
 	return (a_sample,m_sample)
 
 # A heuristic that divides testing homogeneously among all groups in groups variable
-def homogeneous(dyn_model, groups, max_a_tests, max_m_tests):
+def homogeneous(dyn_model, max_a_tests, max_m_tests):
+	groups = dyn_model.groups
 	a_tests = {}
 	m_tests = {}
 	for name in dyn_model.groups:

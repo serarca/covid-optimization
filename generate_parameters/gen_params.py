@@ -5,7 +5,6 @@ pp = pprint.PrettyPrinter(indent=4)
 import argparse
 # Parse data
 parser = argparse.ArgumentParser()
-parser.add_argument("-lockdown", "--lockdown", help="Lockdown pattern")
 parser.add_argument("-region", "--region", help="Region")
 args = parser.parse_args()
 
@@ -33,58 +32,50 @@ initial_percentages = {
       "ICU": 0,
       "D": 0,
 }
-# Percentages in each lockdown pattern
-with open("../lockdown_patterns/pattern_"+args.lockdown+".yaml") as file:
-    # The FullLoader parameter handles the conversion from YAML
-    # scalar values to Python the dictionary format
-    patterns_percentages = yaml.load(file, Loader=yaml.FullLoader)
+
+# Number of lockdown patterns
+n_lockdown_patterns = {
+	"age_group_1": 5,
+	"age_group_2": 5,
+	"age_group_3": 5,
+	"age_group_4": 5,
+	"age_group_5": 5,
+	"age_group_6": 3,
+}
 
 
 # Create yaml
 yaml_dict ={}
 yaml_dict["seir-groups"] = {}
 for group in data_dict['age_groups']:
-	for p in patterns_percentages[group]: 
-		yaml_dict["seir-groups"][group+"_lp_"+str(p)] = {
-			"name":group+"_lp_"+str(p),
-			"initial-conditions":{
-				"S": float(patterns_percentages[group][p]*initial_percentages["S"]*data_dict["population"][group][region]),
-				"E": float(patterns_percentages[group][p]*initial_percentages["E"]*data_dict["population"][group][region]),
-				"I": float(patterns_percentages[group][p]*initial_percentages["I"]*data_dict["population"][group][region]),
-				"R": float(patterns_percentages[group][p]*initial_percentages["R"]*data_dict["population"][group][region]),
-				"Ia": float(patterns_percentages[group][p]*initial_percentages["Ia"]*data_dict["population"][group][region]),
-				"Ips": float(patterns_percentages[group][p]*initial_percentages["Ips"]*data_dict["population"][group][region]),
-				"Ims": float(patterns_percentages[group][p]*initial_percentages["Ims"]*data_dict["population"][group][region]),
-				"Iss": float(patterns_percentages[group][p]*initial_percentages["Iss"]*data_dict["population"][group][region]),
-				"Rq": float(patterns_percentages[group][p]*initial_percentages["Rq"]*data_dict["population"][group][region]),
-				"H": float(patterns_percentages[group][p]*initial_percentages["H"]*data_dict["population"][group][region]),
-				"ICU": float(patterns_percentages[group][p]*initial_percentages["ICU"]*data_dict["population"][group][region]),
-				"D": float(patterns_percentages[group][p]*initial_percentages["D"]*data_dict["population"][group][region]),
-			},
-			"parameters":{
-			      "beta": float(data_dict['beta']),
-			      "sigma": float(data_dict['SEIR_parameters']['sigma'][group]),
-			      "mu": float(data_dict['SEIR_parameters']['mu'][group]),
-			      "p_H": float(data_dict['SEIR_parameters']['p_H'][group]),
-			      "p_ICU": float(data_dict['SEIR_parameters']['p_ICU'][group]),
-			      "p_Ia": float((1-data_dict['SEIR_parameters']['p_ss'][group])*0.5),
-			      "p_Ips": float((1-data_dict['SEIR_parameters']['p_ss'][group])*0.25),
-			      "p_Ims": float((1-data_dict['SEIR_parameters']['p_ss'][group])*0.25),
-			      "p_Iss": float(data_dict['SEIR_parameters']['p_ss'][group]),
-			      "lambda_H_R": float(data_dict['SEIR_parameters']['lambda_HR'][group]),
-			      "lambda_H_D": float(data_dict['SEIR_parameters']['lambda_HD'][group]),
-			      "lambda_ICU_R": float(data_dict['SEIR_parameters']['lambda_ICUR'][group]),
-			      "lambda_ICU_D": float(data_dict['SEIR_parameters']['lambda_ICUD'][group]),
-			      "v_unconf": float(data_dict['economic_values'][(region, group, p)]),
-			      "v_conf": float(data_dict['economic_values'][(region, group, p)]),
-			      "v_deaths": float(data_dict['death_cost']['death_cost'][group]),
-			},
-			"contacts":{
-				group2+"_lp_"+str(p2): float(data_dict["all_contacts"][(region,group,p,region,group2,p2)]) for group2 in data_dict['age_groups'] for p2 in patterns_percentages[group2]
-			},
-			"same_biomarkers":[group+"_lp_"+str(p_aux) for p_aux in patterns_percentages[group]]
-
+	yaml_dict["seir-groups"][group] = {
+		"name":group,
+		"parameters":{
+			"beta": float(data_dict['beta']),
+			"sigma": float(data_dict['SEIR_parameters']['sigma'][group]),
+			"mu": float(data_dict['SEIR_parameters']['mu'][group]),
+			"p_H": float(data_dict['SEIR_parameters']['p_H'][group]),
+			"p_ICU": float(data_dict['SEIR_parameters']['p_ICU'][group]),
+			"p_Ia": float((1-data_dict['SEIR_parameters']['p_ss'][group])*0.5),
+			"p_Ips": float((1-data_dict['SEIR_parameters']['p_ss'][group])*0.25),
+			"p_Ims": float((1-data_dict['SEIR_parameters']['p_ss'][group])*0.25),
+			"p_Iss": float(data_dict['SEIR_parameters']['p_ss'][group]),
+			"lambda_H_R": float(data_dict['SEIR_parameters']['lambda_HR'][group]),
+			"lambda_H_D": float(data_dict['SEIR_parameters']['lambda_HD'][group]),
+			"lambda_ICU_R": float(data_dict['SEIR_parameters']['lambda_ICUR'][group]),
+			"lambda_ICU_D": float(data_dict['SEIR_parameters']['lambda_ICUD'][group]),
+		},
+		"economic_value":{
+			"work_value": float(data_dict['economic_value'][(region,group)]),
+			"lockdown_fraction": float(data_dict['lockdown_fraction']),
+			"death_value": float(data_dict['death_cost'][group]),
+		},
+		"contacts":{
+			activity:{
+				group2: float(data_dict['social_contact_matrices'][activity][group2][group]) for group2 in data_dict['age_groups']
+			} for activity in data_dict['activities']
 		}
+	}
 
 # Add ICUS, beds and test capacities
 yaml_dict['global-parameters'] = {
@@ -92,7 +83,28 @@ yaml_dict['global-parameters'] = {
 	'C_ICU':float(data_dict['hospital_icu']["ICU"][region]),
 }
 
+# Construct initialization
+initialization_dict = {}
+for group in data_dict['age_groups']:
+	initialization_dict[group] = {
+		"S": float(initial_percentages["S"]*data_dict["population"][group][region]),
+		"E": float(initial_percentages["E"]*data_dict["population"][group][region]),
+		"I": float(initial_percentages["I"]*data_dict["population"][group][region]),
+		"R": float(initial_percentages["R"]*data_dict["population"][group][region]),
+		"Ia": float(initial_percentages["Ia"]*data_dict["population"][group][region]),
+		"Ips": float(initial_percentages["Ips"]*data_dict["population"][group][region]),
+		"Ims": float(initial_percentages["Ims"]*data_dict["population"][group][region]),
+		"Iss": float(initial_percentages["Iss"]*data_dict["population"][group][region]),
+		"Rq": float(initial_percentages["Rq"]*data_dict["population"][group][region]),
+		"H": float(initial_percentages["H"]*data_dict["population"][group][region]),
+		"ICU": float(initial_percentages["ICU"]*data_dict["population"][group][region]),
+		"D": float(initial_percentages["D"]*data_dict["population"][group][region]),
+	}
 
-with open('../parameters/%s_lp_%s_params.yaml'%(region,args.lockdown), 'w') as file:
-    documents = yaml.dump(yaml_dict, file)
+
+with open('../parameters/params_%s.yaml'%(region), 'w') as file:
+    yaml.dump(yaml_dict, file)
+
+with open('../parameters/initialization_%s.yaml'%(region), 'w') as file:
+    yaml.dump(initialization_dict, file)
 

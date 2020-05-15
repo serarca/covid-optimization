@@ -1,0 +1,376 @@
+global-parameters:
+  C_H: 20000000.0
+  C_ICU: 2500.0
+seir-groups:
+  age_group_1:
+    contacts:
+      home:
+        age_group_1: 0.849595454209064
+        age_group_2: 0.435781294068067
+        age_group_3: 0.0758984944929828
+        age_group_4: 1.54840939032354
+        age_group_5: 0.380974818176523
+        age_group_6: 0.202726826717025
+      leisure:
+        age_group_1: 0.493551492940649
+        age_group_2: 0.155126595078563
+        age_group_3: 0.0587751816750028
+        age_group_4: 0.57272513206369
+        age_group_5: 0.297569395331662
+        age_group_6: 0.122915452821869
+      other:
+        age_group_1: 0.21745418683595
+        age_group_2: 0.0664260242588434
+        age_group_3: 0.00818481713562584
+        age_group_4: 0.155742335215486
+        age_group_5: 0.0593514581928244
+        age_group_6: 0.0360319782670454
+      school:
+        age_group_1: 1.34992904093881
+        age_group_2: 0.144017449012547
+        age_group_3: 0.0149806919663354
+        age_group_4: 0.339808764548688
+        age_group_5: 0.037468851796648
+        age_group_6: 0.0
+      transport:
+        age_group_1: 0.0519617489909729
+        age_group_2: 0.0161801948487289
+        age_group_3: 0.00277209526546383
+        age_group_4: 0.0238514686196019
+        age_group_5: 0.0112513503836602
+        age_group_6: 0.000866279770457448
+      work:
+        age_group_1: 0.605006613
+        age_group_2: 0.836601412
+        age_group_3: 0.33417543
+        age_group_4: 1.404643095
+        age_group_5: 0.876054384
+        age_group_6: 0.475889769
+    economic_value:
+      lockdown_fraction: 0.5
+      work_value: 0.0
+    name: age_group_1
+    parameters:
+      beta: 0.05187016636538126
+      lambda_H_D: 0.0
+      lambda_H_R: 0.0
+      lambda_ICU_D: 0.0
+      lambda_ICU_R: 0.0
+      mu: 0.2631578947368421
+      p_H: 0.0
+      p_ICU: 0.0
+      p_Ia: 0.5
+      p_Ims: 0.25
+      p_Ips: 0.25
+      p_Iss: 0.0
+      sigma: 0.27027027027027023
+  age_group_2:
+    contacts:
+      home:
+        age_group_1: 0.448729295626641
+        age_group_2: 1.0827620655944
+        age_group_3: 0.24314077672287
+        age_group_4: 1.32902258845548
+        age_group_5: 0.356489171466935
+        age_group_6: 0.208199498225305
+      leisure:
+        age_group_1: 0.159735740588466
+        age_group_2: 0.547695605237583
+        age_group_3: 0.142125214418093
+        age_group_4: 0.529282052473497
+        age_group_5: 0.168413387022678
+        age_group_6: 0.145492135973697
+      other:
+        age_group_1: 0.0683996846186178
+        age_group_2: 0.629673989723226
+        age_group_3: 0.123663826900247
+        age_group_4: 0.228469905496339
+        age_group_5: 0.112785404839351
+        age_group_6: 0.0505169881983388
+      school:
+        age_group_1: 0.14829651784744
+        age_group_2: 4.01392420551495
+        age_group_3: 0.175630777503792
+        age_group_4: 0.387446187225978
+        age_group_5: 0.0491658980495857
+        age_group_6: 0.000845768620786505
+      transport:
+        age_group_1: 0.0166609433135463
+        age_group_2: 0.313013081360761
+        age_group_3: 0.0147750282760108
+        age_group_4: 0.0417472563263179
+        age_group_5: 0.0250067955933865
+        age_group_6: 0.00702063548041268
+      work:
+        age_group_1: 0.861458643
+        age_group_2: 1.244849469
+        age_group_3: 0.557576341
+        age_group_4: 2.535548101
+        age_group_5: 1.460834302
+        age_group_6: 0.813010672
+    economic_value:
+      lockdown_fraction: 0.5
+      work_value: 0.0
+    name: age_group_2
+    parameters:
+      beta: 0.05187016636538126
+      lambda_H_D: 0.0
+      lambda_H_R: 0.0
+      lambda_ICU_D: 0.0
+      lambda_ICU_R: 0.0
+      mu: 0.2631578947368421
+      p_H: 0.0
+      p_ICU: 0.0
+      p_Ia: 0.5
+      p_Ims: 0.25
+      p_Ips: 0.25
+      p_Iss: 0.0
+      sigma: 0.27027027027027023
+  age_group_3:
+    contacts:
+      home:
+        age_group_1: 0.149777532484282
+        age_group_2: 0.465967332070607
+        age_group_3: 0.825761784430958
+        age_group_4: 1.09618131790428
+        age_group_5: 0.530777969038019
+        age_group_6: 0.141207503182257
+      leisure:
+        age_group_1: 0.115986512531039
+        age_group_2: 0.272375978537921
+        age_group_3: 1.06686552758139
+        age_group_4: 1.35055999810404
+        age_group_5: 0.505961958296775
+        age_group_6: 0.163284159086592
+      other:
+        age_group_1: 0.0161518581178504
+        age_group_2: 0.236995637963385
+        age_group_3: 0.288587117085331
+        age_group_4: 0.408946076565363
+        age_group_5: 0.093436540426966
+        age_group_6: 0.0516707469550558
+      school:
+        age_group_1: 0.0295627876760095
+        age_group_2: 0.336587741167773
+        age_group_3: 1.06984149800084
+        age_group_4: 0.202412730385096
+        age_group_5: 0.0222269039007269
+        age_group_6: 0.00162087393603303
+      transport:
+        age_group_1: 0.00547043246965751
+        age_group_2: 0.0283156145169662
+        age_group_3: 0.00854515741591382
+        age_group_4: 0.0717246385837952
+        age_group_5: 0.0
+        age_group_6: 0.0411683644003397
+      work:
+        age_group_1: 0.659459343
+        age_group_2: 1.068567615
+        age_group_3: 0.593024503
+        age_group_4: 2.616200805
+        age_group_5: 1.355753242
+        age_group_6: 0.739039642
+    economic_value:
+      lockdown_fraction: 0.5
+      work_value: 18.377512328767125
+    name: age_group_3
+    parameters:
+      beta: 0.05187016636538126
+      lambda_H_D: 0.0042
+      lambda_H_R: 0.072
+      lambda_ICU_D: 0.0074
+      lambda_ICU_R: 0.05
+      mu: 0.2631578947368421
+      p_H: 0.0512
+      p_ICU: 0.0288
+      p_Ia: 0.46
+      p_Ims: 0.23
+      p_Ips: 0.23
+      p_Iss: 0.08
+      sigma: 0.27027027027027023
+  age_group_4:
+    contacts:
+      home:
+        age_group_1: 0.584959025779158
+        age_group_2: 0.48759155251374
+        age_group_3: 0.209849788603695
+        age_group_4: 1.16675458698017
+        age_group_5: 0.50963564752671
+        age_group_6: 0.276729552806209
+      leisure:
+        age_group_1: 0.216364443011556
+        age_group_2: 0.194182897961976
+        age_group_3: 0.258547309162851
+        age_group_4: 1.84341560174209
+        age_group_5: 0.717164006654019
+        age_group_6: 0.400983532235971
+      other:
+        age_group_1: 0.0588364325672206
+        age_group_2: 0.0838209951368025
+        age_group_3: 0.0782874569342416
+        age_group_4: 0.405533187408246
+        age_group_5: 0.21282276123787
+        age_group_6: 0.150275207163122
+      school:
+        age_group_1: 0.128373158354514
+        age_group_2: 0.142146182906185
+        age_group_3: 0.0387493090679711
+        age_group_4: 0.152554966730048
+        age_group_5: 0.0434745935499854
+        age_group_6: 0.0163454570651011
+      transport:
+        age_group_1: 0.0090106220837431
+        age_group_2: 0.0153162253991444
+        age_group_3: 0.0137307578578894
+        age_group_4: 0.0938441051930135
+        age_group_5: 0.030744643512159
+        age_group_6: 0.0128497770756072
+      work:
+        age_group_1: 0.530646909
+        age_group_2: 0.930241401
+        age_group_3: 0.500837933
+        age_group_4: 3.19890432
+        age_group_5: 1.526684451
+        age_group_6: 0.541516692
+    economic_value:
+      lockdown_fraction: 0.5
+      work_value: 93.7568191780822
+    name: age_group_4
+    parameters:
+      beta: 0.05187016636538126
+      lambda_H_D: 0.0042
+      lambda_H_R: 0.072
+      lambda_ICU_D: 0.0074
+      lambda_ICU_R: 0.05
+      mu: 0.2631578947368421
+      p_H: 0.0512
+      p_ICU: 0.0288
+      p_Ia: 0.46
+      p_Ims: 0.23
+      p_Ips: 0.23
+      p_Iss: 0.08
+      sigma: 0.27027027027027023
+  age_group_5:
+    contacts:
+      home:
+        age_group_1: 0.244406012567548
+        age_group_2: 0.222098751994904
+        age_group_3: 0.172550011845745
+        age_group_4: 0.865437606996067
+        age_group_5: 0.947319015503615
+        age_group_6: 0.46326829267327
+      leisure:
+        age_group_1: 0.190899098589372
+        age_group_2: 0.104924373784074
+        age_group_3: 0.164482602877874
+        age_group_4: 1.21785182169745
+        age_group_5: 0.853563573779536
+        age_group_6: 0.478773714651502
+      other:
+        age_group_1: 0.038075622179985
+        age_group_2: 0.0702672049055025
+        age_group_3: 0.0303751796381428
+        age_group_4: 0.361404901901696
+        age_group_5: 0.436006229766737
+        age_group_6: 0.182956949873173
+      school:
+        age_group_1: 0.0240373174976096
+        age_group_2: 0.0306311817343223
+        age_group_3: 0.00722571914263073
+        age_group_4: 0.0738263667183016
+        age_group_5: 0.0489114529848994
+        age_group_6: 0.0199477884937354
+      transport:
+        age_group_1: 0.00721805629157516
+        age_group_2: 0.0155796544108997
+        age_group_3: 0.0
+        age_group_4: 0.0522090062542485
+        age_group_5: 0.020320165214047
+        age_group_6: 0.0199870107283578
+      work:
+        age_group_1: 0.562013416
+        age_group_2: 0.91012435
+        age_group_3: 0.440740294
+        age_group_4: 2.592538697
+        age_group_5: 1.668686535
+        age_group_6: 0.661916774
+    economic_value:
+      lockdown_fraction: 0.5
+      work_value: 90.9338301369863
+    name: age_group_5
+    parameters:
+      beta: 0.05187016636538126
+      lambda_H_D: 0.0042
+      lambda_H_R: 0.072
+      lambda_ICU_D: 0.0074
+      lambda_ICU_R: 0.05
+      mu: 0.2631578947368421
+      p_H: 0.0512
+      p_ICU: 0.0288
+      p_Ia: 0.46
+      p_Ims: 0.23
+      p_Ips: 0.23
+      p_Iss: 0.08
+      sigma: 0.27027027027027023
+  age_group_6:
+    contacts:
+      home:
+        age_group_1: 0.153915867205327
+        age_group_2: 0.153509766179292
+        age_group_3: 0.054327089013
+        age_group_4: 0.556145032532179
+        age_group_5: 0.548263245901432
+        age_group_6: 0.904439218134728
+      leisure:
+        age_group_1: 0.0933208437205046
+        age_group_2: 0.107274340066268
+        age_group_3: 0.0628206918555925
+        age_group_4: 0.80585899597218
+        age_group_5: 0.566613418182383
+        age_group_6: 0.746146339744025
+      other:
+        age_group_1: 0.027356483953833
+        age_group_2: 0.0372472129496537
+        age_group_3: 0.0198794058809493
+        age_group_4: 0.302008979991526
+        age_group_5: 0.216523713761771
+        age_group_6: 0.422274941532925
+      school:
+        age_group_1: 0.0
+        age_group_2: 0.000623602575056243
+        age_group_3: 0.000623602575056243
+        age_group_4: 0.0328495625387358
+        age_group_5: 0.0236075713384595
+        age_group_6: 0.0653788829088368
+      transport:
+        age_group_1: 0.000657703789240006
+        age_group_2: 0.00517645873412194
+        age_group_3: 0.0158387999709204
+        age_group_4: 0.0258242736176043
+        age_group_5: 0.0236539896019274
+        age_group_6: 0.0520986203142518
+      work:
+        age_group_1: 0.3613088
+        age_group_2: 0.599449467
+        age_group_3: 0.284332429
+        age_group_4: 1.088289325
+        age_group_5: 0.783357387
+        age_group_6: 0.367855919
+    economic_value:
+      lockdown_fraction: 0.5
+      work_value: 0.0
+    name: age_group_6
+    parameters:
+      beta: 0.05187016636538126
+      lambda_H_D: 0.014
+      lambda_H_R: 0.022
+      lambda_ICU_D: 0.029
+      lambda_ICU_R: 0.036
+      mu: 0.2631578947368421
+      p_H: 0.128
+      p_ICU: 0.032
+      p_Ia: 0.42
+      p_Ims: 0.21
+      p_Ips: 0.21
+      p_Iss: 0.16
+      sigma: 0.27027027027027023

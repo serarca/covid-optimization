@@ -5,16 +5,16 @@ import sys
 import matplotlib
 import matplotlib.pyplot as plt
 import argparse
-
-
 current_path = os.path.abspath(getsourcefile(lambda:0))
 current_dir = os.path.dirname(current_path)
 sys.path.insert(0, current_dir+"/lower_bounds")
 from group import SEIR_group, DynamicalModel
 from heuristics import *
 
+# Global variables
+dt = 0.1
 
-# Parse data
+# Parse parameters
 parser = argparse.ArgumentParser()
 parser.add_argument("-region", "--region", help="Region")
 parser.add_argument("-lockdown", "--lockdown", help="Lockdown pattern")
@@ -22,42 +22,24 @@ parser.add_argument("-heuristic", "--heuristic", help="Whether to draw plots")
 parser.add_argument("-a_tests", "--a_tests", help="Number of A tests")
 parser.add_argument("-m_tests", "--m_tests", help="Number of M tests")
 parser.add_argument("-days", "--days", help="Number of days")
-
-
 args = parser.parse_args()
 
 
-with open("./parameters/"+args.region+"_lp_"+args.lockdown+"_params.yaml") as file:
+# Read group parameters
+with open("./parameters/"+args.region+"_params.yaml") as file:
     # The FullLoader parameter handles the conversion from YAML
     # scalar values to Python the dictionary format
     parameters = yaml.load(file, Loader=yaml.FullLoader)
 
-# Set up parameters of simulation
-dt = 0.1
-total_time = int(args.days)
 
+# Set up parameters of simulation
+total_time = int(args.days)
 time_periods = int(round(total_time/dt))
 
-# Nonzero groups
-groups = []
-for group in parameters['seir-groups']:
-	pop = sum([parameters['seir-groups'][group]['initial-conditions'][sg] for sg in ["S","E","I","R","Ia","Ips","Ims","Iss","Rq","H","ICU","D"]])
-	if pop>0:
-		groups.append(group)
-groups.sort()
-#print(groups)
 
-# Load number of beds, icus and tests
-h_cap_vec = [parameters['global-parameters']['C_H'] for t in range(time_periods)]
-icu_cap_vec = [parameters['global-parameters']['C_ICU'] for t in range(time_periods)]
-
+# Construct vector of tests
 max_m_tests = [float(args.m_tests) for t in range(time_periods)]
 max_a_tests = [float(args.a_tests) for t in range(time_periods)]
-
-
-# Create model
-dynModel = DynamicalModel(parameters, dt, time_periods)
-
 if args.heuristic == "random":
 	a_tests_vec, m_tests_vec = random_partition(dynModel, groups, max_a_tests, max_m_tests)
 elif args.heuristic == "homogeneous":
@@ -69,6 +51,14 @@ elif "age_group" in args.heuristic:
 		a_tests_vec, m_tests_vec = all_to_one(dynModel, args.heuristic+"_lp_"+args.lockdown, max_a_tests, max_m_tests)
 elif args.heuristic == "no_tests":
 	a_tests_vec, m_tests_vec = no_tests(dynModel)
+
+
+
+
+# Create model
+dynModel = DynamicalModel(parameters, dt, time_periods)
+
+
 
 
 # Simulate model
