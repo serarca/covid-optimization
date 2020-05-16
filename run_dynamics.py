@@ -24,8 +24,10 @@ parser.add_argument("-m_tests", "--m_tests", help="Number of M tests")
 parser.add_argument("-days", "--days", help="Number of days")
 
 
+
 args = parser.parse_args()
 
+print("read_all")
 
 with open("./parameters/"+args.region+"_lp_"+args.lockdown+"_params.yaml") as file:
     # The FullLoader parameter handles the conversion from YAML
@@ -72,7 +74,7 @@ elif args.heuristic == "no_tests":
 elif args.heuristic == "forecasting_heuristic":
     tolerance = 1000000
     max_iterations = 2
-    a_tests_vec, m_tests_vec = forecasting_heuristic(dynModel, max_a_tests, max_m_tests, h_cap_vec, icu_cap_vec, max_iterations)
+    a_tests_vec, m_tests_vec = forecasting_heuristic(dynModel, max_a_tests, max_m_tests, h_cap_vec, icu_cap_vec, tolerance, max_iterations)
 
 # Simulate model
 dynModel.simulate(m_tests_vec, a_tests_vec, h_cap_vec, icu_cap_vec)
