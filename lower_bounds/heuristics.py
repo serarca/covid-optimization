@@ -1,8 +1,14 @@
 import random
 import numpy as np
 from collections import defaultdict
+# Import group module
+from inspect import getsourcefile
+import os.path
 import sys
-sys.path.append('../')
+current_path = os.path.abspath(getsourcefile(lambda:0))
+current_dir = os.path.dirname(current_path)
+parent_dir = current_dir[:current_dir.rfind(os.path.sep)]
+sys.path.insert(0, parent_dir)
 from group import SEIR_group, DynamicalModel
 from gurobipy import *
 
