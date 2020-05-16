@@ -24,8 +24,10 @@ parser.add_argument("-m_tests", "--m_tests", help="Number of M tests")
 parser.add_argument("-days", "--days", help="Number of days")
 
 
+
 args = parser.parse_args()
 
+print("read_all")
 
 with open("./parameters/"+args.region+"_lp_"+args.lockdown+"_params.yaml") as file:
     # The FullLoader parameter handles the conversion from YAML
@@ -69,7 +71,10 @@ elif "age_group" in args.heuristic:
 		a_tests_vec, m_tests_vec = all_to_one(dynModel, args.heuristic+"_lp_"+args.lockdown, max_a_tests, max_m_tests)
 elif args.heuristic == "no_tests":
 	a_tests_vec, m_tests_vec = no_tests(dynModel)
-
+elif args.heuristic == "forecasting_heuristic":
+    tolerance = 1000000
+    max_iterations = 2
+    a_tests_vec, m_tests_vec = forecasting_heuristic(dynModel, max_a_tests, max_m_tests, h_cap_vec, icu_cap_vec, tolerance, max_iterations)
 
 # Simulate model
 dynModel.simulate(m_tests_vec, a_tests_vec, h_cap_vec, icu_cap_vec)
@@ -108,14 +113,14 @@ for i,group in enumerate(groups):
 	plt.plot(time_axis, dynModel.groups[group].Ia, label="Infected A-Q")
 	plt.plot(time_axis, dynModel.groups[group].Ips, label="Infected PS-Q")
 	plt.plot(time_axis, dynModel.groups[group].Ims, label="Infected MS-Q")
-	plt.plot(time_axis, dynModel.groups[group].Iss, label="Infected SS-Q")	
+	plt.plot(time_axis, dynModel.groups[group].Iss, label="Infected SS-Q")
 	plt.legend(loc='upper right')
 
 for i,group in enumerate(groups):
 	plt.subplot(6,len(groups),i+1+len(groups)*4)
 	plt.plot(time_axis, dynModel.groups[group].H, label="Hospital Bed")
 	plt.plot(time_axis, dynModel.groups[group].ICU, label="ICU")
-	plt.plot(time_axis, dynModel.groups[group].D, label="Dead")	
+	plt.plot(time_axis, dynModel.groups[group].D, label="Dead")
 	plt.legend(loc='upper right')
 
 plt.subplot(6,2,11)
@@ -137,4 +142,3 @@ figure = plt.gcf() # get current figure
 figure.set_size_inches(6*len(groups),18)
 figure.suptitle('Region: %s, Lockdown-Pattern: %s, MTests/day: %s, Heuristic: %s'%(args.region,args.lockdown,args.m_tests,args.heuristic), fontsize=22)
 plt.savefig("results_runs/"+args.region+"_lp_"+args.lockdown+"_m_tests_"+args.m_tests+"_heuristic_"+args.heuristic+".png", dpi = 100)
-
