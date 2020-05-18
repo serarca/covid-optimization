@@ -24,6 +24,7 @@ parser.add_argument("-a_tests", "--a_tests", help="Number of A tests")
 parser.add_argument("-m_tests", "--m_tests", help="Number of M tests")
 args = parser.parse_args()
 
+print("read_all")
 
 # Read group parameters
 with open("./parameters/"+region+".yaml") as file:
@@ -64,6 +65,11 @@ elif "age_group" in args.heuristic:
 	a_tests_vec, m_tests_vec = all_to_one(dynModel, args.heuristic, max_a_tests, max_m_tests)
 elif args.heuristic == "no_tests":
 	a_tests_vec, m_tests_vec = no_tests(dynModel)
+elif args.heuristic == "forecasting_heuristic":
+    tolerance = 1000000
+    max_iterations = 2
+    a_tests_vec, m_tests_vec = forecasting_heuristic(dynModel, max_a_tests, max_m_tests, h_cap_vec, icu_cap_vec, tolerance, max_iterations)
+
 
 # Construct vector of alphas
 alphas_vec = [alphas for t in range(time_periods)]
@@ -109,14 +115,14 @@ for i,group in enumerate(groups):
 	plt.plot(time_axis, dynModel.groups[group].Ia, label="Infected A-Q")
 	plt.plot(time_axis, dynModel.groups[group].Ips, label="Infected PS-Q")
 	plt.plot(time_axis, dynModel.groups[group].Ims, label="Infected MS-Q")
-	plt.plot(time_axis, dynModel.groups[group].Iss, label="Infected SS-Q")	
+	plt.plot(time_axis, dynModel.groups[group].Iss, label="Infected SS-Q")
 	plt.legend(loc='upper right')
 
 for i,group in enumerate(groups):
 	plt.subplot(6,len(groups),i+1+len(groups)*4)
 	plt.plot(time_axis, dynModel.groups[group].H, label="Hospital Bed")
 	plt.plot(time_axis, dynModel.groups[group].ICU, label="ICU")
-	plt.plot(time_axis, dynModel.groups[group].D, label="Dead")	
+	plt.plot(time_axis, dynModel.groups[group].D, label="Dead")
 	plt.legend(loc='upper right')
 
 plt.subplot(6,2,11)
