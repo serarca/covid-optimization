@@ -35,7 +35,7 @@ with open("./parameters/"+args.region+"_lp_"+args.lockdown+"_params.yaml") as fi
     parameters = yaml.load(file, Loader=yaml.FullLoader)
 
 # Set up parameters of simulation
-dt = 0.1
+dt = 1
 total_time = int(args.days)
 
 time_periods = int(round(total_time/dt))
@@ -73,7 +73,7 @@ elif args.heuristic == "no_tests":
 	a_tests_vec, m_tests_vec = no_tests(dynModel)
 elif args.heuristic == "forecasting_heuristic":
     tolerance = 1000000
-    max_iterations = 2
+    max_iterations = 1
     a_tests_vec, m_tests_vec = forecasting_heuristic(dynModel, max_a_tests, max_m_tests, h_cap_vec, icu_cap_vec, tolerance, max_iterations)
 
 # Simulate model
@@ -91,25 +91,25 @@ time_axis = [i*dt for i in range(time_periods+1)]
 
 plt.figure(1)
 for i,group in enumerate(groups):
-	plt.subplot(6,len(groups),i+1)
+	plt.subplot(7,len(groups),i+1)
 	plt.plot(time_axis, dynModel.groups[group].S, label="Susceptible")
 	plt.title(group)
 	plt.legend(loc='upper right')
 
 for i,group in enumerate(groups):
-	plt.subplot(6,len(groups),i+1+len(groups))
+	plt.subplot(7,len(groups),i+1+len(groups))
 	plt.plot(time_axis, dynModel.groups[group].E, label="Exposed")
 	plt.plot(time_axis, dynModel.groups[group].I, label="Infected")
 	plt.plot(time_axis, dynModel.groups[group].R, label="Recovered")
 	plt.legend(loc='upper right')
 
 for i,group in enumerate(groups):
-	plt.subplot(6,len(groups),i+1+len(groups)*2)
+	plt.subplot(7,len(groups),i+1+len(groups)*2)
 	plt.plot(time_axis, dynModel.groups[group].Rq, label="Recovered Q")
 	plt.legend(loc='upper right')
 
 for i,group in enumerate(groups):
-	plt.subplot(6,len(groups),i+1+len(groups)*3)
+	plt.subplot(7,len(groups),i+1+len(groups)*3)
 	plt.plot(time_axis, dynModel.groups[group].Ia, label="Infected A-Q")
 	plt.plot(time_axis, dynModel.groups[group].Ips, label="Infected PS-Q")
 	plt.plot(time_axis, dynModel.groups[group].Ims, label="Infected MS-Q")
@@ -117,20 +117,26 @@ for i,group in enumerate(groups):
 	plt.legend(loc='upper right')
 
 for i,group in enumerate(groups):
-	plt.subplot(6,len(groups),i+1+len(groups)*4)
+	plt.subplot(7,len(groups),i+1+len(groups)*4)
 	plt.plot(time_axis, dynModel.groups[group].H, label="Hospital Bed")
 	plt.plot(time_axis, dynModel.groups[group].ICU, label="ICU")
 	plt.plot(time_axis, dynModel.groups[group].D, label="Dead")
 	plt.legend(loc='upper right')
 
-plt.subplot(6,2,11)
+for i,group in enumerate(groups):
+	plt.subplot(7,len(groups),i+1+len(groups)*5)
+	plt.plot(time_axis, m_tests_vec[group]+[0], label="M Tests")
+	plt.plot(time_axis, a_tests_vec[group]+[0], label="A Tests")
+	plt.legend(loc='upper right')
+
+plt.subplot(7,2,13)
 #plt.plot(time_axis, [sum([dynModel.groups[group].H[i] for group in groups]) for i in range(len(time_axis))], label="Total Hospital Beds")
 plt.plot(time_axis, [sum([dynModel.groups[group].ICU[i] for group in groups]) for i in range(len(time_axis))], label="Total ICUs")
 #plt.axhline(y=parameters['global-parameters']['C_H'], color='r', linestyle='dashed', label= "Hospital Capacity")
 plt.axhline(y=parameters['global-parameters']['C_ICU'], color='g', linestyle='dashed', label= "ICU Capacity")
 plt.legend(loc='upper right')
 
-plt.subplot(6,2,12)
+plt.subplot(7,2,14)
 #plt.plot(time_axis, [sum([dynModel.groups[group].H[i] for group in groups]) for i in range(len(time_axis))], label="Total Hospital Beds")
 plt.plot(time_axis, [sum([dynModel.groups[group].D[i] for group in groups]) for i in range(len(time_axis))], label="Total Deaths")
 #plt.axhline(y=parameters['global-parameters']['C_H'], color='r', linestyle='dashed', label= "Hospital Capacity")

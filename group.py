@@ -35,12 +35,12 @@ class DynamicalModel:
 	def get_objective_value(self):
 		value = 0
 		for t in range(self.time_steps):
-			for name,group in self.groups.iteritems():
+			for name,group in self.groups.items():
 				value += (
 					group.parameters['v_unconf']*(group.S[t] + group.E[t] + group.R[t])
 					+ group.parameters['v_conf']*group.Rq[t]
 				)
-		for name,group in self.groups.iteritems():
+		for name,group in self.groups.items():
 			value+=group.D[self.time_steps - 1]*group.parameters['v_deaths']
 
 		return value
@@ -49,7 +49,7 @@ class DynamicalModel:
 	def get_economic_value(self):
 		value = 0
 		for t in range(self.time_steps):
-			for name,group in self.groups.iteritems():
+			for name,group in self.groups.items():
 				value += (
 					group.parameters['v_unconf']*(group.S[t] + group.E[t] + group.R[t])
 					+ group.parameters['v_conf']*group.Rq[t]
@@ -59,7 +59,7 @@ class DynamicalModel:
 
 	def get_deaths(self):
 		value = 0
-		for name,group in self.groups.iteritems():
+		for name,group in self.groups.items():
 			value+=group.D[self.time_steps - 1]
 
 		return value
@@ -93,7 +93,7 @@ class SEIR_group:
 		self.I = [float(initial_conditions['I'])]
 		# Recovered (unquarantined)
 		self.R = [float(initial_conditions['R'])]
-		# Unquarantined patients 
+		# Unquarantined patients
 		self.N = [self.S[0] + self.E[0] + self.I[0]+ self.R[0]]
 
 		# Infected quarantined with different degrees of severity
@@ -121,9 +121,9 @@ class SEIR_group:
 	def update_total_contacts(self, t):
 		if (len(self.total_contacts) == t):
 			summ_contacts = 0
-			for n,g in self.all_groups.iteritems():
+			for n,g in self.all_groups.items():
 				biomarkers_pop = sum([self.all_groups[g_bio].N[self.t] + self.all_groups[g_bio].Rq[self.t] for g_bio in g.same_biomarkers])
-				summ_contacts+=self.contacts[n]*g.I[t]/(biomarkers_pop if biomarkers_pop!=0 else 10e-6)				
+				summ_contacts+=self.contacts[n]*g.I[t]/(biomarkers_pop if biomarkers_pop!=0 else 10e-6)
 			self.total_contacts.append(summ_contacts*self.S[t])
 		else:
 			assert(False)
@@ -232,7 +232,7 @@ class SEIR_group:
 		entering_h = {}
 		summ_entering_h = 0
 		summ_staying_h = 0
-		for n,g in self.all_groups.iteritems():
+		for n,g in self.all_groups.items():
 			entering_h[n] = self.all_groups[n].flow_H(self.t)
 			summ_entering_h += entering_h[n]
 			summ_staying_h += (1-g.parameters['lambda_H_R']-g.parameters['lambda_H_D'])*g.H[self.t]
@@ -249,7 +249,7 @@ class SEIR_group:
 		entering_icu = {}
 		summ_entering_icu = 0
 		summ_staying_icu = 0
-		for n,g in self.all_groups.iteritems():
+		for n,g in self.all_groups.items():
 			entering_icu[n] = self.all_groups[n].flow_ICU(self.t)
 			summ_entering_icu += entering_icu[n]
 			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[self.t]
@@ -273,7 +273,7 @@ class SEIR_group:
 		entering_h = {}
 		summ_entering_h = 0
 		summ_staying_h = 0
-		for n,g in self.all_groups.iteritems():
+		for n,g in self.all_groups.items():
 			entering_h[n] = self.all_groups[n].flow_H(self.t)
 			summ_entering_h += entering_h[n]
 			summ_staying_h += (1-g.parameters['lambda_H_R']-g.parameters['lambda_H_D'])*g.H[self.t]
@@ -281,10 +281,10 @@ class SEIR_group:
 		entering_icu = {}
 		summ_entering_icu = 0
 		summ_staying_icu = 0
-		for n,g in self.all_groups.iteritems():
+		for n,g in self.all_groups.items():
 			entering_icu[n] = self.all_groups[n].flow_ICU(self.t)
 			summ_entering_icu += entering_icu[n]
-			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[self.t]	
+			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[self.t]
 
 
 		delta_D = (
