@@ -111,10 +111,10 @@ def forecasting_heuristic(dynModel, max_a_tests, max_m_tests, h_cap_vec, icu_cap
     #For all times time_steps
     for t in time_steps:
         # Set the correct time steps
-        time_steps = range(dynModel.time_steps - t)
+        remaining_time_steps = range(dynModel.time_steps - t)
 
         # Empty the copy of the dyn model and put as initial conditions the first elements of the old forecast.
-        dynModelC.__init__(dynModelC.parameters, dynModelC.dt, len(time_steps))
+        dynModelC.__init__(dynModelC.parameters, dynModelC.dt, len(remaining_time_steps))
 
         initialize_with_forecast(dynModelC, old_forecasting)
 
@@ -123,8 +123,8 @@ def forecasting_heuristic(dynModel, max_a_tests, max_m_tests, h_cap_vec, icu_cap
         no_m_tests = {}
         no_a_tests = {}
         for g in dynModelC.groups:
-            no_m_tests[g] = [0 for i in time_steps]
-            no_a_tests[g] = [0 for i in time_steps]
+            no_m_tests[g] = [0 for i in remaining_time_steps]
+            no_a_tests[g] = [0 for i in remaining_time_steps]
 
         dynModelC.simulate(no_m_tests, no_a_tests, h_cap_vec[t:], icu_cap_vec[t:])
 
@@ -153,10 +153,10 @@ def forecasting_heuristic(dynModel, max_a_tests, max_m_tests, h_cap_vec, icu_cap
 
         #Create G Model (so as to modify it later)
         M = Model()
-        B_ICU = M.addVars(time_steps, dynModelC.groups.keys(), vtype=GRB.CONTINUOUS, name="ICU-Bounces")
-        B_H = M.addVars(time_steps,dynModelC.groups.keys(), vtype=GRB.CONTINUOUS, name="H-Bounces")
-        A_test = M.addVars(time_steps, dynModelC.groups.keys(), vtype=GRB.CONTINUOUS, ub=max_a_tests[0], name="a-tests")
-        M_test = M.addVars(time_steps, dynModelC.groups.keys(), vtype=GRB.CONTINUOUS, ub=max_m_tests[0], name="m-tests")
+        B_ICU = M.addVars(remaining_time_steps, dynModelC.groups.keys(), vtype=GRB.CONTINUOUS, name="ICU-Bounces")
+        B_H = M.addVars(remaining_time_steps,dynModelC.groups.keys(), vtype=GRB.CONTINUOUS, name="H-Bounces")
+        A_test = M.addVars(remaining_time_steps, dynModelC.groups.keys(), vtype=GRB.CONTINUOUS, ub=max_a_tests[0], name="a-tests")
+        M_test = M.addVars(remaining_time_steps, dynModelC.groups.keys(), vtype=GRB.CONTINUOUS, ub=max_m_tests[0], name="m-tests")
 
         M.update()
 
@@ -168,29 +168,29 @@ def forecasting_heuristic(dynModel, max_a_tests, max_m_tests, h_cap_vec, icu_cap
             #Write gurobi problem with fixed states to be the old forecast and obtain a seq of m and a tests
             #Objective
 
-            economic_obj = quicksum(group.parameters['v_unconf'] * (obtain_E(dynModelC, M_test, A_test, old_forecasting, group, t) + obtain_S(dynModelC, M_test, A_test, old_forecasting, group, t) + obtain_R(M_test, A_test, old_forecasting, group, t)) + group.parameters['v_conf'] * obtain_Rq(M_test, A_test, old_forecasting, group, t) for t in time_steps for name, group in dynModelC.groups.items())
+            economic_obj = quicksum(group.parameters['v_unconf'] * (obtain_E(dynModelC, M_test, A_test, old_forecasting, group, ti) + obtain_S(dynModelC, M_test, A_test, old_forecasting, group, ti) + obtain_R(M_test, A_test, old_forecasting, group, ti)) + group.parameters['v_conf'] * obtain_Rq(M_test, A_test, old_forecasting, group, ti) for ti in remaining_time_steps for name, group in dynModelC.groups.items())
 
-            deaths = quicksum(group.parameters['v_deaths'] * obtain_Deaths(M_test, A_test, B_H, B_ICU, old_forecasting, group, time_steps) for name, group in dynModelC.groups.items())
+            deaths = quicksum(group.parameters['v_deaths'] * obtain_Deaths(M_test, A_test, B_H, B_ICU, old_forecasting, group, remaining_time_steps) for name, group in dynModelC.groups.items())
 
             obj = economic_obj - deaths
 
             M.setObjective(obj, GRB.MAXIMIZE)
 
-            M.addConstrs((quicksum(group.parameters['mu'] * (group.parameters['p_H'] * obtain_I(M_test, A_test, old_forecasting, group, t))
+            M.addConstrs((quicksum(group.parameters['mu'] * (group.parameters['p_H'] * obtain_I(M_test, A_test, old_forecasting, group, ti))
             + (group.parameters['p_H']/((group.parameters['p_ICU'] + group.parameters['p_H']) if (group.parameters['p_ICU'] + group.parameters['p_H']) != 0 else 10e-6))
-            * obtain_Iss(M_test,A_test,old_forecasting,group,t) - B_H[t, group.name] for name, group in dynModelC.groups.items()) <= h_cap_vec[t] - quicksum((1 - group2.parameters['lambda_H_R'] - group2.parameters['lambda_H_D']) * get_H(M_test, A_test, B_H, B_ICU,  old_forecasting, group2, t) for name2, group2 in dynModelC.groups.items()) for t in time_steps), name="HCAP")
+            * obtain_Iss(M_test,A_test,old_forecasting,group,ti) - B_H[ti, group.name] for name, group in dynModelC.groups.items()) <= h_cap_vec[ti] - quicksum((1 - group2.parameters['lambda_H_R'] - group2.parameters['lambda_H_D']) * get_H(M_test, A_test, B_H, B_ICU,  old_forecasting, group2, ti) for name2, group2 in dynModelC.groups.items()) for ti in remaining_time_steps), name="HCAP")
 
-            M.addConstrs((quicksum(group.parameters['mu'] * (group.parameters['p_ICU'] * obtain_I(M_test, A_test, old_forecasting, group, t)) + (group.parameters['p_ICU']
+            M.addConstrs((quicksum(group.parameters['mu'] * (group.parameters['p_ICU'] * obtain_I(M_test, A_test, old_forecasting, group, ti)) + (group.parameters['p_ICU']
             /((group.parameters['p_ICU'] + group.parameters['p_H']) if (group.parameters['p_ICU'] + group.parameters['p_H']) != 0 else 10e-6))
-            * obtain_Iss(M_test,A_test,old_forecasting,group,t) - B_H[t, group.name] for name, group in dynModelC.groups.items()) <= h_cap_vec[t] - quicksum((1 - group2.parameters['lambda_ICU_R'] - group2.parameters['lambda_ICU_D']) * get_ICU(M_test, A_test, B_H, B_ICU,  old_forecasting, group2, t) for name2, group2 in dynModelC.groups.items()) for t in time_steps), name="ICUCAP")
+            * obtain_Iss(M_test,A_test,old_forecasting,group,ti) - B_H[ti, group.name] for name, group in dynModelC.groups.items()) <= h_cap_vec[ti] - quicksum((1 - group2.parameters['lambda_ICU_R'] - group2.parameters['lambda_ICU_D']) * get_ICU(M_test, A_test, B_H, B_ICU,  old_forecasting, group2, ti) for name2, group2 in dynModelC.groups.items()) for ti in remaining_time_steps), name="ICUCAP")
 
-            M.addConstrs(B_H[t, group.name] <= group.parameters['mu'] * (group.parameters['p_H'] * obtain_I(M_test, A_test, old_forecasting, group, t) + obtain_Iss(M_test, A_test, old_forecasting, group, t) * (group.parameters['p_H']
+            M.addConstrs(B_H[ti, group.name] <= group.parameters['mu'] * (group.parameters['p_H'] * obtain_I(M_test, A_test, old_forecasting, group, ti) + obtain_Iss(M_test, A_test, old_forecasting, group, ti) * (group.parameters['p_H']
             /((group.parameters['p_ICU'] + group.parameters['p_H']) if (group.parameters['p_ICU'] + group.parameters['p_H']) != 0 else 10e-6)))
-            for t in time_steps for name,group in dynModelC.groups.items())
+            for ti in remaining_time_steps for name,group in dynModelC.groups.items())
 
-            M.addConstrs(B_ICU[t, group.name] <= group.parameters['mu'] * (group.parameters['p_ICU'] * obtain_I(M_test, A_test, old_forecasting, group, t) + obtain_Iss(M_test, A_test, old_forecasting, group, t) * (group.parameters['p_ICU']
+            M.addConstrs(B_ICU[ti, group.name] <= group.parameters['mu'] * (group.parameters['p_ICU'] * obtain_I(M_test, A_test, old_forecasting, group, ti) + obtain_Iss(M_test, A_test, old_forecasting, group, ti) * (group.parameters['p_ICU']
             /((group.parameters['p_ICU'] + group.parameters['p_H']) if (group.parameters['p_ICU'] + group.parameters['p_H']) != 0 else 10e-6)))
-            for t in time_steps for name, group in dynModelC.groups.items())
+            for ti in remaining_time_steps for name, group in dynModelC.groups.items())
 
             #
             # for name, group in dynModelC.groups.items():
@@ -198,10 +198,10 @@ def forecasting_heuristic(dynModel, max_a_tests, max_m_tests, h_cap_vec, icu_cap
             # print(sum([M_test[0, name] for name in dynModelC.groups.keys()]))
             # M.addConstr(sum([M_test[0, name] for name in dynModelC.groups.keys()]) <= max_m_tests)
 
-            M.addConstrs(M_test.sum(t,'*') <= max_m_tests[t] for t in time_steps)
+            M.addConstrs(M_test.sum(ti,'*') <= max_m_tests[ti] for ti in remaining_time_steps)
 
 
-            M.addConstrs(A_test.sum(t,'*') <= max_a_tests[t] for t in time_steps)
+            M.addConstrs(A_test.sum(ti,'*') <= max_a_tests[ti] for ti in remaining_time_steps)
 
 
             M.update()
@@ -212,26 +212,38 @@ def forecasting_heuristic(dynModel, max_a_tests, max_m_tests, h_cap_vec, icu_cap
             m_tests = {}
 
             for name in dynModelC.groups:
-                a_tests[name] = [A_test[t, name].x for t in time_steps]
+                a_tests[name] = [A_test[ti, name].x for ti in remaining_time_steps]
 
             for name in dynModelC.groups:
-                m_tests[name] = [M_test[t, name].x for t in time_steps]
+                m_tests[name] = [M_test[ti, name].x for ti in remaining_time_steps]
 
-            dynModelC.__init__(dynModelC.parameters, dynModelC.dt, len(time_steps))
+            dynModelC.__init__(dynModelC.parameters, dynModelC.dt, len(remaining_time_steps))
 
             initialize_with_forecast(dynModelC, old_forecasting)
             print(dynModelC.time_steps)
+            # print(m_tests)
+            # print(a_tests)
+            # print(h_cap_vec[ti:])
+            # print(icu_cap_vec[t:])
+            # print(t)
             dynModelC.simulate(m_tests, a_tests, h_cap_vec[t:], icu_cap_vec[t:])
 
 
             assign_forecastings(dynModelC, new_forecasting)
 
+            # for name in dynModelC.groups:
+            #     print(new_forecasting[name]['I'])
+
+            # print(new_forecasting)
+            # print(old_forecasting)
             diff = calculate_diff(new_forecasting, old_forecasting)
+
+            print(diff)
 
             old_forecasting = new_forecasting
 
             iterations += 1
-
+            print(iterations)
             if iterations >= max_iterations or diff <= tolerance:
                 break
 
@@ -240,6 +252,10 @@ def forecasting_heuristic(dynModel, max_a_tests, max_m_tests, h_cap_vec, icu_cap
         for g in dynModelC.groups:
             final_m_testing[g].append(M_test[0,g].x)
             final_a_testing[g].append(A_test[0,g].x)
+
+        for name in dynModelC.groups:
+            for s in old_forecasting[name]:
+                old_forecasting[name][s] = old_forecasting[name][s][1:]
 
     return (final_a_testing, final_m_testing)
         #Reeinitialize the dynModel to first values of the old forecast
@@ -314,9 +330,9 @@ def obtain_Rq(M_test, A_test, old_forecasting, group, t):
             + A_test[t, group.name] * (old_forecasting[group.name]['R'][t]/old_forecasting[group.name]['N'][t]if old_forecasting[group.name]['N'][t]!=0.0 else 10e-6)
     )
 
-def obtain_Deaths(M_test, A_test, B_H, B_ICU,  old_forecasting, group, time_steps):
+def obtain_Deaths(M_test, A_test, B_H, B_ICU,  old_forecasting, group, remaining_time_steps):
     return (quicksum(
-            B_H[t, group.name] + B_ICU[t, group.name] + group.parameters['lambda_ICU_D'] * get_ICU(M_test, A_test, B_H, B_ICU,  old_forecasting, group, t) + group.parameters['lambda_H_D'] * get_H(M_test, A_test, B_H, B_ICU,  old_forecasting, group, t) for t in time_steps)
+            B_H[t, group.name] + B_ICU[t, group.name] + group.parameters['lambda_ICU_D'] * get_ICU(M_test, A_test, B_H, B_ICU,  old_forecasting, group, t) + group.parameters['lambda_H_D'] * get_H(M_test, A_test, B_H, B_ICU,  old_forecasting, group, t) for t in remaining_time_steps)
     )
 
 def get_ICU(M_test, A_test, B_H, B_ICU,  old_forecasting, group, t):
@@ -340,7 +356,7 @@ def calculate_diff(new_forecasting, old_forecasting):
                 total_diff += abs(new_forecasting[n][s][t]- old_forecasting[n][s][t])
                 total_sums += 1
 
-    return float(total_diff) / float(total_sums)
+    return float(total_diff)
 
 def initializeForecastings(old_forecasting, new_forecasting, dynModelC):
     for name, group in dynModelC.groups.items():
@@ -458,7 +474,7 @@ def initialize_with_forecast(dynModelC, old_forecasting):
 
 def assign_forecastings(dynModelC, forecasting):
 
-    forecasting = {}
+    # forecasting = {}
 
     for name, group in dynModelC.groups.items():
         forecasting[group.name] = {}
@@ -468,6 +484,7 @@ def assign_forecastings(dynModelC, forecasting):
         forecasting[group.name]["E"] = group.E
 
         forecasting[group.name]["I"] = group.I
+        # print(group.I)
 
         forecasting[group.name]["R"] = group.R
 
@@ -488,3 +505,6 @@ def assign_forecastings(dynModelC, forecasting):
         forecasting[group.name]["ICU"]  = group.ICU
 
         forecasting[group.name]["D"] = group.D
+
+    # for name in dynModelC.groups:
+    #     print("Forecasting after change", forecasting[name]['I'])

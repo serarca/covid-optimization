@@ -25,6 +25,7 @@ class DynamicalModel:
 	def simulate(self, m_tests_vec, a_tests_vec, h_cap_vec, icu_cap_vec):
 		for t in range(self.time_steps):
 			for n in self.groups:
+				# print(self.t)
 				self.groups[n].take_time_step(m_tests_vec[n][self.t], a_tests_vec[n][self.t], h_cap_vec[self.t], icu_cap_vec[self.t])
 			self.t +=1
 
@@ -148,7 +149,7 @@ class SEIR_group:
 		self.update_H(m_tests, a_tests, h_cap, icu_cap)
 		self.update_ICU(m_tests, a_tests, h_cap, icu_cap)
 		self.update_D(m_tests, a_tests, h_cap, icu_cap)
-
+		# print(self.I)
 		self.t += 1
 
 	# Gives flow of how many people flowing to H

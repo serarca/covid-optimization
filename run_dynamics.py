@@ -72,8 +72,8 @@ elif "age_group" in args.heuristic:
 elif args.heuristic == "no_tests":
 	a_tests_vec, m_tests_vec = no_tests(dynModel)
 elif args.heuristic == "forecasting_heuristic":
-    tolerance = 1000000
-    max_iterations = 1
+    tolerance = 10
+    max_iterations = 10
     a_tests_vec, m_tests_vec = forecasting_heuristic(dynModel, max_a_tests, max_m_tests, h_cap_vec, icu_cap_vec, tolerance, max_iterations)
 
 # Simulate model
