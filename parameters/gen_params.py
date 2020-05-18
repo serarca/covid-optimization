@@ -9,7 +9,7 @@ parser.add_argument("-region", "--region", help="Region")
 args = parser.parse_args()
 
 # Import data
-data_dict = pickle.load( open( "data_dict.p", "rb" ) )
+data_dict = pickle.load( open( "../data/data_dict.p", "rb" ) )
 
 
 # Choose default parameters
@@ -33,17 +33,6 @@ initial_percentages = {
       "D": 0,
 }
 
-# Number of lockdown patterns
-n_lockdown_patterns = {
-	"age_group_1": 5,
-	"age_group_2": 5,
-	"age_group_3": 5,
-	"age_group_4": 5,
-	"age_group_5": 5,
-	"age_group_6": 3,
-}
-
-
 # Create yaml
 yaml_dict ={}
 yaml_dict["seir-groups"] = {}
@@ -65,7 +54,7 @@ for group in data_dict['age_groups']:
 			"lambda_ICU_R": float(data_dict['SEIR_parameters']['lambda_ICUR'][group]),
 			"lambda_ICU_D": float(data_dict['SEIR_parameters']['lambda_ICUD'][group]),
 		},
-		"economic_value":{
+		"economics":{
 			"work_value": float(data_dict['economic_value'][(region,group)]),
 			"lockdown_fraction": float(data_dict['lockdown_fraction']),
 			"death_value": float(data_dict['death_cost'][group]),
@@ -83,28 +72,6 @@ yaml_dict['global-parameters'] = {
 	'C_ICU':float(data_dict['hospital_icu']["ICU"][region]),
 }
 
-# Construct initialization
-initialization_dict = {}
-for group in data_dict['age_groups']:
-	initialization_dict[group] = {
-		"S": float(initial_percentages["S"]*data_dict["population"][group][region]),
-		"E": float(initial_percentages["E"]*data_dict["population"][group][region]),
-		"I": float(initial_percentages["I"]*data_dict["population"][group][region]),
-		"R": float(initial_percentages["R"]*data_dict["population"][group][region]),
-		"Ia": float(initial_percentages["Ia"]*data_dict["population"][group][region]),
-		"Ips": float(initial_percentages["Ips"]*data_dict["population"][group][region]),
-		"Ims": float(initial_percentages["Ims"]*data_dict["population"][group][region]),
-		"Iss": float(initial_percentages["Iss"]*data_dict["population"][group][region]),
-		"Rq": float(initial_percentages["Rq"]*data_dict["population"][group][region]),
-		"H": float(initial_percentages["H"]*data_dict["population"][group][region]),
-		"ICU": float(initial_percentages["ICU"]*data_dict["population"][group][region]),
-		"D": float(initial_percentages["D"]*data_dict["population"][group][region]),
-	}
-
-
-with open('../parameters/params_%s.yaml'%(region), 'w') as file:
+with open('../parameters/%s.yaml'%(region), 'w') as file:
     yaml.dump(yaml_dict, file)
-
-with open('../parameters/initialization_%s.yaml'%(region), 'w') as file:
-    yaml.dump(initialization_dict, file)
 

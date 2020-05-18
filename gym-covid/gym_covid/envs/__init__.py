@@ -1,0 +1,1 @@
+from gym_covid.envs.covid_env import CovidEnv

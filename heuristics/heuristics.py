@@ -2,6 +2,17 @@ import random
 import numpy as np
 from collections import defaultdict
 
+def change_order(d):
+	d_array = []
+	times = len(d[list(d.keys())[0]])
+	for t in range(times):
+		curr_d = {
+			key:d[key][t] for key in d
+		} 
+		d_array.append(curr_d)
+	return d_array
+
+
 # A heuristic that assigns all testing to a given group
 def all_to_one(dyn_model, group, max_a_tests, max_m_tests):
 	# Choose a group randomly
@@ -16,7 +27,7 @@ def all_to_one(dyn_model, group, max_a_tests, max_m_tests):
 			a_tests[name] = [0 for t in range(dyn_model.time_steps)]
 			m_tests[name] = [0 for t in range(dyn_model.time_steps)]
 
-	return (a_tests,m_tests)
+	return (change_order(a_tests),change_order(m_tests))
 
 
 # A heuristic that assigns random testing at each point in time among all groups in 'groups' variable
@@ -49,7 +60,7 @@ def random_partition(dyn_model, max_a_tests, max_m_tests):
 		for n in dyn_model.groups:
 			m_sample[n][t] = m_sample[n][t]/sample_sum*max_m_tests[t]
 
-	return (a_sample,m_sample)
+	return (change_order(a_sample),change_order(m_sample))
 
 # A heuristic that divides testing homogeneously among all groups in groups variable
 def homogeneous(dyn_model, max_a_tests, max_m_tests):
@@ -64,7 +75,7 @@ def homogeneous(dyn_model, max_a_tests, max_m_tests):
 			a_tests[name] = [0 for t in range(dyn_model.time_steps)]
 			m_tests[name] = [0 for t in range(dyn_model.time_steps)]
 
-	return (a_tests,m_tests)
+	return (change_order(a_tests),change_order(m_tests))
 
 # A heuristic that assigns all testing to a given group
 def no_tests(dyn_model):
@@ -75,4 +86,4 @@ def no_tests(dyn_model):
 		a_tests[name] = [0 for t in range(dyn_model.time_steps)]
 		m_tests[name] = [0 for t in range(dyn_model.time_steps)]
 
-	return (a_tests,m_tests)
+	return (change_order(a_tests),change_order(m_tests))
