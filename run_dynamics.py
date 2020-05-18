@@ -147,4 +147,4 @@ plt.legend(loc='upper right')
 figure = plt.gcf() # get current figure
 figure.set_size_inches(6*len(groups),18)
 figure.suptitle('Region: %s, Lockdown-Pattern: %s, MTests/day: %s, Heuristic: %s'%(args.region,args.lockdown,args.m_tests,args.heuristic), fontsize=22)
-plt.savefig("results_runs/"+args.region+"_lp_"+args.lockdown+"_m_tests_"+args.m_tests+"_heuristic_"+args.heuristic+".png", dpi = 100)
+plt.savefig("results_runs/"+args.region+"_lp_"+args.lockdown+"_m_tests_"+args.m_tests+"_heuristic_"+args.heuristic+".pdf")
