@@ -1,8 +1,16 @@
 from collections import defaultdict
 from bound import Bounds
+import numpy as np
+
+def n_contacts(group_g, group_h, alphas):
+	n = 0
+	for activity in alphas[group_g.name]:
+		n += group_g.contacts[activity][group_h.name]*alphas[group_g.name][activity]*alphas[group_h.name][activity]
+	return n
+
 
 class DynamicalModel:
-	def __init__(self, parameters, dt, time_steps):
+	def __init__(self, parameters, initialization, dt, time_steps):
 		self.parameters = parameters
 		self.t = 0
 		self.dt = dt
@@ -11,72 +19,154 @@ class DynamicalModel:
 		# Create groups from parameters
 		self.groups = {}
 		for n in parameters['seir-groups']:
-			self.groups[n] = SEIR_group(parameters['seir-groups'][n], self.dt)
+			self.groups[n] = SEIR_group(parameters['seir-groups'][n], initialization[n], self.dt)
 
 		# Attach other groups to each group
 		for n in self.groups:
 			self.groups[n].attach_other_groups(self.groups)
 
-		# Initialize rho
+		# Fix number of beds and icus
+		self.beds = self.parameters['global-parameters']['C_H']
+		self.icus = self.parameters['global-parameters']['C_ICU']
+
+		# Initialize objective values
+		self.economic_values = [float("nan")]
+		self.rewards = [float("nan")]
+		self.deaths = [float("nan")]
+
+		# Initialize total population
+		self.total_population = sum([sum([initialization[group][cat] for cat in initialization[group].keys()]) for group in initialization.keys()])
+
+	def take_time_step(self, m_tests, a_tests, alphas):
 		for n in self.groups:
-			self.groups[n].initialize_total_contacts()
+			self.groups[n].update_total_contacts(self.t, alphas)
+		for n in self.groups:
+			self.groups[n].take_time_step(m_tests[n], a_tests[n], self.beds, self.icus)
 
-	# Simulates the dynamics given a vector of molecular and atomic tests
-	def simulate(self, m_tests_vec, a_tests_vec, h_cap_vec, icu_cap_vec):
+
+		# Calculate economic values
+		state = self.get_state(self.t+1)
+		deaths = sum([group.D[self.t+1]-group.D[self.t] for name,group in self.groups.items()])
+		deaths_value = sum([(group.D[self.t+1]-group.D[self.t])*group.economics['death_value'] for name,group in self.groups.items()])
+		economic_value = self.get_economic_value(state, alphas)
+		reward = economic_value - deaths_value
+		result = {
+			"state": state,
+			"economic_value": economic_value,
+			"deaths": deaths,
+			"deaths_value": deaths_value,
+			"reward":reward,
+		}
+
+		# Update economic values
+		self.economic_values.append(economic_value)
+		self.deaths.append(deaths)
+		self.rewards.append(reward)
+
+		# Update time
+		self.t += 1
+		return result
+
+	# Simulates the dynamics given a vector of molecular tests, atomic tests and alphas
+	def simulate(self, m_tests_vec, a_tests_vec, alphas_vec):
 		for t in range(self.time_steps):
-			for n in self.groups:
-				self.groups[n].take_time_step(m_tests_vec[n][self.t], a_tests_vec[n][self.t], h_cap_vec[self.t], icu_cap_vec[self.t])
-			self.t +=1
+			self.take_time_step(m_tests_vec[t], a_tests_vec[t], alphas_vec[t])
 
-			for n in self.groups:
-				# Update rho
-				self.groups[n].update_total_contacts(self.t)
-
-	def get_objective_value(self):
+	# Given a state and set of alphas, returns the economic value
+	def get_economic_value(self, state, alphas):
 		value = 0
-		for t in range(self.time_steps):
-			for name,group in self.groups.iteritems():
-				value += (
-					group.parameters['v_unconf']*(group.S[t] + group.E[t] + group.R[t])
-					+ group.parameters['v_conf']*group.Rq[t]
-				)
-		for name,group in self.groups.iteritems():
-			value+=group.D[self.time_steps - 1]*group.parameters['v_deaths']
-
+		for group in state:
+			value += (
+				self.groups[group].economics['work_value']*(
+					alphas[group]['work']+
+					self.groups[group].economics['lockdown_fraction']*(1-alphas[group]['work'])
+				)*
+				(state[group]["S"] + state[group]["E"] + state[group]["R"]+ state[group]["Rq"])
+				* self.dt
+			)
 		return value
 
+	def get_state(self, t):
+		state = {}
+		for name,group in self.groups.items():
+			state[name] = {
+				"S": group.S[t],
+				"E": group.E[t],
+				"I": group.I[t],
+				"R": group.R[t],
+				"N": group.N[t],
+				"Ia": group.Ia[t],
+				"Ips": group.Ips[t],
+				"Ims": group.Ims[t],
+				"Iss": group.Iss[t],
+				"Rq": group.Rq[t],
+				"H": group.H[t],
+				"ICU": group.ICU[t],
+				"D": group.D[t],
+			}
+		return state
 
-	def get_economic_value(self):
-		value = 0
-		for t in range(self.time_steps):
-			for name,group in self.groups.iteritems():
-				value += (
-					group.parameters['v_unconf']*(group.S[t] + group.E[t] + group.R[t])
-					+ group.parameters['v_conf']*group.Rq[t]
-				)
+	# Returns state but in OpenAIGym Format
+	def get_normalized_state(self, t):
+		norm_state = np.array([[
+			group.S[t]/self.total_population,
+			group.E[t]/self.total_population,
+			group.I[t]/self.total_population,
+			group.R[t]/self.total_population,
+			(group.Ia[t] + group.Ips[t] + group.Ims[t])/self.total_population,
+			group.Iss[t]/self.total_population,
+			group.Rq[t]/self.total_population,
+			group.H[t]/self.total_population,
+			group.ICU[t]/self.total_population,
+			group.D[t]/self.total_population
+			] for name,group in self.groups.items()])
+		return norm_state.flatten()
 
-		return value
 
-	def get_deaths(self):
-		value = 0
-		for name,group in self.groups.iteritems():
-			value+=group.D[self.time_steps - 1]
+	# Returns state but in OpenAIGym Format
+	def get_normalized_partial_state(self, t):
+		norm_state = np.array([[
+			(group.Ia[t] + group.Ips[t] + group.Ims[t])/self.total_population,
+			group.Iss[t]/self.total_population,
+			group.Rq[t]/self.total_population,
+			group.H[t]/self.total_population,
+			group.ICU[t]/self.total_population,
+			group.D[t]/self.total_population
+			] for name,group in self.groups.items()])
+		return norm_state.flatten()
 
-		return value
+	def get_total_deaths(self):
+		total = 0
+		for t in range(1,self.time_steps+1):
+			total += self.deaths[t]
+		return total
+
+	def get_total_economic_value(self):
+		total = 0
+		for t in range(1,self.time_steps+1):
+			total += self.economic_values[t]
+		return total
+
+	def get_total_reward(self):
+		total = 0
+		for t in range(1,self.time_steps+1):
+			total += self.rewards[t]
+		return total
 
 	def print_stats(self):
-		print("Economic Value: "+str(self.get_economic_value()))
-		print("Deaths "+str(self.get_deaths()))
+		print("Economic Value: "+str(self.get_total_economic_value()))
+		print("Deaths "+str(self.get_total_deaths()))
+		print("Total Reward "+str(self.get_total_reward()))
 
 class SEIR_group:
 	# Time step
-	def __init__(self, group_parameters, dt):
+	def __init__(self, group_parameters, group_initialization, dt):
 		# Group name
 		self.name = group_parameters['name']
 		self.parameters = group_parameters['parameters']
 		self.contacts = group_parameters['contacts']
-		self.initial_conditions = group_parameters['initial-conditions']
-		self.same_biomarkers = group_parameters['same_biomarkers']
+		self.economics = group_parameters['economics']
+		self.initial_conditions = group_initialization
 		self.initialize_vars(self.initial_conditions)
 
 		# Time step
@@ -111,19 +201,19 @@ class SEIR_group:
 		self.ICU = [float(initial_conditions['ICU'])]
 		# Dead
 		self.D = [float(initial_conditions['D'])]
+		# Economic value
+		self.Econ = [0.0]
 
 		# Contacts
 		self.total_contacts = []
 
-	def initialize_total_contacts(self):
-		self.update_total_contacts(0)
 
-	def update_total_contacts(self, t):
+	def update_total_contacts(self, t, alphas):
 		if (len(self.total_contacts) == t):
 			summ_contacts = 0
-			for n,g in self.all_groups.iteritems():
-				biomarkers_pop = sum([self.all_groups[g_bio].N[self.t] + self.all_groups[g_bio].Rq[self.t] for g_bio in g.same_biomarkers])
-				summ_contacts+=self.contacts[n]*g.I[t]/(biomarkers_pop if biomarkers_pop!=0 else 10e-6)				
+			for n,g in self.all_groups.items():
+				pop_g = g.N[t] + g.Rq[t]
+				summ_contacts += n_contacts(self, g, alphas)*g.I[t]/(pop_g if pop_g!=0 else 10e-6)	
 			self.total_contacts.append(summ_contacts*self.S[t])
 		else:
 			assert(False)
@@ -176,7 +266,7 @@ class SEIR_group:
 
 	# Updates S
 	def update_S(self, m_tests, a_tests):
-
+		## TODO might be wrong
 		delta_S = -self.parameters['beta']*self.total_contacts[self.t-1]
 		self.S += [self.S[self.t]+delta_S*self.dt]
 
@@ -232,7 +322,7 @@ class SEIR_group:
 		entering_h = {}
 		summ_entering_h = 0
 		summ_staying_h = 0
-		for n,g in self.all_groups.iteritems():
+		for n,g in self.all_groups.items():
 			entering_h[n] = self.all_groups[n].flow_H(self.t)
 			summ_entering_h += entering_h[n]
 			summ_staying_h += (1-g.parameters['lambda_H_R']-g.parameters['lambda_H_D'])*g.H[self.t]
@@ -249,7 +339,7 @@ class SEIR_group:
 		entering_icu = {}
 		summ_entering_icu = 0
 		summ_staying_icu = 0
-		for n,g in self.all_groups.iteritems():
+		for n,g in self.all_groups.items():
 			entering_icu[n] = self.all_groups[n].flow_ICU(self.t)
 			summ_entering_icu += entering_icu[n]
 			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[self.t]
@@ -273,7 +363,7 @@ class SEIR_group:
 		entering_h = {}
 		summ_entering_h = 0
 		summ_staying_h = 0
-		for n,g in self.all_groups.iteritems():
+		for n,g in self.all_groups.items():
 			entering_h[n] = self.all_groups[n].flow_H(self.t)
 			summ_entering_h += entering_h[n]
 			summ_staying_h += (1-g.parameters['lambda_H_R']-g.parameters['lambda_H_D'])*g.H[self.t]
@@ -281,7 +371,7 @@ class SEIR_group:
 		entering_icu = {}
 		summ_entering_icu = 0
 		summ_staying_icu = 0
-		for n,g in self.all_groups.iteritems():
+		for n,g in self.all_groups.items():
 			entering_icu[n] = self.all_groups[n].flow_ICU(self.t)
 			summ_entering_icu += entering_icu[n]
 			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[self.t]	
