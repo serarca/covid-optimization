@@ -3,6 +3,7 @@ from inspect import getsourcefile
 import os.path
 import sys
 import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import argparse
 current_path = os.path.abspath(getsourcefile(lambda:0))
