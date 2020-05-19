@@ -178,7 +178,7 @@ class CovidEnvContinuous(gym.Env):
 
 		# Create action_space and observation space
 		print([len(actions_dict['age_group_%d'%(i+1)])-1 for i in range(6)])
-		self.action_space = spaces.Box(low=np.array([0 for i in range(6)]), high=np.array([len(actions_dict['age_group_%d'%(i+1)])-1 for i in range(6)]), shape=(6,), dtype=np.float32)
+		self.action_space = spaces.Box(low=np.array([np.float32(0) for i in range(6)]), high=np.array([np.float32(len(actions_dict['age_group_%d'%(i+1)])-1) for i in range(6)]), shape=(6,), dtype=np.float32)
 		self.observation_space = spaces.Box(low=0, high=1.0, shape=(61,), dtype=np.float32)
 
 
