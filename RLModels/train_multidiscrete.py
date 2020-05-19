@@ -106,4 +106,4 @@ while True:
         break
 print("Rewards: %f"%rewards)
 
-model.save("a2c_model")
+model.save("a2c_model_multidiscrete")

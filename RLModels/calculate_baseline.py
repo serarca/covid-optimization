@@ -1,10 +1,6 @@
-import gym
-from stable_baselines.common.env_checker import check_env
 
 from gym_covid.envs.covid_env import CovidEnv
 
-from stable_baselines import A2C
-from stable_baselines.common.cmd_util import make_vec_env
 import math
 import argparse
 import yaml
@@ -86,24 +82,33 @@ tests = {
 env.testing(tests)
 
 
-# wrap it
-env = make_vec_env(lambda: env, n_envs=1)
-model = A2C('MlpPolicy', env, verbose=1)
+## Calculate all possible actions
+actions = []
+for i1 in range(5):
+    for i2 in range(5):
+        for i3 in range(5):
+            for i4 in range(5):
+                for i5 in range(5):
+                    for i6 in range(3):
+                        actions.append([i1,i2,i3,i4,i5,i6])
 
-# Learn
-model = model.learn(steps)
+optimal_value = -float('inf')
+optimal_action = None
+for i,action in enumerate(actions):
+    print(i/len(actions))
+    obs = env.reset()
+    rewards = 0
+    while True:
+        obs, reward, done, info = env.step(action)
+        rewards += reward
+        if done:
+            break
+    if rewards > optimal_value:
+        optimal_value = rewards
+        optimal_action = action
+    print(i/len(actions),optimal_value)
+print(optimal_value)
+print(optimal_action)
 
-# Test
-obs = env.reset()
-a = 1
-rewards = 0
-while True:
-    action, _ = model.predict(obs, deterministic=True)
-    obs, reward, done, info = env.step(action)
-    rewards += reward
-    print(action)
-    if done:
-        break
-print("Rewards: %f"%rewards)
 
-model.save("a2c_model")
+

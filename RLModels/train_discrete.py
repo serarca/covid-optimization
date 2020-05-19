@@ -1,9 +1,9 @@
 import gym
 from stable_baselines.common.env_checker import check_env
 
-from gym_covid.envs.covid_env import CovidEnv
+from gym_covid.envs.covid_env import CovidEnvDiscrete
 
-from stable_baselines import A2C
+from stable_baselines import A2C, DQN
 from stable_baselines.common.cmd_util import make_vec_env
 import math
 import argparse
@@ -61,7 +61,7 @@ with open("../alphas_action_space/default.yaml") as file:
 
 
 # Instantiate the env
-env = CovidEnv(universe_params, simulation_params, actions_dict, initialization)
+env = CovidEnvDiscrete(universe_params, simulation_params, actions_dict, initialization)
 
 # Construct vector of tests with a heuristic
 max_m_tests = [float(args.m_tests) for t in range(simulation_params['n_policies'])]
@@ -88,7 +88,7 @@ env.testing(tests)
 
 # wrap it
 env = make_vec_env(lambda: env, n_envs=1)
-model = A2C('MlpPolicy', env, verbose=1)
+model = DQN('MlpPolicy', env, verbose=1)
 
 # Learn
 model = model.learn(steps)
@@ -106,4 +106,4 @@ while True:
         break
 print("Rewards: %f"%rewards)
 
-model.save("a2c_model")
+model.save("dqn_model_discrete")

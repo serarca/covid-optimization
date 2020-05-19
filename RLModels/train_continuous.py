@@ -1,9 +1,9 @@
 import gym
 from stable_baselines.common.env_checker import check_env
 
-from gym_covid.envs.covid_env import CovidEnv
+from gym_covid.envs.covid_env import CovidEnvContinuous
 
-from stable_baselines import A2C
+from stable_baselines import SAC
 from stable_baselines.common.cmd_util import make_vec_env
 import math
 import argparse
@@ -61,7 +61,7 @@ with open("../alphas_action_space/default.yaml") as file:
 
 
 # Instantiate the env
-env = CovidEnv(universe_params, simulation_params, actions_dict, initialization)
+env = CovidEnvContinuous(universe_params, simulation_params, actions_dict, initialization)
 
 # Construct vector of tests with a heuristic
 max_m_tests = [float(args.m_tests) for t in range(simulation_params['n_policies'])]
@@ -106,4 +106,4 @@ while True:
         break
 print("Rewards: %f"%rewards)
 
-model.save("a2c_model")
+model.save("a2c_continuous")
