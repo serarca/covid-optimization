@@ -16,10 +16,6 @@ from group import SEIR_group, DynamicalModel
 from heuristics import *
 
 
-
-
-steps = 100000
-
 # Global variables
 simulation_params = {
 	'dt':1.0,
@@ -38,7 +34,11 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-heuristic", "--heuristic", help="Whether to draw plots")
 parser.add_argument("-a_tests", "--a_tests", help="Number of A tests")
 parser.add_argument("-m_tests", "--m_tests", help="Number of M tests")
+parser.add_argument("-steps", "--steps", help="Steps for learning algorithm")
 args = parser.parse_args()
+
+steps = int(args.steps)
+
 
 
 # Read group parameters

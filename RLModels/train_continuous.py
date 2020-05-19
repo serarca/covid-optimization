@@ -3,7 +3,7 @@ from stable_baselines.common.env_checker import check_env
 
 from gym_covid.envs.covid_env import CovidEnvContinuous
 
-from stable_baselines import SAC
+from stable_baselines import A2C
 from stable_baselines.common.cmd_util import make_vec_env
 import math
 import argparse
@@ -16,9 +16,6 @@ from group import SEIR_group, DynamicalModel
 from heuristics import *
 
 
-
-
-steps = 100000
 
 # Global variables
 simulation_params = {
@@ -38,7 +35,11 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-heuristic", "--heuristic", help="Whether to draw plots")
 parser.add_argument("-a_tests", "--a_tests", help="Number of A tests")
 parser.add_argument("-m_tests", "--m_tests", help="Number of M tests")
+parser.add_argument("-steps", "--steps", help="Steps for learning algorithm")
 args = parser.parse_args()
+
+steps = int(args.steps)
+
 
 
 # Read group parameters

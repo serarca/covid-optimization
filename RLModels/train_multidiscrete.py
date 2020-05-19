@@ -1,7 +1,7 @@
 import gym
 from stable_baselines.common.env_checker import check_env
 
-from gym_covid.envs.covid_env import CovidEnv
+from gym_covid.envs.covid_env import CovidEnvMultiDiscrete
 
 from stable_baselines import A2C
 from stable_baselines.common.cmd_util import make_vec_env
@@ -15,10 +15,6 @@ sys.path.insert(0, "../../covid-optimization/heuristics")
 from group import SEIR_group, DynamicalModel
 from heuristics import *
 
-
-
-
-steps = 100000
 
 # Global variables
 simulation_params = {
@@ -38,7 +34,10 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-heuristic", "--heuristic", help="Whether to draw plots")
 parser.add_argument("-a_tests", "--a_tests", help="Number of A tests")
 parser.add_argument("-m_tests", "--m_tests", help="Number of M tests")
+parser.add_argument("-steps", "--steps", help="Steps for learning algorithm")
+
 args = parser.parse_args()
+steps = int(args.steps)
 
 
 # Read group parameters
@@ -61,7 +60,7 @@ with open("../alphas_action_space/default.yaml") as file:
 
 
 # Instantiate the env
-env = CovidEnv(universe_params, simulation_params, actions_dict, initialization)
+env = CovidEnvMultiDiscrete(universe_params, simulation_params, actions_dict, initialization)
 
 # Construct vector of tests with a heuristic
 max_m_tests = [float(args.m_tests) for t in range(simulation_params['n_policies'])]
