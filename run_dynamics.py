@@ -9,10 +9,16 @@ current_path = os.path.abspath(getsourcefile(lambda:0))
 current_dir = os.path.dirname(current_path)
 sys.path.insert(0, current_dir+"/heuristics")
 sys.path.insert(0, "./gym-covid/gym_covid/envs")
+
 from group import SEIR_group, DynamicalModel
 from heuristics import *
-from covid_env import CovidEnv
+from covid_env import CovidEnvContinuous
 import gym
+import math
+
+from stable_baselines import A2C
+import pprint
+
 
 
 # Global variables
@@ -21,7 +27,9 @@ simulation_params = {
 	'days': 182.0,
 	'policy_freq': 7.0,
 }
-time_periods = int(round(simulation_params["days"]/simulation_params["dt"]))
+simulation_params['time_periods'] = int(math.ceil(simulation_params["days"]/simulation_params["dt"]))
+simulation_params['n_policies'] = int(math.ceil(simulation_params["days"]/simulation_params["policy_freq"]))
+baseline = "000120"
 
 region = "Ile-de-France"
 
@@ -54,14 +62,12 @@ with open("./alphas_action_space/default.yaml") as file:
     actions_dict = yaml.load(file, Loader=yaml.FullLoader)
 
 # Create environment
-env = CovidEnv(universe_params, simulation_params, actions_dict, initialization)
-
-
+env = CovidEnvContinuous(universe_params, simulation_params, actions_dict, initialization)
 
 
 # Construct vector of tests with a heuristic
-max_m_tests = [float(args.m_tests) for t in range(time_periods)]
-max_a_tests = [float(args.a_tests) for t in range(time_periods)]
+max_m_tests = [float(args.m_tests) for t in range(simulation_params['n_policies'])]
+max_a_tests = [float(args.a_tests) for t in range(simulation_params['n_policies'])]
 if args.heuristic == "random":
 	a_tests_vec, m_tests_vec = random_partition(env.dynModel, max_a_tests, max_m_tests)
 elif args.heuristic == "homogeneous":
@@ -79,6 +85,7 @@ tests = {
 	'a_tests_vec':a_tests_vec,
 	'm_tests_vec':m_tests_vec,
 }
+env.testing(tests)
 
 
 # Define policy
@@ -86,102 +93,91 @@ if args.policy == "constant":
 	static_policy = [int(s) for s in args.policy_params]
 elif args.policy == "a2c_model":
 	model = A2C('MlpPolicy', env, verbose=1)
-	model = model.load("RLModels/a2c_model")
+	model = model.load("./RLModels/a2c_model")
+elif args.policy == "baseline":
+	static_policy = [int(s) for s in args.policy_params]
 
 
 
 # Simulate environment
-obs = env.reset(initialization, tests)
+obs = env.reset()
 actions = []
 rewards = 0
 while True:
-	if args.policy == "constant":
+	if args.policy in ["constant","baseline"]:
 		action = static_policy
 	else:
-		action, _ = model.predict(obs, deterministic=True)
+		action = env.multidiscrete_to_action((0,0,0,1,2,0))
+	print(action)
 	obs, reward, done, info = env.step(action)
 	rewards += reward
 	actions.append(action)
 	if done:
 		break
 
-print(env.dynModel.print_stats())
+env.dynModel.print_stats()
 
 
 
 
 
-# # Construct vector of alphas
-# alphas_vec = [alphas for t in range(time_periods)]
+# Draw plots
+dynModel = env.dynModel
+time_axis = [i*simulation_params["dt"] for i in range(simulation_params['time_periods']+1)]
 
 
-# # Simulate model
-# dynModel.simulate(m_tests_vec, a_tests_vec, alphas_vec)
-# dynModel.print_stats()
+groups = dynModel.groups.keys()
+plt.figure(1)
+for i,group in enumerate(groups):
+	plt.subplot(6,len(groups),i+1)
+	plt.plot(time_axis, dynModel.groups[group].S, label="Susceptible")
+	plt.title(group)
+	plt.legend(loc='upper right')
 
+for i,group in enumerate(groups):
+	plt.subplot(6,len(groups),i+1+len(groups))
+	plt.plot(time_axis, dynModel.groups[group].E, label="Exposed")
+	plt.plot(time_axis, dynModel.groups[group].I, label="Infected")
+	plt.plot(time_axis, dynModel.groups[group].R, label="Recovered")
+	plt.legend(loc='upper right')
 
+for i,group in enumerate(groups):
+	plt.subplot(6,len(groups),i+1+len(groups)*2)
+	plt.plot(time_axis, dynModel.groups[group].Rq, label="Recovered Q")
+	plt.legend(loc='upper right')
 
+for i,group in enumerate(groups):
+	plt.subplot(6,len(groups),i+1+len(groups)*3)
+	plt.plot(time_axis, dynModel.groups[group].Ia, label="Infected A-Q")
+	plt.plot(time_axis, dynModel.groups[group].Ips, label="Infected PS-Q")
+	plt.plot(time_axis, dynModel.groups[group].Ims, label="Infected MS-Q")
+	plt.plot(time_axis, dynModel.groups[group].Iss, label="Infected SS-Q")
+	plt.legend(loc='upper right')
 
-# # # string_to_print = str(dynModel.get_economic_value()) +"\t"+ str(dynModel.get_deaths())+"\t"+ str(dynModel.get_economic_value()-1000000*dynModel.get_deaths())
-# # # print(string_to_print)
+for i,group in enumerate(groups):
+	plt.subplot(6,len(groups),i+1+len(groups)*4)
+	plt.plot(time_axis, dynModel.groups[group].H, label="Hospital Bed")
+	plt.plot(time_axis, dynModel.groups[group].ICU, label="ICU")
+	plt.plot(time_axis, dynModel.groups[group].D, label="Dead")
+	plt.legend(loc='upper right')
 
+plt.subplot(6,2,11)
+#plt.plot(time_axis, [sum([dynModel.groups[group].H[i] for group in groups]) for i in range(len(time_axis))], label="Total Hospital Beds")
+plt.plot(time_axis, [sum([dynModel.groups[group].ICU[i] for group in groups]) for i in range(len(time_axis))], label="Total ICUs")
+#plt.axhline(y=parameters['global-parameters']['C_H'], color='r', linestyle='dashed', label= "Hospital Capacity")
+plt.axhline(y=dynModel.icus, color='g', linestyle='dashed', label= "ICU Capacity")
+plt.legend(loc='upper right')
 
-# # Draw plots
-# time_axis = [i*dt for i in range(time_periods+1)]
-
-
-# groups = dynModel.groups.keys()
-# plt.figure(1)
-# for i,group in enumerate(groups):
-# 	plt.subplot(6,len(groups),i+1)
-# 	plt.plot(time_axis, dynModel.groups[group].S, label="Susceptible")
-# 	plt.title(group)
-# 	plt.legend(loc='upper right')
-
-# for i,group in enumerate(groups):
-# 	plt.subplot(6,len(groups),i+1+len(groups))
-# 	plt.plot(time_axis, dynModel.groups[group].E, label="Exposed")
-# 	plt.plot(time_axis, dynModel.groups[group].I, label="Infected")
-# 	plt.plot(time_axis, dynModel.groups[group].R, label="Recovered")
-# 	plt.legend(loc='upper right')
-
-# for i,group in enumerate(groups):
-# 	plt.subplot(6,len(groups),i+1+len(groups)*2)
-# 	plt.plot(time_axis, dynModel.groups[group].Rq, label="Recovered Q")
-# 	plt.legend(loc='upper right')
-
-# for i,group in enumerate(groups):
-# 	plt.subplot(6,len(groups),i+1+len(groups)*3)
-# 	plt.plot(time_axis, dynModel.groups[group].Ia, label="Infected A-Q")
-# 	plt.plot(time_axis, dynModel.groups[group].Ips, label="Infected PS-Q")
-# 	plt.plot(time_axis, dynModel.groups[group].Ims, label="Infected MS-Q")
-# 	plt.plot(time_axis, dynModel.groups[group].Iss, label="Infected SS-Q")
-# 	plt.legend(loc='upper right')
-
-# for i,group in enumerate(groups):
-# 	plt.subplot(6,len(groups),i+1+len(groups)*4)
-# 	plt.plot(time_axis, dynModel.groups[group].H, label="Hospital Bed")
-# 	plt.plot(time_axis, dynModel.groups[group].ICU, label="ICU")
-# 	plt.plot(time_axis, dynModel.groups[group].D, label="Dead")
-# 	plt.legend(loc='upper right')
-
-# plt.subplot(6,2,11)
-# #plt.plot(time_axis, [sum([dynModel.groups[group].H[i] for group in groups]) for i in range(len(time_axis))], label="Total Hospital Beds")
-# plt.plot(time_axis, [sum([dynModel.groups[group].ICU[i] for group in groups]) for i in range(len(time_axis))], label="Total ICUs")
-# #plt.axhline(y=parameters['global-parameters']['C_H'], color='r', linestyle='dashed', label= "Hospital Capacity")
-# plt.axhline(y=parameters['global-parameters']['C_ICU'], color='g', linestyle='dashed', label= "ICU Capacity")
-# plt.legend(loc='upper right')
-
-# plt.subplot(6,2,12)
-# #plt.plot(time_axis, [sum([dynModel.groups[group].H[i] for group in groups]) for i in range(len(time_axis))], label="Total Hospital Beds")
-# plt.plot(time_axis, [sum([dynModel.groups[group].D[i] for group in groups]) for i in range(len(time_axis))], label="Total Deaths")
-# #plt.axhline(y=parameters['global-parameters']['C_H'], color='r', linestyle='dashed', label= "Hospital Capacity")
-# plt.legend(loc='upper right')
+plt.subplot(6,2,12)
+#plt.plot(time_axis, [sum([dynModel.groups[group].H[i] for group in groups]) for i in range(len(time_axis))], label="Total Hospital Beds")
+plt.plot(time_axis, [sum([dynModel.groups[group].D[i] for group in groups]) for i in range(len(time_axis))], label="Total Deaths")
+#plt.axhline(y=parameters['global-parameters']['C_H'], color='r', linestyle='dashed', label= "Hospital Capacity")
+plt.legend(loc='upper right')
 
 
 
-# figure = plt.gcf() # get current figure
-# figure.set_size_inches(6*len(groups),18)
-# figure.suptitle('Region: %s, Lockdown-Pattern: %s, MTests/day: %s, Heuristic: %s'%(region,args.lockdown,args.m_tests,args.heuristic), fontsize=22)
-# plt.savefig("results_runs/"+region+"_lp_"+args.lockdown+"_m_tests_"+args.m_tests+"_heuristic_"+args.heuristic+".png", dpi = 100)
+figure = plt.gcf() # get current figure
+figure.set_size_inches(6*len(groups),18)
+figure.suptitle('Region: %s, Policy: %s, MTests/day: %s, Heuristic: %s'%(region,args.policy,args.m_tests,args.heuristic), fontsize=22)
+plt.savefig("results_runs/"+region+"_lp_"+args.policy+"_params_"+args.policy_params+"_m_tests_"+args.m_tests+"_heuristic_"+args.heuristic+".png", dpi = 100)
 
