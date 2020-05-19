@@ -96,10 +96,10 @@ elif args.policy == "a2c_model":
 	model = A2C('MlpPolicy', env, verbose=1)
 	model = model.load("./RLModels/a2c_model")
 elif args.policy == "baseline":
-	static_policy = [int(s) for s in args.policy_params]
+	static_policy = [int(s) for s in baseline]
 
 
-
+print("Lockdown Patterns: ")
 # Simulate environment
 obs = env.reset()
 actions = []
@@ -109,7 +109,7 @@ while True:
 		action = static_policy
 	else:
 		action = env.multidiscrete_to_action((0,0,0,1,2,0))
-	print(action)
+	print("Day %d: Group1:%.1f Group2:%.1f Group3:%.1f Group4:%.1f Group5:%.1f Group6:%.1f"%(env.t*env.dt,action[0],action[1],action[2],action[3],action[4],action[5]))
 	obs, reward, done, info = env.step(action)
 	rewards += reward
 	actions.append(action)
@@ -180,5 +180,5 @@ plt.legend(loc='upper right')
 figure = plt.gcf() # get current figure
 figure.set_size_inches(6*len(groups),18)
 figure.suptitle('Region: %s, Policy: %s, MTests/day: %s, Heuristic: %s'%(region,args.policy,args.m_tests,args.heuristic), fontsize=22)
-plt.savefig("results_runs/"+region+"_lp_"+args.policy+"_params_"+args.policy_params+"_m_tests_"+args.m_tests+"_heuristic_"+args.heuristic+".png", dpi = 100)
+plt.savefig("results_runs/"+region+"_lp_"+args.policy+"_params_"+(args.policy_params if args.policy_params else "")+"_m_tests_"+args.m_tests+"_heuristic_"+args.heuristic+".png", dpi = 100)
 
