@@ -13,32 +13,31 @@ sys.path.insert(0, "./gym-covid/gym_covid/envs")
 
 from group import SEIR_group, DynamicalModel
 from heuristics import *
-<<<<<<< HEAD
-from forecasting_heuristic import *
 from covid_env import CovidEnvContinuous
 import gym
-=======
->>>>>>> 7716224690d66ab6362bcd08882d5599281c8a5f
 import math
+
+from stable_baselines import A2C
 import pprint
+
 
 
 # Global variables
 simulation_params = {
 	'dt':1.0,
 	'days': 182.0,
-	'region': "Ile-de-France",
+	'policy_freq': 7.0,
 }
-
-
-# Define time variables
 simulation_params['time_periods'] = int(math.ceil(simulation_params["days"]/simulation_params["dt"]))
+simulation_params['n_policies'] = int(math.ceil(simulation_params["days"]/simulation_params["policy_freq"]))
+baseline = "000120"
 
-
+region = "Ile-de-France"
 
 # Parse parameters
 parser = argparse.ArgumentParser()
-parser.add_argument("-heuristic", "--heuristic", help="Chose heuristic")
+parser.add_argument("-heuristic", "--heuristic", help="Whether to draw plots")
+parser.add_argument("-policy", "--policy", help="Policy")
 parser.add_argument("-a_tests", "--a_tests", help="Number of A tests")
 parser.add_argument("-m_tests", "--m_tests", help="Number of M tests")
 parser.add_argument("-policy_params", "--policy_params", help="Number of M tests")
@@ -46,89 +45,82 @@ args = parser.parse_args()
 
 
 # Read group parameters
-<<<<<<< HEAD
 with open("./parameters/"+region+".yaml") as file:
-	# The FullLoader parameter handles the conversion from YAML
-	# scalar values to Python the dictionary format
-	universe_params = yaml.load(file, Loader=yaml.FullLoader)
-=======
-with open("./parameters/"+simulation_params["region"]+".yaml") as file:
     # The FullLoader parameter handles the conversion from YAML
     # scalar values to Python the dictionary format
     universe_params = yaml.load(file, Loader=yaml.FullLoader)
->>>>>>> 7716224690d66ab6362bcd08882d5599281c8a5f
 
 # Read initialization
 with open("./initialization/initialization.yaml") as file:
-	# The FullLoader parameter handles the conversion from YAML
-	# scalar values to Python the dictionary format
-	initialization = yaml.load(file, Loader=yaml.FullLoader)
+    # The FullLoader parameter handles the conversion from YAML
+    # scalar values to Python the dictionary format
+    initialization = yaml.load(file, Loader=yaml.FullLoader)
 
 # Read lockdown
 with open("./alphas_action_space/default.yaml") as file:
-	# The FullLoader parameter handles the conversion from YAML
-	# scalar values to Python the dictionary format
-	actions_dict = yaml.load(file, Loader=yaml.FullLoader)
-
+    # The FullLoader parameter handles the conversion from YAML
+    # scalar values to Python the dictionary format
+    actions_dict = yaml.load(file, Loader=yaml.FullLoader)
 
 # Create environment
-dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt'], simulation_params['time_periods'])
+env = CovidEnvContinuous(universe_params, simulation_params, actions_dict, initialization)
 
 
 # Construct vector of tests with a heuristic
-max_m_tests = [float(args.m_tests) for t in range(simulation_params['time_periods'])]
-max_a_tests = [float(args.a_tests) for t in range(simulation_params['time_periods'])]
+max_m_tests = [float(args.m_tests) for t in range(simulation_params['n_policies'])]
+max_a_tests = [float(args.a_tests) for t in range(simulation_params['n_policies'])]
 if args.heuristic == "random":
-<<<<<<< HEAD
-	groups = []
-	for group in env.dynModel.parameters['seir-groups']:
-		population = sum([env.dynModel.initialization[group][sg] for sg in ["S","E","I","R","Ia","Ips","Ims","Iss","Rq","H","ICU","D"]])
-		if population > 0:
-			groups.append(group)
-	groups.sort()
-
-	a_tests_vec, m_tests_vec = random_partition(env.dynModel, groups, max_a_tests, max_m_tests)
-=======
-	a_tests_vec, m_tests_vec = random_partition(dynModel, max_a_tests, max_m_tests)
->>>>>>> 7716224690d66ab6362bcd08882d5599281c8a5f
+	a_tests_vec, m_tests_vec = random_partition(env.dynModel, max_a_tests, max_m_tests)
 elif args.heuristic == "homogeneous":
-	a_tests_vec, m_tests_vec = homogeneous(dynModel, max_a_tests, max_m_tests)
+	a_tests_vec, m_tests_vec = homogeneous(env.dynModel, max_a_tests, max_m_tests)
 elif "age_group" in args.heuristic:
-	a_tests_vec, m_tests_vec = all_to_one(dynModel, args.heuristic, max_a_tests, max_m_tests)
+	a_tests_vec, m_tests_vec = all_to_one(env.dynModel, args.heuristic, max_a_tests, max_m_tests)
 elif args.heuristic == "no_tests":
-	a_tests_vec, m_tests_vec = no_tests(dynModel)
+	a_tests_vec, m_tests_vec = no_tests(env.dynModel)
 elif args.heuristic == "forecasting_heuristic":
-<<<<<<< HEAD
-	tolerance = 10
-	max_iterations = 10
-	a_tests_vec, m_tests_vec = forecasting_heuristic(env.dynModel, max_a_tests, max_m_tests, [env.dynModel.beds for t in range(len(max_a_tests))], [env.dynModel.icus for t in range(len(max_a_tests))], tolerance, max_iterations)
-#ICU CAP replaced by single value dynModel.icus
-=======
     tolerance = 10
     max_iterations = 10
-    a_tests_vec, m_tests_vec = forecasting_heuristic(dynModel, max_a_tests, max_m_tests, h_cap_vec, icu_cap_vec, tolerance, max_iterations)
-# Put tests in dictionary
->>>>>>> 7716224690d66ab6362bcd08882d5599281c8a5f
+    a_tests_vec, m_tests_vec = forecasting_heuristic(env.dynModel, max_a_tests, max_m_tests, h_cap_vec, icu_cap_vec, tolerance, max_iterations)
+
 tests = {
 	'a_tests_vec':a_tests_vec,
 	'm_tests_vec':m_tests_vec,
 }
+env.testing(tests)
 
 
 # Define policy
-static_alpha = {
-	'age_group_%d'%i:actions_dict['age_group_%d'%i][int(args.policy_params[i-1])] for i in range(1,7)
-}
+if args.policy == "constant":
+	static_policy = [int(s) for s in args.policy_params]
+elif args.policy == "a2c_model":
+	model = A2C('MlpPolicy', env, verbose=1)
+	model = model.load("./RLModels/a2c_model")
+elif args.policy == "baseline":
+	static_policy = [int(s) for s in baseline]
 
-# Run the model for the whole time range
-for t in range(simulation_params['time_periods']):
-	dynModel.take_time_step(m_tests_vec[t], a_tests_vec[t], static_alpha)
 
-# Print model stats
-dynModel.print_stats()
+print("Lockdown Patterns: ")
+# Simulate environment
+obs = env.reset()
+actions = []
+rewards = 0
+while True:
+	if args.policy in ["constant","baseline"]:
+		action = static_policy
+	else:
+		action = env.multidiscrete_to_action((0,0,0,1,2,0))
+	print("Day %d: Group1:%.1f Group2:%.1f Group3:%.1f Group4:%.1f Group5:%.1f Group6:%.1f"%(env.t*env.dt,action[0],action[1],action[2],action[3],action[4],action[5]))
+	obs, reward, done, info = env.step(action)
+	rewards += reward
+	actions.append(action)
+	if done:
+		break
+
+env.dynModel.print_stats()
 
 
 # Draw plots
+dynModel = env.dynModel
 time_axis = [i*simulation_params["dt"] for i in range(simulation_params['time_periods']+1)]
 
 groups = dynModel.groups.keys()
@@ -169,8 +161,8 @@ for i,group in enumerate(groups):
 
 for i,group in enumerate(groups):
 	plt.subplot(7,len(groups),i+1+len(groups)*5)
-	plt.plot(range(0,int(simulation_params['time_periods'])), re_change_order(m_tests_vec)[group], label="M Tests")
-	plt.plot(range(0,int(simulation_params['time_periods'])), re_change_order(a_tests_vec)[group], label="A Tests")
+	plt.plot(range(0,int(simulation_params['days']), int(simulation_params['policy_freq'])), re_change_order(m_tests_vec)[group], label="M Tests")
+	plt.plot(range(0,int(simulation_params['days']), int(simulation_params['policy_freq'])), re_change_order(a_tests_vec)[group], label="A Tests")
 	plt.legend(loc='upper right')
 
 plt.subplot(7,2,13)
@@ -189,5 +181,5 @@ plt.legend(loc='upper right')
 
 figure = plt.gcf() # get current figure
 figure.set_size_inches(7*len(groups),18)
-figure.suptitle('Region: %s, Policy: %s, MTests/day: %s, Heuristic: %s'%(simulation_params['region'],args.policy_params,args.m_tests,args.heuristic), fontsize=22)
-plt.savefig("results_runs/"+simulation_params['region']+"_params_"+args.policy_params +"_m_tests_"+args.m_tests+"_heuristic_"+args.heuristic+".pdf")
+figure.suptitle('Region: %s, Policy: %s, MTests/day: %s, Heuristic: %s'%(region,args.policy,args.m_tests,args.heuristic), fontsize=22)
+plt.savefig("results_runs/"+region+"_lp_"+args.policy+"_params_"+(args.policy_params if args.policy_params else "")+"_m_tests_"+args.m_tests+"_heuristic_"+args.heuristic+".pdf")
