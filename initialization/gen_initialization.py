@@ -15,9 +15,9 @@ data_dict = pickle.load( open( "../data/data_dict.p", "rb" ) )
 
 # Assume all of the groups have the following initial distribution
 initial_percentages = {
-	"S": 0.998,
-      "E": 0.001,
-      "I": 0.001,
+	"S": 1-1/12278210.0,
+      "E": 1/12278210.0,
+      "I": 0,
       "R": 0,
       "Ia": 0,
       "Ips": 0,
@@ -48,5 +48,5 @@ for group in data_dict['age_groups']:
       }
 
 
-with open('../initialization/initialization.yaml', 'w') as file:
+with open('../initialization/patient_zero.yaml', 'w') as file:
     yaml.dump(initialization_dict, file)
