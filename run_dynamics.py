@@ -119,9 +119,6 @@ while True:
 env.dynModel.print_stats()
 
 
-
-
-
 # Draw plots
 dynModel = env.dynModel
 time_axis = [i*simulation_params["dt"] for i in range(simulation_params['time_periods']+1)]
@@ -186,36 +183,3 @@ figure = plt.gcf() # get current figure
 figure.set_size_inches(7*len(groups),18)
 figure.suptitle('Region: %s, Policy: %s, MTests/day: %s, Heuristic: %s'%(region,args.policy,args.m_tests,args.heuristic), fontsize=22)
 plt.savefig("results_runs/"+region+"_lp_"+args.policy+"_params_"+(args.policy_params if args.policy_params else "")+"_m_tests_"+args.m_tests+"_heuristic_"+args.heuristic+".pdf")
-
-
-
-
-
-
-# groups = dynModel.groups.keys()
-# plt.figure(1)
-# for i,group in enumerate(groups):
-# 	plt.subplot(6,len(groups),i+1)
-# 	plt.plot(time_axis, dynModel.groups[group].S, label="Susceptible")
-# 	plt.title(group)
-# 	plt.legend(loc='upper right')
-#
-# for i,group in enumerate(groups):
-# 	plt.subplot(6,len(groups),i+1+len(groups))
-# 	plt.plot(time_axis, dynModel.groups[group].E, label="Exposed")
-# 	plt.plot(time_axis, dynModel.groups[group].I, label="Infected")
-# 	plt.plot(time_axis, dynModel.groups[group].R, label="Recovered")
-# 	plt.legend(loc='upper right')
-#
-# for i,group in enumerate(groups):
-# 	plt.subplot(6,len(groups),i+1+len(groups)*2)
-# 	plt.plot(time_axis, dynModel.groups[group].Rq, label="Recovered Q")
-# 	plt.legend(loc='upper right')
-#
-# for i,group in enumerate(groups):
-# 	plt.subplot(6,len(groups),i+1+len(groups)*3)
-# 	plt.plot(time_axis, dynModel.groups[group].Ia, label="Infected A-Q")
-# 	plt.plot(time_axis, dynModel.groups[group].Ips, label="Infected PS-Q")
-# 	plt.plot(time_axis, dynModel.groups[group].Ims, label="Infected MS-Q")
-# 	plt.plot(time_axis, dynModel.groups[group].Iss, label="Infected SS-Q")
-# 	plt.legend(loc='upper right')
