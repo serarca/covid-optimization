@@ -125,8 +125,8 @@ for i,group in enumerate(groups):
 
 for i,group in enumerate(groups):
 	plt.subplot(7,len(groups),i+1+len(groups)*5)
-	plt.plot(time_axis, m_tests_vec[group]+[0], label="M Tests")
-	plt.plot(time_axis, a_tests_vec[group]+[0], label="A Tests")
+	plt.plot(time_axis[:-1], m_tests_vec[group], label="M Tests")
+	plt.plot(time_axis[:-1], a_tests_vec[group], label="A Tests")
 	plt.legend(loc='upper right')
 
 plt.subplot(7,2,13)
