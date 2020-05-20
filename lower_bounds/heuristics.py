@@ -120,16 +120,25 @@ def forecasting_heuristic(dynModel, max_a_tests, max_m_tests, h_cap_vec, icu_cap
 
         # Run the model with no testing and fix the results as the old forecasting
         # Fix the new forecast as all all zeros
-        no_m_tests = {}
-        no_a_tests = {}
-        for g in dynModelC.groups:
-            no_m_tests[g] = [0 for i in remaining_time_steps]
-            no_a_tests[g] = [0 for i in remaining_time_steps]
+        # no_m_tests = {}
+        # no_a_tests = {}
+        # for g in dynModelC.groups:
+        #     no_m_tests[g] = [0 for i in remaining_time_steps]
+        #     no_a_tests[g] = [0 for i in remaining_time_steps]
 
-        dynModelC.simulate(no_m_tests, no_a_tests, h_cap_vec[t:], icu_cap_vec[t:])
+        groups = []
+        for group in dynModelC.parameters['seir-groups']:
+        	pop = sum([dynModelC.parameters['seir-groups'][group]['initial-conditions'][sg] for sg in ["S","E","I","R","Ia","Ips","Ims","Iss","Rq","H","ICU","D"]])
+        	if pop>0:
+        		groups.append(group)
+        groups.sort()
+
+        forecast_m_tests, forecast_a_tests = random_partition(dynModelC, groups, max_a_tests, max_m_tests)
+
+        dynModelC.simulate(forecast_m_tests, forecast_a_tests, h_cap_vec[t:], icu_cap_vec[t:])
 
         assign_forecastings(dynModelC, old_forecasting)
-        assign_forecastings(dynModelC, new_forecasting)
+        # assign_forecastings(dynModelC, new_forecasting)
 
         #While true do (will break only when the number of iterations have completed or the tolerance level has been reached)
 
