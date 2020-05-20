@@ -9,16 +9,11 @@ import argparse
 current_path = os.path.abspath(getsourcefile(lambda:0))
 current_dir = os.path.dirname(current_path)
 sys.path.insert(0, current_dir+"/heuristics")
-sys.path.insert(0, "./gym-covid/gym_covid/envs")
+
 
 from group import SEIR_group, DynamicalModel
 from heuristics import *
-<<<<<<< HEAD
 from forecasting_heuristic import *
-from covid_env import CovidEnvContinuous
-import gym
-=======
->>>>>>> 7716224690d66ab6362bcd08882d5599281c8a5f
 import math
 import pprint
 
@@ -46,17 +41,10 @@ args = parser.parse_args()
 
 
 # Read group parameters
-<<<<<<< HEAD
-with open("./parameters/"+region+".yaml") as file:
-	# The FullLoader parameter handles the conversion from YAML
-	# scalar values to Python the dictionary format
-	universe_params = yaml.load(file, Loader=yaml.FullLoader)
-=======
 with open("./parameters/"+simulation_params["region"]+".yaml") as file:
     # The FullLoader parameter handles the conversion from YAML
     # scalar values to Python the dictionary format
     universe_params = yaml.load(file, Loader=yaml.FullLoader)
->>>>>>> 7716224690d66ab6362bcd08882d5599281c8a5f
 
 # Read initialization
 with open("./initialization/initialization.yaml") as file:
@@ -79,18 +67,14 @@ dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt
 max_m_tests = [float(args.m_tests) for t in range(simulation_params['time_periods'])]
 max_a_tests = [float(args.a_tests) for t in range(simulation_params['time_periods'])]
 if args.heuristic == "random":
-<<<<<<< HEAD
 	groups = []
-	for group in env.dynModel.parameters['seir-groups']:
-		population = sum([env.dynModel.initialization[group][sg] for sg in ["S","E","I","R","Ia","Ips","Ims","Iss","Rq","H","ICU","D"]])
+	for group in dynModel.parameters['seir-groups']:
+		population = sum([dynModel.initialization[group][sg] for sg in ["S","E","I","R","Ia","Ips","Ims","Iss","Rq","H","ICU","D"]])
 		if population > 0:
 			groups.append(group)
 	groups.sort()
 
-	a_tests_vec, m_tests_vec = random_partition(env.dynModel, groups, max_a_tests, max_m_tests)
-=======
-	a_tests_vec, m_tests_vec = random_partition(dynModel, max_a_tests, max_m_tests)
->>>>>>> 7716224690d66ab6362bcd08882d5599281c8a5f
+	a_tests_vec, m_tests_vec = random_partition(dynModel, groups, max_a_tests, max_m_tests)
 elif args.heuristic == "homogeneous":
 	a_tests_vec, m_tests_vec = homogeneous(dynModel, max_a_tests, max_m_tests)
 elif "age_group" in args.heuristic:
@@ -98,17 +82,10 @@ elif "age_group" in args.heuristic:
 elif args.heuristic == "no_tests":
 	a_tests_vec, m_tests_vec = no_tests(dynModel)
 elif args.heuristic == "forecasting_heuristic":
-<<<<<<< HEAD
 	tolerance = 10
 	max_iterations = 10
-	a_tests_vec, m_tests_vec = forecasting_heuristic(env.dynModel, max_a_tests, max_m_tests, [env.dynModel.beds for t in range(len(max_a_tests))], [env.dynModel.icus for t in range(len(max_a_tests))], tolerance, max_iterations)
+	a_tests_vec, m_tests_vec = forecasting_heuristic(dynModel, max_a_tests, max_m_tests, [dynModel.beds for t in range(len(max_a_tests))], [dynModel.icus for t in range(len(max_a_tests))], tolerance, max_iterations)
 #ICU CAP replaced by single value dynModel.icus
-=======
-    tolerance = 10
-    max_iterations = 10
-    a_tests_vec, m_tests_vec = forecasting_heuristic(dynModel, max_a_tests, max_m_tests, h_cap_vec, icu_cap_vec, tolerance, max_iterations)
-# Put tests in dictionary
->>>>>>> 7716224690d66ab6362bcd08882d5599281c8a5f
 tests = {
 	'a_tests_vec':a_tests_vec,
 	'm_tests_vec':m_tests_vec,
