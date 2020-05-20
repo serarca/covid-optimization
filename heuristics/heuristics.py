@@ -17,10 +17,18 @@ def change_order(d):
 	for t in range(times):
 		curr_d = {
 			key:d[key][t] for key in d
-		} 
+		}
 		d_array.append(curr_d)
 	return d_array
 
+def re_change_order(l):
+	times = len(l)
+	groups = l[0].keys()
+	d = {}
+	for g in groups:
+		d[g] = [test[g] for test in l]
+		
+	return d
 
 # A heuristic that assigns all testing to a given group
 def all_to_one(dyn_model, group, max_a_tests, max_m_tests):
@@ -129,6 +137,3 @@ def random_partition(dyn_model, groups, max_a_tests, max_m_tests):
             m_sample[n][t] = m_sample[n][t]/sample_sum*max_m_tests[t]
 
     return (a_sample,m_sample)
-
-
-

@@ -126,29 +126,28 @@ env.dynModel.print_stats()
 dynModel = env.dynModel
 time_axis = [i*simulation_params["dt"] for i in range(simulation_params['time_periods']+1)]
 
-
 groups = dynModel.groups.keys()
 plt.figure(1)
 for i,group in enumerate(groups):
-	plt.subplot(6,len(groups),i+1)
+	plt.subplot(7,len(groups),i+1)
 	plt.plot(time_axis, dynModel.groups[group].S, label="Susceptible")
 	plt.title(group)
 	plt.legend(loc='upper right')
 
 for i,group in enumerate(groups):
-	plt.subplot(6,len(groups),i+1+len(groups))
+	plt.subplot(7,len(groups),i+1+len(groups))
 	plt.plot(time_axis, dynModel.groups[group].E, label="Exposed")
 	plt.plot(time_axis, dynModel.groups[group].I, label="Infected")
 	plt.plot(time_axis, dynModel.groups[group].R, label="Recovered")
 	plt.legend(loc='upper right')
 
 for i,group in enumerate(groups):
-	plt.subplot(6,len(groups),i+1+len(groups)*2)
+	plt.subplot(7,len(groups),i+1+len(groups)*2)
 	plt.plot(time_axis, dynModel.groups[group].Rq, label="Recovered Q")
 	plt.legend(loc='upper right')
 
 for i,group in enumerate(groups):
-	plt.subplot(6,len(groups),i+1+len(groups)*3)
+	plt.subplot(7,len(groups),i+1+len(groups)*3)
 	plt.plot(time_axis, dynModel.groups[group].Ia, label="Infected A-Q")
 	plt.plot(time_axis, dynModel.groups[group].Ips, label="Infected PS-Q")
 	plt.plot(time_axis, dynModel.groups[group].Ims, label="Infected MS-Q")
@@ -156,29 +155,67 @@ for i,group in enumerate(groups):
 	plt.legend(loc='upper right')
 
 for i,group in enumerate(groups):
-	plt.subplot(6,len(groups),i+1+len(groups)*4)
+	plt.subplot(7,len(groups),i+1+len(groups)*4)
 	plt.plot(time_axis, dynModel.groups[group].H, label="Hospital Bed")
 	plt.plot(time_axis, dynModel.groups[group].ICU, label="ICU")
 	plt.plot(time_axis, dynModel.groups[group].D, label="Dead")
 	plt.legend(loc='upper right')
 
-plt.subplot(6,2,11)
+
+for i,group in enumerate(groups):
+	plt.subplot(7,len(groups),i+1+len(groups)*5)
+	plt.plot(range(0,int(simulation_params['days']), int(simulation_params['policy_freq'])), re_change_order(m_tests_vec)[group], label="M Tests")
+	plt.plot(range(0,int(simulation_params['days']), int(simulation_params['policy_freq'])), re_change_order(a_tests_vec)[group], label="A Tests")
+	plt.legend(loc='upper right')
+
+plt.subplot(7,2,13)
 #plt.plot(time_axis, [sum([dynModel.groups[group].H[i] for group in groups]) for i in range(len(time_axis))], label="Total Hospital Beds")
 plt.plot(time_axis, [sum([dynModel.groups[group].ICU[i] for group in groups]) for i in range(len(time_axis))], label="Total ICUs")
 #plt.axhline(y=parameters['global-parameters']['C_H'], color='r', linestyle='dashed', label= "Hospital Capacity")
 plt.axhline(y=dynModel.icus, color='g', linestyle='dashed', label= "ICU Capacity")
 plt.legend(loc='upper right')
 
-plt.subplot(6,2,12)
+plt.subplot(7,2,14)
 #plt.plot(time_axis, [sum([dynModel.groups[group].H[i] for group in groups]) for i in range(len(time_axis))], label="Total Hospital Beds")
 plt.plot(time_axis, [sum([dynModel.groups[group].D[i] for group in groups]) for i in range(len(time_axis))], label="Total Deaths")
 #plt.axhline(y=parameters['global-parameters']['C_H'], color='r', linestyle='dashed', label= "Hospital Capacity")
 plt.legend(loc='upper right')
 
 
-
 figure = plt.gcf() # get current figure
-figure.set_size_inches(6*len(groups),18)
+figure.set_size_inches(7*len(groups),18)
 figure.suptitle('Region: %s, Policy: %s, MTests/day: %s, Heuristic: %s'%(region,args.policy,args.m_tests,args.heuristic), fontsize=22)
-plt.savefig("results_runs/"+region+"_lp_"+args.policy+"_params_"+(args.policy_params if args.policy_params else "")+"_m_tests_"+args.m_tests+"_heuristic_"+args.heuristic+".png", dpi = 100)
+plt.savefig("results_runs/"+region+"_lp_"+args.policy+"_params_"+(args.policy_params if args.policy_params else "")+"_m_tests_"+args.m_tests+"_heuristic_"+args.heuristic+".pdf")
 
+
+
+
+
+
+# groups = dynModel.groups.keys()
+# plt.figure(1)
+# for i,group in enumerate(groups):
+# 	plt.subplot(6,len(groups),i+1)
+# 	plt.plot(time_axis, dynModel.groups[group].S, label="Susceptible")
+# 	plt.title(group)
+# 	plt.legend(loc='upper right')
+#
+# for i,group in enumerate(groups):
+# 	plt.subplot(6,len(groups),i+1+len(groups))
+# 	plt.plot(time_axis, dynModel.groups[group].E, label="Exposed")
+# 	plt.plot(time_axis, dynModel.groups[group].I, label="Infected")
+# 	plt.plot(time_axis, dynModel.groups[group].R, label="Recovered")
+# 	plt.legend(loc='upper right')
+#
+# for i,group in enumerate(groups):
+# 	plt.subplot(6,len(groups),i+1+len(groups)*2)
+# 	plt.plot(time_axis, dynModel.groups[group].Rq, label="Recovered Q")
+# 	plt.legend(loc='upper right')
+#
+# for i,group in enumerate(groups):
+# 	plt.subplot(6,len(groups),i+1+len(groups)*3)
+# 	plt.plot(time_axis, dynModel.groups[group].Ia, label="Infected A-Q")
+# 	plt.plot(time_axis, dynModel.groups[group].Ips, label="Infected PS-Q")
+# 	plt.plot(time_axis, dynModel.groups[group].Ims, label="Infected MS-Q")
+# 	plt.plot(time_axis, dynModel.groups[group].Iss, label="Infected SS-Q")
+# 	plt.legend(loc='upper right')
