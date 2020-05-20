@@ -1,6 +1,7 @@
 from collections import defaultdict
 from bound import Bounds
 import numpy as np
+import pandas as pd
 
 def n_contacts(group_g, group_h, alphas):
 	n = 0
@@ -158,6 +159,24 @@ class DynamicalModel:
 		print("Economic Value: "+str(self.get_total_economic_value()))
 		print("Deaths "+str(self.get_total_deaths()))
 		print("Total Reward "+str(self.get_total_reward()))
+
+	def get_pandas_summary(self):
+		d = {
+			"S": [sum([self.groups[g].S[t] for g in self.groups ]) for t in range(self.t+1)],
+			"E": [sum([self.groups[g].E[t] for g in self.groups ]) for t in range(self.t+1)],
+			"I": [sum([self.groups[g].I[t] for g in self.groups ]) for t in range(self.t+1)],
+			"R": [sum([self.groups[g].R[t] for g in self.groups ]) for t in range(self.t+1)],
+			"N": [sum([self.groups[g].N[t] for g in self.groups ]) for t in range(self.t+1)],
+			"Ia": [sum([self.groups[g].Ia[t] for g in self.groups ]) for t in range(self.t+1)],
+			"Ips": [sum([self.groups[g].Ips[t] for g in self.groups ]) for t in range(self.t+1)],
+			"Ims": [sum([self.groups[g].Ims[t] for g in self.groups ]) for t in range(self.t+1)],
+			"Iss": [sum([self.groups[g].Iss[t] for g in self.groups ]) for t in range(self.t+1)],
+			"Rq": [sum([self.groups[g].Rq[t] for g in self.groups ]) for t in range(self.t+1)],
+			"H": [sum([self.groups[g].H[t] for g in self.groups ]) for t in range(self.t+1)],
+			"ICU": [sum([self.groups[g].ICU[t] for g in self.groups ]) for t in range(self.t+1)],
+			"D": [sum([self.groups[g].D[t] for g in self.groups ]) for t in range(self.t+1)],
+		}
+		return pd.DataFrame(d)
 
 class SEIR_group:
 	# Time step
