@@ -13,6 +13,7 @@ sys.path.insert(0, "./gym-covid/gym_covid/envs")
 
 from group import SEIR_group, DynamicalModel
 from heuristics import *
+from forecasting_heuristic import *
 from covid_env import CovidEnvContinuous
 import gym
 import math
@@ -46,21 +47,21 @@ args = parser.parse_args()
 
 # Read group parameters
 with open("./parameters/"+region+".yaml") as file:
-    # The FullLoader parameter handles the conversion from YAML
-    # scalar values to Python the dictionary format
-    universe_params = yaml.load(file, Loader=yaml.FullLoader)
+	# The FullLoader parameter handles the conversion from YAML
+	# scalar values to Python the dictionary format
+	universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
 # Read initialization
 with open("./initialization/initialization.yaml") as file:
-    # The FullLoader parameter handles the conversion from YAML
-    # scalar values to Python the dictionary format
-    initialization = yaml.load(file, Loader=yaml.FullLoader)
+	# The FullLoader parameter handles the conversion from YAML
+	# scalar values to Python the dictionary format
+	initialization = yaml.load(file, Loader=yaml.FullLoader)
 
 # Read lockdown
 with open("./alphas_action_space/default.yaml") as file:
-    # The FullLoader parameter handles the conversion from YAML
-    # scalar values to Python the dictionary format
-    actions_dict = yaml.load(file, Loader=yaml.FullLoader)
+	# The FullLoader parameter handles the conversion from YAML
+	# scalar values to Python the dictionary format
+	actions_dict = yaml.load(file, Loader=yaml.FullLoader)
 
 # Create environment
 env = CovidEnvContinuous(universe_params, simulation_params, actions_dict, initialization)
@@ -70,7 +71,14 @@ env = CovidEnvContinuous(universe_params, simulation_params, actions_dict, initi
 max_m_tests = [float(args.m_tests) for t in range(simulation_params['n_policies'])]
 max_a_tests = [float(args.a_tests) for t in range(simulation_params['n_policies'])]
 if args.heuristic == "random":
-	a_tests_vec, m_tests_vec = random_partition(env.dynModel, max_a_tests, max_m_tests)
+	groups = []
+	for group in env.dynModel.parameters['seir-groups']:
+		population = sum([env.dynModel.initialization[group][sg] for sg in ["S","E","I","R","Ia","Ips","Ims","Iss","Rq","H","ICU","D"]])
+		if population > 0:
+			groups.append(group)
+	groups.sort()
+
+	a_tests_vec, m_tests_vec = random_partition(env.dynModel, groups, max_a_tests, max_m_tests)
 elif args.heuristic == "homogeneous":
 	a_tests_vec, m_tests_vec = homogeneous(env.dynModel, max_a_tests, max_m_tests)
 elif "age_group" in args.heuristic:
@@ -78,10 +86,10 @@ elif "age_group" in args.heuristic:
 elif args.heuristic == "no_tests":
 	a_tests_vec, m_tests_vec = no_tests(env.dynModel)
 elif args.heuristic == "forecasting_heuristic":
-    tolerance = 10
-    max_iterations = 10
-    a_tests_vec, m_tests_vec = forecasting_heuristic(env.dynModel, max_a_tests, max_m_tests, h_cap_vec, icu_cap_vec, tolerance, max_iterations)
-
+	tolerance = 10
+	max_iterations = 10
+	a_tests_vec, m_tests_vec = forecasting_heuristic(env.dynModel, max_a_tests, max_m_tests, [env.dynModel.beds for t in range(len(max_a_tests))], [env.dynModel.icus for t in range(len(max_a_tests))], tolerance, max_iterations)
+#ICU CAP replaced by single value dynModel.icus
 tests = {
 	'a_tests_vec':a_tests_vec,
 	'm_tests_vec':m_tests_vec,

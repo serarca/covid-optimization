@@ -15,6 +15,7 @@ class DynamicalModel:
 		self.t = 0
 		self.dt = dt
 		self.time_steps = time_steps
+		self.initialization = initialization
 
 		# Create groups from parameters
 		self.groups = {}
@@ -183,7 +184,7 @@ class SEIR_group:
 		self.I = [float(initial_conditions['I'])]
 		# Recovered (unquarantined)
 		self.R = [float(initial_conditions['R'])]
-		# Unquarantined patients 
+		# Unquarantined patients
 		self.N = [self.S[0] + self.E[0] + self.I[0]+ self.R[0]]
 
 		# Infected quarantined with different degrees of severity
@@ -213,7 +214,7 @@ class SEIR_group:
 			summ_contacts = 0
 			for n,g in self.all_groups.items():
 				pop_g = g.N[t] + g.Rq[t]
-				summ_contacts += n_contacts(self, g, alphas)*g.I[t]/(pop_g if pop_g!=0 else 10e-6)	
+				summ_contacts += n_contacts(self, g, alphas)*g.I[t]/(pop_g if pop_g!=0 else 10e-6)
 			self.total_contacts.append(summ_contacts*self.S[t])
 		else:
 			assert(False)
@@ -374,7 +375,7 @@ class SEIR_group:
 		for n,g in self.all_groups.items():
 			entering_icu[n] = self.all_groups[n].flow_ICU(self.t)
 			summ_entering_icu += entering_icu[n]
-			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[self.t]	
+			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[self.t]
 
 
 		delta_D = (

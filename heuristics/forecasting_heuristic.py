@@ -6,7 +6,7 @@ from heuristics import *
 
 def forecasting_heuristic(dynModel, max_a_tests, max_m_tests, h_cap_vec, icu_cap_vec, tolerance, max_iterations):
     #Create copy of dyn model to modify
-    dynModelC = DynamicalModel(dynModel.parameters, dynModel.dt, dynModel.time_steps)
+    dynModelC = DynamicalModel(dynModel.parameters, dynModel.initialization, dynModel.dt, dynModel.time_steps)
 
     #Initialize real testing vectors
     final_a_testing = {}
@@ -29,7 +29,7 @@ def forecasting_heuristic(dynModel, max_a_tests, max_m_tests, h_cap_vec, icu_cap
         remaining_time_steps = range(dynModel.time_steps - t)
 
         # Empty the copy of the dyn model and put as initial conditions the first elements of the old forecast.
-        dynModelC.__init__(dynModelC.parameters, dynModelC.dt, len(remaining_time_steps))
+        dynModelC.__init__(dynModelC.parameters, dynModelC.initialization, dynModelC.dt, len(remaining_time_steps))
 
         initialize_with_forecast(dynModelC, old_forecasting)
 
@@ -43,8 +43,8 @@ def forecasting_heuristic(dynModel, max_a_tests, max_m_tests, h_cap_vec, icu_cap
 
         groups = []
         for group in dynModelC.parameters['seir-groups']:
-        	pop = sum([dynModelC.parameters['seir-groups'][group]['initial-conditions'][sg] for sg in ["S","E","I","R","Ia","Ips","Ims","Iss","Rq","H","ICU","D"]])
-        	if pop>0:
+        	population = sum([dynModelC.initialization[group][sg] for sg in ["S","E","I","R","Ia","Ips","Ims","Iss","Rq","H","ICU","D"]])
+        	if population > 0:
         		groups.append(group)
         groups.sort()
 
