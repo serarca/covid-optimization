@@ -12,7 +12,7 @@ sys.path.insert(0, current_dir+"/heuristics")
 
 
 from group import SEIR_group, DynamicalModel
-from heuristics import *
+# from heuristics import *
 from forecasting_heuristic import *
 import math
 import pprint
@@ -66,6 +66,7 @@ dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt
 # Construct vector of tests with a heuristic
 max_m_tests = [float(args.m_tests) for t in range(simulation_params['time_periods'])]
 max_a_tests = [float(args.a_tests) for t in range(simulation_params['time_periods'])]
+
 if args.heuristic == "random":
 	groups = []
 	for group in dynModel.parameters['seir-groups']:
@@ -99,6 +100,7 @@ static_alpha = {
 
 # Run the model for the whole time range
 for t in range(simulation_params['time_periods']):
+	
 	dynModel.take_time_step(m_tests_vec[t], a_tests_vec[t], static_alpha)
 
 # Print model stats

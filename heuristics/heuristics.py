@@ -27,7 +27,7 @@ def re_change_order(l):
 	d = {}
 	for g in groups:
 		d[g] = [test[g] for test in l]
-		
+
 	return d
 
 # A heuristic that assigns all testing to a given group
@@ -48,22 +48,25 @@ def all_to_one(dyn_model, group, max_a_tests, max_m_tests):
 
 
 # A heuristic that assigns random testing at each point in time among all groups in 'groups' variable
-def random_partition(dyn_model, max_a_tests, max_m_tests):
-	groups = dyn_model.groups
+def random_partition(dyn_model, groups, max_a_tests, max_m_tests):
+	print(groups)
 	a_sample = defaultdict(list)
 	m_sample = defaultdict(list)
 	# Sample dictionary of A tests for all groups at all times uniformly from the simplex boundary
 	for t in range(dyn_model.time_steps):
 		sample_sum = 0
 		for n in dyn_model.groups:
+
 			if n in groups:
 				sample = np.random.uniform()
 			else:
 				sample = 0
 			a_sample[n].append(sample)
+			print(a_sample[n])
 			sample_sum += sample
 		for n in dyn_model.groups:
 			a_sample[n][t] = a_sample[n][t]/sample_sum*max_a_tests[t]
+			print(a_sample[n][t])
 	# Sample dictionary of M tests for all groups at all times uniformly from the simplex boundary
 	for t in range(dyn_model.time_steps):
 		sample_sum = 0
@@ -89,8 +92,8 @@ def homogeneous(dyn_model, max_a_tests, max_m_tests):
 			a_tests[name] = [max_a_tests[i]/(len(groups)+0.0) for i in range(len(max_a_tests))]
 			m_tests[name] = [max_m_tests[i]/(len(groups)+0.0) for i in range(len(max_m_tests))]
 		else:
-			a_tests[name] = [0 for t in range(dyn_model.time_steps)]
-			m_tests[name] = [0 for t in range(dyn_model.time_steps)]
+			a_tests[name] = [0 for t in range(len(max_m_tests))]
+			m_tests[name] = [0 for t in range(len(max_m_tests))]
 
 	return (change_order(a_tests),change_order(m_tests))
 
@@ -104,36 +107,3 @@ def no_tests(dyn_model):
 		m_tests[name] = [0 for t in range(dyn_model.time_steps)]
 
 	return (change_order(a_tests),change_order(m_tests))
-
-
-
-# A heuristic that assigns random testing at each point in time among all groups in 'groups' variable
-def random_partition(dyn_model, groups, max_a_tests, max_m_tests):
-    a_sample = defaultdict(list)
-    m_sample = defaultdict(list)
-    # Sample dictionary of A tests for all groups at all times uniformly from the simplex boundary
-    for t in range(dyn_model.time_steps):
-        sample_sum = 0
-        for n in dyn_model.groups:
-            if n in groups:
-                sample = np.random.uniform()
-            else:
-                sample = 0
-            a_sample[n].append(sample)
-            sample_sum += sample
-        for n in dyn_model.groups:
-            a_sample[n][t] = a_sample[n][t]/sample_sum*max_a_tests[t]
-    # Sample dictionary of M tests for all groups at all times uniformly from the simplex boundary
-    for t in range(dyn_model.time_steps):
-        sample_sum = 0
-        for n in dyn_model.groups:
-            if n in groups:
-                sample = np.random.uniform()
-            else:
-                sample = 0
-            m_sample[n].append(sample)
-            sample_sum += sample
-        for n in dyn_model.groups:
-            m_sample[n][t] = m_sample[n][t]/sample_sum*max_m_tests[t]
-
-    return (a_sample,m_sample)
