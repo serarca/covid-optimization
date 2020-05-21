@@ -13,40 +13,23 @@ region = args.region
 data_dict = pickle.load( open( "../data/data_dict.p", "rb" ) )
 
 
-# Assume all of the groups have the following initial distribution
-initial_percentages = {
-	"S": 1-1/12278210.0,
-      "E": 1/12278210.0,
-      "I": 0,
-      "R": 0,
-      "Ia": 0,
-      "Ips": 0,
-      "Ims": 0,
-      "Iss": 0,
-      "Rq": 0,
-      "H": 0,
-      "ICU": 0,
-      "D": 0,
-}
-
 # Construct initialization
 initialization_dict = {}
 for group in data_dict['age_groups']:
       initialization_dict[group] = {
-            "S": float(initial_percentages["S"]*data_dict["population"][group][region]),
-            "E": float(initial_percentages["E"]*data_dict["population"][group][region]),
-            "I": float(initial_percentages["I"]*data_dict["population"][group][region]),
-            "R": float(initial_percentages["R"]*data_dict["population"][group][region]),
-            "Ia": float(initial_percentages["Ia"]*data_dict["population"][group][region]),
-            "Ips": float(initial_percentages["Ips"]*data_dict["population"][group][region]),
-            "Ims": float(initial_percentages["Ims"]*data_dict["population"][group][region]),
-            "Iss": float(initial_percentages["Iss"]*data_dict["population"][group][region]),
-            "Rq": float(initial_percentages["Rq"]*data_dict["population"][group][region]),
-            "H": float(initial_percentages["H"]*data_dict["population"][group][region]),
-            "ICU": float(initial_percentages["ICU"]*data_dict["population"][group][region]),
-            "D": float(initial_percentages["D"]*data_dict["population"][group][region]),
+            "S": float(data_dict["population"][group][region]),
+            "E": float(0),
+            "I": float(0),
+            "R": float(0),
+            "Ia": float(0),
+            "Ips": float(0),
+            "Ims": float(0),
+            "Iss": float(0),
+            "Rq": float(0),
+            "H": float(0),
+            "ICU": float(0),
+            "D": float(0),
       }
-
 
 with open('../initialization/patient_zero.yaml', 'w') as file:
     yaml.dump(initialization_dict, file)

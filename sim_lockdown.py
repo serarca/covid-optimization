@@ -54,8 +54,9 @@ with open("./initialization/patient_zero.yaml") as file:
 	initialization = yaml.load(file, Loader=yaml.FullLoader)
 
 # Update initialization
-for group in initialization:
-	initialization[group]["E"] = initialization[group]["E"]*int(args.initial_infected)
+# Put exactly one infected individual in age group 40-49. No infected individuals in other groups.    
+initialization["age_group_40_49"]["I"] = initialization["age_group_40_49"]["I"] + int(args.initial_infected)
+initialization["age_group_40_49"]["S"] = initialization["age_group_40_49"]["S"] - int(args.initial_infected)
 
 # Read lockdown
 with open("./alphas_action_space/default.yaml") as file:
@@ -68,15 +69,16 @@ with open("./alphas_action_space/default.yaml") as file:
 dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt'], simulation_params['time_periods'])
 
 # Define policy
-total_lockdown_pattern = "000000"
+total_lockdown_pattern = "000000000"
 total_lockdown = {
-	'age_group_%d'%i:actions_dict['age_group_%d'%i][int(total_lockdown_pattern[i-1])] for i in range(1,7)
+	'age_group_%d_%d'%(10*i,10*i+9):actions_dict['age_group_%d_%d'%(10*i,10*i+9)][int(total_lockdown_pattern[i])] for i in range(0,8)
 }
-no_lockdown_pattern = "444442"
+total_lockdown['age_group_80_plus'] = actions_dict['age_group_80_plus'][0]
+no_lockdown_pattern = "444444422"
 no_lockdown = {
-	'age_group_%d'%i:actions_dict['age_group_%d'%i][int(no_lockdown_pattern[i-1])] for i in range(1,7)
+	'age_group_%d_%d'%(10*i,10*i+9):actions_dict['age_group_%d_%d'%(10*i,10*i+9)][int(no_lockdown_pattern[i])] for i in range(0,8)
 }
-
+no_lockdown['age_group_80_plus'] = actions_dict['age_group_80_plus'][2]
 
 # Construct vector of tests with a heuristic
 max_m_tests = [float(args.m_tests) for t in range(simulation_params['time_periods'])]
