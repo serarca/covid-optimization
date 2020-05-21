@@ -31,5 +31,5 @@ for group in data_dict['age_groups']:
             "D": float(0),
       }
 
-with open('../initialization/patient_zero.yaml', 'w') as file:
+with open('../initialization/initialization.yaml', 'w') as file:
     yaml.dump(initialization_dict, file)

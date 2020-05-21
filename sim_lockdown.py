@@ -48,7 +48,7 @@ with open("./parameters/"+simulation_params["region"]+".yaml") as file:
     universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
 # Read initialization
-with open("./initialization/patient_zero.yaml") as file:
+with open("./initialization/initialization.yaml") as file:
 	# The FullLoader parameter handles the conversion from YAML
 	# scalar values to Python the dictionary format
 	initialization = yaml.load(file, Loader=yaml.FullLoader)
