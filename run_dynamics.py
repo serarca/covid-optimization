@@ -67,6 +67,11 @@ dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt
 max_m_tests = [float(args.m_tests) for t in range(simulation_params['time_periods'])]
 max_a_tests = [float(args.a_tests) for t in range(simulation_params['time_periods'])]
 
+# Define policy
+static_alpha = {
+	'age_group_%d'%i:actions_dict['age_group_%d'%i][int(args.policy_params[i-1])] for i in range(1,7)
+}
+
 if args.heuristic == "random":
 	groups = []
 	for group in dynModel.parameters['seir-groups']:
@@ -85,7 +90,7 @@ elif args.heuristic == "no_tests":
 elif args.heuristic == "forecasting_heuristic":
 	tolerance = 10
 	max_iterations = 10
-	a_tests_vec, m_tests_vec = forecasting_heuristic(dynModel, max_a_tests, max_m_tests, [dynModel.beds for t in range(len(max_a_tests))], [dynModel.icus for t in range(len(max_a_tests))], tolerance, max_iterations)
+	a_tests_vec, m_tests_vec = forecasting_heuristic(dynModel, max_a_tests, max_m_tests, [static_alpha for t in range(simulation_params['time_periods'])], [dynModel.beds for t in range(len(max_a_tests))], [dynModel.icus for t in range(len(max_a_tests))], tolerance, max_iterations)
 #ICU CAP replaced by single value dynModel.icus
 tests = {
 	'a_tests_vec':a_tests_vec,
@@ -93,14 +98,8 @@ tests = {
 }
 
 
-# Define policy
-static_alpha = {
-	'age_group_%d'%i:actions_dict['age_group_%d'%i][int(args.policy_params[i-1])] for i in range(1,7)
-}
-
 # Run the model for the whole time range
 for t in range(simulation_params['time_periods']):
-	
 	dynModel.take_time_step(m_tests_vec[t], a_tests_vec[t], static_alpha)
 
 # Print model stats

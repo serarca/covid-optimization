@@ -49,7 +49,7 @@ def all_to_one(dyn_model, group, max_a_tests, max_m_tests):
 
 # A heuristic that assigns random testing at each point in time among all groups in 'groups' variable
 def random_partition(dyn_model, groups, max_a_tests, max_m_tests):
-	print(groups)
+
 	a_sample = defaultdict(list)
 	m_sample = defaultdict(list)
 	# Sample dictionary of A tests for all groups at all times uniformly from the simplex boundary
@@ -62,11 +62,10 @@ def random_partition(dyn_model, groups, max_a_tests, max_m_tests):
 			else:
 				sample = 0
 			a_sample[n].append(sample)
-			print(a_sample[n])
 			sample_sum += sample
 		for n in dyn_model.groups:
-			a_sample[n][t] = a_sample[n][t]/sample_sum*max_a_tests[t]
-			print(a_sample[n][t])
+			a_sample[n][t] = a_sample[n][t] / sample_sum * max_a_tests[t]
+
 	# Sample dictionary of M tests for all groups at all times uniformly from the simplex boundary
 	for t in range(dyn_model.time_steps):
 		sample_sum = 0
