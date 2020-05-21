@@ -67,6 +67,16 @@ with open("./alphas_action_space/default.yaml") as file:
 # Create environment
 dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt'], simulation_params['time_periods'])
 
+# Define policy
+total_lockdown_pattern = "000000"
+total_lockdown = {
+	'age_group_%d'%i:actions_dict['age_group_%d'%i][int(total_lockdown_pattern[i-1])] for i in range(1,7)
+}
+no_lockdown_pattern = "444442"
+no_lockdown = {
+	'age_group_%d'%i:actions_dict['age_group_%d'%i][int(no_lockdown_pattern[i-1])] for i in range(1,7)
+}
+
 
 # Construct vector of tests with a heuristic
 max_m_tests = [float(args.m_tests) for t in range(simulation_params['time_periods'])]
@@ -89,7 +99,7 @@ elif args.heuristic == "no_tests":
 elif args.heuristic == "forecasting_heuristic":
 	tolerance = 10
 	max_iterations = 10
-	a_tests_vec, m_tests_vec = forecasting_heuristic(dynModel, max_a_tests, max_m_tests, [dynModel.beds for t in range(len(max_a_tests))], [dynModel.icus for t in range(len(max_a_tests))], tolerance, max_iterations)
+	a_tests_vec, m_tests_vec = forecasting_heuristic(dynModel, max_a_tests, max_m_tests, [no_lockdown for t in range(0,int(args.lockdown_start))] + [total_lockdown for t in range(int(args.lockdown_start),int(args.n_days))], [dynModel.beds for t in range(len(max_a_tests))], [dynModel.icus for t in range(len(max_a_tests))], tolerance, max_iterations)
 #ICU CAP replaced by single value dynModel.icus
 tests = {
 	'a_tests_vec':a_tests_vec,
@@ -97,15 +107,7 @@ tests = {
 }
 
 
-# Define policy
-total_lockdown_pattern = "000000"
-total_lockdown = {
-	'age_group_%d'%i:actions_dict['age_group_%d'%i][int(total_lockdown_pattern[i-1])] for i in range(1,7)
-}
-no_lockdown_pattern = "444442"
-no_lockdown = {
-	'age_group_%d'%i:actions_dict['age_group_%d'%i][int(no_lockdown_pattern[i-1])] for i in range(1,7)
-}
+
 
 # Run the model for the whole time range
 for t in range(0,int(args.lockdown_start)):
