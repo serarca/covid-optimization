@@ -83,9 +83,11 @@ class DynamicalModel:
 					alphas[group]['work']+
 					self.groups[group].economics['lockdown_fraction']*(1-alphas[group]['work'])
 				)*
-				(state[group]["S"] + state[group]["E"] + state[group]["R"]+ state[group]["Rq"])
+				(state[group]["S"] + state[group]["E"] + state[group]["R"])
 				* self.dt
 			)
+			# Liberate people in Rq group
+			value += state[group]["Rq"]*self.groups[group].economics['work_value']* self.dt
 		return value
 
 	def get_state(self, t):
@@ -286,7 +288,6 @@ class SEIR_group:
 
 	# Updates S
 	def update_S(self, m_tests, a_tests):
-		## TODO might be wrong
 		delta_S = -self.parameters['beta']*self.total_contacts[self.t-1]
 		self.S += [self.S[self.t]+delta_S*self.dt]
 

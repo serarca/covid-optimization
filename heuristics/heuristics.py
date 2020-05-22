@@ -30,6 +30,16 @@ def re_change_order(l):
 
 	return d
 
+def change_order_alphas(alphas_vec):
+	times = len(alphas_vec)
+	age_groups = list(alphas_vec[0].keys())
+	activities = alphas_vec[0][age_groups[0]].keys()
+	d = {group:{
+		activity:[alphas_vec[t][group][activity] for t in range(times)] for activity in activities
+	} for group in age_groups}
+
+	return d
+
 # A heuristic that assigns all testing to a given group
 def all_to_one(dyn_model, group, max_a_tests, max_m_tests):
     # Choose a group randomly
