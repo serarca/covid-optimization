@@ -24,6 +24,8 @@ simulation_params = {
 	'days': 182.0,
 	'region': "Ile-de-France",
 }
+age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29', 'age_group_30_39', 'age_group_40_49', 
+	'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
 
 
 # Define time variables
@@ -36,7 +38,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-heuristic", "--heuristic", help="Chose heuristic")
 parser.add_argument("-a_tests", "--a_tests", help="Number of A tests")
 parser.add_argument("-m_tests", "--m_tests", help="Number of M tests")
-parser.add_argument("-policy_params", "--policy_params", help="Number of M tests")
+parser.add_argument("-policy", "--policy", help="Parameters of policy")
+parser.add_argument("-perc_infected", "--perc_infected", help="Percentage of population infected")
 args = parser.parse_args()
 
 
@@ -59,6 +62,30 @@ with open("./alphas_action_space/default.yaml") as file:
 	actions_dict = yaml.load(file, Loader=yaml.FullLoader)
 
 
+# Move population to infected
+for group in initialization:
+	change = initialization[group]["S"]*float(args.perc_infected)/100
+	initialization[group]["S"] = initialization[group]["S"] - change
+	initialization[group]["I"] = initialization[group]["I"] + change
+
+# Define policy
+if args.policy in ["static","dynamic"]:
+	# Read policy
+	with open('./benchmarks/'+args.policy+"_infected_"+args.perc_infected+'.yaml') as file:
+	    # The FullLoader parameter handles the conversion from YAML
+	    # scalar values to Python the dictionary format
+	    policy_file = yaml.load(file, Loader=yaml.FullLoader)
+	alphas_vec = policy_file['alphas_vec']
+
+else:
+	static_alpha = {
+		age_groups[i]:actions_dict[age_groups[i]][int(args.policy_params[i])] for i in range(len(age_groups))
+	}
+	alphas_vec = [static_alpha for t in range(simulation_params['time_periods'])]
+
+
+
+
 # Create environment
 dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt'], simulation_params['time_periods'])
 
@@ -67,10 +94,7 @@ dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt
 max_m_tests = [float(args.m_tests) for t in range(simulation_params['time_periods'])]
 max_a_tests = [float(args.a_tests) for t in range(simulation_params['time_periods'])]
 
-# Define policy
-static_alpha = {
-	'age_group_%d'%i:actions_dict['age_group_%d'%i][int(args.policy_params[i-1])] for i in range(1,7)
-}
+
 
 if args.heuristic == "random":
 	groups = []
@@ -100,7 +124,7 @@ tests = {
 
 # Run the model for the whole time range
 for t in range(simulation_params['time_periods']):
-	dynModel.take_time_step(m_tests_vec[t], a_tests_vec[t], static_alpha)
+	dynModel.take_time_step(m_tests_vec[t], a_tests_vec[t], alphas_vec[t])
 
 # Print model stats
 dynModel.print_stats()
@@ -112,25 +136,29 @@ time_axis = [i*simulation_params["dt"] for i in range(simulation_params['time_pe
 groups = dynModel.groups.keys()
 plt.figure(1)
 for i,group in enumerate(groups):
-	plt.subplot(7,len(groups),i+1)
+	plt.subplot(9,len(groups),i+1)
 	plt.plot(time_axis, dynModel.groups[group].S, label="Susceptible")
 	plt.title(group)
 	plt.legend(loc='upper right')
 
 for i,group in enumerate(groups):
-	plt.subplot(7,len(groups),i+1+len(groups))
+	plt.subplot(9,len(groups),i+1+len(groups))
 	plt.plot(time_axis, dynModel.groups[group].E, label="Exposed")
 	plt.plot(time_axis, dynModel.groups[group].I, label="Infected")
+	plt.legend(loc='upper right')
+
+for i,group in enumerate(groups):
+	plt.subplot(9,len(groups),i+1+len(groups)*2)
 	plt.plot(time_axis, dynModel.groups[group].R, label="Recovered")
 	plt.legend(loc='upper right')
 
 for i,group in enumerate(groups):
-	plt.subplot(7,len(groups),i+1+len(groups)*2)
+	plt.subplot(9,len(groups),i+1+len(groups)*3)
 	plt.plot(time_axis, dynModel.groups[group].Rq, label="Recovered Q")
 	plt.legend(loc='upper right')
 
 for i,group in enumerate(groups):
-	plt.subplot(7,len(groups),i+1+len(groups)*3)
+	plt.subplot(9,len(groups),i+1+len(groups)*4)
 	plt.plot(time_axis, dynModel.groups[group].Ia, label="Infected A-Q")
 	plt.plot(time_axis, dynModel.groups[group].Ips, label="Infected PS-Q")
 	plt.plot(time_axis, dynModel.groups[group].Ims, label="Infected MS-Q")
@@ -138,7 +166,7 @@ for i,group in enumerate(groups):
 	plt.legend(loc='upper right')
 
 for i,group in enumerate(groups):
-	plt.subplot(7,len(groups),i+1+len(groups)*4)
+	plt.subplot(9,len(groups),i+1+len(groups)*5)
 	plt.plot(time_axis, dynModel.groups[group].H, label="Hospital Bed")
 	plt.plot(time_axis, dynModel.groups[group].ICU, label="ICU")
 	plt.plot(time_axis, dynModel.groups[group].D, label="Dead")
@@ -146,19 +174,32 @@ for i,group in enumerate(groups):
 
 
 for i,group in enumerate(groups):
-	plt.subplot(7,len(groups),i+1+len(groups)*5)
+	plt.subplot(9,len(groups),i+1+len(groups)*6)
 	plt.plot(range(0,int(simulation_params['time_periods'])), re_change_order(m_tests_vec)[group], label="M Tests")
 	plt.plot(range(0,int(simulation_params['time_periods'])), re_change_order(a_tests_vec)[group], label="A Tests")
 	plt.legend(loc='upper right')
 
-plt.subplot(7,2,13)
+dic_alphas = change_order_alphas(alphas_vec)
+for i,group in enumerate(groups):
+	plt.subplot(9,len(groups),i+1+len(groups)*7)
+	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(dic_alphas[group]["home"])+0.01, label="Home")
+	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(dic_alphas[group]["work"])+0.01*2, label="Work")
+	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(dic_alphas[group]["leisure"])+0.01*3, label="Leisure")
+	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(dic_alphas[group]["school"])+0.01*4, label="School")
+	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(dic_alphas[group]["other"])+0.01*5, label="Other")
+	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(dic_alphas[group]["transport"])+0.01*6, label="Transport")
+	plt.ylim(-0.1,1.1)
+	plt.legend(loc='upper right')
+
+
+plt.subplot(9,2,17)
 #plt.plot(time_axis, [sum([dynModel.groups[group].H[i] for group in groups]) for i in range(len(time_axis))], label="Total Hospital Beds")
 plt.plot(time_axis, [sum([dynModel.groups[group].ICU[i] for group in groups]) for i in range(len(time_axis))], label="Total ICUs")
 #plt.axhline(y=parameters['global-parameters']['C_H'], color='r', linestyle='dashed', label= "Hospital Capacity")
 plt.axhline(y=dynModel.icus, color='g', linestyle='dashed', label= "ICU Capacity")
 plt.legend(loc='upper right')
 
-plt.subplot(7,2,14)
+plt.subplot(9,2,18)
 #plt.plot(time_axis, [sum([dynModel.groups[group].H[i] for group in groups]) for i in range(len(time_axis))], label="Total Hospital Beds")
 plt.plot(time_axis, [sum([dynModel.groups[group].D[i] for group in groups]) for i in range(len(time_axis))], label="Total Deaths")
 #plt.axhline(y=parameters['global-parameters']['C_H'], color='r', linestyle='dashed', label= "Hospital Capacity")
@@ -166,6 +207,6 @@ plt.legend(loc='upper right')
 
 
 figure = plt.gcf() # get current figure
-figure.set_size_inches(7*len(groups),18)
-figure.suptitle('Region: %s, Policy: %s, MTests/day: %s, Heuristic: %s'%(simulation_params['region'],args.policy_params,args.m_tests,args.heuristic), fontsize=22)
-plt.savefig("results_runs/"+simulation_params['region']+"_params_"+args.policy_params +"_m_tests_"+args.m_tests+"_heuristic_"+args.heuristic+".pdf")
+figure.set_size_inches(7*len(groups),24)
+figure.suptitle('Region: %s, Policy: %s, MTests/day: %s, Heuristic: %s, Infected: %s'%(simulation_params['region'],args.policy,args.m_tests,args.heuristic,args.perc_infected), fontsize=22)
+plt.savefig("results_runs/"+simulation_params['region']+"_params_"+args.policy +"_m_tests_"+args.m_tests+"_heuristic_"+args.heuristic+"_infected_"+args.perc_infected+".pdf")
