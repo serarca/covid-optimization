@@ -2,26 +2,42 @@ from collections import defaultdict
 from bound import Bounds
 import numpy as np
 import pandas as pd
+import math
 
-def n_contacts(group_g, group_h, alphas):
+def n_contacts(group_g, group_h, alphas, mixing_method):
 	n = 0
-	for activity in alphas[group_g.name]:
-		n += group_g.contacts[activity][group_h.name]*alphas[group_g.name][activity]*alphas[group_h.name][activity]
+	if mixing_method['name'] == "maxmin":
+		for activity in alphas[group_g.name]:
+			n += group_g.contacts[activity][group_h.name]*(
+					(alphas[group_g.name][activity]*math.exp(alphas[group_g.name][activity]*mixing_method['param']) + alphas[group_h.name][activity]*math.exp(alphas[group_h.name][activity]*mixing_method['param']))
+					/(math.exp(alphas[group_g.name][activity]*mixing_method['param'])+math.exp(alphas[group_h.name][activity]*mixing_method['param']))
+				)
+	elif mixing_method['name'] == "mult":
+		for activity in alphas[group_g.name]:
+			n += group_g.contacts[activity][group_h.name]*alphas[group_g.name][activity]*alphas[group_h.name][activity]	
+	elif mixing_method['name'] == "min":
+		for activity in alphas[group_g.name]:
+			n += group_g.contacts[activity][group_h.name]*min(alphas[group_g.name][activity],alphas[group_h.name][activity])	
+	elif mixing_method['name'] == "max":
+		for activity in alphas[group_g.name]:
+			n += group_g.contacts[activity][group_h.name]*max(alphas[group_g.name][activity],alphas[group_h.name][activity])	
+	
 	return n
 
 
 class DynamicalModel:
-	def __init__(self, parameters, initialization, dt, time_steps):
+	def __init__(self, parameters, initialization, dt, time_steps, mixing_method):
 		self.parameters = parameters
 		self.t = 0
 		self.dt = dt
 		self.time_steps = time_steps
 		self.initialization = initialization
+		self.mixing_method = mixing_method
 
 		# Create groups from parameters
 		self.groups = {}
 		for n in parameters['seir-groups']:
-			self.groups[n] = SEIR_group(parameters['seir-groups'][n], initialization[n], self.dt)
+			self.groups[n] = SEIR_group(parameters['seir-groups'][n], initialization[n], self.dt, self.mixing_method)
 
 		# Attach other groups to each group
 		for n in self.groups:
@@ -182,14 +198,16 @@ class DynamicalModel:
 
 class SEIR_group:
 	# Time step
-	def __init__(self, group_parameters, group_initialization, dt):
+	def __init__(self, group_parameters, group_initialization, dt, mixing_method):
 		# Group name
 		self.name = group_parameters['name']
 		self.parameters = group_parameters['parameters']
 		self.contacts = group_parameters['contacts']
 		self.economics = group_parameters['economics']
 		self.initial_conditions = group_initialization
+		self.mixing_method = mixing_method
 		self.initialize_vars(self.initial_conditions)
+
 
 		# Time step
 		self.t = 0
@@ -235,7 +253,7 @@ class SEIR_group:
 			summ_contacts = 0
 			for n,g in self.all_groups.items():
 				pop_g = g.N[t] + g.Rq[t]
-				summ_contacts += n_contacts(self, g, alphas)*g.I[t]/(pop_g if pop_g!=0 else 10e-6)
+				summ_contacts += n_contacts(self, g, alphas, self.mixing_method)*g.I[t]/(pop_g if pop_g!=0 else 10e-6)
 			self.total_contacts.append(summ_contacts*self.S[t])
 		else:
 			assert(False)

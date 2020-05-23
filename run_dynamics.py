@@ -40,6 +40,8 @@ parser.add_argument("-a_tests", "--a_tests", help="Number of A tests")
 parser.add_argument("-m_tests", "--m_tests", help="Number of M tests")
 parser.add_argument("-policy", "--policy", help="Parameters of policy")
 parser.add_argument("-perc_infected", "--perc_infected", help="Percentage of population infected")
+parser.add_argument("-mixing", "--mixing", help="Percentage of population infected")
+parser.add_argument("-mixing_param", "--mixing_param", help="Percentage of population infected")
 args = parser.parse_args()
 
 
@@ -79,15 +81,20 @@ if args.policy in ["static","dynamic"]:
 
 else:
 	static_alpha = {
-		age_groups[i]:actions_dict[age_groups[i]][int(args.policy_params[i])] for i in range(len(age_groups))
+		age_groups[i]:actions_dict[age_groups[i]][int(args.policy[i])] for i in range(len(age_groups))
 	}
 	alphas_vec = [static_alpha for t in range(simulation_params['time_periods'])]
 
+# Define mixing parameter
+mixing_method = {
+	"name":args.mixing,
+	"param":float(args.mixing_param) if args.mixing_param else 0.0,
+}
 
 
 
 # Create environment
-dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt'], simulation_params['time_periods'])
+dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method)
 
 
 # Construct vector of tests with a heuristic
