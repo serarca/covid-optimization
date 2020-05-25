@@ -64,26 +64,7 @@ def forecasting_heuristic(dynModel, max_a_tests, max_m_tests, alphas, h_cap_vec,
         dynModelC.simulate(forecast_m_tests, forecast_a_tests, alphas)
 
         assign_forecastings(dynModelC, old_forecasting)
-        # assign_forecastings(dynModelC, new_forecasting)
 
-        #While true do (will break only when the number of iterations have completed or the tolerance level has been reached)
-
-        #Write gurobi problem with fixed states to be the old forecast and obtain a seq of m and a tests
-
-        #Reeinitialize the dynModel to first values of the old forecast
-
-        #Run the simulation of the dyn model with the new test sequence and obtain the new forecast
-
-        #Compute vector of diff
-
-        #old is new
-
-        #Iterations ++
-        #Compare old and new forecast break if the sum of squared diff is small enough or iterations have been met print which has happened
-
-        # append the t-th test values for a and m
-
-        # iterations = 0
         iterations = 0
 
         #Create G Model (so as to modify it later)
@@ -403,34 +384,34 @@ def initializeForecastings(old_forecasting, new_forecasting, dynModelC):
         new_forecasting[group.name]["D"][0] = float(group.D[0])
 
 
-def initialize_with_forecast(dynModelC, old_forecasting):
+def initialize_with_forecast(dynModelC, forecasting):
 
     for name, group in dynModelC.groups.items():
-        group.S = [float(old_forecasting[group.name]["S"][0])]
+        group.S = [float(forecasting[group.name]["S"][0])]
 
-        group.E = [float(old_forecasting[group.name]["E"][0])]
+        group.E = [float(forecasting[group.name]["E"][0])]
 
-        group.I = [float(old_forecasting[group.name]["I"][0])]
+        group.I = [float(forecasting[group.name]["I"][0])]
 
-        group.R = [float(old_forecasting[group.name]["R"][0])]
+        group.R = [float(forecasting[group.name]["R"][0])]
 
-        group.N = [float(old_forecasting[group.name]["N"][0])]
+        group.N = [float(forecasting[group.name]["N"][0])]
 
-        group.Ia = [float(old_forecasting[group.name]["Ia"][0])]
+        group.Ia = [float(forecasting[group.name]["Ia"][0])]
 
-        group.Ips = [float(old_forecasting[group.name]["Ips"][0])]
+        group.Ips = [float(forecasting[group.name]["Ips"][0])]
 
-        group.Ims = [float(old_forecasting[group.name]["Ims"][0])]
+        group.Ims = [float(forecasting[group.name]["Ims"][0])]
 
-        group.Iss = [float(old_forecasting[group.name]["Iss"][0])]
+        group.Iss = [float(forecasting[group.name]["Iss"][0])]
 
-        group.Rq = [float(old_forecasting[group.name]["Rq"][0])]
+        group.Rq = [float(forecasting[group.name]["Rq"][0])]
 
-        group.H = [float(old_forecasting[group.name]["H"][0])]
+        group.H = [float(forecasting[group.name]["H"][0])]
 
-        group.ICU = [float(old_forecasting[group.name]["ICU"][0])]
+        group.ICU = [float(forecasting[group.name]["ICU"][0])]
 
-        group.D = [float(old_forecasting[group.name]["D"][0])]
+        group.D = [float(forecasting[group.name]["D"][0])]
 
 
 def assign_forecastings(dynModelC, forecasting):
