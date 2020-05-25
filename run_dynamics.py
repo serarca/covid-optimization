@@ -24,7 +24,7 @@ simulation_params = {
 	'days': 182.0,
 	'region': "Ile-de-France",
 }
-age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29', 'age_group_30_39', 'age_group_40_49', 
+age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29', 'age_group_30_39', 'age_group_40_49',
 	'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
 
 
@@ -40,8 +40,8 @@ parser.add_argument("-a_tests", "--a_tests", help="Number of A tests")
 parser.add_argument("-m_tests", "--m_tests", help="Number of M tests")
 parser.add_argument("-policy", "--policy", help="Parameters of policy")
 parser.add_argument("-perc_infected", "--perc_infected", help="Percentage of population infected")
-parser.add_argument("-mixing", "--mixing", help="Percentage of population infected")
-parser.add_argument("-mixing_param", "--mixing_param", help="Percentage of population infected")
+parser.add_argument("-mixing", "--mixing", help="Type of mixing (can be maxmin, max, min, or mult)")
+parser.add_argument("-mixing_param", "--mixing_param", help="If the type of mixing is maxmin, then the mixing_param is the appropiate alpha")
 args = parser.parse_args()
 
 
@@ -121,7 +121,7 @@ elif args.heuristic == "no_tests":
 elif args.heuristic == "forecasting_heuristic":
 	tolerance = 10
 	max_iterations = 10
-	a_tests_vec, m_tests_vec = forecasting_heuristic(dynModel, max_a_tests, max_m_tests, [static_alpha for t in range(simulation_params['time_periods'])], [dynModel.beds for t in range(len(max_a_tests))], [dynModel.icus for t in range(len(max_a_tests))], tolerance, max_iterations)
+	a_tests_vec, m_tests_vec = forecasting_heuristic(dynModel, max_a_tests, max_m_tests, alphas_vec, [dynModel.beds for t in range(len(max_a_tests))], [dynModel.icus for t in range(len(max_a_tests))], tolerance, max_iterations)
 #ICU CAP replaced by single value dynModel.icus
 tests = {
 	'a_tests_vec':a_tests_vec,
@@ -189,12 +189,12 @@ for i,group in enumerate(groups):
 dic_alphas = change_order_alphas(alphas_vec)
 for i,group in enumerate(groups):
 	plt.subplot(9,len(groups),i+1+len(groups)*7)
-	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(dic_alphas[group]["home"])+0.01, label="Home")
-	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(dic_alphas[group]["work"])+0.01*2, label="Work")
-	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(dic_alphas[group]["leisure"])+0.01*3, label="Leisure")
-	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(dic_alphas[group]["school"])+0.01*4, label="School")
-	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(dic_alphas[group]["other"])+0.01*5, label="Other")
-	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(dic_alphas[group]["transport"])+0.01*6, label="Transport")
+	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(dic_alphas[group]["home"][0:int(simulation_params['time_periods'])])+0.01, label="Home")
+	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(dic_alphas[group]["work"][0:int(simulation_params['time_periods'])])+0.01*2, label="Work")
+	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(dic_alphas[group]["leisure"][0:int(simulation_params['time_periods'])])+0.01*3, label="Leisure")
+	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(dic_alphas[group]["school"][0:int(simulation_params['time_periods'])])+0.01*4, label="School")
+	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(dic_alphas[group]["other"][0:int(simulation_params['time_periods'])])+0.01*5, label="Other")
+	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(dic_alphas[group]["transport"][0:int(simulation_params['time_periods'])])+0.01*6, label="Transport")
 	plt.ylim(-0.1,1.1)
 	plt.legend(loc='upper right')
 
