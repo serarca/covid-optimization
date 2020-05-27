@@ -17,8 +17,6 @@ import time
 
 
 from group import SEIR_group, DynamicalModel
-# from heuristics import *
-from forecasting_heuristic import *
 import math
 import pprint
 import collections
