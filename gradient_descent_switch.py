@@ -20,6 +20,7 @@ from group import SEIR_group, DynamicalModel
 import math
 import pprint
 import collections
+import numpy as np
 
 
 # Global variables
