@@ -13,9 +13,10 @@ sys.path.insert(0, current_dir+"/heuristics")
 
 from group import SEIR_group, DynamicalModel
 # from heuristics import *
+from forecasting_heuristic import *
 import math
 import pprint
-import numpy as np
+
 
 # Global variables
 simulation_params = {
