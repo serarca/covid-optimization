@@ -213,13 +213,13 @@ lin_constraint = LinearConstraint(A,lb,ub,keep_feasible=False)
 succeed = False
 start = time.time()
 for iterations in range(20):
-	result_lockdown = minimize(simulate_lockdown, x0_lockdown, method='L-BFGS-B',bounds=bounds_lockdown,options={'eps':10e-8,'maxiter':2})
+	result_lockdown = minimize(simulate_lockdown, x0_lockdown, method='L-BFGS-B',bounds=bounds_lockdown,options={'eps':10e-8,'maxiter':5})
 	prev_x0_lockdown = x0_lockdown
 	x0_lockdown = result_lockdown.x
 	print(x0_lockdown)
 	print("Reward", -result_lockdown.fun)
 	success_lock = result_lockdown.success
-	result_testing = minimize(simulate_testing, x0_testing, method='SLSQP',bounds=bounds_testing,options={'eps':10e-8,'maxiter':2}, constraints=[lin_constraint])
+	result_testing = minimize(simulate_testing, x0_testing, method='SLSQP',bounds=bounds_testing,options={'eps':10e-8,'maxiter':5}, constraints=[lin_constraint])
 	prev_x0_testing  = x0_testing
 	x0_testing = result_testing.x
 	print(x0_testing)
