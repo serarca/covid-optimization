@@ -14,19 +14,21 @@ def n_contacts(group_g, group_h, alphas, mixing_method):
 				)
 	elif mixing_method['name'] == "mult":
 		for activity in alphas[group_g.name]:
-			n += group_g.contacts[activity][group_h.name]*alphas[group_g.name][activity]*alphas[group_h.name][activity]	
+			n += group_g.contacts[activity][group_h.name]*alphas[group_g.name][activity]*alphas[group_h.name][activity]
 	elif mixing_method['name'] == "min":
 		for activity in alphas[group_g.name]:
 			n += group_g.contacts[activity][group_h.name]*min(alphas[group_g.name][activity],alphas[group_h.name][activity])	
 	elif mixing_method['name'] == "max":
 		for activity in alphas[group_g.name]:
 			n += group_g.contacts[activity][group_h.name]*max(alphas[group_g.name][activity],alphas[group_h.name][activity])	
+	else:
+		assert(False)
 	
 	return n
 
 
 class DynamicalModel:
-	def __init__(self, parameters, initialization, dt, time_steps, mixing_method):
+	def __init__(self, parameters, initialization, dt, time_steps, mixing_method, extra_data = False):
 		self.parameters = parameters
 		self.t = 0
 		self.dt = dt
@@ -37,7 +39,7 @@ class DynamicalModel:
 		# Create groups from parameters
 		self.groups = {}
 		for n in parameters['seir-groups']:
-			self.groups[n] = SEIR_group(parameters['seir-groups'][n], initialization[n], self.dt, self.mixing_method)
+			self.groups[n] = SEIR_group(parameters['seir-groups'][n], initialization[n], self.dt, self.mixing_method, self.time_steps, self)
 
 		# Attach other groups to each group
 		for n in self.groups:
@@ -54,6 +56,10 @@ class DynamicalModel:
 
 		# Initialize total population
 		self.total_population = sum([sum([initialization[group][cat] for cat in initialization[group].keys()]) for group in initialization.keys()])
+
+		# Initialize number of contacts
+		if extra_data:
+			self.n_contacts = [{g_name1:{g_name2:float('inf') for g_name2 in self.groups} for g_name1 in self.groups} for i in range(self.time_steps)]
 
 	def take_time_step(self, m_tests, a_tests, alphas):
 		for n in self.groups:
@@ -94,7 +100,7 @@ class DynamicalModel:
 	def get_economic_value(self, state, alphas):
 		value = 0
 		for group in state:
-			value += (
+			value = value + (
 				self.groups[group].economics['work_value']*(
 					alphas[group]['work']+
 					self.groups[group].economics['lockdown_fraction']*(1-alphas[group]['work'])
@@ -103,7 +109,7 @@ class DynamicalModel:
 				* self.dt
 			)
 			# Liberate people in Rq group
-			value += state[group]["Rq"]*self.groups[group].economics['work_value']* self.dt
+			value = value + state[group]["Rq"]*self.groups[group].economics['work_value']* self.dt
 		return value
 
 	def get_state(self, t):
@@ -198,7 +204,7 @@ class DynamicalModel:
 
 class SEIR_group:
 	# Time step
-	def __init__(self, group_parameters, group_initialization, dt, mixing_method):
+	def __init__(self, group_parameters, group_initialization, dt, mixing_method, time_steps, parent):
 		# Group name
 		self.name = group_parameters['name']
 		self.parameters = group_parameters['parameters']
@@ -206,7 +212,10 @@ class SEIR_group:
 		self.economics = group_parameters['economics']
 		self.initial_conditions = group_initialization
 		self.mixing_method = mixing_method
+		self.time_steps = time_steps
+		self.parent = parent
 		self.initialize_vars(self.initial_conditions)
+
 
 
 		# Time step
@@ -253,7 +262,9 @@ class SEIR_group:
 			summ_contacts = 0
 			for n,g in self.all_groups.items():
 				pop_g = g.N[t] + g.Rq[t]
-				summ_contacts += n_contacts(self, g, alphas, self.mixing_method)*g.I[t]/(pop_g if pop_g!=0 else 10e-6)
+				new_contacts = n_contacts(self, g, alphas, self.mixing_method)
+				summ_contacts += new_contacts*g.I[t]/(pop_g if pop_g!=0 else 10e-6)
+				self.parent.n_contacts[t][self.name][g.name] = new_contacts
 			self.total_contacts.append(summ_contacts*self.S[t])
 		else:
 			assert(False)

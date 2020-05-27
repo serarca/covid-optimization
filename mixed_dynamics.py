@@ -35,14 +35,10 @@ simulation_params['time_periods'] = int(math.ceil(simulation_params["days"]/simu
 
 # Parse parameters
 parser = argparse.ArgumentParser()
-parser.add_argument("-heuristic", "--heuristic", help="Chose heuristic")
+parser.add_argument("-policy", "--policy", help="Policy")
 parser.add_argument("-a_tests", "--a_tests", help="Number of A tests")
 parser.add_argument("-m_tests", "--m_tests", help="Number of M tests")
-parser.add_argument("-policy", "--policy", help="Parameters of policy")
 parser.add_argument("-perc_infected", "--perc_infected", help="Percentage of population infected")
-parser.add_argument("-mixing", "--mixing", help="Percentage of population infected")
-parser.add_argument("-mixing_param", "--mixing_param", help="Percentage of population infected")
-parser.add_argument("-testing", "--testing", help="Type of testing")
 args = parser.parse_args()
 
 
@@ -58,12 +54,6 @@ with open("./initialization/initialization.yaml") as file:
 	# scalar values to Python the dictionary format
 	initialization = yaml.load(file, Loader=yaml.FullLoader)
 
-# Read lockdown
-with open("./alphas_action_space/default.yaml") as file:
-	# The FullLoader parameter handles the conversion from YAML
-	# scalar values to Python the dictionary format
-	actions_dict = yaml.load(file, Loader=yaml.FullLoader)
-
 
 # Move population to infected
 for group in initialization:
@@ -71,20 +61,16 @@ for group in initialization:
 	initialization[group]["S"] = initialization[group]["S"] - change
 	initialization[group]["I"] = initialization[group]["I"] + change
 
-# Define policy
-if args.policy in ["static","dynamic"]:
-	# Read policy
-	with open('./benchmarks/'+args.policy+"_infected_"+args.perc_infected+'.yaml') as file:
-	    # The FullLoader parameter handles the conversion from YAML
-	    # scalar values to Python the dictionary format
-	    policy_file = yaml.load(file, Loader=yaml.FullLoader)
-	alphas_vec = policy_file['alphas_vec']
 
-else:
-	static_alpha = {
-		age_groups[i]:actions_dict[age_groups[i]][int(args.policy[i])] for i in range(len(age_groups))
-	}
-	alphas_vec = [static_alpha for t in range(simulation_params['time_periods'])]
+# Read policy and testing
+with open('./gradient_mixed/'+args.policy+"_infected_"+args.perc_infected+"_m_tests_"+args.m_tests+"_a_tests_"+args.a_tests+'.yaml') as file:
+    # The FullLoader parameter handles the conversion from YAML
+    # scalar values to Python the dictionary format
+    policy_file = yaml.load(file, Loader=yaml.FullLoader)
+alphas_vec = policy_file['alphas_vec']
+m_tests_vec = policy_file['m_tests_vec']
+a_tests_vec = policy_file['a_tests_vec']
+
 
 # Define mixing parameter
 mixing_method = {
@@ -97,42 +83,6 @@ mixing_method = {
 # Create environment
 dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method)
 
-
-# Construct vector of tests with a heuristic
-# If heuristic is different than gradient, distribute tests, otherwise, loads tests from other run
-if args.heuristic != "gradient":
-	max_m_tests = [float(args.m_tests) for t in range(simulation_params['time_periods'])]
-	max_a_tests = [float(args.a_tests) for t in range(simulation_params['time_periods'])]
-	a_tests = float(args.a_tests) 
-	m_tests = float(args.m_tests) 
-	if args.heuristic == "random":
-		groups = []
-		for group in dynModel.parameters['seir-groups']:
-			population = sum([dynModel.initialization[group][sg] for sg in ["S","E","I","R","Ia","Ips","Ims","Iss","Rq","H","ICU","D"]])
-			if population > 0:
-				groups.append(group)
-		groups.sort()
-
-		a_tests_vec, m_tests_vec = random_partition(dynModel, groups, max_a_tests, max_m_tests)
-	elif args.heuristic == "homogeneous":
-		a_tests_vec, m_tests_vec = homogeneous(dynModel, max_a_tests, max_m_tests)
-	elif "age_group" in args.heuristic:
-		a_tests_vec, m_tests_vec = all_to_one(dynModel, args.heuristic, max_a_tests, max_m_tests)
-	elif args.heuristic == "no_tests":
-		a_tests_vec, m_tests_vec = no_tests(dynModel)
-	elif args.heuristic == "forecasting_heuristic":
-		tolerance = 10
-		max_iterations = 10
-		a_tests_vec, m_tests_vec = forecasting_heuristic(dynModel, max_a_tests, max_m_tests, [static_alpha for t in range(simulation_params['time_periods'])], [dynModel.beds for t in range(len(max_a_tests))], [dynModel.icus for t in range(len(max_a_tests))], tolerance, max_iterations)
-else:
-	with open('./gradient_testing/'+args.policy+"_infected_"+args.perc_infected+'.yaml') as file:
-	    # The FullLoader parameter handles the conversion from YAML
-	    # scalar values to Python the dictionary format
-	    gradient_testing = yaml.load(file, Loader=yaml.FullLoader)
-	a_tests_vec = gradient_testing["a_tests_vec"]
-	m_tests_vec = gradient_testing["m_tests_vec"]
-	m_tests = gradient_testing["m_tests"]
-	a_tests = gradient_testing["a_tests"]
 
 tests = {
 	'a_tests_vec':a_tests_vec,
