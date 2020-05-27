@@ -35,6 +35,7 @@ class DynamicalModel:
 		self.time_steps = time_steps
 		self.initialization = initialization
 		self.mixing_method = mixing_method
+		self.extra_data = extra_data
 
 		# Create groups from parameters
 		self.groups = {}
