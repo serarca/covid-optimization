@@ -264,7 +264,8 @@ class SEIR_group:
 				pop_g = g.N[t] + g.Rq[t]
 				new_contacts = n_contacts(self, g, alphas, self.mixing_method)
 				summ_contacts += new_contacts*g.I[t]/(pop_g if pop_g!=0 else 10e-6)
-				self.parent.n_contacts[t][self.name][g.name] = new_contacts
+				if self.parent.extra_data:
+					self.parent.n_contacts[t][self.name][g.name] = new_contacts
 			self.total_contacts.append(summ_contacts*self.S[t])
 		else:
 			assert(False)
