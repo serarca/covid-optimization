@@ -225,7 +225,7 @@ def forecasting_heuristic(dynModel, max_a_tests, max_m_tests, alphas, h_cap_vec,
 
             for name in dynModelC.groups:
                 m_tests[name] = [M_test[ti, name].x for ti in remaining_time_steps]
-
+            M.write("Model-Period-{}-iteration-{}.lp".format(t, iterations))
 
 
             dynModelC.__init__(dynModelC.parameters, dynModelC.initialization,  dynModelC.dt, len(remaining_time_steps), mixing_method)
@@ -321,7 +321,7 @@ def obtain_R(M_test, A_test, old_forecasting, group, t, I_vector):
             old_forecasting[group.name]['R'][t-1]
             + group.parameters['mu'] * (1-group.parameters['p_H'] - group.parameters['p_ICU'])
                 * obtain_I(M_test, A_test, old_forecasting, group, t-1, I_vector)
-            - M_test[t-1, group.name] * old_forecasting[group.name]['I'][t-1]/(old_forecasting[group.name]['N'][t-1] if old_forecasting[group.name]['N'][t-1]!=0 else 10e-6)
+            - A_test[t-1, group.name] * old_forecasting[group.name]['R'][t-1]/(old_forecasting[group.name]['N'][t-1] if old_forecasting[group.name]['N'][t-1]!=0 else 10e-6)
             ) if t>0 else old_forecasting[group.name]['R'][0]
 
 def obtain_Ia(M_test, A_test, old_forecasting, group, t):
