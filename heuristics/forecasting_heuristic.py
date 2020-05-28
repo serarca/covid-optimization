@@ -9,7 +9,7 @@ def n_contacts(group_g, group_h, alphas):
         n += group_g.contacts[activity][group_h.name]*alphas[group_g.name][activity]*alphas[group_h.name][activity]
     return n
 
-def forecasting_heuristic(dynModel, max_a_tests, max_m_tests, alphas, h_cap_vec, icu_cap_vec, tolerance, max_iterations):
+def forecasting_heuristic(dynModel, max_a_tests, max_m_tests, alphas, h_cap_vec, icu_cap_vec, tolerance, max_iterations, death_value):
     #Create copy of dyn model to modify
     mixing_method = {
     "name":"mult",
@@ -91,21 +91,26 @@ def forecasting_heuristic(dynModel, max_a_tests, max_m_tests, alphas, h_cap_vec,
             #Objective
             start_obj_time = time.time()
 
+            
             economic_obj = quicksum((
             group.economics['work_value']*(
             alphas[ti][name]['work']+
             group.economics['lockdown_fraction']*(1-alphas[ti][name]['work'])
             )) * (obtain_E(dynModelC, M_test, A_test, old_forecasting, group, ti, alphas) + obtain_S(dynModelC, M_test, A_test, old_forecasting, group, ti, alphas) + obtain_R(M_test, A_test, old_forecasting, group, ti)) + group.economics['work_value'] * obtain_Rq(M_test, A_test, old_forecasting, group, ti) for ti in remaining_time_steps for name, group in dynModelC.groups.items())
 
-            deaths = quicksum(group.economics['death_value'] * obtain_Deaths(M_test, A_test, B_H, B_ICU, old_forecasting, group, remaining_time_steps) for name, group in dynModelC.groups.items())
+            deaths = quicksum(death_value * obtain_Deaths(M_test, A_test, B_H, B_ICU, old_forecasting, group, remaining_time_steps) for name, group in dynModelC.groups.items())
 
             obj = economic_obj - deaths
+
+            end_gen_obj_time = time.time()
+
+            print("Time building obj: {}".format(end_gen_obj_time - start_obj_time))
 
             M.setObjective(obj, GRB.MAXIMIZE)
 
             end_obj_time = time.time()
 
-            print("Total time building obj: {}".format(end_obj_time - start_obj_time))
+            print("Total time adding obj to Gurobi: {}".format(end_obj_time - end_gen_obj_time))
 
 
             start_const_time = time.time()
@@ -222,55 +227,58 @@ def obtain_I(M_test, A_test, old_forecasting, group2, t):
 
 
 def obtain_E(dynModelC, M_test, A_test, old_forecasting, group, t, alphas):
-    return (old_forecasting[group.name]['E'][t] * (1 - group.parameters['sigma']) + group.parameters['beta'] * old_forecasting[group.name]['S'][t]
+    return (old_forecasting[group.name]['E'][t-1] * (1 - group.parameters['sigma']) + group.parameters['beta'] * old_forecasting[group.name]['S'][t]
     * quicksum(obtain_I(M_test, A_test, old_forecasting, group2, t)
-    *  n_contacts(group, group2, alphas[t])
+    *  n_contacts(group, group2, alphas[t-1])
 
-    / ((old_forecasting[group2.name]['N'][t] + old_forecasting[group2.name]['Rq'][t]) if (old_forecasting[group2.name]['N'][t] + old_forecasting[group2.name]['Rq'][t])!=0 else 10e-6) for name2, group2 in dynModelC.groups.items()))
+    / ((old_forecasting[group2.name]['N'][t-1] + old_forecasting[group2.name]['Rq'][t-1]) if (old_forecasting[group2.name]['N'][t-1] + old_forecasting[group2.name]['Rq'][t-1])!=0 else 10e-6)
+    for name2, group2 in dynModelC.groups.items())) if t > 0 else old_forecasting[group.name]['E'][0]
 
 def obtain_S(dynModelC, M_test, A_test, old_forecasting, group, t, alphas):
-    return (old_forecasting[group.name]['S'][t] * (1- group.parameters['beta'] * quicksum(obtain_I(M_test, A_test, old_forecasting, group2, t)
+    return (old_forecasting[group.name]['S'][t-1] * (1- group.parameters['beta'] * quicksum(obtain_I(M_test, A_test, old_forecasting, group2, t)
     *  n_contacts(group, group2, alphas[t])
 
-    / ((old_forecasting[group2.name]['N'][t] + old_forecasting[group2.name]['Rq'][t]) if (old_forecasting[group2.name]['N'][t] + old_forecasting[group2.name]['Rq'][t])!=0 else 10e-6) for name2, group2 in dynModelC.groups.items())))
+    / ((old_forecasting[group2.name]['N'][t-1] + old_forecasting[group2.name]['Rq'][t-1]) if (old_forecasting[group2.name]['N'][t-1] + old_forecasting[group2.name]['Rq'][t-1])!=0 else 10e-6)
+    for name2, group2 in dynModelC.groups.items()))) if t>0 else old_forecasting[group.name]['S'][0]
 
 def obtain_R(M_test, A_test, old_forecasting, group, t):
     return (
-            old_forecasting[group.name]['R'][t]
+            old_forecasting[group.name]['R'][t-1]
             + group.parameters['mu'] * (1-group.parameters['p_H'] - group.parameters['p_ICU'])
-                * obtain_I(M_test, A_test, old_forecasting, group, t)
-            - M_test[t, group.name] * old_forecasting[group.name]['I'][t]/(old_forecasting[group.name]['N'][t] if old_forecasting[group.name]['N'][t]!=0 else 10e-6)
-            )
+                * obtain_I(M_test, A_test, old_forecasting, group, t-1)
+            - M_test[t-1, group.name] * old_forecasting[group.name]['I'][t-1]/(old_forecasting[group.name]['N'][t-1] if old_forecasting[group.name]['N'][t-1]!=0 else 10e-6)
+            ) if t>0 else old_forecasting[group.name]['R'][0]
 
 def obtain_Ia(M_test, A_test, old_forecasting, group, t):
-    return ( old_forecasting[group.name]['Ia'][t] * (1- group.parameters['mu']) +
-            group.parameters['p_Ia'] * M_test[t, group.name] * (old_forecasting[group.name]['I'][t]/old_forecasting[group.name]['N'][t]if old_forecasting[group.name]['N'][t]!=0 else 10e-6)
-    )
+    return ( old_forecasting[group.name]['Ia'][t-1] * (1- group.parameters['mu']) +
+            group.parameters['p_Ia'] * M_test[t-1, group.name] * (old_forecasting[group.name]['I'][t-1]/old_forecasting[group.name]['N'][t-1]if old_forecasting[group.name]['N'][t-1]!=0 else 10e-6)
+    ) if t>0 else old_forecasting[group.name]['Ia'][0]
 
 def obtain_Ips(M_test, A_test, old_forecasting, group, t):
-    return ( old_forecasting[group.name]['Ips'][t] * (1- group.parameters['mu']) +
-            group.parameters['p_Ips'] * M_test[t, group.name] * (old_forecasting[group.name]['I'][t]/old_forecasting[group.name]['N'][t]if old_forecasting[group.name]['N'][t]!=0 else 10e-6)
-    )
+    return ( old_forecasting[group.name]['Ips'][t-1] * (1- group.parameters['mu']) +
+            group.parameters['p_Ips'] * M_test[t-1, group.name] * (old_forecasting[group.name]['I'][t-1]/old_forecasting[group.name]['N'][t-1]if old_forecasting[group.name]['N'][t-1]!=0 else 10e-6)
+    )if t>0 else old_forecasting[group.name]['Ips'][0]
 
 def obtain_Ims(M_test, A_test, old_forecasting, group, t):
-    return ( old_forecasting[group.name]['Ims'][t] * (1- group.parameters['mu']) +
-            group.parameters['p_Ims'] * M_test[t, group.name] * (old_forecasting[group.name]['I'][t]/old_forecasting[group.name]['N'][t]if old_forecasting[group.name]['N'][t]!=0 else 10e-6)
-    )
+    return ( old_forecasting[group.name]['Ims'][t-1] * (1- group.parameters['mu']) +
+            group.parameters['p_Ims'] * M_test[t-1, group.name] * (old_forecasting[group.name]['I'][t-1]/old_forecasting[group.name]['N'][t-1]if old_forecasting[group.name]['N'][t-1]!=0 else 10e-6)
+    ) if t>0 else old_forecasting[group.name]['Ims'][0]
+
 def obtain_Iss(M_test, A_test, old_forecasting, group, t):
-    return ( old_forecasting[group.name]['Iss'][t] * (1- group.parameters['mu']) +
-            group.parameters['p_Iss'] * M_test[t, group.name] * (old_forecasting[group.name]['I'][t]/old_forecasting[group.name]['N'][t]if old_forecasting[group.name]['N'][t]!=0 else 10e-6)
-    )
+    return ( old_forecasting[group.name]['Iss'][t-1] * (1- group.parameters['mu']) +
+            group.parameters['p_Iss'] * M_test[t-1, group.name] * (old_forecasting[group.name]['I'][t-1]/old_forecasting[group.name]['N'][t-1]if old_forecasting[group.name]['N'][t-1]!=0 else 10e-6)
+    ) if t>0 else old_forecasting[group.name]['Iss'][0]
 
 
 def obtain_Rq(M_test, A_test, old_forecasting, group, t):
-    return( old_forecasting[group.name]['Rq'][t] +
-            group.parameters['mu'] * (obtain_Ia(M_test, A_test, old_forecasting, group, t)
-            + obtain_Ips(M_test, A_test, old_forecasting, group, t)
-            + obtain_Ims(M_test, A_test, old_forecasting, group, t))
-            + group.parameters['lambda_H_R'] * old_forecasting[group.name]['H'][t]
-            + group.parameters['lambda_ICU_R'] * old_forecasting[group.name]['ICU'][t]
-            + A_test[t, group.name] * (old_forecasting[group.name]['R'][t]/old_forecasting[group.name]['N'][t]if old_forecasting[group.name]['N'][t]!=0.0 else 10e-6)
-    )
+    return( old_forecasting[group.name]['Rq'][t-1] +
+            group.parameters['mu'] * (obtain_Ia(M_test, A_test, old_forecasting, group, t-1)
+            + obtain_Ips(M_test, A_test, old_forecasting, group, t-1)
+            + obtain_Ims(M_test, A_test, old_forecasting, group, t-1))
+            + group.parameters['lambda_H_R'] * old_forecasting[group.name]['H'][t-1]
+            + group.parameters['lambda_ICU_R'] * old_forecasting[group.name]['ICU'][t-1]
+            + A_test[t, group.name] * (old_forecasting[group.name]['R'][t-1]/old_forecasting[group.name]['N'][t-1]if old_forecasting[group.name]['N'][t-1]!=0.0 else 10e-6)
+    ) if t>0 else old_forecasting[group.name]['Rq'][0]
 
 def obtain_Deaths(M_test, A_test, B_H, B_ICU,  old_forecasting, group, remaining_time_steps):
     return (quicksum(
@@ -279,15 +287,15 @@ def obtain_Deaths(M_test, A_test, B_H, B_ICU,  old_forecasting, group, remaining
 
 def get_ICU(M_test, A_test, B_H, B_ICU,  old_forecasting, group, t):
     return (
-    old_forecasting[group.name]['ICU'][t] * (1 - group.parameters['lambda_ICU_R'] - group.parameters['lambda_ICU_D']) - B_ICU[t, group.name] + group.parameters['mu'] * (group.parameters['p_ICU'] * obtain_I(M_test, A_test, old_forecasting, group, t)
-    + obtain_Iss(M_test, A_test, old_forecasting, group, t) * (group.parameters['p_ICU'] / ((group.parameters['p_ICU'] + group.parameters['p_H']) if (group.parameters['p_ICU'] + group.parameters['p_H']) != 0 else 10e-6)))
-    )
+    old_forecasting[group.name]['ICU'][t-1] * (1 - group.parameters['lambda_ICU_R'] - group.parameters['lambda_ICU_D']) - B_ICU[t-1, group.name] + group.parameters['mu'] * (group.parameters['p_ICU'] * obtain_I(M_test, A_test, old_forecasting, group, t-1)
+    + obtain_Iss(M_test, A_test, old_forecasting, group, t-1) * (group.parameters['p_ICU'] / ((group.parameters['p_ICU'] + group.parameters['p_H']) if (group.parameters['p_ICU'] + group.parameters['p_H']) != 0 else 10e-6)))
+    ) if t>0 else old_forecasting[group.name]["ICU"][0]
 
 def get_H(M_test, A_test, B_H, B_ICU, old_forecasting, group, t):
     return (
-    old_forecasting[group.name]['H'][t] * (1 - group.parameters['lambda_H_R'] - group.parameters['lambda_H_D']) - B_H[t, group.name] + group.parameters['mu'] * (group.parameters['p_H'] * obtain_I(M_test, A_test, old_forecasting, group, t)
-    + obtain_Iss(M_test, A_test, old_forecasting, group, t) * (group.parameters['p_H'] / ((group.parameters['p_ICU'] + group.parameters['p_H']) if (group.parameters['p_ICU'] + group.parameters['p_H']) != 0 else 10e-6)))
-    )
+    old_forecasting[group.name]['H'][t-1] * (1 - group.parameters['lambda_H_R'] - group.parameters['lambda_H_D']) - B_H[t-1, group.name] + group.parameters['mu'] * (group.parameters['p_H'] * obtain_I(M_test, A_test, old_forecasting, group, t-1)
+    + obtain_Iss(M_test, A_test, old_forecasting, group, t-1) * (group.parameters['p_H'] / ((group.parameters['p_ICU'] + group.parameters['p_H']) if (group.parameters['p_ICU'] + group.parameters['p_H']) != 0 else 10e-6)))
+    ) if t>0 else old_forecasting[group.name]['H'][0]
 
 def calculate_diff(new_forecasting, old_forecasting):
     total_diff = 0
