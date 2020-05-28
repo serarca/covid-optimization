@@ -5,6 +5,7 @@ import pandas as pd
 import math
 
 def n_contacts(group_g, group_h, alphas, mixing_method):
+	
 	n = 0
 	if mixing_method['name'] == "maxmin":
 		for activity in alphas[group_g.name]:
@@ -17,13 +18,13 @@ def n_contacts(group_g, group_h, alphas, mixing_method):
 			n += group_g.contacts[activity][group_h.name]*alphas[group_g.name][activity]*alphas[group_h.name][activity]
 	elif mixing_method['name'] == "min":
 		for activity in alphas[group_g.name]:
-			n += group_g.contacts[activity][group_h.name]*min(alphas[group_g.name][activity],alphas[group_h.name][activity])	
+			n += group_g.contacts[activity][group_h.name]*min(alphas[group_g.name][activity],alphas[group_h.name][activity])
 	elif mixing_method['name'] == "max":
 		for activity in alphas[group_g.name]:
-			n += group_g.contacts[activity][group_h.name]*max(alphas[group_g.name][activity],alphas[group_h.name][activity])	
+			n += group_g.contacts[activity][group_h.name]*max(alphas[group_g.name][activity],alphas[group_h.name][activity])
 	else:
 		assert(False)
-	
+
 	return n
 
 
