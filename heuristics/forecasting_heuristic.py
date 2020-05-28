@@ -9,7 +9,7 @@ def n_contacts(group_g, group_h, alphas):
         n += group_g.contacts[activity][group_h.name]*alphas[group_g.name][activity]*alphas[group_h.name][activity]
     return n
 
-def forecasting_heuristic(dynModel, max_a_tests, max_m_tests, alphas, h_cap_vec, icu_cap_vec, tolerance, max_iterations):
+def forecasting_heuristic(dynModel, max_a_tests, max_m_tests, alphas, h_cap_vec, icu_cap_vec, tolerance, max_iterations, death_value):
     #Create copy of dyn model to modify
     mixing_method = {
     "name":"mult",
@@ -91,21 +91,26 @@ def forecasting_heuristic(dynModel, max_a_tests, max_m_tests, alphas, h_cap_vec,
             #Objective
             start_obj_time = time.time()
 
+            
             economic_obj = quicksum((
             group.economics['work_value']*(
             alphas[ti][name]['work']+
             group.economics['lockdown_fraction']*(1-alphas[ti][name]['work'])
             )) * (obtain_E(dynModelC, M_test, A_test, old_forecasting, group, ti, alphas) + obtain_S(dynModelC, M_test, A_test, old_forecasting, group, ti, alphas) + obtain_R(M_test, A_test, old_forecasting, group, ti)) + group.economics['work_value'] * obtain_Rq(M_test, A_test, old_forecasting, group, ti) for ti in remaining_time_steps for name, group in dynModelC.groups.items())
 
-            deaths = quicksum(group.economics['death_value'] * obtain_Deaths(M_test, A_test, B_H, B_ICU, old_forecasting, group, remaining_time_steps) for name, group in dynModelC.groups.items())
+            deaths = quicksum(death_value * obtain_Deaths(M_test, A_test, B_H, B_ICU, old_forecasting, group, remaining_time_steps) for name, group in dynModelC.groups.items())
 
             obj = economic_obj - deaths
+
+            end_gen_obj_time = time.time()
+
+            print("Time building obj: {}".format(end_gen_obj_time - start_obj_time))
 
             M.setObjective(obj, GRB.MAXIMIZE)
 
             end_obj_time = time.time()
 
-            print("Total time building obj: {}".format(end_obj_time - start_obj_time))
+            print("Total time adding obj to Gurobi: {}".format(end_obj_time - end_gen_obj_time))
 
 
             start_const_time = time.time()
@@ -227,7 +232,7 @@ def obtain_E(dynModelC, M_test, A_test, old_forecasting, group, t, alphas):
     *  n_contacts(group, group2, alphas[t-1])
 
     / ((old_forecasting[group2.name]['N'][t-1] + old_forecasting[group2.name]['Rq'][t-1]) if (old_forecasting[group2.name]['N'][t-1] + old_forecasting[group2.name]['Rq'][t-1])!=0 else 10e-6)
-    for name2, group2 in dynModelC.groups.items())) if t > 0 else: old_forecasting[group.name]['E'][0]
+    for name2, group2 in dynModelC.groups.items())) if t > 0 else old_forecasting[group.name]['E'][0]
 
 def obtain_S(dynModelC, M_test, A_test, old_forecasting, group, t, alphas):
     return (old_forecasting[group.name]['S'][t-1] * (1- group.parameters['beta'] * quicksum(obtain_I(M_test, A_test, old_forecasting, group2, t)

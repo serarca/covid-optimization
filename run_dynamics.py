@@ -21,7 +21,7 @@ import pprint
 # Global variables
 simulation_params = {
 	'dt':1.0,
-	'days': 182.0,
+	'days': 30.0,
 	'region': "Ile-de-France",
 }
 age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29', 'age_group_30_39', 'age_group_40_49',
@@ -121,7 +121,8 @@ elif args.heuristic == "no_tests":
 elif args.heuristic == "forecasting_heuristic":
 	tolerance = 10
 	max_iterations = 10
-	a_tests_vec, m_tests_vec = forecasting_heuristic(dynModel, max_a_tests, max_m_tests, alphas_vec, [dynModel.beds for t in range(len(max_a_tests))], [dynModel.icus for t in range(len(max_a_tests))], tolerance, max_iterations)
+	death_value = 10000
+	a_tests_vec, m_tests_vec = forecasting_heuristic(dynModel, max_a_tests, max_m_tests, alphas_vec, [dynModel.beds for t in range(len(max_a_tests))], [dynModel.icus for t in range(len(max_a_tests))], tolerance, max_iterations, death_value)
 #ICU CAP replaced by single value dynModel.icus
 tests = {
 	'a_tests_vec':a_tests_vec,
@@ -224,4 +225,8 @@ plt.legend(loc='upper right')
 figure = plt.gcf() # get current figure
 figure.set_size_inches(7*len(groups),24)
 figure.suptitle('Region: %s, Policy: %s, MTests/day: %s, Heuristic: %s, Infected: %s'%(simulation_params['region'],args.policy,args.m_tests,args.heuristic,args.perc_infected), fontsize=22)
-plt.savefig("results_runs/"+simulation_params['region']+"_params_"+args.policy+"_heuristic_"+args.heuristic+"_infected_"+args.perc_infected+".pdf")
+
+if args.heuristic == "forecasting_heuristic"
+	plt.savefig("results_runs/"+simulation_params['region']+"_params_"+args.policy+"_heuristic_"+args.heuristic+"_infected_"+args.perc_infected+"cost_of_death_"+death_value+".pdf")
+else:
+	plt.savefig("results_runs/"+simulation_params['region']+"_params_"+args.policy+"_heuristic_"+args.heuristic+"_infected_"+args.perc_infected+".pdf")
