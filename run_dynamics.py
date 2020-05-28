@@ -121,7 +121,7 @@ elif args.heuristic == "no_tests":
 elif args.heuristic == "forecasting_heuristic":
 	tolerance = 10
 	max_iterations = 10
-	death_value = 1
+	death_value = 0.5
 	a_tests_vec, m_tests_vec = forecasting_heuristic(dynModel, max_a_tests, max_m_tests, alphas_vec, [dynModel.beds for t in range(len(max_a_tests))], [dynModel.icus for t in range(len(max_a_tests))], tolerance, max_iterations, death_value, mixing_method)
 #ICU CAP replaced by single value dynModel.icus
 tests = {
