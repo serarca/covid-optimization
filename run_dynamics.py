@@ -9,6 +9,7 @@ import argparse
 current_path = os.path.abspath(getsourcefile(lambda:0))
 current_dir = os.path.dirname(current_path)
 sys.path.insert(0, current_dir+"/heuristics")
+sys.path.insert(0, current_dir+"/heuristics/LP-Models")
 
 
 from group import SEIR_group, DynamicalModel
@@ -21,7 +22,7 @@ import pprint
 # Global variables
 simulation_params = {
 	'dt':1.0,
-	'days': 3.0,
+	'days': 100.0,
 	'region': "Ile-de-France",
 }
 age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29', 'age_group_30_39', 'age_group_40_49',
@@ -121,7 +122,7 @@ elif args.heuristic == "no_tests":
 elif args.heuristic == "forecasting_heuristic":
 	tolerance = 10
 	max_iterations = 10
-	death_value = 0
+	death_value = 100000
 	a_tests_vec, m_tests_vec = forecasting_heuristic(dynModel, max_a_tests, max_m_tests, alphas_vec, [dynModel.beds for t in range(len(max_a_tests))], [dynModel.icus for t in range(len(max_a_tests))], tolerance, max_iterations, death_value, mixing_method)
 #ICU CAP replaced by single value dynModel.icus
 tests = {
@@ -146,7 +147,7 @@ n_contacts_given = [{g1:{g2:n_contacts_received[t][g2][g1] for g2 in dynModel.gr
 time_axis = [i*simulation_params["dt"] for i in range(simulation_params['time_periods']+1)]
 
 groups = dynModel.groups.keys()
-groups.sort()
+groups = sorted(groups)
 plt.figure(1)
 for i,group in enumerate(groups):
 	plt.subplot(13,len(groups),i+1)
@@ -246,95 +247,6 @@ for i,group in enumerate(groups):
 	plt.legend(loc='upper right')
 	plt.ylim(0,maximum)
 
-
-
-
-
-#
-# # Draw plots
-# time_axis = [i*simulation_params["dt"] for i in range(simulation_params['time_periods']+1)]
-#
-# groups = dynModel.groups.keys()
-# plt.figure(1)
-# for i,group in enumerate(groups):
-# 	plt.subplot(9,len(groups),i+1)
-# 	plt.plot(time_axis, dynModel.groups[group].S, label="Susceptible")
-# 	plt.title(group)
-# 	plt.legend(loc='upper right')
-# 	plt.ylim(-10000,np.max([np.max(dynModel.groups[group].S) for group in groups]))
-#
-# for i,group in enumerate(groups):
-# 	plt.subplot(9,len(groups),i+1+len(groups))
-# 	plt.plot(time_axis, dynModel.groups[group].E, label="Exposed")
-# 	plt.plot(time_axis, dynModel.groups[group].I, label="Infected")
-# 	plt.legend(loc='upper right')
-# 	plt.ylim(-10000,np.max([max(np.max(dynModel.groups[group].E),np.max(dynModel.groups[group].I)) for group in groups]))
-#
-# for i,group in enumerate(groups):
-# 	plt.subplot(9,len(groups),i+1+len(groups)*2)
-# 	plt.plot(time_axis, dynModel.groups[group].R, label="Recovered")
-# 	plt.ylim(-10000,np.max([np.max(dynModel.groups[group].R) for group in groups]))
-# 	plt.legend(loc='upper right')
-#
-# for i,group in enumerate(groups):
-# 	plt.subplot(9,len(groups),i+1+len(groups)*3)
-# 	plt.plot(time_axis, dynModel.groups[group].Rq, label="Recovered Q")
-# 	plt.ylim(-10000,np.max([np.max(dynModel.groups[group].Rq) for group in groups]))
-# 	plt.legend(loc='upper right')
-#
-# for i,group in enumerate(groups):
-# 	plt.subplot(9,len(groups),i+1+len(groups)*4)
-# 	plt.plot(time_axis, dynModel.groups[group].Ia, label="Infected A-Q")
-# 	plt.plot(time_axis, dynModel.groups[group].Ips, label="Infected PS-Q")
-# 	plt.plot(time_axis, dynModel.groups[group].Ims, label="Infected MS-Q")
-# 	plt.plot(time_axis, dynModel.groups[group].Iss, label="Infected SS-Q")
-# 	plt.ylim(-10000,np.max([max(np.max(dynModel.groups[group].Ia),np.max(dynModel.groups[group].Ips),np.max(dynModel.groups[group].Ims),np.max(dynModel.groups[group].Iss)) for group in groups]))
-# 	plt.legend(loc='upper right')
-#
-# for i,group in enumerate(groups):
-# 	plt.subplot(9,len(groups),i+1+len(groups)*5)
-# 	plt.plot(time_axis, dynModel.groups[group].H, label="Hospital Bed")
-# 	plt.plot(time_axis, dynModel.groups[group].ICU, label="ICU")
-# 	plt.plot(time_axis, dynModel.groups[group].D, label="Dead")
-# 	plt.ylim(-10000,np.max([max(np.max(dynModel.groups[group].H),np.max(dynModel.groups[group].ICU),np.max(dynModel.groups[group].D)) for group in groups]))
-# 	plt.legend(loc='upper right')
-#
-#
-# for i,group in enumerate(groups):
-# 	plt.subplot(9,len(groups),i+1+len(groups)*6)
-# 	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(re_change_order(m_tests_vec)[group])+max(args.m_tests,args.a_tests)/100, label="M Tests")
-# 	plt.plot(range(0,int(simulation_params['time_periods'])), re_change_order(a_tests_vec)[group], label="A Tests")
-# 	plt.ylim(-max(args.m_tests,args.a_tests)/10,max(args.m_tests,args.a_tests)+max(args.m_tests,args.a_tests)/10)
-# 	plt.legend(loc='upper right')
-#
-#
-# dic_alphas = change_order_alphas(alphas_vec)
-# for i,group in enumerate(groups):
-# 	plt.subplot(9,len(groups),i+1+len(groups)*7)
-# 	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(dic_alphas[group]["home"][0:int(simulation_params['time_periods'])])+0.01, label="Home")
-# 	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(dic_alphas[group]["work"][0:int(simulation_params['time_periods'])])+0.01*2, label="Work")
-# 	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(dic_alphas[group]["leisure"][0:int(simulation_params['time_periods'])])+0.01*3, label="Leisure")
-# 	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(dic_alphas[group]["school"][0:int(simulation_params['time_periods'])])+0.01*4, label="School")
-# 	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(dic_alphas[group]["other"][0:int(simulation_params['time_periods'])])+0.01*5, label="Other")
-# 	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(dic_alphas[group]["transport"][0:int(simulation_params['time_periods'])])+0.01*6, label="Transport")
-# 	plt.ylim(-0.1,1.1)
-# 	plt.legend(loc='upper right')
-#
-#
-# plt.subplot(9,2,17)
-# #plt.plot(time_axis, [sum([dynModel.groups[group].H[i] for group in groups]) for i in range(len(time_axis))], label="Total Hospital Beds")
-# plt.plot(time_axis, [sum([dynModel.groups[group].ICU[i] for group in groups]) for i in range(len(time_axis))], label="Total ICUs")
-# #plt.axhline(y=parameters['global-parameters']['C_H'], color='r', linestyle='dashed', label= "Hospital Capacity")
-# plt.axhline(y=dynModel.icus, color='g', linestyle='dashed', label= "ICU Capacity")
-# plt.legend(loc='upper right')
-#
-# plt.subplot(9,2,18)
-# #plt.plot(time_axis, [sum([dynModel.groups[group].H[i] for group in groups]) for i in range(len(time_axis))], label="Total Hospital Beds")
-# plt.plot(time_axis, [sum([dynModel.groups[group].D[i] for group in groups]) for i in range(len(time_axis))], label="Total Deaths")
-# #plt.axhline(y=parameters['global-parameters']['C_H'], color='r', linestyle='dashed', label= "Hospital Capacity")
-# plt.legend(loc='upper right')
-#
-#
 figure = plt.gcf() # get current figure
 figure.set_size_inches(7*len(groups),24)
 figure.suptitle('Region: %s, Policy: %s, MTests/day: %s, ATests/day: %s, Heuristic: %s, Infected: %s, Total Deaths: %s, Total Economic Value: %s'%(simulation_params['region'],args.policy,args.m_tests,args.a_tests, args.heuristic,args.perc_infected, dynModel.get_total_deaths(), dynModel.get_total_economic_value()), fontsize=22)
