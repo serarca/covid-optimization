@@ -25,7 +25,11 @@ parser.add_argument("-a_tests", "--a_tests", help="Number of A tests")
 parser.add_argument("-m_tests", "--m_tests", help="Number of M tests")
 parser.add_argument("-lockdown_start", "--lockdown_start", help="Day at which lockdown started")
 parser.add_argument("-n_days", "--n_days", help="Total number of days")
-parser.add_argument("-initial_infected", "--initial_infected", help="Total number of people initially infected")
+#parser.add_argument("-initial_infected_20_29", "--initial_infected_20_29", help="Number of people aged 20-29 initially infected")
+parser.add_argument("-initial_infected_30_39", "--initial_infected_30_39", help="Number of people aged 30-39 initially infected")
+parser.add_argument("-initial_infected_40_49", "--initial_infected_40_49", help="Number of people aged 40-49 initially infected")
+#parser.add_argument("-initial_infected_50_59", "--initial_infected_50_59", help="Number of people aged 50-59 initially infected")
+#parser.add_argument("-initial_infected_60_69", "--initial_infected_60_69", help="Number of people aged 60-69 initially infected")
 parser.add_argument("-mixing", "--mixing", help="Choose mixing method (can be maxmin, max, min, or mult)")
 parser.add_argument("-lockdown_factor", "--lockdown_factor", help="Choose level of non-home activities during lockdown")
 args = parser.parse_args()
@@ -63,8 +67,18 @@ with open("./initialization/initialization.yaml") as file:
 
 # Update initialization
 # Put exactly one infected individual in age group 40-49. No infected individuals in other groups.    
-initialization["age_group_40_49"]["I"] = initialization["age_group_40_49"]["I"] + int(args.initial_infected)
-initialization["age_group_40_49"]["S"] = initialization["age_group_40_49"]["S"] - int(args.initial_infected)
+#initialization["age_group_20_29"]["I"] = initialization["age_group_20_29"]["I"] + int(args.initial_infected_20_29)
+#initialization["age_group_20_29"]["S"] = initialization["age_group_20_29"]["S"] - int(args.initial_infected_20_29)
+initialization["age_group_30_39"]["I"] = initialization["age_group_30_39"]["I"] + int(args.initial_infected_30_39)
+initialization["age_group_30_39"]["S"] = initialization["age_group_30_39"]["S"] - int(args.initial_infected_30_39)    
+initialization["age_group_40_49"]["I"] = initialization["age_group_40_49"]["I"] + int(args.initial_infected_40_49)
+initialization["age_group_40_49"]["S"] = initialization["age_group_40_49"]["S"] - int(args.initial_infected_40_49)
+#initialization["age_group_50_59"]["I"] = initialization["age_group_50_59"]["I"] + int(args.initial_infected_50_59)
+#initialization["age_group_50_59"]["S"] = initialization["age_group_50_59"]["S"] - int(args.initial_infected_50_59)
+#initialization["age_group_60_69"]["I"] = initialization["age_group_60_69"]["I"] + int(args.initial_infected_60_69)
+#initialization["age_group_60_69"]["S"] = initialization["age_group_60_69"]["S"] - int(args.initial_infected_60_69)
+
+
 
 # # Read lockdown
 # #with open("./alphas_action_space/default.yaml") as file:
@@ -207,8 +221,8 @@ plt.legend(loc='upper right')
 
 figure = plt.gcf() # get current figure
 figure.set_size_inches(7*len(groups),18)
-figure.suptitle('Region: %s, MTests/day: %s, Heuristic: %s, Initial Infected: %s, Day of Lockdown: %s, Total Days: %s'%(simulation_params['region'],args.m_tests,args.heuristic, args.initial_infected, args.lockdown_start,args.n_days), fontsize=22)
-plt.savefig("results_runs/"+simulation_params['region']+"_m_tests_"+args.m_tests+"_heuristic_"+args.heuristic+"_initialinfected_"+args.initial_infected+"_lockdown_start_"+args.lockdown_start+"_n_days_"+args.n_days+".pdf")
+figure.suptitle('Region: %s, MTests/day: %s, Heuristic: %s, Initial Infected 30-39: %s, Initial Infected 40-49: %s, Day of Lockdown: %s, Total Days: %s, Mixing: %s, Lockdown level for non-home: %s'%(simulation_params['region'],args.m_tests,args.heuristic, args.initial_infected_30_39, args.initial_infected_40_49, args.lockdown_start,args.n_days,args.mixing,args.lockdown_factor), fontsize=22)
+plt.savefig("results_runs/"+simulation_params['region']+"_m_tests_"+args.m_tests+"_heuristic_"+args.heuristic+"_initialinfected_30_39_"+args.initial_infected_30_39+"_initialinfected_40_49_"+args.initial_infected_40_49+"_lockdown_start_"+args.lockdown_start+"_n_days_"+args.n_days+"_mixing_"+args.mixing+"_lockdown_factor_"+args.lockdown_factor+".pdf")
 
 
-dynModel.get_pandas_summary().to_csv("results_runs/"+simulation_params['region']+"_m_tests_"+args.m_tests+"_heuristic_"+args.heuristic+"_initialinfected_"+args.initial_infected+"_lockdown_start_"+args.lockdown_start+"_n_days_"+args.n_days+".csv")
+dynModel.get_pandas_summary().to_csv("results_runs/"+simulation_params['region']+"_m_tests_"+args.m_tests+"_heuristic_"+args.heuristic+"_initialinfected_30_39_"+args.initial_infected_30_39+"_initialinfected_40_49_"+args.initial_infected_40_49+"_lockdown_start_"+args.lockdown_start+"_n_days_"+args.n_days+"_mixing_"+args.mixing+"_lockdown_factor_"+args.lockdown_factor+".csv")
