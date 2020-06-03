@@ -27,7 +27,6 @@ def re_change_order(l):
 	d = {}
 	for g in groups:
 		d[g] = [test[g] for test in l]
-
 	return d
 
 def change_order_alphas(alphas_vec):

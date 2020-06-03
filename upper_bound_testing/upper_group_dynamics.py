@@ -27,20 +27,19 @@ def n_contacts(group_g, group_h, alphas, mixing_method):
 	return n
 
 
-class DynamicalModel:
-	def __init__(self, parameters, initialization, dt, time_steps, mixing_method, extra_data = False):
+class DynamicalModelUpper:
+	def __init__(self, parameters, initialization, dt, time_steps, mixing_method):
 		self.parameters = parameters
 		self.t = 0
 		self.dt = dt
 		self.time_steps = time_steps
 		self.initialization = initialization
 		self.mixing_method = mixing_method
-		self.extra_data = extra_data
 
 		# Create groups from parameters
 		self.groups = {}
 		for n in parameters['seir-groups']:
-			self.groups[n] = SEIR_group(parameters['seir-groups'][n], initialization[n], self.dt, self.mixing_method, self.time_steps, self)
+			self.groups[n] = SEIR_group_upper(parameters['seir-groups'][n], initialization[n], self.dt, self.mixing_method, self.time_steps, self)
 
 		# Attach other groups to each group
 		for n in self.groups:
@@ -58,9 +57,6 @@ class DynamicalModel:
 		# Initialize total population
 		self.total_population = sum([sum([initialization[group][cat] for cat in initialization[group].keys()]) for group in initialization.keys()])
 
-		# Initialize number of contacts
-		if extra_data:
-			self.n_contacts = [{g_name1:{g_name2:float('inf') for g_name2 in self.groups} for g_name1 in self.groups} for i in range(self.time_steps)]
 
 	def take_time_step(self, m_tests, a_tests, alphas):
 		for n in self.groups:
@@ -133,35 +129,6 @@ class DynamicalModel:
 			}
 		return state
 
-	# Returns state but in OpenAIGym Format
-	def get_normalized_state(self, t):
-		norm_state = np.array([[
-			group.S[t]/self.total_population,
-			group.E[t]/self.total_population,
-			group.I[t]/self.total_population,
-			group.R[t]/self.total_population,
-			(group.Ia[t] + group.Ips[t] + group.Ims[t])/self.total_population,
-			group.Iss[t]/self.total_population,
-			group.Rq[t]/self.total_population,
-			group.H[t]/self.total_population,
-			group.ICU[t]/self.total_population,
-			group.D[t]/self.total_population
-			] for name,group in self.groups.items()])
-		return norm_state.flatten()
-
-
-	# Returns state but in OpenAIGym Format
-	def get_normalized_partial_state(self, t):
-		norm_state = np.array([[
-			(group.Ia[t] + group.Ips[t] + group.Ims[t])/self.total_population,
-			group.Iss[t]/self.total_population,
-			group.Rq[t]/self.total_population,
-			group.H[t]/self.total_population,
-			group.ICU[t]/self.total_population,
-			group.D[t]/self.total_population
-			] for name,group in self.groups.items()])
-		return norm_state.flatten()
-
 	def get_total_deaths(self):
 		total = 0
 		for t in range(1,self.time_steps+1):
@@ -185,25 +152,8 @@ class DynamicalModel:
 		print("Deaths "+str(self.get_total_deaths()))
 		print("Total Reward "+str(self.get_total_reward()))
 
-	def get_pandas_summary(self):
-		d = {
-			"S": [sum([self.groups[g].S[t] for g in self.groups ]) for t in range(self.t+1)],
-			"E": [sum([self.groups[g].E[t] for g in self.groups ]) for t in range(self.t+1)],
-			"I": [sum([self.groups[g].I[t] for g in self.groups ]) for t in range(self.t+1)],
-			"R": [sum([self.groups[g].R[t] for g in self.groups ]) for t in range(self.t+1)],
-			"N": [sum([self.groups[g].N[t] for g in self.groups ]) for t in range(self.t+1)],
-			"Ia": [sum([self.groups[g].Ia[t] for g in self.groups ]) for t in range(self.t+1)],
-			"Ips": [sum([self.groups[g].Ips[t] for g in self.groups ]) for t in range(self.t+1)],
-			"Ims": [sum([self.groups[g].Ims[t] for g in self.groups ]) for t in range(self.t+1)],
-			"Iss": [sum([self.groups[g].Iss[t] for g in self.groups ]) for t in range(self.t+1)],
-			"Rq": [sum([self.groups[g].Rq[t] for g in self.groups ]) for t in range(self.t+1)],
-			"H": [sum([self.groups[g].H[t] for g in self.groups ]) for t in range(self.t+1)],
-			"ICU": [sum([self.groups[g].ICU[t] for g in self.groups ]) for t in range(self.t+1)],
-			"D": [sum([self.groups[g].D[t] for g in self.groups ]) for t in range(self.t+1)],
-		}
-		return pd.DataFrame(d)
 
-class SEIR_group:
+class SEIR_group_upper:
 	# Time step
 	def __init__(self, group_parameters, group_initialization, dt, mixing_method, time_steps, parent):
 		# Group name
@@ -257,16 +207,18 @@ class SEIR_group:
 		# Contacts
 		self.total_contacts = []
 
+		# The initial population
+		self.N0 = self.S[0] + self.E[0] + self.I[0]+ self.R[0] + self.Rq[0]
+
 
 	def update_total_contacts(self, t, alphas):
 		if (len(self.total_contacts) == t):
 			summ_contacts = 0
 			for n,g in self.all_groups.items():
-				pop_g = g.N[t] + g.Rq[t]
+				# Set population the same as N0
+				pop_g = self.N0
 				new_contacts = n_contacts(self, g, alphas, self.mixing_method)
 				summ_contacts += new_contacts*g.I[t]/(pop_g if pop_g!=0 else 10e-6)
-				if self.parent.extra_data:
-					self.parent.n_contacts[t][self.name][g.name] = new_contacts
 			self.total_contacts.append(summ_contacts*self.S[t])
 		else:
 			assert(False)
@@ -311,50 +263,50 @@ class SEIR_group:
 	# Updates N
 	def update_N(self, m_tests, a_tests):
 		delta_N = (
-			- m_tests*self.I[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6)
-			- a_tests*self.R[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6)
+			- m_tests
+			- a_tests
 			- self.parameters['mu']*(self.parameters['p_H'] + self.parameters['p_ICU'])*self.I[self.t]
 		)
 		self.N += [self.N[self.t]+delta_N*self.dt]
 
 	# Updates S
 	def update_S(self, m_tests, a_tests):
-		delta_S = -self.parameters['beta']*self.total_contacts[self.t]
+		delta_S = -self.parameters['beta']*self.total_contacts[self.t-1]
 		self.S += [self.S[self.t]+delta_S*self.dt]
 
 	# Updates Exposed
 	def update_E(self, m_tests, a_tests):
-		delta_E = self.parameters['beta']*self.total_contacts[self.t] - self.parameters['sigma']*self.E[self.t]
+		delta_E = self.parameters['beta']*self.total_contacts[self.t-1] - self.parameters['sigma']*self.E[self.t]
 		self.E += [self.E[self.t]+delta_E*self.dt]
 
 
 	# Updates infected
 	def update_I(self, m_tests, a_tests):
-		delta_I = self.parameters['sigma']*self.E[self.t] - self.parameters['mu']*self.I[self.t] - m_tests*self.I[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6)
+		delta_I = self.parameters['sigma']*self.E[self.t] - self.parameters['mu']*self.I[self.t] - m_tests
 		self.I += [self.I[self.t]+delta_I*self.dt]
 
 
 	# Updates recovered
 	def update_R(self, m_tests, a_tests):
-		delta_R = self.parameters['mu']*(1-self.parameters["p_H"]-self.parameters["p_ICU"])*self.I[self.t] - a_tests*self.R[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6)
+		delta_R = self.parameters['mu']*(1-self.parameters["p_H"]-self.parameters["p_ICU"])*self.I[self.t] - a_tests
 		self.R += [self.R[self.t]+delta_R*self.dt]
 
 
 	# Updates infected in quarantine
 	def update_Ia(self, m_tests, a_tests):
-		delta_Ia = self.parameters['p_Ia']*m_tests*self.I[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6) - self.parameters['mu']*self.Ia[self.t]
+		delta_Ia = self.parameters['p_Ia']*m_tests - self.parameters['mu']*self.Ia[self.t]
 		self.Ia += [self.Ia[self.t]+delta_Ia*self.dt]
 
 	def update_Ips(self, m_tests, a_tests):
-		delta_Ips = self.parameters['p_Ips']*m_tests*self.I[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6) - self.parameters['mu']*self.Ips[self.t]
+		delta_Ips = self.parameters['p_Ips']*m_tests - self.parameters['mu']*self.Ips[self.t]
 		self.Ips += [self.Ips[self.t]+delta_Ips*self.dt]
 
 	def update_Ims(self, m_tests, a_tests):
-		delta_Ims = self.parameters['p_Ims']*m_tests*self.I[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6) - self.parameters['mu']*self.Ims[self.t]
+		delta_Ims = self.parameters['p_Ims']*m_tests - self.parameters['mu']*self.Ims[self.t]
 		self.Ims += [self.Ims[self.t]+delta_Ims*self.dt]
 
 	def update_Iss(self, m_tests, a_tests):
-		delta_Iss = self.parameters['p_Iss']*m_tests*self.I[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6) - self.parameters['mu']*self.Iss[self.t]
+		delta_Iss = self.parameters['p_Iss']*m_tests - self.parameters['mu']*self.Iss[self.t]
 		self.Iss += [self.Iss[self.t]+delta_Iss*self.dt]
 
 
@@ -364,7 +316,7 @@ class SEIR_group:
 			self.parameters['mu']*(self.Ia[self.t]+self.Ips[self.t]+self.Ims[self.t]) +
 			self.parameters['lambda_H_R']*self.H[self.t] +
 			self.parameters['lambda_ICU_R']*self.ICU[self.t] +
-			a_tests*self.R[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6)
+			a_tests
 		)
 		self.Rq += [self.Rq[self.t]+delta_Rq*self.dt]
 

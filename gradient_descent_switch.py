@@ -12,8 +12,8 @@ sys.path.insert(0, current_dir+"/heuristics")
 import copy
 import time
 
-
-
+from heuristics import *
+from forecasting_heuristic import *
 
 
 from group import SEIR_group, DynamicalModel

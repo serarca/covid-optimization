@@ -12,7 +12,7 @@ sys.path.insert(0, current_dir+"/heuristics")
 
 
 from group import SEIR_group, DynamicalModel
-# from heuristics import *
+from heuristics import *
 import math
 import pprint
 import numpy as np
