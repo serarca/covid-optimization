@@ -22,12 +22,13 @@ import pprint
 # Global variables
 simulation_params = {
 	'dt':1.0,
-	'days': 100.0,
+	'days': 50.0,
 	'region': "Ile-de-France",
 }
 age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29', 'age_group_30_39', 'age_group_40_49',
 	'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
 
+# age_groups = ['age_group_30_39']
 
 # Define time variables
 simulation_params['time_periods'] = int(math.ceil(simulation_params["days"]/simulation_params["dt"]))
@@ -122,7 +123,7 @@ elif args.heuristic == "no_tests":
 elif args.heuristic == "forecasting_heuristic":
 	tolerance = 10
 	max_iterations = 10
-	death_value = 100000
+	death_value = 1000000
 	a_tests_vec, m_tests_vec = forecasting_heuristic(dynModel, max_a_tests, max_m_tests, alphas_vec, [dynModel.beds for t in range(len(max_a_tests))], [dynModel.icus for t in range(len(max_a_tests))], tolerance, max_iterations, death_value, mixing_method)
 #ICU CAP replaced by single value dynModel.icus
 tests = {
@@ -154,25 +155,25 @@ for i,group in enumerate(groups):
 	plt.plot(time_axis, dynModel.groups[group].S, label="Susceptible")
 	plt.title(group)
 	plt.legend(loc='upper right')
-	plt.ylim(-10000,np.max([np.max(dynModel.groups[group].S) for group in groups]))
+	plt.ylim(-1,np.max([np.max(dynModel.groups[group].S) for group in groups]))
 
 for i,group in enumerate(groups):
 	plt.subplot(13,len(groups),i+1+len(groups))
 	plt.plot(time_axis, dynModel.groups[group].E, label="Exposed")
 	plt.plot(time_axis, dynModel.groups[group].I, label="Infected")
 	plt.legend(loc='upper right')
-	plt.ylim(-10000,np.max([max(np.max(dynModel.groups[group].E),np.max(dynModel.groups[group].I)) for group in groups]))
+	plt.ylim(-1,np.max([max(np.max(dynModel.groups[group].E),np.max(dynModel.groups[group].I)) for group in groups]))
 
 for i,group in enumerate(groups):
 	plt.subplot(13,len(groups),i+1+len(groups)*2)
 	plt.plot(time_axis, dynModel.groups[group].R, label="Recovered")
-	plt.ylim(-10000,np.max([np.max(dynModel.groups[group].R) for group in groups]))
+	plt.ylim(-1,np.max([np.max(dynModel.groups[group].R) for group in groups]))
 	plt.legend(loc='upper right')
 
 for i,group in enumerate(groups):
 	plt.subplot(13,len(groups),i+1+len(groups)*3)
 	plt.plot(time_axis, dynModel.groups[group].Rq, label="Recovered Q")
-	plt.ylim(-10000,np.max([np.max(dynModel.groups[group].Rq) for group in groups]))
+	plt.ylim(-1,np.max([np.max(dynModel.groups[group].Rq) for group in groups]))
 	plt.legend(loc='upper right')
 
 for i,group in enumerate(groups):
@@ -181,7 +182,7 @@ for i,group in enumerate(groups):
 	plt.plot(time_axis, dynModel.groups[group].Ips, label="Infected PS-Q")
 	plt.plot(time_axis, dynModel.groups[group].Ims, label="Infected MS-Q")
 	plt.plot(time_axis, dynModel.groups[group].Iss, label="Infected SS-Q")
-	plt.ylim(-10000,np.max([max(np.max(dynModel.groups[group].Ia),np.max(dynModel.groups[group].Ips),np.max(dynModel.groups[group].Ims),np.max(dynModel.groups[group].Iss)) for group in groups]))
+	plt.ylim(-1,np.max([max(np.max(dynModel.groups[group].Ia),np.max(dynModel.groups[group].Ips),np.max(dynModel.groups[group].Ims),np.max(dynModel.groups[group].Iss)) for group in groups]))
 	plt.legend(loc='upper right')
 
 for i,group in enumerate(groups):
@@ -189,13 +190,14 @@ for i,group in enumerate(groups):
 	plt.plot(time_axis, dynModel.groups[group].H, label="Hospital Bed")
 	plt.plot(time_axis, dynModel.groups[group].ICU, label="ICU")
 	plt.plot(time_axis, dynModel.groups[group].D, label="Dead")
-	plt.ylim(-10000,np.max([max(np.max(dynModel.groups[group].H),np.max(dynModel.groups[group].ICU),np.max(dynModel.groups[group].D)) for group in groups]))
+	plt.ylim(-1,np.max([max(np.max(dynModel.groups[group].H),np.max(dynModel.groups[group].ICU),np.max(dynModel.groups[group].D)) for group in groups]))
 	plt.legend(loc='upper right')
 
 
 for i,group in enumerate(groups):
 	plt.subplot(13,len(groups),i+1+len(groups)*6)
-	plt.plot(range(0,int(simulation_params['time_periods'])), np.array(re_change_order(m_tests_vec)[group])+max(float(args.m_tests),float(args.a_tests))/100, label="M Tests")
+	plt.plot(range(0,int(simulation_params['time_periods'])),
+	np.array(re_change_order(m_tests_vec)[group])+max(float(args.m_tests),float(args.a_tests))/100, label="M Tests")
 	plt.plot(range(0,int(simulation_params['time_periods'])), re_change_order(a_tests_vec)[group], label="A Tests")
 	plt.ylim(-max(float(args.m_tests),float(args.a_tests))/10,max(float(args.m_tests),float(args.a_tests))+max(float(args.m_tests),float(args.a_tests))/10)
 	plt.legend(loc='upper right')
