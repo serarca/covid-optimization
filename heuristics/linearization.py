@@ -84,15 +84,15 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method):
 
         # df^Sg/dIh all h
         for ah in range(0, num_age_groups):
-            jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('N_g')] = - dynModel.groups[age_groups[ag]].parameters['beta'] * X_hat[Sg_idx] * c_gh_arr[ah] * I_h_slice[ah] / (N_h_slice[ah] + Rq_h_slice[ah])
+            jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('I_g')] = - dynModel.groups[age_groups[ag]].parameters['beta'] * X_hat[Sg_idx] * c_gh_arr[ah] * I_h_slice[ah] / (N_h_slice[ah] + Rq_h_slice[ah])
 
         # df^Sg/dRqh all h
         for ah in range(0, num_age_groups):
-            jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('N_g')] = dynModel.groups[age_groups[ag]].parameters['beta'] * X_hat[Sg_idx] * c_gh_arr[ah] * I_h_slice[ah] / ((N_h_slice[ah] + Rq_h_slice[ah])**2)
+            jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('Rq_g')] = dynModel.groups[age_groups[ag]].parameters['beta'] * X_hat[Sg_idx] * c_gh_arr[ah] / ((N_h_slice[ah] + Rq_h_slice[ah])**2)
 
         ########### f^Eg
         # df^Eg/dSg
-        jacob[Eg_idx,Sg_idx] = dynModel.groups[age_groups[ag]].parameters['beta'] * X_hat[ag * num_compartments + SEIR_groups.index('S_g')] * contacts
+        jacob[Eg_idx,Sg_idx] = dynModel.groups[age_groups[ag]].parameters['beta'] * X_hat[Sg_idx] * contacts
 
         # df^Eg/dNh all h
         for ah in range(0, num_age_groups):
@@ -100,11 +100,11 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method):
 
         # df^Eg/dIh all h
         for ah in range(0, num_age_groups):
-            jacob[Eg_idx,ah * num_compartments + SEIR_groups.index('N_g')] = dynModel.groups[age_groups[ag]].parameters['beta'] * X_hat[Sg_idx] * c_gh_arr[ah] * I_h_slice[ah] / (N_h_slice[ah] + Rq_h_slice[ah])
+            jacob[Eg_idx,ah * num_compartments + SEIR_groups.index('I_g')] = dynModel.groups[age_groups[ag]].parameters['beta'] * X_hat[Sg_idx] * c_gh_arr[ah] / (N_h_slice[ah] + Rq_h_slice[ah])
 
         # df^Eg/dRqh all h
         for ah in range(0, num_age_groups):
-            jacob[Eg_idx,ah * num_compartments + SEIR_groups.index('N_g')] = - dynModel.groups[age_groups[ag]].parameters['beta'] * X_hat[Sg_idx] * c_gh_arr[ah] * I_h_slice[ah] / ((N_h_slice[ah] + Rq_h_slice[ah])**2)
+            jacob[Eg_idx,ah * num_compartments + SEIR_groups.index('Rq_g')] = - dynModel.groups[age_groups[ag]].parameters['beta'] * X_hat[Sg_idx] * c_gh_arr[ah] * I_h_slice[ah] / ((N_h_slice[ah] + Rq_h_slice[ah])**2)
 
         #### Derivatives for the function that yields I_g
         # Deriv w.r.t E_g
@@ -112,7 +112,7 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method):
         # Deriv w.r.t I_g
         jacob[Ig_idx, Ig_idx] = -dynModel.groups[age_groups[ag]].parameters['mu'] - u_hat[Nmtestg_idx]/X_hat[Ng_idx]
         # Deriv w.r.t N_g
-        jacob[Ig_idx, Ng_idx] = u_hat[Nmtestg_idx]*X_hat[Ig_idx] * X_hat[Ig_idx]/(X_hat[Ng_idx])**2
+        jacob[Ig_idx, Ng_idx] = u_hat[Nmtestg_idx] * X_hat[Ig_idx]/((X_hat[Ng_idx])**2)
 
         #### Derivatives for the function that yields R_g
         # Deriv w.r.t I_g
@@ -120,13 +120,13 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method):
         # Deriv w.r.t R_g
         jacob[Rg_idx, Rg_idx] = -u_hat[Natestg_idx]/X_hat[Ng_idx]
         # Deriv w.r.t N_g
-        jacob[Rg_idx, Ng_idx] = u_hat[Natestg_idx]*X_hat[Rg_idx]/(X_hat[Ng_idx])**2
+        jacob[Rg_idx, Ng_idx] = u_hat[Natestg_idx]*X_hat[Rg_idx]/((X_hat[Ng_idx])**2)
 
         #### Derivatives for the function that yields Ia_g
         # Deriv w.r.t I_g
         jacob[Iag_idx, Ig_idx] = dynModel.groups[age_groups[ag]].parameters['p_Ia']*u_hat[Nmtestg_idx]/X_hat[Ng_idx]
         # Deriv w.r.t N_g
-        jacob[Iag_idx, Ng_idx] = -dynModel.groups[age_groups[ag]].parameters['p_Ia']*u_hat[Nmtestg_idx]*X_hat[Ig_idx]/(X_hat[Ng_idx])**2
+        jacob[Iag_idx, Ng_idx] = -dynModel.groups[age_groups[ag]].parameters['p_Ia']*u_hat[Nmtestg_idx]*X_hat[Ig_idx]/((X_hat[Ng_idx])**2)
         # Deriv w.r.t Ia_g
         jacob[Iag_idx, Iag_idx] = -dynModel.groups[age_groups[ag]].parameters['mu']
 
@@ -134,7 +134,7 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method):
         # Deriv w.r.t I_g
         jacob[Ipsg_idx, Ig_idx] = dynModel.groups[age_groups[ag]].parameters['p_Ips']*u_hat[Nmtestg_idx]/X_hat[Ng_idx]
         # Deriv w.r.t N_g
-        jacob[Ipsg_idx, Ng_idx] = -dynModel.groups[age_groups[ag]].parameters['p_Ips']*u_hat[Nmtestg_idx]*X_hat[Ig_idx]/(X_hat[Ng_idx])**2
+        jacob[Ipsg_idx, Ng_idx] = -dynModel.groups[age_groups[ag]].parameters['p_Ips']*u_hat[Nmtestg_idx]*X_hat[Ig_idx]/((X_hat[Ng_idx])**2)
         # Deriv w.r.t Ips_g
         jacob[Ipsg_idx, Ipsg_idx] = -dynModel.groups[age_groups[ag]].parameters['mu']
 
@@ -142,7 +142,7 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method):
         # Deriv w.r.t I_g
         jacob[Imsg_idx, Ig_idx] = dynModel.groups[age_groups[ag]].parameters['p_Ims']*u_hat[Nmtestg_idx]/X_hat[Ng_idx]
         # Deriv w.r.t N_g
-        jacob[Imsg_idx, Ng_idx] = -dynModel.groups[age_groups[ag]].parameters['p_Ims']*u_hat[Nmtestg_idx]*X_hat[Ig_idx]/(X_hat[Ng_idx])**2
+        jacob[Imsg_idx, Ng_idx] = -dynModel.groups[age_groups[ag]].parameters['p_Ims']*u_hat[Nmtestg_idx]*X_hat[Ig_idx]/((X_hat[Ng_idx])**2)
         # Deriv w.r.t Ims_g
         jacob[Imsg_idx, Imsg_idx] = -dynModel.groups[age_groups[ag]].parameters['mu']
 
@@ -151,7 +151,7 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method):
         # Deriv w.r.t I_g
         jacob[Issg_idx, Ig_idx] = dynModel.groups[age_groups[ag]].parameters['p_Iss']*u_hat[Nmtestg_idx]/X_hat[Ng_idx]
         # Deriv w.r.t N_g
-        jacob[Issg_idx, Ng_idx] = -dynModel.groups[age_groups[ag]].parameters['p_Iss']*u_hat[Nmtestg_idx]*X_hat[Ig_idx]/(X_hat[Ng_idx])**2
+        jacob[Issg_idx, Ng_idx] = -dynModel.groups[age_groups[ag]].parameters['p_Iss']*u_hat[Nmtestg_idx]*X_hat[Ig_idx]/((X_hat[Ng_idx])**2)
         # Deriv w.r.t Iss_g
         jacob[Issg_idx, Issg_idx] = -dynModel.groups[age_groups[ag]].parameters['mu']
 
@@ -160,8 +160,6 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method):
         jacob[Rqg_idx, Iag_idx] = dynModel.groups[age_groups[ag]].parameters['mu']
         jacob[Rqg_idx, Ipsg_idx] = dynModel.groups[age_groups[ag]].parameters['mu']
         jacob[Rqg_idx, Imsg_idx] = dynModel.groups[age_groups[ag]].parameters['mu']
-        # Deriv w.r.t I_g
-        jacob[Rqg_idx, Ig_idx] = dynModel.groups[age_groups[ag]].parameters['mu']
         # Deriv w.r.t H_g
         jacob[Rqg_idx, Hg_idx] = dynModel.groups[age_groups[ag]].parameters['lambda_H_R']
         # Deriv w.r.t ICU_g
@@ -169,17 +167,17 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method):
         # Deriv w.r.t R_g
         jacob[Rqg_idx, Rg_idx] = u_hat[Natestg_idx]/X_hat[Ng_idx]
         # Deriv w.r.t N_g
-        jacob[Rqg_idx, Ng_idx] = -u_hat[Natestg_idx]*X_hat[Rg_idx]/(X_hat[Ng_idx])**2
+        jacob[Rqg_idx, Ng_idx] = -u_hat[Natestg_idx]*X_hat[Rg_idx]/((X_hat[Ng_idx])**2)
 
         ########### f^Ng
         # df^Ng/dNg
-        jacob[Ng_idx,ag * num_compartments + SEIR_groups.index('N_g')] = u_hat[ag * num_controls + controls.index('Nmtest_g')] * X_hat[Ig_idx] / (X_hat[Ng_idx]**2) + u_hat[ag * num_controls + controls.index('Natest_g')] * X_hat[Rg_idx] / (X_hat[Ng_idx]**2)
+        jacob[Ng_idx,Ng_idx] = u_hat[Nmtestg_idx] * X_hat[Ig_idx] / (X_hat[Ng_idx]**2) + u_hat[Natestg_idx] * X_hat[Rg_idx] / (X_hat[Ng_idx]**2)
 
         # df^Ng/dIg
-        jacob[Ng_idx,Ig_idx] = - u_hat[ag * num_controls + controls.index('Nmtest_g')] / X_hat[Ng_idx] - dynModel.groups[age_groups[ag]].parameters['mu'] * (dynModel.groups[age_groups[ag]].parameters['p_H'] + dynModel.groups[age_groups[ag]].parameters['p_ICU'])
+        jacob[Ng_idx,Ig_idx] = - u_hat[Nmtestg_idx] / X_hat[Ng_idx] - dynModel.groups[age_groups[ag]].parameters['mu'] * (dynModel.groups[age_groups[ag]].parameters['p_H'] + dynModel.groups[age_groups[ag]].parameters['p_ICU'])
 
         # df^Ng/dRg
-        jacob[Ng_idx,Rg_idx] = - u_hat[ag * num_controls + controls.index('Natest_g')] / X_hat[Ng_idx]
+        jacob[Ng_idx,Rg_idx] = - u_hat[Natestg_idx] / X_hat[Ng_idx]
 
         ########### f^Hg
         # df^Hg/dHg
