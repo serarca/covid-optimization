@@ -39,3 +39,20 @@ python sim_lockdown.py --heuristic homogeneous --a_tests 0 --m_tests 0 --lockdow
 * The ```n_days``` flag indicates how many days to run the simulation
 * The ```initial_infected``` flag is the number of people infected at day zero (we assume these people to be sampled from the groups in proportion with the size of the group)
 * The script outputs a CSV file with the number of infected people, deaths, etc, at each day, the script also outputs a plot of the dynamics (you can find them in the folder ```results_runs```)
+
+
+# Locdown simulation -- sensitivity
+
+This script allows to run experiments on the sensitivity of testing schemes. To run the simulation, run
+
+```
+python sim_lockdown_sensitivity.py --heuristic age_group_40_49 --a_tests 0 --m_tests 3000 --lockdown_start 75 --n_days 130 --initial_infected_30_39 49 --initial_infected_40_49 49 --mixing mult --lockdown_factor 0.25
+```
+
+* The ```heuristic```, ```a_tests``` and ```m_tests``` flags are the same as in the previous section
+* The ```lockdown_start``` flag indicates the day that lockdown started
+* The ```n_days``` flag indicates how many days to run the simulation
+* The ```initial_infected_``` flags are the number of people infected at day zero from each of the groups. (Currently, only age groups 30-39 and 40-49.)
+* The ```mixing``` flag indicates the type of mixing for the number of contacts, this can be max, min, mult. 
+* The ```lockdown_factor``` flag indicates the level at which groups exercise the activities, other than home, during lockdown.
+* The script outputs a CSV file with the number of infected people, deaths, etc, on each day. The script also outputs a plot of the dynamics. You can find both in the folder ```results_runs```.

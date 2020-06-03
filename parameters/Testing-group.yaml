@@ -1,0 +1,43 @@
+global-parameters:
+  C_H: 20000000.0
+  C_ICU: 2500.0
+seir-groups:
+  age_group_30_39:
+    contacts:
+      home:
+        age_group_30_39: 0.60844724
+
+      leisure:
+        age_group_30_39: 0.55920476
+
+      other:
+        age_group_30_39: 0.79037431
+
+      school:
+        age_group_30_39: 0.22717866
+
+      transport:
+        age_group_30_39: 0.0310989706065815
+
+      work:
+        age_group_30_39: 1.06898578570271
+
+    economics:
+      death_value: 1000000.0
+      lockdown_fraction: 0.5
+      work_value: 85.28878053728769
+    name: age_group_30_39
+    parameters:
+      beta: 0.060606045273519614
+      lambda_H_D: 0.0014492753623188406
+      lambda_H_R: 0.0748283752860412
+      lambda_ICU_D: 0.0009963293130571577
+      lambda_ICU_R: 0.051442055584687986
+      mu: 0.25
+      p_H: 0.010933000000000002
+      p_ICU: 0.0020670000000000003
+      p_Ia: 0.4935
+      p_Ims: 0.24675
+      p_Ips: 0.24675
+      p_Iss: 0.013000000000000001
+      sigma: 0.25

@@ -5,6 +5,7 @@ import pandas as pd
 import math
 
 def n_contacts(group_g, group_h, alphas, mixing_method):
+	
 	n = 0
 	if mixing_method['name'] == "maxmin":
 		for activity in alphas[group_g.name]:
@@ -17,13 +18,13 @@ def n_contacts(group_g, group_h, alphas, mixing_method):
 			n += group_g.contacts[activity][group_h.name]*alphas[group_g.name][activity]*alphas[group_h.name][activity]
 	elif mixing_method['name'] == "min":
 		for activity in alphas[group_g.name]:
-			n += group_g.contacts[activity][group_h.name]*min(alphas[group_g.name][activity],alphas[group_h.name][activity])	
+			n += group_g.contacts[activity][group_h.name]*min(alphas[group_g.name][activity],alphas[group_h.name][activity])
 	elif mixing_method['name'] == "max":
 		for activity in alphas[group_g.name]:
-			n += group_g.contacts[activity][group_h.name]*max(alphas[group_g.name][activity],alphas[group_h.name][activity])	
+			n += group_g.contacts[activity][group_h.name]*max(alphas[group_g.name][activity],alphas[group_h.name][activity])
 	else:
 		assert(False)
-	
+
 	return n
 
 
@@ -91,6 +92,24 @@ class DynamicalModel:
 		# Update time
 		self.t += 1
 		return result
+
+	# Reset the overall simulation time
+	def reset_time(self, new_time):
+		"""Resets the current time of the simulation to an earlier time point"""
+
+		if(new_time > self.t):
+			assert(False)
+
+		# reset the time in each group
+		for n in self.groups:
+			self.groups[n].reset_time(new_time)
+
+		# reset internal calculations of econ values, deaths, rewards
+		self.economic_values = self.economic_values[0:new_time+1]
+		self.deaths = self.deaths[0:new_time+1]
+		self.rewards = self.rewards[0:new_time+1]
+
+		self.t = new_time
 
 	# Simulates the dynamics given a vector of molecular tests, atomic tests and alphas
 	def simulate(self, m_tests_vec, a_tests_vec, alphas_vec):
@@ -217,8 +236,6 @@ class SEIR_group:
 		self.parent = parent
 		self.initialize_vars(self.initial_conditions)
 
-
-
 		# Time step
 		self.t = 0
 		self.dt = dt
@@ -293,6 +310,28 @@ class SEIR_group:
 		self.update_D(m_tests, a_tests, h_cap, icu_cap)
 
 		self.t += 1
+
+	# Reset the time to a past time
+	def reset_time(self, new_time):
+		if(new_time > self.t):
+			assert(False)
+		self.S = self.S[0:new_time+1]
+		self.E = self.E[0:new_time+1]
+		self.I = self.I[0:new_time+1]
+		self.R = self.R[0:new_time+1]
+		self.N = self.N[0:new_time+1]
+		self.Ia = self.Ia[0:new_time+1]
+		self.Ips = self.Ips[0:new_time+1]
+		self.Ims = self.Ims[0:new_time+1]
+		self.Iss = self.Iss[0:new_time+1]
+		self.Rq = self.Rq[0:new_time+1]
+		self.H = self.H[0:new_time+1]
+		self.ICU = self.ICU[0:new_time+1]
+		self.D = self.D[0:new_time+1]
+		self.total_contacts = self.total_contacts[0:new_time]
+		
+		self.t = new_time
+
 
 	# Gives flow of how many people flowing to H
 	def flow_H(self, t):
