@@ -35,7 +35,7 @@ num_activities = len(activities)
 #    return age_groups.index(ag_name)*len(SEIR_groups) + SEIR_groups.index(SEIRg_name)
 
 ####################################
-# Calculate the Jacobian with respect to u (decisions/controls)
+# Calculate the Jacobian with respect to X (states)
 def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method):
     """ Calculates the Jacobian for a given control trajectory u_hat and corresponding state trajectory X_hat """
     # This assumes that the order of components in X_hat and u_hat is as follows:
