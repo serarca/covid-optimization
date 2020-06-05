@@ -452,10 +452,10 @@ def calculate_M_gamma_and_eta(dynModel):
     M = np.zeros((num_age_groups*num_controls, num_age_groups*num_compartments))
 
     # Vector gamma should have len equal to the size of X(t)
-    gamma = np.zeros((1,num_age_groups*num_compartments))
+    gamma = np.zeros(num_age_groups*num_compartments)
 
     # Vector eta should have len equal to the size of X(t)
-    eta = np.zeros((1,num_age_groups*num_compartments))
+    eta = np.zeros(num_age_groups*num_compartments)
 
     for ag in range(0,num_age_groups):
         # Get all the useful indices for the columns
@@ -491,15 +491,15 @@ def calculate_M_gamma_and_eta(dynModel):
         # lockdown if we want to implement the obj with R^q being
         # in lockdown, we should have v_NLg * theta in the
         # column corresponding to R^q_g
-        gamma[0, Sg_idx] = v_NLg * theta
-        gamma[0, Eg_idx] = v_NLg * theta
-        gamma[0, Rg_idx] = v_NLg * theta
-        gamma[0, Rqg_idx] = v_NLg
+        gamma[Sg_idx] = v_NLg * theta
+        gamma[Eg_idx] = v_NLg * theta
+        gamma[Rg_idx] = v_NLg * theta
+        gamma[Rqg_idx] = v_NLg
 
         # Vector eta should have only nonzero elements in the
         # columns corresponding to D_g. We assume here that D(0)=0
         # but this should not change the decisions of the heur.
-        eta[0, Dg_idx] = -v_Dg
+        eta[Dg_idx] = -v_Dg
 
     return M, gamma, eta
 
