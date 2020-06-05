@@ -63,11 +63,33 @@ class DynamicalModel:
 		if extra_data:
 			self.n_contacts = [{g_name1:{g_name2:float('inf') for g_name2 in self.groups} for g_name1 in self.groups} for i in range(self.time_steps)]
 
-	def take_time_step(self, m_tests, a_tests, alphas):
+	def take_time_step(self, m_tests, a_tests, alphas, B_H = False, B_ICU = False):
 		for n in self.groups:
 			self.groups[n].update_total_contacts(self.t, alphas)
-		for n in self.groups:
-			self.groups[n].take_time_step(m_tests[n], a_tests[n], self.beds, self.icus)
+		if B_H and B_ICU:
+			# Verify that the bouncing variables satisfy the required bounds
+			for n,g in self.groups.items():
+				assert(B_H[n]<=group.flow_H(self.t))
+				assert(B_ICU[n]<=group.flow_ICU(self.t))
+
+			assert(
+				sum([group.flow_H(self.t)-B_H[name] for name,group in self.groups.items()])<=
+				self.beds
+				- sum([(1-group.parameters["lambda_H_R"]-group.parameters["lambda_H_D"])*group.H[t] for name,group in self.groups.items()])
+			)
+			assert(
+				sum([group.flow_ICU(t)-B_ICU[name] for name,group in self.groups.items()])<=
+				self.icus
+				- sum([(1-group.parameters["lambda_ICU_R"]-group.parameters["lambda_ICU_D"])*group.ICU[t] for name,group in self.groups.items()])
+			)
+
+			for n in self.groups:
+				self.groups[n].take_time_step(m_tests[n], a_tests[n], self.beds, self.icus, B_H[n], B_ICU[n])
+		else:
+			for n in self.groups:
+				self.groups[n].take_time_step(m_tests[n], a_tests[n], self.beds, self.icus, False, False)
+
+				
 
 
 		# Calculate economic values
@@ -297,7 +319,7 @@ class SEIR_group:
 		self.all_groups = all_groups
 
 	# Advances one time step, given the m_tests and a_tests variable
-	def take_time_step(self, m_tests, a_tests, h_cap, icu_cap):
+	def take_time_step(self, m_tests, a_tests, h_cap, icu_cap, B_H, B_ICU):
 		self.update_N(m_tests, a_tests)
 		self.update_S(m_tests, a_tests)
 		self.update_E(m_tests, a_tests)
@@ -308,9 +330,9 @@ class SEIR_group:
 		self.update_Ims(m_tests, a_tests)
 		self.update_Iss(m_tests, a_tests)
 		self.update_Rq(m_tests, a_tests)
-		self.update_H(m_tests, a_tests, h_cap, icu_cap)
-		self.update_ICU(m_tests, a_tests, h_cap, icu_cap)
-		self.update_D(m_tests, a_tests, h_cap, icu_cap)
+		self.update_H(m_tests, a_tests, h_cap, icu_cap, B_H)
+		self.update_ICU(m_tests, a_tests, h_cap, icu_cap, B_ICU)
+		self.update_D(m_tests, a_tests, h_cap, icu_cap, B_H, B_ICU)
 
 		self.t += 1
 
@@ -411,7 +433,8 @@ class SEIR_group:
 		self.Rq += [self.Rq[self.t]+delta_Rq*self.dt]
 
 
-	def update_H(self, m_tests, a_tests, h_cap, icu_cap):
+	def update_H(self, m_tests, a_tests, h_cap, icu_cap, B_H):
+		
 		# For each group, calculate the entering amount
 		entering_h = {}
 		summ_entering_h = 0
@@ -420,15 +443,19 @@ class SEIR_group:
 			entering_h[n] = self.all_groups[n].flow_H(self.t)
 			summ_entering_h += entering_h[n]
 			summ_staying_h += (1-g.parameters['lambda_H_R']-g.parameters['lambda_H_D'])*g.H[self.t]
+		
+		if not B_H:
+			B_H = entering_h[self.name]*(summ_entering_h-h_cap+summ_staying_h if summ_entering_h-h_cap+summ_staying_h>0 else 0)/(summ_entering_h if summ_entering_h!=0 else 10e-6)
 
 		delta_H = (
 			- (self.parameters["lambda_H_R"] + self.parameters["lambda_H_D"])*self.H[self.t]
-			+ entering_h[self.name]*(1-(summ_entering_h-h_cap+summ_staying_h if summ_entering_h-h_cap+summ_staying_h>0 else 0)/(summ_entering_h if summ_entering_h!=0 else 10e-6))
+			+ entering_h[self.name]
+			- B_H
 		)
 		self.H += [self.H[self.t]+delta_H*self.dt]
 
 
-	def update_ICU(self, m_tests, a_tests, h_cap, icu_cap):
+	def update_ICU(self, m_tests, a_tests, h_cap, icu_cap, B_ICU):
 		# For each group, calculate the entering amount
 		entering_icu = {}
 		summ_entering_icu = 0
@@ -438,21 +465,19 @@ class SEIR_group:
 			summ_entering_icu += entering_icu[n]
 			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[self.t]
 
+		if not B_ICU:
+			B_ICU = entering_icu[self.name]*(summ_entering_icu-icu_cap+summ_staying_icu if summ_entering_icu-icu_cap+summ_staying_icu>0 else 0)/(summ_entering_icu if summ_entering_icu!=0 else 10e-6)
 
 		delta_ICU = (
 			- (self.parameters["lambda_ICU_R"] + self.parameters["lambda_ICU_D"])*self.ICU[self.t]
-			+ entering_icu[self.name]*(1-(summ_entering_icu-icu_cap+summ_staying_icu if summ_entering_icu-icu_cap+summ_staying_icu>0 else 0)/(summ_entering_icu if summ_entering_icu!=0 else 10e-6))
+			+ entering_icu[self.name]
+			- B_ICU
 		)
 		self.ICU += [self.ICU[self.t]+delta_ICU*self.dt]
 
-		# if self.ICU[-1] < 0:
-		# 	print(-(self.parameters["lambda_ICU_R"] + self.parameters["lambda_ICU_D"])*self.ICU[self.t])
-		# 	print(+ entering_icu[self.name])
-		# 	print(+ entering_icu[self.name]*(1-(summ_entering_icu-icus if summ_entering_icu-icus>0 else 0)/(summ_entering_icu if summ_entering_icu!=0 else 10e-6)))
-		# 	assert(False)
 
 
-	def update_D(self, m_tests, a_tests, h_cap, icu_cap):
+	def update_D(self, m_tests, a_tests, h_cap, icu_cap, B_H, B_ICU):
 		# For each group, calculate the entering amount
 		entering_h = {}
 		summ_entering_h = 0
@@ -469,13 +494,18 @@ class SEIR_group:
 			entering_icu[n] = self.all_groups[n].flow_ICU(self.t)
 			summ_entering_icu += entering_icu[n]
 			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[self.t]
+
+		if not B_H:
+			B_H = entering_h[self.name]*(summ_entering_h-h_cap+summ_staying_h if summ_entering_h-h_cap+summ_staying_h>0 else 0)/(summ_entering_h if summ_entering_h!=0 else 10e-6)
+		if not B_ICU:
+			B_ICU = entering_icu[self.name]*(summ_entering_icu-icu_cap+summ_staying_icu if summ_entering_icu-icu_cap+summ_staying_icu>0 else 0)/(summ_entering_icu if summ_entering_icu!=0 else 10e-6)
 
 
 		delta_D = (
 			self.parameters["lambda_H_D"]*self.H[self.t]
 			+ self.parameters["lambda_ICU_D"]*self.ICU[self.t]
-			+ entering_icu[self.name]*((summ_entering_icu-icu_cap+summ_staying_icu if summ_entering_icu-icu_cap+summ_staying_icu>0 else 0)/(summ_entering_icu if summ_entering_icu!=0 else 10e-6))
-			+ entering_h[self.name]*((summ_entering_h-h_cap+summ_staying_h if summ_entering_h-h_cap+summ_staying_h>0 else 0)/(summ_entering_h if summ_entering_h!=0 else 10e-6))
+			+ B_H
+			+ B_ICU
 		)
 
 		self.D += [self.D[self.t]+delta_D*self.dt]
