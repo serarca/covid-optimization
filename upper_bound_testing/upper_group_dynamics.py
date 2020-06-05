@@ -139,6 +139,7 @@ class DynamicalModelUpper:
 		total = 0
 		for t in range(1,self.time_steps+1):
 			total += self.economic_values[t]
+		print("Calculated economic value from 1 to %d inclusive"%self.time_steps)
 		return total
 
 	def get_total_reward(self):
@@ -206,6 +207,7 @@ class SEIR_group_upper:
 
 		# Contacts
 		self.total_contacts = []
+		self.IR = []
 
 		# The initial population
 		self.N0 = self.S[0] + self.E[0] + self.I[0]+ self.R[0] + self.Rq[0]
@@ -216,10 +218,12 @@ class SEIR_group_upper:
 			summ_contacts = 0
 			for n,g in self.all_groups.items():
 				# Set population the same as N0
-				pop_g = self.N0
+				pop_g = g.N0
 				new_contacts = n_contacts(self, g, alphas, self.mixing_method)
 				summ_contacts += new_contacts*g.I[t]/(pop_g if pop_g!=0 else 10e-6)
+			self.IR.append(summ_contacts)
 			self.total_contacts.append(summ_contacts*self.S[t])
+
 		else:
 			assert(False)
 
@@ -230,19 +234,24 @@ class SEIR_group_upper:
 
 	# Advances one time step, given the m_tests and a_tests variable
 	def take_time_step(self, m_tests, a_tests, h_cap, icu_cap):
-		self.update_N(m_tests, a_tests)
-		self.update_S(m_tests, a_tests)
-		self.update_E(m_tests, a_tests)
-		self.update_I(m_tests, a_tests)
-		self.update_R(m_tests, a_tests)
-		self.update_Ia(m_tests, a_tests)
-		self.update_Ips(m_tests, a_tests)
-		self.update_Ims(m_tests, a_tests)
-		self.update_Iss(m_tests, a_tests)
-		self.update_Rq(m_tests, a_tests)
-		self.update_H(m_tests, a_tests, h_cap, icu_cap)
-		self.update_ICU(m_tests, a_tests, h_cap, icu_cap)
-		self.update_D(m_tests, a_tests, h_cap, icu_cap)
+
+		# Save these variables because it might be necessary to modify them
+		self.m_tests = m_tests
+		self.a_tests = a_tests
+
+		self.update_S()
+		self.update_E()
+		self.update_I()
+		self.update_R()
+		self.update_N()
+		self.update_Ia()
+		self.update_Ips()
+		self.update_Ims()
+		self.update_Iss()
+		self.update_Rq()
+		self.update_H( h_cap, icu_cap)
+		self.update_ICU(h_cap, icu_cap)
+		self.update_D(h_cap, icu_cap)
 
 		self.t += 1
 
@@ -261,67 +270,82 @@ class SEIR_group_upper:
 			return 0.0
 
 	# Updates N
-	def update_N(self, m_tests, a_tests):
+	def update_N(self):
 		delta_N = (
-			- m_tests
-			- a_tests
+			- self.m_tests
+			- self.a_tests
 			- self.parameters['mu']*(self.parameters['p_H'] + self.parameters['p_ICU'])*self.I[self.t]
 		)
 		self.N += [self.N[self.t]+delta_N*self.dt]
 
 	# Updates S
-	def update_S(self, m_tests, a_tests):
-		delta_S = -self.parameters['beta']*self.total_contacts[self.t-1]
+	def update_S(self):
+		delta_S = -self.parameters['beta']*self.total_contacts[self.t]
 		self.S += [self.S[self.t]+delta_S*self.dt]
 
 	# Updates Exposed
-	def update_E(self, m_tests, a_tests):
-		delta_E = self.parameters['beta']*self.total_contacts[self.t-1] - self.parameters['sigma']*self.E[self.t]
+	def update_E(self):
+		delta_E = self.parameters['beta']*self.total_contacts[self.t] - self.parameters['sigma']*self.E[self.t]
 		self.E += [self.E[self.t]+delta_E*self.dt]
 
 
 	# Updates infected
-	def update_I(self, m_tests, a_tests):
-		delta_I = self.parameters['sigma']*self.E[self.t] - self.parameters['mu']*self.I[self.t] - m_tests
-		self.I += [self.I[self.t]+delta_I*self.dt]
+	def update_I(self):
+		# This line makes sure that the number of infected does not become negative
+		delta_I = self.parameters['sigma']*self.E[self.t] - self.parameters['mu']*self.I[self.t] - self.m_tests
 
+		if self.I[self.t]+delta_I*self.dt < 0:
+			self.I += [0]
+			self.m_tests = self.I[self.t]+self.parameters['sigma']*self.E[self.t] - self.parameters['mu']*self.I[self.t] + self.I[self.t]/self.dt
+		else:
+			self.I += [self.I[self.t]+delta_I*self.dt]
 
 	# Updates recovered
-	def update_R(self, m_tests, a_tests):
-		delta_R = self.parameters['mu']*(1-self.parameters["p_H"]-self.parameters["p_ICU"])*self.I[self.t] - a_tests
-		self.R += [self.R[self.t]+delta_R*self.dt]
+	def update_R(self):
+		# This line makes sure that the number of recovered does not become negative
+		delta_R = self.parameters['mu']*(1-self.parameters["p_H"]-self.parameters["p_ICU"])*self.I[self.t] - self.a_tests
+
+		if self.R[self.t]+delta_R*self.dt < 0:
+			self.R += [0]
+			self.a_tests = self.parameters['mu']*(1-self.parameters["p_H"]-self.parameters["p_ICU"])*self.I[self.t] + self.R[self.t]/self.dt
+		else:
+			self.R += [self.R[self.t]+delta_R*self.dt]
+		
+
+
+		
 
 
 	# Updates infected in quarantine
-	def update_Ia(self, m_tests, a_tests):
-		delta_Ia = self.parameters['p_Ia']*m_tests - self.parameters['mu']*self.Ia[self.t]
+	def update_Ia(self):
+		delta_Ia = self.parameters['p_Ia']*self.m_tests - self.parameters['mu']*self.Ia[self.t]
 		self.Ia += [self.Ia[self.t]+delta_Ia*self.dt]
 
-	def update_Ips(self, m_tests, a_tests):
-		delta_Ips = self.parameters['p_Ips']*m_tests - self.parameters['mu']*self.Ips[self.t]
+	def update_Ips(self):
+		delta_Ips = self.parameters['p_Ips']*self.m_tests - self.parameters['mu']*self.Ips[self.t]
 		self.Ips += [self.Ips[self.t]+delta_Ips*self.dt]
 
-	def update_Ims(self, m_tests, a_tests):
-		delta_Ims = self.parameters['p_Ims']*m_tests - self.parameters['mu']*self.Ims[self.t]
+	def update_Ims(self):
+		delta_Ims = self.parameters['p_Ims']*self.m_tests - self.parameters['mu']*self.Ims[self.t]
 		self.Ims += [self.Ims[self.t]+delta_Ims*self.dt]
 
-	def update_Iss(self, m_tests, a_tests):
-		delta_Iss = self.parameters['p_Iss']*m_tests - self.parameters['mu']*self.Iss[self.t]
+	def update_Iss(self):
+		delta_Iss = self.parameters['p_Iss']*self.m_tests - self.parameters['mu']*self.Iss[self.t]
 		self.Iss += [self.Iss[self.t]+delta_Iss*self.dt]
 
 
 	# Update recovered in quarentine
-	def update_Rq(self, m_tests, a_tests):
+	def update_Rq(self):
 		delta_Rq = (
 			self.parameters['mu']*(self.Ia[self.t]+self.Ips[self.t]+self.Ims[self.t]) +
 			self.parameters['lambda_H_R']*self.H[self.t] +
 			self.parameters['lambda_ICU_R']*self.ICU[self.t] +
-			a_tests
+			self.a_tests
 		)
 		self.Rq += [self.Rq[self.t]+delta_Rq*self.dt]
 
 
-	def update_H(self, m_tests, a_tests, h_cap, icu_cap):
+	def update_H(self, h_cap, icu_cap):
 		# For each group, calculate the entering amount
 		entering_h = {}
 		summ_entering_h = 0
@@ -338,7 +362,7 @@ class SEIR_group_upper:
 		self.H += [self.H[self.t]+delta_H*self.dt]
 
 
-	def update_ICU(self, m_tests, a_tests, h_cap, icu_cap):
+	def update_ICU(self, h_cap, icu_cap):
 		# For each group, calculate the entering amount
 		entering_icu = {}
 		summ_entering_icu = 0
@@ -362,7 +386,7 @@ class SEIR_group_upper:
 		# 	assert(False)
 
 
-	def update_D(self, m_tests, a_tests, h_cap, icu_cap):
+	def update_D(self, h_cap, icu_cap):
 		# For each group, calculate the entering amount
 		entering_h = {}
 		summ_entering_h = 0

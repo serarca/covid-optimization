@@ -17,6 +17,9 @@ from heuristics import *
 from interval_dynamics import DynamicalModelInterval
 import math
 import pprint
+import yaml
+from matplotlib.ticker import PercentFormatter
+
 
 
 
@@ -86,22 +89,67 @@ dynModel = DynamicalModelInterval(universe_params, initialization, simulation_pa
 
 
 
-iters = 20
+iters = 90
 warm_start = False
 for t in range(iters):
 	warm_start = dynModel.construct_model(t, float(args.m_tests), float(args.a_tests), warm_start)
 
 
-# Check how the bounds behave
-name = "age_group_50_59"
-group = dynModel.groups[group]
-print(group.S_U)
-ind_S_U = []
-for i in range(len(group.S_U)):
-	calc = group.S_U[0] - group.parameters['beta']*sum([group.IR_L[t]*group.S_L[t] for t in range(i)])
-	ind_S_U.append(calc)
+intervals = {
+	"S_L":{},
+	"S_U":{},
+	"IR_L":{},
+	"IR_U":{},
+}
+for group in age_groups:
+	intervals["S_L"][group] = dynModel.groups[group].S_L
+	intervals["S_U"][group] = dynModel.groups[group].S_U
+	intervals["IR_L"][group] = dynModel.groups[group].IR_L
+	intervals["IR_U"][group] = dynModel.groups[group].IR_U
 
-print(ind_S_U)
+with open('intervals_policy_%s_perc_infected_%s_a_tests_%s_m_tests_%s.yaml'%(args.policy, args.perc_infected, args.a_tests, args.m_tests), 'w') as file:
+    yaml.dump(intervals, file)
+
+
+# Now we draw plots to check how big are the gaps
+plt.figure(1)
+ax = plt.subplot(1,2,1)
+time_axis = list(range(iters))
+for i,name in enumerate(age_groups):
+	plt.plot(time_axis, (np.array(intervals["S_U"][name])-np.array(intervals["S_L"][name]))/np.array(intervals["S_U"][name]), label=name)
+	plt.legend(loc='upper right')
+plt.title("S Gap")
+ax.yaxis.set_major_formatter(PercentFormatter(1.0))
+
+
+ax = plt.subplot(1,2,2)
+time_axis = list(range(iters))
+for i,name in enumerate(age_groups):
+	plt.plot(time_axis, (np.array(intervals["IR_U"][name])-np.array(intervals["IR_L"][name]))/np.array(intervals["IR_U"][name]), label=name)
+	plt.legend(loc='upper right')
+plt.title("IR Gap")
+ax.yaxis.set_major_formatter(PercentFormatter(1.0))
+
+
+figure = plt.gcf() 
+figure.set_size_inches(7*2,7)
+
+name_file = 'intervals_policy_%s_perc_infected_%s_a_tests_%s_m_tests_%s.pdf'%(args.policy, args.perc_infected, args.a_tests, args.m_tests)
+
+plt.savefig(name_file)
+
+
+
+# # Check how the bounds behave
+# name = "age_group_50_59"
+# group = dynModel.groups[group]
+# print(group.S_U)
+# ind_S_U = []
+# for i in range(len(group.S_U)):
+# 	calc = group.S_U[0] - group.parameters['beta']*sum([group.IR_L[t]*group.S_L[t] for t in range(i)])
+# 	ind_S_U.append(calc)
+
+# print(ind_S_U)
 
 
 
