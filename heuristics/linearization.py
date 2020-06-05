@@ -35,11 +35,15 @@ num_activities = len(activities)
 #    return age_groups.index(ag_name)*len(SEIR_groups) + SEIR_groups.index(SEIRg_name)
 
 ####################################
-# Calculate the Jacobian with respect to u (decisions/controls)
+# Calculate the Jacobian with respect to X (states)
 def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method):
     """ Calculates the Jacobian for a given control trajectory u_hat and corresponding state trajectory X_hat """
-    # This assumes that the order of components in X_hat and u_hat is done by age group and then SEIR states, i.e.,
+    # This assumes that the order of components in X_hat and u_hat is as follows:
+    # For X_hat: all the SEIR states for age group 1, then all the SEIR states for age group 2, etc.
+    # For u_hat: all the controls for age group 1, then all the controls for age group 2, etc.
+    # The order of the SEIR states is as follows:
     # X_hat = [ S_g, E_g, I_g, R_g, N_g, Ia_g, Ips_g, Ims_g, Iss_g, Rq_g, H_g, ICU_g, D_g , ...]
+    # The order of the controls is as follows:
     # u_hat = [ Nmtest_g, Natest_g, BounceH_g, BounceICU_g, alpha_{g,activity1}, alpha_{g,activity2}, ... ]
 
     jacob = np.zeros((num_age_groups*num_compartments, num_age_groups*num_compartments))
@@ -64,7 +68,7 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method):
         ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
         Dg_idx = ag*num_compartments + SEIR_groups.index('D_g')
 
-        # These are subarrays that only contain I_h, Rq_h, N_ out of X_hat
+        # These are subarrays that only contain I_h, Rq_h, N_h out of X_hat
         I_h_slice = X_hat[SEIR_groups.index('I_g'): len(X_hat): num_compartments]
         Rq_h_slice = X_hat[SEIR_groups.index('Rq_g'): len(X_hat): num_compartments]
         N_h_slice = X_hat[SEIR_groups.index('N_g'): len(X_hat): num_compartments]
@@ -76,7 +80,7 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method):
 
         ########### f^Sg
         # df^Sg/dSg
-        jacob[Sg_idx,Sg_idx] = - dynModel.groups[age_groups[ag]].parameters['beta'] * X_hat[Sg_idx] * contacts
+        jacob[Sg_idx,Sg_idx] = - dynModel.groups[age_groups[ag]].parameters['beta'] * contacts
 
         # df^Sg/dNh all h
         for ah in range(0, num_age_groups):
@@ -84,27 +88,30 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method):
 
         # df^Sg/dIh all h
         for ah in range(0, num_age_groups):
-            jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('I_g')] = - dynModel.groups[age_groups[ag]].parameters['beta'] * X_hat[Sg_idx] * c_gh_arr[ah] * I_h_slice[ah] / (N_h_slice[ah] + Rq_h_slice[ah])
+            jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('I_g')] = - dynModel.groups[age_groups[ag]].parameters['beta'] * X_hat[Sg_idx] * c_gh_arr[ah] / (N_h_slice[ah] + Rq_h_slice[ah])
 
         # df^Sg/dRqh all h
         for ah in range(0, num_age_groups):
-            jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('Rq_g')] = dynModel.groups[age_groups[ag]].parameters['beta'] * X_hat[Sg_idx] * c_gh_arr[ah] / ((N_h_slice[ah] + Rq_h_slice[ah])**2)
+            jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('Rq_g')] = dynModel.groups[age_groups[ag]].parameters['beta'] * X_hat[Sg_idx] * c_gh_arr[ah] * I_h_slice[ah] / ((N_h_slice[ah] + Rq_h_slice[ah])**2)
 
         ########### f^Eg
         # df^Eg/dSg
-        jacob[Eg_idx,Sg_idx] = dynModel.groups[age_groups[ag]].parameters['beta'] * X_hat[Sg_idx] * contacts
+        jacob[Eg_idx,Sg_idx] = - jacob[Sg_idx,Sg_idx]
 
         # df^Eg/dNh all h
         for ah in range(0, num_age_groups):
-            jacob[Eg_idx,ah * num_compartments + SEIR_groups.index('N_g')] = - dynModel.groups[age_groups[ag]].parameters['beta'] * X_hat[Sg_idx] * c_gh_arr[ah] * I_h_slice[ah] / ((N_h_slice[ah] + Rq_h_slice[ah])**2)
+            jacob[Eg_idx,ah * num_compartments + SEIR_groups.index('N_g')] = - jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('N_g')]
 
         # df^Eg/dIh all h
         for ah in range(0, num_age_groups):
-            jacob[Eg_idx,ah * num_compartments + SEIR_groups.index('I_g')] = dynModel.groups[age_groups[ag]].parameters['beta'] * X_hat[Sg_idx] * c_gh_arr[ah] / (N_h_slice[ah] + Rq_h_slice[ah])
+            jacob[Eg_idx,ah * num_compartments + SEIR_groups.index('I_g')] = - jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('I_g')]
 
         # df^Eg/dRqh all h
         for ah in range(0, num_age_groups):
-            jacob[Eg_idx,ah * num_compartments + SEIR_groups.index('Rq_g')] = - dynModel.groups[age_groups[ag]].parameters['beta'] * X_hat[Sg_idx] * c_gh_arr[ah] * I_h_slice[ah] / ((N_h_slice[ah] + Rq_h_slice[ah])**2)
+            jacob[Eg_idx,ah * num_compartments + SEIR_groups.index('Rq_g')] = - jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('Rq_g')]
+
+        # # df^Eg/dEg
+        jacob[Eg_idx,Eg_idx] = - dynModel.groups[age_groups[ag]].parameters['sigma']
 
         #### Derivatives for the function that yields I_g
         # Deriv w.r.t E_g
@@ -208,9 +215,13 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method):
 # Calculate the Jacobian with respect to u (decisions/controls)
 def get_Jacobian_u(dynModel, X_hat, u_hat, mixing_method):
     """ Calculates the Jacobian with respect to decisions, for a given control trajectory u_hat and corresponding state trajectory X_hat """
-    # For now, this is done for the model with powers ell_g^alpha ell_h^beta
-    # This assumes that the order of components in X_hat and u_hat is done by age group and then SEIR states, i.e.,
+    # For now, for mult mixing this is done for the model with powers ell_g^alpha * ell_h^beta
+    # This assumes that the order of components in X_hat and u_hat is as follows:
+    # For X_hat: all the SEIR states for age group 1, then all the SEIR states for age group 2, etc.
+    # For u_hat: all the controls for age group 1, then all the controls for age group 2, etc.
+    # The order of the SEIR states is as follows:
     # X_hat = [ S_g, E_g, I_g, R_g, N_g, Ia_g, Ips_g, Ims_g, Iss_g, Rq_g, H_g, ICU_g, D_g , ...]
+    # The order of the controls is as follows:
     # u_hat = [ Nmtest_g, Natest_g, BounceH_g, BounceICU_g, alpha_{g,activity1}, alpha_{g,activity2}, ... ]
 
     alpha = mixing_method['param_alpha']
@@ -321,6 +332,75 @@ def get_Jacobian_u(dynModel, X_hat, u_hat, mixing_method):
     return jacob
 
 ####################################
+# Build X_hat given a dynModel, a starting point k, and a
+# sequence of controls u_hats
+def get_X_hat_sequence(dynModel, k, u_hat_sequence):
+    """Given a dynamical model, a starting point k, and the controls for time periods k to T, we re-start the dynamical model at time k, and then run it until time T with the controls in u_hat. This produces the nominal trajectory X_hat_sequence. X_hat_sequence is a np.array of shape (T-k, num_compartments * num_age_groups), where each row represents the X_hat at time k, k+1,...
+
+    This assumes that the dynamical model has already been run at least up to point k (it takes the states at time k as the starting points for the new nominal trajectory).
+
+    We assume as well that u_hat_sequence is a 2-d numpy array with shape (T-k, num_controls * num_age_groups) with each row corresponding to a u_hat at time k, k+1,.... Hence, u_hat_sequence[k,:] gives the u_hat at time k.
+    """
+    # Erase the states after k so as to reset the dyn model
+    dynModel.reset_time(k)
+
+    # The total time horizon for the dynamical model
+    T = dynModel.time_steps
+
+    X_hat_sequence = np.zeros((T-k, num_compartments * num_age_groups))
+
+    for t in range(T-k):
+        # Write the values of u_hat at time t in dict form
+
+        u_hat_dict, alphas = buildAlphaDict(u_hat_sequence[t,:])
+        #Create m and a tests in the format taken by dynModel
+        m_tests = {}
+        a_tests = {}
+        for g in age_groups:
+            m_tests[g] = u_hat_dict[g]['Nmtest_g']
+            a_tests[g] = u_hat_dict[g]['Natest_g']
+
+        #Using the controls u_hat for time t, take time step
+        dynModel.take_time_step(m_tests, a_tests, alphas)
+
+        state = dynModel.get_state(t+k)
+        # print(t+k)
+        # print(dynModel.state)
+
+        for ag in range(num_age_groups):
+            Sg_idx = ag*num_compartments + SEIR_groups.index('S_g')
+            Eg_idx = ag*num_compartments + SEIR_groups.index('E_g')
+            Ig_idx = ag*num_compartments + SEIR_groups.index('I_g')
+            Ng_idx = ag*num_compartments + SEIR_groups.index('N_g')
+            Rg_idx = ag*num_compartments + SEIR_groups.index('R_g')
+            Iag_idx = ag*num_compartments + SEIR_groups.index('Ia_g')
+            Ipsg_idx = ag*num_compartments + SEIR_groups.index('Ips_g')
+            Imsg_idx = ag*num_compartments + SEIR_groups.index('Ims_g')
+            Issg_idx = ag*num_compartments + SEIR_groups.index('Iss_g')
+            Rqg_idx = ag*num_compartments + SEIR_groups.index('Rq_g')
+            Hg_idx = ag*num_compartments + SEIR_groups.index('H_g')
+            ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
+            Dg_idx = ag*num_compartments + SEIR_groups.index('D_g')
+
+            X_hat_sequence[t,Sg_idx] = state[age_groups[ag]]['S']
+            X_hat_sequence[t,Eg_idx] = state[age_groups[ag]]['E']
+            X_hat_sequence[t,Ig_idx] = state[age_groups[ag]]['I']
+            X_hat_sequence[t,Rg_idx] = state[age_groups[ag]]['R']
+            X_hat_sequence[t,Ng_idx] = state[age_groups[ag]]['N']
+            X_hat_sequence[t,Iag_idx] = state[age_groups[ag]]['Ia']
+            X_hat_sequence[t,Ipsg_idx] = state[age_groups[ag]]['Ips']
+            X_hat_sequence[t,Imsg_idx] = state[age_groups[ag]]['Ims']
+            X_hat_sequence[t,Issg_idx] = state[age_groups[ag]]['Iss']
+            X_hat_sequence[t,Rqg_idx] = state[age_groups[ag]]['Rq']
+            X_hat_sequence[t,Hg_idx] = state[age_groups[ag]]['H']
+            X_hat_sequence[t,ICUg_idx] = state[age_groups[ag]]['ICU']
+            X_hat_sequence[t,Dg_idx] = state[age_groups[ag]]['D']
+
+    return X_hat_sequence
+
+
+
+####################################
 # Build a dictionary for the state from a numpy array
 def buildStateDict(X_hat_array):
     """Given a state vector X, builds a dictionary for all compartments that is compatible with DynModel"""
@@ -354,10 +434,10 @@ def buildAlphaDict(u_hat_array):
     return u_hat_dict, alphas
 
 ####################################
-# our internal function here to calculate the contacts
+# our internal function here to calculate the contacts of a given age group with all other age groups
 def calcContacts(dynModel, alphas, mixing_method, ag):
     contacts_ag = np.zeros(num_age_groups)
-    for h in range(0, len(age_groups)):
+    for h in range(0, num_age_groups):
         contacts_ag[h] = n_contacts(dynModel.groups[age_groups[ag]], dynModel.groups[age_groups[h]], alphas, mixing_method)
 
     return contacts_ag
@@ -372,10 +452,10 @@ def calculate_M_gamma_and_eta(dynModel):
     M = np.zeros((num_age_groups*num_controls, num_age_groups*num_compartments))
 
     # Vector gamma should have len equal to the size of X(t)
-    gamma = np.zeros((1,num_age_groups*num_compartments))
+    gamma = np.zeros(num_age_groups*num_compartments)
 
     # Vector eta should have len equal to the size of X(t)
-    eta = np.zeros((1,num_age_groups*num_compartments))
+    eta = np.zeros(num_age_groups*num_compartments)
 
     for ag in range(0,num_age_groups):
         # Get all the useful indices for the columns
@@ -395,37 +475,321 @@ def calculate_M_gamma_and_eta(dynModel):
         # Matrix M should have only non-zero entries in the rows
         # corresponding to the lockdown decisions and the columns
         # corresponding to S_g E_g R_g and R^q_g
-        # NOTICE THAT WE ASSUME HERE THAT R^q_g is still in
-        # lockdown if we want to implement the M with R^q being
-        # fully back to work, we should have 0 as well in the
+        # NOTICE THAT WE ASSUME HERE THAT R^q_g is in
+        # no lockdown if we want to implement the M with R^q
+        # having the same lockdown we should have
+        # (1-theta) * v_NLg  as well in the
         # column corresponding to R^q_g
         M[LWorkg_idx, Sg_idx] = (1- theta) * v_NLg
         M[LWorkg_idx, Eg_idx] = (1- theta) * v_NLg
         M[LWorkg_idx, Rg_idx] = (1- theta) * v_NLg
-        M[LWorkg_idx, Rqg_idx] = (1- theta) * v_NLg
+        M[LWorkg_idx, Rqg_idx] = 0
 
         # Vector gamma should have only nonzero elements in the
         # columns corresponding to states S_g E_g R_g and R^q
-        # NOTICE THAT WE ASSUME HERE THAT R^q_g is still in
+        # NOTICE THAT WE ASSUME HERE THAT R^q_g is not in
         # lockdown if we want to implement the obj with R^q being
-        # fully back to work, we should have v_NLg  in the
+        # in lockdown, we should have v_NLg * theta in the
         # column corresponding to R^q_g
-        gamma[0, Sg_idx] = v_NLg * theta
-        gamma[0, Eg_idx] = v_NLg * theta
-        gamma[0, Rg_idx] = v_NLg * theta
-        gamma[0, Rqg_idx] = v_NLg * theta
+        gamma[Sg_idx] = v_NLg * theta
+        gamma[Eg_idx] = v_NLg * theta
+        gamma[Rg_idx] = v_NLg * theta
+        gamma[Rqg_idx] = v_NLg
 
         # Vector eta should have only nonzero elements in the
         # columns corresponding to D_g. We assume here that D(0)=0
         # but this should not change the decisions of the heur.
-        eta[0, Dg_idx] = -v_Dg
+        eta[Dg_idx] = -v_Dg
 
     return M, gamma, eta
 
+
 ####################################
-# Calculate coefficients for ICU constraint
-def calculate_ICU_coefficients(dynModel):
+# Calculate coefficients for the constraints
+    
+def calculate_H_constraint_coefs(dynModel):
+    """Calculates the coefficient vectors a, b that yield the H constraint"""
+
+    # The size of a is always the size of X(t)
+    # The size of b is always the size of u(t)
+    a = np.zeros(num_compartments * num_age_groups)
+    b = np.zeros(num_controls * num_age_groups)
+
+    for ag in range(0,num_age_groups):
+
+        #Useful indices for the elements of a
+        Hg_idx = ag*num_compartments + SEIR_groups.index('H_g')
+        Ig_idx = ag*num_compartments + SEIR_groups.index('I_g')
+        Issg_idx = ag*num_compartments + SEIR_groups.index('Iss_g')
+        ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
+
+        #Useful indices for the elements of b
+        BHg_idx = ag*num_controls + controls.index('BounceH_g')
+        BICUg_idx = ag*num_controls + controls.index('BounceICU_g')
+
+        # Useful coefficients for a and b
+        mu_g = dynModel.groups[age_groups[ag]].parameters['mu']
+        pICU_g = dynModel.groups[age_groups[ag]].parameters['p_ICU']
+        pH_g = dynModel.groups[age_groups[ag]].parameters['p_H']
+        lambda_H_R_g = dynModel.groups[age_groups[ag]].parameters['lambda_H_R']
+        lambda_H_D_g = dynModel.groups[age_groups[ag]].parameters['lambda_H_D']
+
+
+        a[Ig_idx] = mu_g * pH_g
+        a[Issg_idx] = mu_g * (pH_g / (pH_g + pICU_g))
+        a[Hg_idx] = (1 - lambda_H_R_g - lambda_H_D_g)
+
+        b[BHg_idx] = -1
+
+    return a, b
+
+
+def calculate_ICU_constraint_coefs(dynModel):
     """Calculates the coefficient vectors a, b that yield the ICU constraint"""
+
+    # The size of a is always the size of X(t)
+    # The size of b is always the size of u(t)
+    a = np.zeros(num_compartments * num_age_groups)
+    b = np.zeros(num_controls * num_age_groups)
+
+    for ag in range(0,num_age_groups):
+        #Useful indices for the elements of a
+        Hg_idx = ag*num_compartments + SEIR_groups.index('H_g')
+        Ig_idx = ag*num_compartments + SEIR_groups.index('I_g')
+        Issg_idx = ag*num_compartments + SEIR_groups.index('Iss_g')
+        ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
+
+        #Useful indices for the elements of b
+        BHg_idx = ag*num_controls + controls.index('BounceH_g')
+        BICUg_idx = ag*num_controls + controls.index('BounceICU_g')
+
+        # Useful coefficients for a and b
+        mu_g = dynModel.groups[age_groups[ag]].parameters['mu']
+        pICU_g = dynModel.groups[age_groups[ag]].parameters['p_ICU']
+        pH_g = dynModel.groups[age_groups[ag]].parameters['p_H']
+        lambda_ICU_R_g = dynModel.groups[age_groups[ag]].parameters['lambda_ICU_R']
+        lambda_ICU_D_g = dynModel.groups[age_groups[ag]].parameters['lambda_ICU_D']
+
+
+        a[Ig_idx] = mu_g * pICU_g
+        a[Issg_idx] = mu_g * (pICU_g / (pH_g + pICU_g))
+        a[ICUg_idx] = (1 - lambda_ICU_R_g - lambda_ICU_D_g)
+
+        b[BICUg_idx] = -1
+
+    return a, b
+
+
+def calculate_BH_constraint_coefs(dynModel, group):
+    """Calculates the coefficient vectors a, b that yield the BH constraint for group in age_groups. Observe that we have a different constraint for each group."""
+
+    # The size of a is always the size of X(t)
+    # The size of b is always the size of u(t)
+    a = np.zeros(num_compartments * num_age_groups)
+    b = np.zeros(num_controls * num_age_groups)
+
+    ag = age_groups.index(group)
+
+    #Useful indices for the elements of a
+    Hg_idx = ag*num_compartments + SEIR_groups.index('H_g')
+    Ig_idx = ag*num_compartments + SEIR_groups.index('I_g')
+    Issg_idx = ag*num_compartments + SEIR_groups.index('Iss_g')
+    ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
+
+    #Useful indices for the elements of b
+    BHg_idx = ag*num_controls + controls.index('BounceH_g')
+    BICUg_idx = ag*num_controls + controls.index('BounceICU_g')
+
+    # Useful coefficients for a and b
+    mu_g = dynModel.groups[age_groups[ag]].parameters['mu']
+    pICU_g = dynModel.groups[age_groups[ag]].parameters['p_ICU']
+    pH_g = dynModel.groups[age_groups[ag]].parameters['p_H']
+    lambda_ICU_R_g = dynModel.groups[age_groups[ag]].parameters['lambda_ICU_R']
+    lambda_ICU_D_g = dynModel.groups[age_groups[ag]].parameters['lambda_ICU_D']
+
+
+    a[Ig_idx] = - mu_g * pH_g
+    a[Issg_idx] = - mu_g * (pH_g / (pH_g + pICU_g))
+
+    b[BHg_idx] = 1
+
+    return a, b
+
+
+
+def calculate_BICU_constraint_coefs(dynModel, group):
+    """Calculates the coefficient vectors a, b that yield the BICU constraint for group in age_groups. Observe that we have a different constraint for each group."""
+
+    # The size of a is always the size of X(t)
+    # The size of b is always the size of u(t)
+    a = np.zeros(num_compartments * num_age_groups)
+    b = np.zeros(num_controls * num_age_groups)
+
+    ag = age_groups.index(group)
+
+    #Useful indices for the elements of a
+    Hg_idx = ag*num_compartments + SEIR_groups.index('H_g')
+    Ig_idx = ag*num_compartments + SEIR_groups.index('I_g')
+    Issg_idx = ag*num_compartments + SEIR_groups.index('Iss_g')
+    ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
+
+    #Useful indices for the elements of b
+    BHg_idx = ag*num_controls + controls.index('BounceH_g')
+    BICUg_idx = ag*num_controls + controls.index('BounceICU_g')
+
+    # Useful coefficients for a and b
+    mu_g = dynModel.groups[age_groups[ag]].parameters['mu']
+    pICU_g = dynModel.groups[age_groups[ag]].parameters['p_ICU']
+    pH_g = dynModel.groups[age_groups[ag]].parameters['p_H']
+    lambda_ICU_R_g = dynModel.groups[age_groups[ag]].parameters['lambda_ICU_R']
+    lambda_ICU_D_g = dynModel.groups[age_groups[ag]].parameters['lambda_ICU_D']
+
+
+    a[Ig_idx] = - mu_g * pICU_g
+    a[Issg_idx] = - mu_g * (pICU_g / (pH_g + pICU_g))
+
+    b[BICUg_idx] = 1
+
+    return a, b
+
+
+def calculate_Mtest_constraint_coefs(dynModel):
+    """Calculates the coefficient vectors a, b that yield the Mtest constraint"""
+
+    # The size of a is always the size of X(t)
+    # The size of b is always the size of u(t)
+    a = np.zeros(num_compartments * num_age_groups)
+    b = np.zeros(num_controls * num_age_groups)
+    
+    for ag in range(0,num_age_groups):
+        #Useful indices for the elements of b
+        Nmtestg_idx = ag*num_controls + controls.index('Nmtest_g')
+
+        b[Nmtestg_idx] = 1
+    
+    return a, b
+
+
+def calculate_Atest_constraint_coefs(dynModel):
+    """Calculates the coefficient vectors a, b that yield the Atest constraint"""
+
+    # The size of a is always the size of X(t)
+    # The size of b is always the size of u(t)
+    a = np.zeros(num_compartments * num_age_groups)
+    b = np.zeros(num_controls * num_age_groups)
+    
+    for ag in range(0,num_age_groups):
+        #Useful indices for the elements of b
+        Natestg_idx = ag*num_controls + controls.index('Natest_g')
+
+        b[Natestg_idx] = 1
+    
+    return a, b
+
+
+
+########### Returns f(X(t), u(t))  = X(t+1). Does not change
+########### dynModel.
+def get_F(dynModel, X, u):
+    ''' Will return the next states given the state X and
+    controls u. For this, it replaces the current state in
+    dynModel for X, runs one step with controls u, extracts the
+    resulting states, and re-starts the model to it's original
+    state. Assumes as all functions above that X is ordered by
+    compartment and then by group, and u by control and then by group.
+    '''
+    assert(X.shape == (1, num_compartments * num_age_groups))
+    assert(u.shape == (1, num_controls * num_age_groups))
+
+    # We save the initial time of dynModel to revert back to
+    initial_time_of_model = dynModel.t
+
+    #Determine the testing at time t given by u
+    u_hat_dict, alphas = buildAlphaDict(u)
+
+    m_tests = {}
+    a_tests = {}
+    for g in age_groups:
+        m_tests[g] = u_hat_dict[g]['Nmtest_g']
+        a_tests[g] = u_hat_dict[g]['Natest_g']
+
+    # Add the current state to the dynModel
+    for ag in range(num_age_groups):
+        Sg_idx = ag*num_compartments + SEIR_groups.index('S_g')
+        Eg_idx = ag*num_compartments + SEIR_groups.index('E_g')
+        Ig_idx = ag*num_compartments + SEIR_groups.index('I_g')
+        Ng_idx = ag*num_compartments + SEIR_groups.index('N_g')
+        Rg_idx = ag*num_compartments + SEIR_groups.index('R_g')
+        Iag_idx = ag*num_compartments + SEIR_groups.index('Ia_g')
+        Ipsg_idx = ag*num_compartments + SEIR_groups.index('Ips_g')
+        Imsg_idx = ag*num_compartments + SEIR_groups.index('Ims_g')
+        Issg_idx = ag*num_compartments + SEIR_groups.index('Iss_g')
+        Nmtestg_idx = ag*num_controls + controls.index('Nmtest_g')
+        Natestg_idx = ag*num_controls + controls.index('Natest_g')
+        Rqg_idx = ag*num_compartments + SEIR_groups.index('Rq_g')
+        Hg_idx = ag*num_compartments + SEIR_groups.index('H_g')
+        ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
+        Dg_idx = ag*num_compartments + SEIR_groups.index('D_g')
+
+        dynModel.groups(age_groups[ag]).S += [X[0, Sg_idx]]
+        dynModel.groups(age_groups[ag]).E += [X[0, Eg_idx]]
+        dynModel.groups(age_groups[ag]).I += [X[0, Ig_idx]]
+        dynModel.groups(age_groups[ag]).N += [X[0, Ng_idx]]
+        dynModel.groups(age_groups[ag]).R += [X[0, Rg_idx]]
+        dynModel.groups(age_groups[ag]).Ia += [X[0, Iag_idx]]
+        dynModel.groups(age_groups[ag]).Ips += [X[0, Ipsg_idx]]
+        dynModel.groups(age_groups[ag]).Ims += [X[0, Imsg_idx]]
+        dynModel.groups(age_groups[ag]).Iss += [X[0, Issg_idx]]
+        dynModel.groups(age_groups[ag]).Rq += [X[0, Rqg_idx]]
+        dynModel.groups(age_groups[ag]).H += [X[0, Hg_idx]]
+        dynModel.groups(age_groups[ag]).ICU += [X[0, ICUg_idx]]
+        dynModel.groups(age_groups[ag]).D += [X[0, Dg_idx]]
+
+    #Increase in 1 the time of the dynModel (we added a state)
+
+    dynModel.t += 1
+
+    # Run a step of the dyn model
+    dynModel.take_time_step(m_tests, a_tests, alphas)
+
+    # Get the current state (not sure if it shold be t or t-1)
+    state = dynModel.get_state(dynModel.t)
+
+    X_next_step = np.zeros((1, num_compartments * num_age_groups))
+
+    for ag in range(num_age_groups):
+        Sg_idx = ag*num_compartments + SEIR_groups.index('S_g')
+        Eg_idx = ag*num_compartments + SEIR_groups.index('E_g')
+        Ig_idx = ag*num_compartments + SEIR_groups.index('I_g')
+        Ng_idx = ag*num_compartments + SEIR_groups.index('N_g')
+        Rg_idx = ag*num_compartments + SEIR_groups.index('R_g')
+        Iag_idx = ag*num_compartments + SEIR_groups.index('Ia_g')
+        Ipsg_idx = ag*num_compartments + SEIR_groups.index('Ips_g')
+        Imsg_idx = ag*num_compartments + SEIR_groups.index('Ims_g')
+        Issg_idx = ag*num_compartments + SEIR_groups.index('Iss_g')
+        Nmtestg_idx = ag*num_controls + controls.index('Nmtest_g')
+        Natestg_idx = ag*num_controls + controls.index('Natest_g')
+        Rqg_idx = ag*num_compartments + SEIR_groups.index('Rq_g')
+        Hg_idx = ag*num_compartments + SEIR_groups.index('H_g')
+        ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
+        Dg_idx = ag*num_compartments + SEIR_groups.index('D_g')
+
+        X_next_step[0,Sg_idx] = state[age_groups[ag]]['S']
+        X_next_step[0,Eg_idx] = state[age_groups[ag]]['E']
+        X_next_step[0,Ig_idx] = state[age_groups[ag]]['I']
+        X_next_step[0,Rg_idx] = state[age_groups[ag]]['R']
+        X_next_step[0,Ng_idx] = state[age_groups[ag]]['N']
+        X_next_step[0,Iag_idx] = state[age_groups[ag]]['Ia']
+        X_next_step[0,Ipsg_idx] = state[age_groups[ag]]['Ips']
+        X_next_step[0,Imsg_idx] = state[age_groups[ag]]['Ims']
+        X_next_step[0,Issg_idx] = state[age_groups[ag]]['Iss']
+        X_next_step[0,Rqg_idx] = state[age_groups[ag]]['Rq']
+        X_next_step[0,Hg_idx] = state[age_groups[ag]]['H']
+        X_next_step[0,ICUg_idx] = state[age_groups[ag]]['ICU']
+        X_next_step[0,Dg_idx] = state[age_groups[ag]]['D']
+
+    return X_next_step
+
 
 ####################################
 # Main function: runs the linearization heuristic
@@ -477,42 +841,85 @@ with open('../benchmarks/static_infected_10.yaml') as file:
     policy_file = yaml.load(file, Loader=yaml.FullLoader)
 alphas_vec = policy_file['alphas_vec']
 
-# Create environment
-dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method)
+# Percentage infected at time 0
+perc_infected = 10
+# Move population to infected (without this there is no epidem.)
+for group in initialization:
+	change = initialization[group]["S"]*perc_infected/100
+	initialization[group]["S"] = initialization[group]["S"] - change
+	initialization[group]["I"] = initialization[group]["I"] + change
+
+# # Create environment
+# dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method)
 
 # Set up testing decisions: no testing for now
-a_tests_vec, m_tests_vec = no_tests(dynModel)
-tests = {
-    'a_tests_vec':a_tests_vec,
-    'm_tests_vec':m_tests_vec,
-}
+# a_tests_vec, m_tests_vec = no_tests(dynModel)
+# tests = {
+#     'a_tests_vec':a_tests_vec,
+#     'm_tests_vec':m_tests_vec,
+# }
 
+###########################
+# # Check constraints
+# a, b = calculate_H_constraint_coefs(dynModel)
+# print("\nH constraint:\n")
+# print(a)
+# print(b)
 
-#######################
-# Check the function that resets the simulation
-# Run the model for the whole time range
-for t in range(simulation_params['time_periods']):
-    dynModel.take_time_step(m_tests_vec[t], a_tests_vec[t], alphas_vec[t])
+# a, b = calculate_ICU_constraint_coefs(dynModel)
+# print("\nICU constraint:\n")
+# print(a)
+# print(b)
 
-# Print model stats
-print("Results from initial simulation:\n")
-dynModel.print_stats()
+# a, b = calculate_BH_constraint_coefs(dynModel,'age_group_0_9')
+# print("\nBH constraint:\n")
+# print(a)
+# print(b)
 
-# reset the model, Run it again and print stats
-dynModel.reset_time(5)
-for t in np.arange(5,simulation_params['time_periods'],1):
-    dynModel.take_time_step(m_tests_vec[t], a_tests_vec[t], alphas_vec[t])
-print("\nResults from second simulation:\n")
-dynModel.print_stats()
+# a, b = calculate_BICU_constraint_coefs(dynModel,'age_group_0_9')
+# print("\nBICU constraint:\n")
+# print(a)
+# print(b)
 
-#######################
-# Check Jacobians for compilation errors
-# X_hat = np.random.rand(num_age_groups*num_compartments)
-# u_hat = np.random.rand(num_age_groups*num_controls)
-#
-# get_Jacobian_X(dynModel,X_hat,u_hat,mixing_method)
-# get_Jacobian_u(dynModel,X_hat,u_hat,mixing_method)
+# a, b = calculate_Mtest_constraint_coefs(dynModel)
+# print("\nMtest constraint:\n")
+# print(b)
+# a,b = calculate_Atest_constraint_coefs(dynModel)
+# print("\nAtest constraint:\n")
+# print(b)
+# ones_u = np.ones(9*10)
+# #print(ones_u)
+# #print(np.dot(d,ones_u))
+# #print(np.dot(ones_u,ones_u))
 
-############################
-# Test M
-calculate_M_gamma_and_eta(dynModel)
+# # Check reading of fundamental contact matrices
+# ones_X = np.ones(9*13)
+# ones_u = np.ones(9*10)
+# J = get_Jacobian_u(dynModel,ones_X,ones_u,mixing_method)
+# ag = 8
+# print(J[ag*num_compartments + SEIR_groups.index('S_g'),:])
+
+# #######################
+# # Check the function that resets the simulation
+# # Run the model for the whole time range
+# for t in range(simulation_params['time_periods']):
+#     dynModel.take_time_step(m_tests_vec[t], a_tests_vec[t], alphas_vec[t])
+
+# # Print model stats
+# print("Results from initial simulation:\n")
+# dynModel.print_stats()
+
+# # reset the model, Run it again and print stats
+# dynModel.reset_time(5)
+# for t in np.arange(5,simulation_params['time_periods'],1):
+#     dynModel.take_time_step(m_tests_vec[t], a_tests_vec[t], alphas_vec[t])
+# print("\nResults from second simulation:\n")
+# dynModel.print_stats()
+
+# #######################
+# # Check Jacobians for compilation errors
+# # X_hat = np.random.rand(num_age_groups*num_compartments)
+# # u_hat = np.random.rand(num_age_groups*num_controls)
+# #
+# # get_Jacobian_X(dynModel,X_hat,u_hat,mixing_method)
+# # get_Jacobian_u(dynModel,X_hat,u_hat,mixing_method)
