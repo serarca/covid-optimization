@@ -503,50 +503,17 @@ def calculate_M_gamma_and_eta(dynModel):
 
     return M, gamma, eta
 
+
 ####################################
-# Calculate coefficients for the constraint
-def calculate_ICU_coefficients(dynModel):
-    """Calculates the coefficient vectors a, b that yield the ICU constraint"""
-
-    # The size of a is always the size of X(t)
-    # The size of b is always the size of u(t)
-    a = np.zeros((1, num_compartments * num_age_groups))
-    b = np.zeros((1, num_controls * num_age_groups))
-
-    for ag in range(0,num_age_groups):
-        #Useful indices for the elements of a
-        Hg_idx = ag*num_compartments + SEIR_groups.index('H_g')
-        Ig_idx = ag*num_compartments + SEIR_groups.index('I_g')
-        Issg_idx = ag*num_compartments + SEIR_groups.index('Iss_g')
-        ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
-
-        #Useful indices for the elements of b
-        BHg_idx = ag*num_controls + controls.index('BounceH_g')
-        BICUg_idx = ag*num_controls + controls.index('BounceICU_g')
-
-        # Useful coefficients for a and b
-        mu_g = dynModel.groups[age_groups[ag]].parameters['mu']
-        pICU_g = dynModel.groups[age_groups[ag]].parameters['p_ICU']
-        pH_g = dynModel.groups[age_groups[ag]].parameters['p_H']
-        lambda_ICU_R_g = dynModel.groups[age_groups[ag]].parameters['lambda_ICU_R']
-        lambda_ICU_D_g = dynModel.groups[age_groups[ag]].parameters['lambda_ICU_D']
-
-
-        a[0, Ig_idx] = mu_g * pICU_g
-        a[0, Issg_idx] = mu_g * (pICU_g / (pH_g + pICU_g))
-        a[0, ICUg_idx] = (1 - lambda_ICU_R_g - lambda_ICU_D_g)
-
-        b[0, BICUg_idx] = -1
-
-    return a, b
-
-def calculate_H_coefficients(dynModel):
+# Calculate coefficients for the constraints
+    
+def calculate_H_constraint_coefs(dynModel):
     """Calculates the coefficient vectors a, b that yield the H constraint"""
 
     # The size of a is always the size of X(t)
     # The size of b is always the size of u(t)
-    a = np.zeros((1, num_compartments * num_age_groups))
-    b = np.zeros((1, num_controls * num_age_groups))
+    a = np.zeros(num_compartments * num_age_groups)
+    b = np.zeros(num_controls * num_age_groups)
 
     for ag in range(0,num_age_groups):
 
@@ -568,22 +535,58 @@ def calculate_H_coefficients(dynModel):
         lambda_H_D_g = dynModel.groups[age_groups[ag]].parameters['lambda_H_D']
 
 
-        a[0, Ig_idx] = mu_g * pH_g
-        a[0, Issg_idx] = mu_g * (pH_g / (pH_g + pICU_g))
-        a[0, Hg_idx] = (1 - lambda_H_R_g - lambda_H_D_g)
+        a[Ig_idx] = mu_g * pH_g
+        a[Issg_idx] = mu_g * (pH_g / (pH_g + pICU_g))
+        a[Hg_idx] = (1 - lambda_H_R_g - lambda_H_D_g)
 
-        b[0, BHg_idx] = -1
+        b[BHg_idx] = -1
 
     return a, b
 
 
-def calculate_BH_coefficients(dynModel, group):
+def calculate_ICU_constraint_coefs(dynModel):
+    """Calculates the coefficient vectors a, b that yield the ICU constraint"""
+
+    # The size of a is always the size of X(t)
+    # The size of b is always the size of u(t)
+    a = np.zeros(num_compartments * num_age_groups)
+    b = np.zeros(num_controls * num_age_groups)
+
+    for ag in range(0,num_age_groups):
+        #Useful indices for the elements of a
+        Hg_idx = ag*num_compartments + SEIR_groups.index('H_g')
+        Ig_idx = ag*num_compartments + SEIR_groups.index('I_g')
+        Issg_idx = ag*num_compartments + SEIR_groups.index('Iss_g')
+        ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
+
+        #Useful indices for the elements of b
+        BHg_idx = ag*num_controls + controls.index('BounceH_g')
+        BICUg_idx = ag*num_controls + controls.index('BounceICU_g')
+
+        # Useful coefficients for a and b
+        mu_g = dynModel.groups[age_groups[ag]].parameters['mu']
+        pICU_g = dynModel.groups[age_groups[ag]].parameters['p_ICU']
+        pH_g = dynModel.groups[age_groups[ag]].parameters['p_H']
+        lambda_ICU_R_g = dynModel.groups[age_groups[ag]].parameters['lambda_ICU_R']
+        lambda_ICU_D_g = dynModel.groups[age_groups[ag]].parameters['lambda_ICU_D']
+
+
+        a[Ig_idx] = mu_g * pICU_g
+        a[Issg_idx] = mu_g * (pICU_g / (pH_g + pICU_g))
+        a[ICUg_idx] = (1 - lambda_ICU_R_g - lambda_ICU_D_g)
+
+        b[BICUg_idx] = -1
+
+    return a, b
+
+
+def calculate_BH_constraint_coefs(dynModel, group):
     """Calculates the coefficient vectors a, b that yield the BH constraint for group in age_groups. Observe that we have a different constraint for each group."""
 
     # The size of a is always the size of X(t)
     # The size of b is always the size of u(t)
-    a = np.zeros((1, num_compartments * num_age_groups))
-    b = np.zeros((1, num_controls * num_age_groups))
+    a = np.zeros(num_compartments * num_age_groups)
+    b = np.zeros(num_controls * num_age_groups)
 
     ag = age_groups.index(group)
 
@@ -605,23 +608,22 @@ def calculate_BH_coefficients(dynModel, group):
     lambda_ICU_D_g = dynModel.groups[age_groups[ag]].parameters['lambda_ICU_D']
 
 
-    a[0, Ig_idx] = - mu_g * pH_g
-    a[0, Issg_idx] = - mu_g * (pH_g / (pH_g + pICU_g))
+    a[Ig_idx] = - mu_g * pH_g
+    a[Issg_idx] = - mu_g * (pH_g / (pH_g + pICU_g))
 
-
-    b[0, BHg_idx] = 1
+    b[BHg_idx] = 1
 
     return a, b
 
 
 
-def calculate_BICU_coefficients(dynModel, group):
+def calculate_BICU_constraint_coefs(dynModel, group):
     """Calculates the coefficient vectors a, b that yield the BICU constraint for group in age_groups. Observe that we have a different constraint for each group."""
 
     # The size of a is always the size of X(t)
     # The size of b is always the size of u(t)
-    a = np.zeros((1, num_compartments * num_age_groups))
-    b = np.zeros((1, num_controls * num_age_groups))
+    a = np.zeros(num_compartments * num_age_groups)
+    b = np.zeros(num_controls * num_age_groups)
 
     ag = age_groups.index(group)
 
@@ -643,13 +645,47 @@ def calculate_BICU_coefficients(dynModel, group):
     lambda_ICU_D_g = dynModel.groups[age_groups[ag]].parameters['lambda_ICU_D']
 
 
-    a[0, Ig_idx] = - mu_g * pICU_g
-    a[0, Issg_idx] = - mu_g * (pICU_g / (pH_g + pICU_g))
+    a[Ig_idx] = - mu_g * pICU_g
+    a[Issg_idx] = - mu_g * (pICU_g / (pH_g + pICU_g))
 
-
-    b[0, BICUg_idx] = 1
+    b[BICUg_idx] = 1
 
     return a, b
+
+
+def calculate_Mtest_constraint_coefs(dynModel):
+    """Calculates the coefficient vectors a, b that yield the Mtest constraint"""
+
+    # The size of a is always the size of X(t)
+    # The size of b is always the size of u(t)
+    a = np.zeros(num_compartments * num_age_groups)
+    b = np.zeros(num_controls * num_age_groups)
+    
+    for ag in range(0,num_age_groups):
+        #Useful indices for the elements of b
+        Nmtestg_idx = ag*num_controls + controls.index('Nmtest_g')
+
+        b[Nmtestg_idx] = 1
+    
+    return a, b
+
+
+def calculate_Atest_constraint_coefs(dynModel):
+    """Calculates the coefficient vectors a, b that yield the Atest constraint"""
+
+    # The size of a is always the size of X(t)
+    # The size of b is always the size of u(t)
+    a = np.zeros(num_compartments * num_age_groups)
+    b = np.zeros(num_controls * num_age_groups)
+    
+    for ag in range(0,num_age_groups):
+        #Useful indices for the elements of b
+        Natestg_idx = ag*num_controls + controls.index('Natest_g')
+
+        b[Natestg_idx] = 1
+    
+    return a, b
+
 
 
 ########### Returns f(X(t), u(t))  = X(t+1). Does not change
@@ -813,7 +849,7 @@ for group in initialization:
 	initialization[group]["S"] = initialization[group]["S"] - change
 	initialization[group]["I"] = initialization[group]["I"] + change
 
-# Create environment
+# # Create environment
 # dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method)
 
 # Set up testing decisions: no testing for now
@@ -822,6 +858,39 @@ for group in initialization:
 #     'a_tests_vec':a_tests_vec,
 #     'm_tests_vec':m_tests_vec,
 # }
+
+###########################
+# # Check constraints
+# a, b = calculate_H_constraint_coefs(dynModel)
+# print("\nH constraint:\n")
+# print(a)
+# print(b)
+
+# a, b = calculate_ICU_constraint_coefs(dynModel)
+# print("\nICU constraint:\n")
+# print(a)
+# print(b)
+
+# a, b = calculate_BH_constraint_coefs(dynModel,'age_group_0_9')
+# print("\nBH constraint:\n")
+# print(a)
+# print(b)
+
+# a, b = calculate_BICU_constraint_coefs(dynModel,'age_group_0_9')
+# print("\nBICU constraint:\n")
+# print(a)
+# print(b)
+
+# a, b = calculate_Mtest_constraint_coefs(dynModel)
+# print("\nMtest constraint:\n")
+# print(b)
+# a,b = calculate_Atest_constraint_coefs(dynModel)
+# print("\nAtest constraint:\n")
+# print(b)
+# ones_u = np.ones(9*10)
+# #print(ones_u)
+# #print(np.dot(d,ones_u))
+# #print(np.dot(ones_u,ones_u))
 
 # # Check reading of fundamental contact matrices
 # ones_X = np.ones(9*13)
