@@ -174,6 +174,24 @@ class DynamicalModel:
 			}
 		return state
 
+	def write_state(self, t, X):
+		for group_name in X.keys():
+			self.groups[group_name].S[t] = X[group_name]['S']
+			self.groups[group_name].E[t] = X[group_name]['E']
+			self.groups[group_name].I[t] = X[group_name]['I']
+			self.groups[group_name].R[t] = X[group_name]['R']
+			self.groups[group_name].N[t] = X[group_name]['N']
+			self.groups[group_name].Ia[t] = X[group_name]['Ia']
+			self.groups[group_name].Ips[t] = X[group_name]['Ips']
+			self.groups[group_name].Ims[t] = X[group_name]['Ims']
+			self.groups[group_name].Iss[t] = X[group_name]['Iss']
+			self.groups[group_name].Rq[t] = X[group_name]['Rq']
+			self.groups[group_name].H[t] = X[group_name]['H']
+			self.groups[group_name].ICU[t] = X[group_name]['ICU']
+			self.groups[group_name].D[t] = X[group_name]['D']
+		return 1
+
+
 	# Returns state but in OpenAIGym Format
 	def get_normalized_state(self, t):
 		norm_state = np.array([[
@@ -311,6 +329,7 @@ class SEIR_group:
 			self.IR.append(summ_contacts)
 
 		else:
+			print("t = ", t, "len of self.total_contacts = ", len(self.total_contacts))
 			assert(False)
 
 
