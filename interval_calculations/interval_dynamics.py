@@ -8,7 +8,8 @@ import time
 
 
 CONTACTS_BOUND = 100
-MIPGAP = 1e-12
+MIPGAP = 1e-9
+NUMERICFOCUS = 1
 
 def solution_values(z_vars, m_test_vars, S_vars, I_vars, IR_vars):
 	solution_v = {
@@ -250,52 +251,60 @@ class DynamicalModelInterval:
 		t1 = time.time()
 		# Get lower bound S
 		for name,group in self.groups.items():
-			model.setObjective(S_vars[name][T],GRB.MINIMIZE)
-			if warm_start:
-				set_start(z_vars, m_test_vars, S_vars, I_vars, IR_vars, warm_start["S_L"])
-			model.update()
-			model.setParam( 'OutputFlag', False )
+			# model.setObjective(S_vars[name][T],GRB.MINIMIZE)
+			# if warm_start:
+			# 	set_start(z_vars, m_test_vars, S_vars, I_vars, IR_vars, warm_start["S_L"])
+			# model.update()
+			# model.setParam( 'OutputFlag', False )
 
-			model.Params.NumericFocus = 3
-			model.optimize()
-			if T==3:
-				model.write("out.lp")
-			if model.status == GRB.Status.INFEASIBLE:
-				print(name)
-				print("S_L")
-				print(T)
-				model.computeIIS()
-				model.write("out.ilp")
-				assert(False)
+			# model.Params.NumericFocus = 3
+			# model.optimize()
+			# if T==3:
+			# 	model.write("out.lp")
+			# if model.status == GRB.Status.INFEASIBLE:
+			# 	print(name)
+			# 	print("S_L")
+			# 	print(T)
+			# 	model.computeIIS()
+			# 	model.write("out.ilp")
+			# 	assert(False)
 
-			lb_S = max(0,model.objVal)
-			if T == 0:
-				assert(np.abs((group.S_L[0] - lb_S)/lb_S)<1e-6)
-			else:
+			# lb_S = max(0,model.objVal)
+			# if T == 0:
+			# 	assert(np.abs((group.S_L[0] - lb_S)/lb_S)<1e-6)
+			# else:
+			# 	group.S_L.append(lb_S)
+			# solution["S_L"] = solution_values(z_vars, m_test_vars, S_vars, I_vars, IR_vars)
+			if T != 0:
+				lb_S = group.S_L[0] - group.parameters['beta']*sum([group.IR_U[t]*group.S_U[t] for t in range(T)])
 				group.S_L.append(lb_S)
-			solution["S_L"] = solution_values(z_vars, m_test_vars, S_vars, I_vars, IR_vars)
+
 
 		# Get upper bound S
 		for name,group in self.groups.items():
-			model.setObjective(S_vars[name][T],GRB.MAXIMIZE)
-			if warm_start:
-				set_start(z_vars, m_test_vars, S_vars, I_vars, IR_vars, warm_start["S_U"])
-			model.update()
-			model.setParam( 'OutputFlag', False )
-			if T == 3 and name == "age_group_50_59":
-				model.setParam( 'OutputFlag', True )
-			model.Params.NumericFocus = 3
-			model.optimize()
-			if model.status == GRB.Status.INFEASIBLE:
-				print(name)
-				print("S_U")
-				assert(False)
-			ub_S = model.objVal
-			if T == 0:
-				assert(np.abs((group.S_U[0] - ub_S)/ub_S)<1e-6)
-			else:
+			# model.setObjective(S_vars[name][T],GRB.MAXIMIZE)
+			# if warm_start:
+			# 	set_start(z_vars, m_test_vars, S_vars, I_vars, IR_vars, warm_start["S_U"])
+			# model.update()
+			# model.setParam( 'OutputFlag', False )
+			# if T == 3 and name == "age_group_50_59":
+			# 	model.setParam( 'OutputFlag', True )
+			# model.Params.NumericFocus = 3
+			# model.optimize()
+			# if model.status == GRB.Status.INFEASIBLE:
+			# 	print(name)
+			# 	print("S_U")
+			# 	assert(False)
+			# ub_S = model.objVal
+			# if T == 0:
+			# 	assert(np.abs((group.S_U[0] - ub_S)/ub_S)<1e-6)
+			# else:
+			# 	group.S_U.append(ub_S)
+			# solution["S_U"] = solution_values(z_vars, m_test_vars, S_vars, I_vars, IR_vars)
+			if T != 0:
+				ub_S = group.S_U[0] - group.parameters['beta']*sum([group.IR_L[t]*group.S_L[t] for t in range(T)])
 				group.S_U.append(ub_S)
-			solution["S_U"] = solution_values(z_vars, m_test_vars, S_vars, I_vars, IR_vars)
+
 
 
 		# Get lower bound IR
@@ -305,7 +314,7 @@ class DynamicalModelInterval:
 				set_start(z_vars, m_test_vars, S_vars, I_vars, IR_vars, warm_start["IR_L"])
 			model.update()
 			model.setParam( 'OutputFlag', False )
-			model.Params.NumericFocus = 3
+			model.Params.NumericFocus = NUMERICFOCUS
 			model.optimize()
 			if model.status == GRB.Status.INFEASIBLE:
 				print(name)
@@ -325,7 +334,7 @@ class DynamicalModelInterval:
 				set_start(z_vars, m_test_vars, S_vars, I_vars, IR_vars, warm_start["S_U"])
 			model.update()
 			model.setParam( 'OutputFlag', False )
-			model.Params.NumericFocus = 3
+			model.Params.NumericFocus = NUMERICFOCUS
 			model.optimize()
 			if model.status == GRB.Status.INFEASIBLE:
 				print(name)

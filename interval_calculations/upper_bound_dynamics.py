@@ -10,43 +10,6 @@ import time
 CONTACTS_BOUND = 100
 MIPGAP = 1e-12
 
-def solution_values(z_vars, m_test_vars, S_vars, I_vars, IR_vars):
-	solution_v = {
-					"z":defaultdict(dict),
-					"m":defaultdict(dict),
-					"S":defaultdict(dict),
-					"I":defaultdict(dict),
-					"IR":defaultdict(dict),
-			}
-	for group in z_vars:
-		for t in z_vars[group]:
-			solution_v["z"][group][t] = z_vars[group][t].x
-			solution_v["m"][group][t] = m_test_vars[group][t].x
-			solution_v["S"][group][t] = S_vars[group][t].x
-			solution_v["I"][group][t] = I_vars[group][t].x
-			solution_v["IR"][group][t] = IR_vars[group][t].x
-	return solution_v
-
-def set_start(z_vars, m_test_vars, S_vars, I_vars, IR_vars, start):
-	for group in start["z"]:
-		for t in start["z"][group]:
-			z_vars[group][t].start = start["z"][group][t] 
-			m_test_vars[group][t].start = start["m"][group][t] 
-			S_vars[group][t].start = start["S"][group][t] 
-			I_vars[group][t].start = start["I"][group][t] 
-			IR_vars[group][t].start = start["IR"][group][t] 
-
-def set_bounds(model, z_vars, m_test_vars, S_vars, I_vars, IR_vars, force):
-	for group in force["z"]:
-		for t in force["z"][group]:
-			model.addConstr(z_vars[group][t] == force["z"][group][t])
-			model.addConstr(m_test_vars[group][t] == force["m"][group][t])
-		for t in force["S"][group]:
-			model.addConstr(S_vars[group][t] == force["S"][group][t])
-			model.addConstr(I_vars[group][t] == force["I"][group][t])
-			model.addConstr(IR_vars[group][t] == force["IR"][group][t])
-
-
 
 
 def n_contacts(group_g, group_h, alphas, mixing_method):
@@ -72,8 +35,8 @@ def n_contacts(group_g, group_h, alphas, mixing_method):
 	return n
 
 
-class DynamicalModelInterval:
-	def __init__(self, parameters, initialization, dt, time_steps, mixing_method, alphas_vec):
+class DynamicalModelUpper:
+	def __init__(self, parameters, initialization, dt, time_steps, mixing_method, alphas_vec, intervals):
 		self.parameters = parameters
 		self.t = 0
 		self.dt = dt
@@ -91,62 +54,33 @@ class DynamicalModelInterval:
 		for n in self.groups:
 			self.groups[n].attach_other_groups(self.groups)
 
-		# Initialize bounds
+		# Fix number of beds and icus
+		self.beds = self.parameters['global-parameters']['C_H']
+		self.icus = self.parameters['global-parameters']['C_ICU']
+
+		# Initialize intervals
 		for n in self.groups:
-			self.groups[n].initialize_bounds(alphas_vec[0])
+			self.groups[n].initialize_intervals(intervals)
+
+		# Initialize IR and total_contacts
+		for n in self.groups:
+			self.groups[n].update_total_contacts(0, alphas_vec[0])
 
 
-	def take_time_step(self, m_tests, a_tests, alphas):
+	def take_time_step(self, model):
 		for n in self.groups:
-			self.groups[n].update_total_contacts(self.t, alphas)
-		for n in self.groups:
-			self.groups[n].take_time_step(m_tests[n], a_tests[n])
+			self.groups[n].take_time_step(model)
 
 
 		# Update time
 		self.t += 1
 
-	# Simulates the dynamics given a vector of molecular tests, atomic tests and alphas
-	def simulate(self, m_tests_vec, a_tests_vec, alphas_vec):
-		for t in range(self.time_steps):
-			self.take_time_step(m_tests_vec[t], a_tests_vec[t], alphas_vec[t])
 
 
-	def construct_model(self, T, m_tests, a_tests, warm_start = False, force = False):
+	def construct_model(self, T, m_tests, a_tests):
 
 		t0 = time.time()
 
-		# This will store the solution of the model to be able to use it as a warm start
-		solution = {
-			"S_L":{
-				"z":defaultdict(dict),
-				"m":defaultdict(dict),
-				"S":defaultdict(dict),
-				"I":defaultdict(dict),
-				"IR":defaultdict(dict),
-			},
-			"S_U":{
-				"z":defaultdict(dict),
-				"m":defaultdict(dict),
-				"S":defaultdict(dict),
-				"I":defaultdict(dict),
-				"IR":defaultdict(dict),
-			},
-			"IR_L":{
-				"z":defaultdict(dict),
-				"m":defaultdict(dict),
-				"S":defaultdict(dict),
-				"I":defaultdict(dict),
-				"IR":defaultdict(dict),
-			},
-			"IR_U":{
-				"z":defaultdict(dict),
-				"m":defaultdict(dict),
-				"S":defaultdict(dict),
-				"I":defaultdict(dict),
-				"IR":defaultdict(dict),
-			}
-		}
 
 		model = Model()
 		model.Params.MIPGap = MIPGAP
@@ -156,34 +90,65 @@ class DynamicalModelInterval:
 				z_vars[group][t] = model.addVar(lb=0, ub=self.groups[group].N0*CONTACTS_BOUND ,name="z_%s_%d"%(group,t))
 
 		m_test_vars = defaultdict(dict)
+		a_test_vars = defaultdict(dict)
 		for group in self.groups:
 			for t in range(0, T):
-				m_test_vars[group][t] = model.addVar(lb=0, ub=m_tests ,name="Mtest_%s_%d"%(group,t))
+				m_test_vars[group][t] = model.addVar(lb=0, ub=m_tests, name="Mtest_%s_%d"%(group,t))
+				a_test_vars[group][t] = model.addVar(lb=0, ub=a_tests, name="Atest_%s_%d"%(group,t))
 
 		S_vars = defaultdict(dict)
 		for group in self.groups:
-			for t in range(0, T+1):
+			for t in range(0, T):
 				S_vars[group][t] = model.addVar(lb=0, ub=self.groups[group].N0, name="S_%s_%d"%(group,t))
 
 		I_vars = defaultdict(dict)
 		for group in self.groups:
-			for t in range(0, T+1):
+			for t in range(0, T):
 				I_vars[group][t] = model.addVar(lb=0, ub=self.groups[group].N0, name="I_%s_%d"%(group,t))
 
 		IR_vars = defaultdict(dict)
 		for group in self.groups:
-			for t in range(0, T+1):
+			for t in range(0, T):
 				IR_vars[group][t] = model.addVar(lb=0, ub=CONTACTS_BOUND, name="IR_%s_%d"%(group,t))
+
+
+		# Add vars into each group
+		for group in self.groups:
+			for t in range(0, T):
+				self.groups[group].z.append(z_vars[group][t])
+
+		for group in self.groups:
+			for t in range(0, T):
+				self.groups[group].B_H.append(model.addVar(lb=0, name="B_H_%s_%d"%(group,t)))
+				self.groups[group].B_ICU.append(model.addVar(lb=0, name="B_ICU_%s_%d"%(group,t)))
+
+		for group in self.groups:
+			for t in range(0, T):
+				self.groups[group].m_tests.append(m_test_vars[group][t])
+				self.groups[group].a_tests.append(a_test_vars[group][t])
+
+		for group in self.groups:
+			for t in range(1, T):
+				self.groups[group].S.append(S_vars[group][t])
+
+		for group in self.groups:
+			for t in range(1, T):
+				self.groups[group].I.append(I_vars[group][t])
+
+		for group in self.groups:
+			for t in range(1, T):
+				self.groups[group].IR.append(IR_vars[group][t])
+
 
 
 		# Add definition of S
 		for name,group in self.groups.items():
-			for t in range(0, T+1):
+			for t in range(0, T):
 				model.addConstr(S_vars[name][t] == group.S[0] - group.parameters['beta']*sum([z_vars[name][tao] for tao in range(0,t)]))
 
 		# Add definition of I
 		for name,group in self.groups.items():
-			for t in range(0, T+1):
+			for t in range(0, T):
 				model.addConstr(I_vars[name][t] == (
 					group.I[0]*(1-group.parameters['mu'])**t
 					+ sum([(1-group.parameters['mu'])**(t-tao-1)*group.parameters['sigma']*(1-group.parameters['sigma'])**tao*group.E[0] for tao in range(0,t)])
@@ -195,7 +160,7 @@ class DynamicalModelInterval:
 
 		# Add definition of IR
 		for n,group in self.groups.items():
-			for t in range(0, T+1):
+			for t in range(0, T):
 				model.addConstr(IR_vars[n][t] == sum([n_contacts(group, group2, self.alphas_vec[t], self.mixing_method)/group2.N0*I_vars[n2][t] for n2,group2 in self.groups.items()]))
 
 		# Add bounds for S and IR
@@ -235,113 +200,55 @@ class DynamicalModelInterval:
 		# Add testing constraints
 		for t in range(0,T):
 			model.addConstr(sum([m_test_vars[group][t] for group in self.groups])<=m_tests)
+			model.addConstr(sum([a_test_vars[group][t] for group in self.groups])<=a_tests)
 
-		# Force variables
-		if force:
-			set_bounds(model,z_vars, m_test_vars, S_vars, I_vars, IR_vars, force)
-			print("Forced")
-			print(T)
+		# Take time steps
+		for t in range(0,T):
+			print(t)
+			self.take_time_step(model)
 
+		# Add bounds on B
+		for name, group in self.groups.items():
+			for t in range(0,T):
+				model.addConstr(group.B_H[t]<=group.flow_H(t))
+				model.addConstr(group.B_ICU[t]<=group.flow_ICU(t))
 
+		for t in range(0,T):
+			model.addConstr(
+				sum([group.flow_H(t)-group.B_H[t] for name,group in self.groups.items()])<=
+				self.beds
+				- sum([(1-group.parameters["lambda_H_R"]-group.parameters["lambda_H_D"])*group.H[t] for name,group in self.groups.items()])
+			)
+			model.addConstr(
+				sum([group.flow_ICU(t)-group.B_ICU[t] for name,group in self.groups.items()])<=
+				self.icus
+				- sum([(1-group.parameters["lambda_ICU_R"]-group.parameters["lambda_ICU_D"])*group.ICU[t] for name,group in self.groups.items()])
+			)
 
 		model.update()
 
+		# Construct objective value
+		objective = 0
+		for t in range(1,T):
+			for name, group in self.groups.items():
+				objective += (
+					group.economics['work_value']*(
+						self.alphas_vec[t-1][name]['work']+
+						group.economics['lockdown_fraction']*(1-self.alphas_vec[t-1][name]['work'])
+					)*
+					(group.S[t] + group.E[t] + group.R[t])
+					* self.dt
+				)
+				# Liberate people in Rq group
+				objective += group.Rq[t]*group.economics['work_value']* self.dt
 
 		t1 = time.time()
-		# Get lower bound S
-		for name,group in self.groups.items():
-			model.setObjective(S_vars[name][T],GRB.MINIMIZE)
-			if warm_start:
-				set_start(z_vars, m_test_vars, S_vars, I_vars, IR_vars, warm_start["S_L"])
-			model.update()
-			model.setParam( 'OutputFlag', False )
 
-			model.Params.NumericFocus = 3
-			model.optimize()
-			if T==3:
-				model.write("out.lp")
-			if model.status == GRB.Status.INFEASIBLE:
-				print(name)
-				print("S_L")
-				print(T)
-				model.computeIIS()
-				model.write("out.ilp")
-				assert(False)
+		model.setObjective(objective,GRB.MAXIMIZE)
+		model.update()
+		model.optimize()
 
-			lb_S = max(0,model.objVal)
-			if T == 0:
-				assert(np.abs((group.S_L[0] - lb_S)/lb_S)<1e-6)
-			else:
-				group.S_L.append(lb_S)
-			solution["S_L"] = solution_values(z_vars, m_test_vars, S_vars, I_vars, IR_vars)
-
-		# Get upper bound S
-		for name,group in self.groups.items():
-			model.setObjective(S_vars[name][T],GRB.MAXIMIZE)
-			if warm_start:
-				set_start(z_vars, m_test_vars, S_vars, I_vars, IR_vars, warm_start["S_U"])
-			model.update()
-			model.setParam( 'OutputFlag', False )
-			if T == 3 and name == "age_group_50_59":
-				model.setParam( 'OutputFlag', True )
-			model.Params.NumericFocus = 3
-			model.optimize()
-			if model.status == GRB.Status.INFEASIBLE:
-				print(name)
-				print("S_U")
-				assert(False)
-			ub_S = model.objVal
-			if T == 0:
-				assert(np.abs((group.S_U[0] - ub_S)/ub_S)<1e-6)
-			else:
-				group.S_U.append(ub_S)
-			solution["S_U"] = solution_values(z_vars, m_test_vars, S_vars, I_vars, IR_vars)
-
-
-		# Get lower bound IR
-		for name,group in self.groups.items():
-			model.setObjective(IR_vars[name][T],GRB.MINIMIZE)
-			if warm_start:
-				set_start(z_vars, m_test_vars, S_vars, I_vars, IR_vars, warm_start["IR_L"])
-			model.update()
-			model.setParam( 'OutputFlag', False )
-			model.Params.NumericFocus = 3
-			model.optimize()
-			if model.status == GRB.Status.INFEASIBLE:
-				print(name)
-				print("IR_L")
-				assert(False)
-			lb_IR = max(0,model.objVal)
-			if T == 0:
-				assert(np.abs((group.IR_L[0] - lb_IR)/lb_IR)<1e-6)
-			else:
-				group.IR_L.append(lb_IR)
-			solution["IR_L"] = solution_values(z_vars, m_test_vars, S_vars, I_vars, IR_vars)
-
-		# Get upper bound IR
-		for name,group in self.groups.items():
-			model.setObjective(IR_vars[name][T],GRB.MAXIMIZE)
-			if warm_start:
-				set_start(z_vars, m_test_vars, S_vars, I_vars, IR_vars, warm_start["S_U"])
-			model.update()
-			model.setParam( 'OutputFlag', False )
-			model.Params.NumericFocus = 3
-			model.optimize()
-			if model.status == GRB.Status.INFEASIBLE:
-				print(name)
-				print("IR_U")
-				assert(False)
-			ub_IR = model.objVal
-			if T == 0:
-				assert(np.abs((group.IR_U[0] - ub_IR)/ub_IR)<1e-6)
-			else:
-				group.IR_U.append(ub_IR)
-			solution["IR_U"] = solution_values(z_vars, m_test_vars, S_vars, I_vars, IR_vars)
-		t2 = time.time()
-
-		print(T,t1-t0,t2-t1)
-		return(solution)
-
+		return(model)
 
 
 class SEIR_group_upper:
@@ -367,13 +274,35 @@ class SEIR_group_upper:
 	def initialize_vars(self, initial_conditions):
 		# Susceptible
 		self.S = [float(initial_conditions['S'])]
-		self.old_S = [float(initial_conditions['S'])]
 		# Exposed (unquarantined)
 		self.E = [float(initial_conditions['E'])]
-		self.old_E = [float(initial_conditions['E'])]
 		# Infected (unquarantined)
 		self.I = [float(initial_conditions['I'])]
-		self.old_I = [float(initial_conditions['I'])]
+
+		# Recovered (unquarantined)
+		self.R = [float(initial_conditions['R'])]
+		# Unquarantined patients
+		self.N = [self.S[0] + self.E[0] + self.I[0]+ self.R[0]]
+
+		# Infected quarantined with different degrees of severity
+		self.Ia = [float(initial_conditions['Ia'])]
+		self.Ips = [float(initial_conditions['Ips'])]
+		self.Ims = [float(initial_conditions['Ims'])]
+		self.Iss = [float(initial_conditions['Iss'])]
+
+		# Recovered quanrantined
+		self.Rq = [float(initial_conditions['Rq'])]
+
+		# In hospital bed
+		self.H = [float(initial_conditions['H'])]
+		# In ICU
+		self.ICU = [float(initial_conditions['ICU'])]
+		# Dead
+		self.D = [float(initial_conditions['D'])]
+		# Leaving H and ICU
+		self.B_H = []
+		self.B_ICU = []
+
 
 		# Contacts
 		self.total_contacts = []
@@ -382,20 +311,10 @@ class SEIR_group_upper:
 		# The initial population
 		self.N0 = self.S[0] + self.E[0] + self.I[0]+ float(initial_conditions['R']) + float(initial_conditions['Rq'])
 
-
-	def initialize_bounds(self, alphas):
-		# These are the bounds for S initially
-		self.S_L = [self.S[0]]
-		self.S_U = [self.S[0]]
-
-		# These are the bounds for IR initially
-		summ_contacts = 0
-		for n,g in self.all_groups.items():
-			new_contacts = n_contacts(self, g, alphas, self.mixing_method)
-			summ_contacts += new_contacts*g.I[0]/g.N0
-		self.IR_L = [summ_contacts]
-		self.IR_U = [summ_contacts]
-
+		# Additional vars
+		self.z = []
+		self.m_tests = []
+		self.a_tests = []
 
 	def update_total_contacts(self, t, alphas):
 		if (len(self.total_contacts) == t):
@@ -411,49 +330,159 @@ class SEIR_group_upper:
 			assert(False)
 
 
+	def initialize_intervals(self, intervals):
+		self.S_L = intervals["S_L"][self.name]
+		self.S_U = intervals["S_U"][self.name]
+		self.IR_L = intervals["IR_L"][self.name]
+		self.IR_U = intervals["IR_U"][self.name]
+
+
 	# Attach other groups to make it easier to find variables of other groups
 	def attach_other_groups(self,all_groups):
 		self.all_groups = all_groups
 
 	# Advances one time step, given the m_tests and a_tests variable
-	def take_time_step(self, m_tests, a_tests):
-		self.update_S(m_tests, a_tests)
-		self.update_E(m_tests, a_tests)
-		self.update_I(m_tests, a_tests)
+	def take_time_step(self, model):
+		self.update_N(model)
+		self.update_E(model)
+		self.update_R(model)
+		self.update_Ia(model)
+		self.update_Ips(model)
+		self.update_Ims(model)
+		self.update_Iss(model)
+		self.update_Rq(model)
+		self.update_H(model)
+		self.update_ICU(model)
+		self.update_D(model)
 
 		self.t += 1
 
-	# Updates S
-	def update_S(self, m_tests, a_tests):
-		delta_S = -self.parameters['beta']*self.total_contacts[self.t]
-		new_S = self.S[0] - self.parameters['beta']*sum([self.total_contacts[k] for k in range(0,self.t+1)])
-		self.S += [new_S]
-		self.old_S += [self.old_S[self.t]+delta_S]
+	def flow_H(self, t):
+		if self.parameters['p_H'] != 0.0:
+			return self.parameters['mu']*self.parameters['p_H']*(self.I[t]+self.Iss[t]/(self.parameters['p_H']+self.parameters['p_ICU']))
+		else:
+			return 0.0
+
+	# Gives flow of how many people flowing to ICU
+	def flow_ICU(self, t):
+		if self.parameters['p_ICU'] != 0.0:
+			return self.parameters['mu']*self.parameters['p_ICU']*(self.I[t]+self.Iss[t]/(self.parameters['p_H']+self.parameters['p_ICU']))
+		else:
+			return 0.0
+
+
+	def update_N(self, model):
+		delta_N = (
+			- self.m_tests[self.t]
+			- self.a_tests[self.t]
+			- self.parameters['mu']*(self.parameters['p_H'] + self.parameters['p_ICU'])*self.I[self.t]
+		)
+
+		new_var = model.addVar(lb=0, name="N_%s_%d"%(self.name,self.t+1))
+		model.addConstr(new_var == self.N[self.t]+delta_N*self.dt)
+		self.N += [new_var]
+
 
 	# Updates Exposed
-	def update_E(self, m_tests, a_tests):
-		delta_E = self.parameters['beta']*self.total_contacts[self.t] - self.parameters['sigma']*self.E[self.t]
-		new_E = (
-			(1-self.parameters['sigma'])**(self.t+1)*self.E[0] + 
-			self.parameters['beta']*sum([(1-self.parameters['sigma'])**(self.t+1-k-1)*self.total_contacts[k] for k in range(0,self.t+1)])
-		)
-		self.E += [new_E]
-		self.old_E += [self.old_E[self.t]+delta_E]
+	def update_E(self, model):
+		delta_E = self.parameters['beta']*self.z[self.t] - self.parameters['sigma']*self.E[self.t]
+
+		new_var = model.addVar(lb=0, name="E_%s_%d"%(self.name,self.t+1))
+		model.addConstr(new_var == self.E[self.t]+delta_E*self.dt)
+		self.E += [new_var]
 
 
-	# Updates infected
-	def update_I(self, m_tests, a_tests):
-		delta_I = self.parameters['sigma']*self.E[self.t] - self.parameters['mu']*self.I[self.t] - m_tests
-		new_I = (
-			(1-self.parameters['mu'])**(self.t+1)*self.I[0]+
-			sum([(1-self.parameters['mu'])**(self.t+1-tao-1)*self.parameters['sigma']*(1-self.parameters['sigma'])**tao*self.E[0] for tao in range(0,self.t+1)])+
-			sum([(1-self.parameters['mu'])**(self.t+1-tao-1)*self.parameters['sigma']*self.parameters['beta']*
-				sum([(1-self.parameters['sigma'])**(tao-k-1)*self.total_contacts[k] for k in range(0,tao)])
-			for tao in range(0,self.t+1)])-
-			sum([(1-self.parameters['mu'])**(self.t+1-tao-1)*m_tests for tao in range(0,self.t+1)])
+	# Updates recovered
+	def update_R(self, model):
+		delta_R = self.parameters['mu']*(1-self.parameters["p_H"]-self.parameters["p_ICU"])*self.I[self.t] - self.a_tests[self.t]
+
+		new_var = model.addVar(lb=0, name="R_%s_%d"%(self.name,self.t+1))
+		model.addConstr(new_var == self.R[self.t]+delta_R*self.dt)
+		self.R += [new_var]
+
+	# Updates infected in quarantine
+	def update_Ia(self, model):
+		delta_Ia = self.parameters['p_Ia']*self.m_tests[self.t] - self.parameters['mu']*self.Ia[self.t]
+
+		new_var = model.addVar(lb=0, name="Ia_%s_%d"%(self.name,self.t+1))
+		model.addConstr(new_var == self.Ia[self.t]+delta_Ia*self.dt)
+		self.Ia += [new_var]
+
+
+	def update_Ips(self, model):
+		delta_Ips = self.parameters['p_Ips']*self.m_tests[self.t] - self.parameters['mu']*self.Ips[self.t]
+
+		new_var = model.addVar(lb=0, name="Ips_%s_%d"%(self.name,self.t+1))
+		model.addConstr(new_var == self.Ips[self.t]+delta_Ips*self.dt)
+		self.Ips += [new_var]
+
+	def update_Ims(self, model):
+		delta_Ims = self.parameters['p_Ims']*self.m_tests[self.t] - self.parameters['mu']*self.Ims[self.t]
+
+		new_var = model.addVar(lb=0, name="Ims_%s_%d"%(self.name,self.t+1))
+		model.addConstr(new_var == self.Ims[self.t]+delta_Ims*self.dt)
+		self.Ims += [new_var]
+
+
+	def update_Iss(self, model):
+		delta_Iss = self.parameters['p_Iss']*self.m_tests[self.t] - self.parameters['mu']*self.Iss[self.t]
+
+		new_var = model.addVar(lb=0, name="Iss_%s_%d"%(self.name,self.t+1))
+		model.addConstr(new_var == self.Iss[self.t]+delta_Iss*self.dt)
+		self.Iss += [new_var]
+
+	# Update recovered in quarentine
+	def update_Rq(self, model):
+		delta_Rq = (
+			self.parameters['mu']*(self.Ia[self.t]+self.Ips[self.t]+self.Ims[self.t]) +
+			self.parameters['lambda_H_R']*self.H[self.t] +
+			self.parameters['lambda_ICU_R']*self.ICU[self.t] +
+			self.a_tests[self.t]
 		)
-		self.I += [new_I]
-		self.old_I += [self.old_I[self.t]+delta_I*self.dt]
+
+		new_var = model.addVar(lb=0, name="Rq_%s_%d"%(self.name,self.t+1))
+		model.addConstr(new_var == self.Rq[self.t]+delta_Rq*self.dt)
+		self.Rq += [new_var]
+
+	def update_H(self, model):
+		delta_H = (
+			- (self.parameters["lambda_H_R"] + self.parameters["lambda_H_D"])*self.H[self.t]
+			+ self.flow_H(self.t)
+			- self.B_H[self.t]
+		)
+
+		new_var = model.addVar(lb=0, name="H_%s_%d"%(self.name,self.t+1))
+		model.addConstr(new_var == self.H[self.t]+delta_H*self.dt)
+		self.H += [new_var]
+
+
+
+
+	def update_ICU(self, model):
+		delta_ICU = (
+			- (self.parameters["lambda_ICU_R"] + self.parameters["lambda_ICU_D"])*self.ICU[self.t]
+			+ self.flow_ICU(self.t)
+			- self.B_ICU[self.t]
+		)
+
+		new_var = model.addVar(lb=0, name="ICU_%s_%d"%(self.name,self.t+1))
+		model.addConstr(new_var == self.ICU[self.t]+delta_ICU*self.dt)
+		self.ICU += [new_var]
+
+
+	def update_D(self, model):
+		delta_D = (
+			self.parameters["lambda_H_D"]*self.H[self.t]
+			+ self.parameters["lambda_ICU_D"]*self.ICU[self.t]
+			+ self.B_H[self.t]
+			+ self.B_ICU[self.t]
+		)
+
+		new_var = model.addVar(lb=0, name="D_%s_%d"%(self.name,self.t+1))
+		model.addConstr(new_var == self.D[self.t]+delta_D*self.dt)
+		self.D += [new_var]
+
+
 
 
 

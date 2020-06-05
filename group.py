@@ -273,6 +273,7 @@ class SEIR_group:
 
 		# Contacts
 		self.total_contacts = []
+		self.IR = []
 
 
 	def update_total_contacts(self, t, alphas):
@@ -285,6 +286,8 @@ class SEIR_group:
 				if self.parent.extra_data:
 					self.parent.n_contacts[t][self.name][g.name] = new_contacts
 			self.total_contacts.append(summ_contacts*self.S[t])
+			self.IR.append(summ_contacts)
+
 		else:
 			assert(False)
 
