@@ -791,7 +791,6 @@ def get_F(dynModel, X, u):
         m_tests[g] = u_hat_dict[g]['Nmtest_g']
         a_tests[g] = u_hat_dict[g]['Natest_g']
 
-    # X_dict = {}
     # Add the current state to the dynModel
     for ag in range(num_age_groups):
         Sg_idx = ag*num_compartments + SEIR_groups.index('S_g')
@@ -809,22 +808,6 @@ def get_F(dynModel, X, u):
         Hg_idx = ag*num_compartments + SEIR_groups.index('H_g')
         ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
         Dg_idx = ag*num_compartments + SEIR_groups.index('D_g')
-
-        # X_dict[age_groups[ag]] = {
-        #     "S" : X[Sg_idx],
-        #     "E": X[Eg_idx],
-        #     "I": X[Ig_idx],
-        #     "R": X[Rg_idx],
-        #     "N": X[Ng_idx],
-        #     "Ia": X[Iag_idx],
-        #     "Ips": X[Ipsg_idx],
-        #     "Ims": X[Imsg_idx],
-        #     "Iss": X[Issg_idx],
-        #     "Rq": X[Rqg_idx],
-        #     "H": X[Hg_idx],
-        #     "ICU": X[ICUg_idx],
-        #     "D": X[Dg_idx],
-        # }
 
     # Run a step of the dyn model
     dynModel.take_time_step(m_tests, a_tests, alphas)
