@@ -335,13 +335,17 @@ def get_Jacobian_u(dynModel, X_hat, u_hat, mixing_method):
 # Build X_hat given a dynModel, a starting point k, and a
 # sequence of controls u_hats
 def get_X_hat_sequence(dynModel, k, u_hat_sequence):
-    """Given a dynamical model, a starting point k, and the controls for time periods k to T, we re-start the dynamical model at time k, and then run it until time T with the controls in u_hat. This produces the nominal trajectory X_hat_sequence. X_hat_sequence is a np.array of shape (T-k, num_compartments * num_age_groups), where each row represents the X_hat at time k, k+1,...
-
+    """Given a dynamical model, a starting point k, and the controls for time periods k to T-1 for tests and lockdowns, we re-start the dynamical model at time k, and then run it until time T with the controls in u_hat. 
+    
+    This produces the nominal trajectory X_hat_sequence. X_hat_sequence is a np.array of shape (num_compartments * num_age_groups, T-k+1), where each column represents the X_hat at time k, k+1,...
+    
     This assumes that the dynamical model has already been run at least up to point k (it takes the states at time k as the starting points for the new nominal trajectory).
 
-    We assume as well that u_hat_sequence is a 2-d numpy array with shape (T-k, num_controls * num_age_groups) with each row corresponding to a u_hat at time k, k+1,.... Hence, u_hat_sequence[k,:] gives the u_hat at time k.
+    We assume as well that u_hat_sequence is a 2-d numpy array with shape (num_controls * num_age_groups, T-k) with each column corresponding to a u_hat at time k, k+1,..., T-1. Hence, u_hat_sequence[:,k] gives the u_hat at time k.
 
-    At the moment returning only x_hat[k+1],... x_hat[T]
+    Note we are not using the bouncing variables in forecasting X_hat_sequence.
+
+    At the moment we return only x_hat[k+1],... x_hat[T]
 
     """
     # Erase the states after k so as to reset the dyn model
