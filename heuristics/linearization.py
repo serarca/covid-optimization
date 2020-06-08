@@ -649,7 +649,7 @@ def calculate_generic_constraint_coefs(dynModel, k, Xhat_seq, uhat_seq, a, b):
         u_coeffs[t][tau-t,:] = b  # CHECK SIZES HERE -- CONVERSION SHOULD WORK IF b SHAPE IS (ut_dim,)
         At_bar[t-1] = np.eye(Xt_dim,Xt_dim)   # initialize At_bar for tau=t-1
 
-        # for controls u(tau) with tau = k,...,t-1, the coefficients are b' * At_bar[tau] * B(tau)
+        # for controls u(tau) with tau = k,...,t-1, the coefficients are a' * At_bar[tau] * B(tau)
         for tau in range(k,t):
 
             u_coeffs[t][tau-k,:] = a @ Abar[tau] @ Bt
