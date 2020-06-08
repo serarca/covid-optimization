@@ -652,7 +652,7 @@ def calculate_generic_constraint_coefs(dynModel, k, Xhat_seq, uhat_seq, a, b):
         # for controls u(tau) with tau = k,...,t-1, the coefficients are b' * At_bar[tau] * B(tau)
         for tau in range(k,t):
 
-            u_coeffs[t][tau-k,:] = b @ Abar[tau] @ Bt
+            u_coeffs[t][tau-k,:] = a @ Abar[tau] @ Bt
 
             # also update At_bar for next period
             At[tau] = At @ At_bar[tau]
