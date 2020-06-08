@@ -525,27 +525,28 @@ def calculate_H_constraint_coefs(dynModel):
 
         #Useful indices for the elements of a
         Hg_idx = ag*num_compartments + SEIR_groups.index('H_g')
-        Ig_idx = ag*num_compartments + SEIR_groups.index('I_g')
-        Issg_idx = ag*num_compartments + SEIR_groups.index('Iss_g')
-        ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
+        # Ig_idx = ag*num_compartments + SEIR_groups.index('I_g')
+        # Issg_idx = ag*num_compartments + SEIR_groups.index('Iss_g')
+        # ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
 
-        #Useful indices for the elements of b
-        BHg_idx = ag*num_controls + controls.index('BounceH_g')
-        BICUg_idx = ag*num_controls + controls.index('BounceICU_g')
+        # #Useful indices for the elements of b
+        # BHg_idx = ag*num_controls + controls.index('BounceH_g')
+        # BICUg_idx = ag*num_controls + controls.index('BounceICU_g')
 
-        # Useful coefficients for a and b
-        mu_g = dynModel.groups[age_groups[ag]].parameters['mu']
-        pICU_g = dynModel.groups[age_groups[ag]].parameters['p_ICU']
-        pH_g = dynModel.groups[age_groups[ag]].parameters['p_H']
-        lambda_H_R_g = dynModel.groups[age_groups[ag]].parameters['lambda_H_R']
-        lambda_H_D_g = dynModel.groups[age_groups[ag]].parameters['lambda_H_D']
+        # # Useful coefficients for a and b
+        # mu_g = dynModel.groups[age_groups[ag]].parameters['mu']
+        # pICU_g = dynModel.groups[age_groups[ag]].parameters['p_ICU']
+        # pH_g = dynModel.groups[age_groups[ag]].parameters['p_H']
+        # lambda_H_R_g = dynModel.groups[age_groups[ag]].parameters['lambda_H_R']
+        # lambda_H_D_g = dynModel.groups[age_groups[ag]].parameters['lambda_H_D']
 
 
-        a[Ig_idx] = mu_g * pH_g
-        a[Issg_idx] = mu_g * (pH_g / (pH_g + pICU_g))
-        a[Hg_idx] = (1 - lambda_H_R_g - lambda_H_D_g)
+        a[Hg_idx] = 1
+        # a[Ig_idx] = mu_g * pH_g
+        # a[Issg_idx] = mu_g * (pH_g / (pH_g + pICU_g))
+        # a[Hg_idx] = (1 - lambda_H_R_g - lambda_H_D_g)
 
-        b[BHg_idx] = -1
+        # b[BHg_idx] = -1
 
     return a, b
 
@@ -560,28 +561,29 @@ def calculate_ICU_constraint_coefs(dynModel):
 
     for ag in range(0,num_age_groups):
         #Useful indices for the elements of a
-        Hg_idx = ag*num_compartments + SEIR_groups.index('H_g')
-        Ig_idx = ag*num_compartments + SEIR_groups.index('I_g')
-        Issg_idx = ag*num_compartments + SEIR_groups.index('Iss_g')
+        # Hg_idx = ag*num_compartments + SEIR_groups.index('H_g')
+        # Ig_idx = ag*num_compartments + SEIR_groups.index('I_g')
+        # Issg_idx = ag*num_compartments + SEIR_groups.index('Iss_g')
         ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
 
-        #Useful indices for the elements of b
-        BHg_idx = ag*num_controls + controls.index('BounceH_g')
-        BICUg_idx = ag*num_controls + controls.index('BounceICU_g')
+        # #Useful indices for the elements of b
+        # BHg_idx = ag*num_controls + controls.index('BounceH_g')
+        # BICUg_idx = ag*num_controls + controls.index('BounceICU_g')
 
-        # Useful coefficients for a and b
-        mu_g = dynModel.groups[age_groups[ag]].parameters['mu']
-        pICU_g = dynModel.groups[age_groups[ag]].parameters['p_ICU']
-        pH_g = dynModel.groups[age_groups[ag]].parameters['p_H']
-        lambda_ICU_R_g = dynModel.groups[age_groups[ag]].parameters['lambda_ICU_R']
-        lambda_ICU_D_g = dynModel.groups[age_groups[ag]].parameters['lambda_ICU_D']
+        # # Useful coefficients for a and b
+        # mu_g = dynModel.groups[age_groups[ag]].parameters['mu']
+        # pICU_g = dynModel.groups[age_groups[ag]].parameters['p_ICU']
+        # pH_g = dynModel.groups[age_groups[ag]].parameters['p_H']
+        # lambda_ICU_R_g = dynModel.groups[age_groups[ag]].parameters['lambda_ICU_R']
+        # lambda_ICU_D_g = dynModel.groups[age_groups[ag]].parameters['lambda_ICU_D']
 
 
-        a[Ig_idx] = mu_g * pICU_g
-        a[Issg_idx] = mu_g * (pICU_g / (pH_g + pICU_g))
-        a[ICUg_idx] = (1 - lambda_ICU_R_g - lambda_ICU_D_g)
+        a[ICUg_idx] = 1 
+        # a[Ig_idx] = mu_g * pICU_g
+        # a[Issg_idx] = mu_g * (pICU_g / (pH_g + pICU_g))
+        # a[ICUg_idx] = (1 - lambda_ICU_R_g - lambda_ICU_D_g)
 
-        b[BICUg_idx] = -1
+        # b[BICUg_idx] = -1
 
     return a, b
 
@@ -590,72 +592,95 @@ def calculate_ICU_constraint_coefs(dynModel):
 # and a linear expression of the form a*X(t)+b*u(t) for some a,b row vectors of suitable dimension.
 # This function returns the coefficients for all the decisions u(k),...,u(T)
 # appearing in such an expression, for every period t=k,k+1,...,T
-def calculate_generic_constraint_coefs(dynModel, k, Xhat_seq, uhat_seq, a, b):
-    """Get coefficients for decisions appearing in a generic linear constraint in each period k,k+1,..."""
-
+def calculate_all_constraint_coefs(dynModel, k, Xhat_seq, uhat_seq, a_matrix, b_matrix):
+    """Get coefficients for decisions appearing in a generic linear constraint in each period k,k+1,...
+    a_matrix and b_matrix are matrices, for now. Can change to dictionaries later. 
+    a_matrix: rows = number of "types" of constraints, columns = num_compartments * num_age_groups
+    b_matrix: rows = number of "types" of constraints, columns = num_controls * num_age_groups"""
+    
     # shorthand for a few useful parameters
-    T = dynModel.time_steps   # OR IS THIS +1 ?
+    T = dynModel.time_steps   
     Xt_dim = num_compartments * num_age_groups
     ut_dim = num_controls * num_age_groups
+    num_constraints = a_matrix.shape[0]
 
     assert( Xhat_seq.shape==(Xt_dim, T-k+1) )
     assert( uhat_seq.shape==(ut_dim, T-k+1) )
-    assert( a.shape==(Xt_dim,) )
-    assert( b.shape==(ut_dim,) )
+    assert(a_matrix.shape ==(num_constraints,Xt_dim))
+    assert(b_matrix.shape ==(num_constraints,ut_dim))
+    
+    # Some pre-processing:
+    # Calculate matrices A and B, and vector c, at given Xhat_seq and uhat_seq, across all the necessary time indices
+    # Hold these as dictionaries, where the key is the time t.
+    At = {}
+    Bt = {}
+    ct = {}
+    for t in range(k,T+1):
+        # get Xhat(t) and uhat(t)
+        Xhat_t = Xhat_seq[:,t-k]
+        uhat_t = uhat_seq[:,t-k]
 
-    # All coefficients are stored in a dictionary u_coeffs: this has a key for each
-    # period t in {k,k+1,...,T}; the value for key t stores the coefficients for
+        jacob_X = get_Jacobian_X(dynModel, Xhat_t, uhat_t, mixing_method)
+        jacob_u = get_Jacobian_u(dynModel, Xhat_t, uhat_t, mixing_method)
+        
+        # Calculate linearization coefficients for X(t+1)
+        At[t] = np.eye(Xt_dim) + dynModel.dt * jacob_X
+        Bt[t] = dynModel.dt * jacob_u
+        ct[t] = dynModel.dt * (get_F(dynModel, Xhat_t, uhat_t) - jacob_X @ Xhat_t - jacob_u @ uhat_t)
+
+    # All constraint coefficients are stored in dictionary u_coeffs: u_coeffs has a key for each
+    # period t in {k,k+1,...,T}. The value for key t stores, in turn, another dictionary, which holds the constraint coefficients
+    # of the constraints indexed with t.
+    # In that dictionary, the key is the index of a constraint "type", and the value is a 2D numpy array with
+    # T-k+1 rows (one for every time period k, k+1, ..., T), and (ut_dim) columns. These are the coefficients for
     # all the controls u(k),...,u(T) appearing in the expression a*X(t) + b*u(t).
-    # i.e., each value is a 2D numpy-array with T-k+1 rows (one for every control), and (ut_dim) columns
     u_coeffs = {}
 
-    # initialize these with zeros. May want to try using sparse matrices here!
-    for t in np.arange(k,T):
-        u_coeffs[t] = np.zeros((T-k+1,ut_dim))
-
-    # the linear expression also has constants, which we store in a separate dictionary
+    # The linear expression for a constraint also has constants, which we store in a separate dictionary: constants. 
+    # The constants dictionary has a key for each period in {k,k+1,...,T}. The value for key t stores, in turn, another dictionary,
+    # which holds the constants of the constraints indexed with t.
+    # In that dictionary, the key is the index of a constraint "type", and the value is the constant corresponding to the specific 
+    # constraint type index and time period.
     constants = {}
+    
+    # Initialize with zeros. (May want to try using sparse matrices here!)
+    for t in np.arange(k,T+1):
+        u_coeffs[t] = {}
+        constants[t] = {}
+        for constr_index in range(num_constraints):
+            u_coeffs[t][constr_index] = np.zeros((T-k+1,ut_dim))
 
-    # we keep track of certain partial products of matrices / vectors that are useful
+    # We keep track of certain partial products of matrices / vectors that are useful
     # NOTE. When comparing this with Overleaf, note that we are only keeping track of
     # the relevant matrices for the current period t (i.e, ignoring t-1,t-2,etc.)
     At_bar = {}
     Xt_bar = Xhat_seq[:,0]      # initialize with X(k)=Xhat(k)
 
-    for ti in range(T-k+1):
+    for t in range(k,T+1): # loop over times k, k+1, ..., T to model constraints indexed with t
+        
+        # Calculate constants for period t
+        for constr_index in range(num_constraints):
+            constants[t][constr_index] = a_matrix[constr_index,:] @ Xt_bar
+        
+        # Update auxiliary vector Xt_bar
+        Xt_bar = At[t] @ Xt_bar + ct[t]
 
-        # get the 'absolute' time
-        t = k+ti
-
-        # get Xhat(t) and uhat(t)
-        Xhat_t = Xhat_seq[:,ti]
-        uhat_t = uhat_seq[:,ti]
-
-        jacob_X = get_Jacobian_x(dynModel, Xhat_t, uhat_t, mixing_method)
-        jacob_u = get_Jacobian_u(dynModel, Xhat_t, uhat_t, mixing_method)
-
-        # Calculate linearization coefficients for X(t+1)
-        At = np.eye(Xt_dim) + dynModel.deltaT * jacob_X
-        Bt = dynModel.deltaT * jacob_u
-        ct = dynModel.deltaT * (get_F(dynModel, Xhat_t, uhat_t) - jacob_X * Xhat_t - jacob_u * uhat_t)
-
-        # calculate constants for period t and update auxilary vector Xt_bar
-        constants[t] = a @ Xt_bar
-        Xt_bar = At @ Xt_bar + ct
-
-        # calculate coefficients for all controls appearing in the constraint for period t
-        # NOTE The coefficients for control u(tau) are stored on row (tau-k) of the 2D array
-        # first coefs for u[t] -- simple
-        u_coeffs[t][tau-t,:] = b  # CHECK SIZES HERE -- CONVERSION SHOULD WORK IF b SHAPE IS (ut_dim,)
-        At_bar[t-1] = np.eye(Xt_dim,Xt_dim)   # initialize At_bar for tau=t-1
-
-        # for controls u(tau) with tau = k,...,t-1, the coefficients are a' * At_bar[tau] * B(tau)
-        for tau in range(k,t):
-
-            u_coeffs[t][tau-k,:] = a @ Abar[tau] @ Bt
-
-            # also update At_bar for next period
-            At[tau] = At @ At_bar[tau]
+        # Calculate coefficients for all controls appearing in the constraint for period t
+        # NOTE: The coefficients for control u(tau) are stored on row indexed (tau-k) of the 2D array
+        for constr_index in range(num_constraints):
+            # coefs for u[t]
+            u_coeffs[t][constr_index][t-k,:] = b_matrix[constr_index,:]
+        
+        # Initialize At_bar for tau=t-1
+        At_bar[t-1] = np.eye(Xt_dim,Xt_dim)   
+            
+        for tau in range(t-1,k-1,-1):
+            for constr_index in range(num_constraints):
+                # coefs for u[t-1], u[t-2], ..., u[k]
+                u_coeffs[t][constr_index][tau-k,:] = a_matrix[constr_index,:] @ At_bar[tau] @ Bt[tau]
+                
+            # Update At_bar for next round
+            At_bar[tau-1] = At_bar[tau] @ At[tau]
 
     return u_coeffs, constants
 
