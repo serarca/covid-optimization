@@ -24,9 +24,9 @@ from heuristics import *
 # Global variables
 simulation_params = {
         'dt':1.0,
-        'days': 90,
+        'days': 3,
         'region': "Ile-de-France",
-        'quar_freq': 90,
+        'quar_freq': 3,
 }
 
 # Define time variables
@@ -116,6 +116,7 @@ for k in range(0,dynModel.time_steps):
     
     #Get X_hat_sequence
     X_hat_sequence = get_X_hat_sequence(dynModel, k, u_hat_sequence)
+    #print(X_hat_sequence)
     
     print("Clock of dynModel:",dynModel.t)
 
@@ -138,7 +139,7 @@ for k in range(0,dynModel.time_steps):
                 assert(
                 X_hat_sequence[ag * num_compartments + SEIR_groups.index(st),i]
                 ==
-                dynModel2.get_state(k+i+1)[age_groups[ag]][st.replace('_g','')])
+                dynModel2.get_state(k+i)[age_groups[ag]][st.replace('_g','')])
                 
     if (k<dynModel.time_steps):
         m_tests = {}
