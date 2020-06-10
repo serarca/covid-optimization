@@ -481,7 +481,7 @@ def get_F(dynModel, X, u):
         Dg_idx = ag*num_compartments + SEIR_groups.index('D_g')
 
     # Run a step of the dyn model
-    dynModel.take_time_step(m_tests, a_tests, alphas, B_H, B_ICU)
+    dynModel.take_time_step(m_tests, a_tests, alphas)
 
     # Get the current state (not sure if it shold be t or t-1)
     state_next_step = dynModel.get_state(dynModel.t)
