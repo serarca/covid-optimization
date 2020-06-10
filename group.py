@@ -69,18 +69,18 @@ class DynamicalModel:
 		if B_H and B_ICU:
 			# Verify that the bouncing variables satisfy the required bounds
 			for n,g in self.groups.items():
-				assert(B_H[n]<=group.flow_H(self.t))
-				assert(B_ICU[n]<=group.flow_ICU(self.t))
+				assert(B_H[n]<=g.flow_H(self.t))
+				assert(B_ICU[n]<=g.flow_ICU(self.t))
 
 			assert(
 				sum([group.flow_H(self.t)-B_H[name] for name,group in self.groups.items()])<=
 				self.beds
-				- sum([(1-group.parameters["lambda_H_R"]-group.parameters["lambda_H_D"])*group.H[t] for name,group in self.groups.items()])
+				- sum([(1-group.parameters["lambda_H_R"]-group.parameters["lambda_H_D"])*group.H[self.t] for name,group in self.groups.items()])
 			)
 			assert(
-				sum([group.flow_ICU(t)-B_ICU[name] for name,group in self.groups.items()])<=
+				sum([group.flow_ICU(self.t)-B_ICU[name] for name,group in self.groups.items()])<=
 				self.icus
-				- sum([(1-group.parameters["lambda_ICU_R"]-group.parameters["lambda_ICU_D"])*group.ICU[t] for name,group in self.groups.items()])
+				- sum([(1-group.parameters["lambda_ICU_R"]-group.parameters["lambda_ICU_D"])*group.ICU[self.t] for name,group in self.groups.items()])
 			)
 
 			for n in self.groups:
