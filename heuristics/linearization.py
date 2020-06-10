@@ -456,6 +456,12 @@ def get_F(dynModel, X, u):
         m_tests[g] = u_hat_dict[g]['Nmtest_g']
         a_tests[g] = u_hat_dict[g]['Natest_g']
 
+    B_H = {}
+    B_ICU = {}
+    for g in age_groups:
+        B_H[g] = u_hat_dict[g]['BounceH_g']
+        B_ICU[g] = u_hat_dict[g]['BounceICU_g']
+
     # Add the current state to the dynModel
     for ag in range(num_age_groups):
         Sg_idx = ag*num_compartments + SEIR_groups.index('S_g')
@@ -475,7 +481,7 @@ def get_F(dynModel, X, u):
         Dg_idx = ag*num_compartments + SEIR_groups.index('D_g')
 
     # Run a step of the dyn model
-    dynModel.take_time_step(m_tests, a_tests, alphas)
+    dynModel.take_time_step(m_tests, a_tests, alphas, B_H, B_ICU)
 
     # Get the current state (not sure if it shold be t or t-1)
     state_next_step = dynModel.get_state(dynModel.t)
@@ -626,6 +632,9 @@ def calculate_all_constraints(dynModel):
 
     # index for current constraint
     curr_constr = 0 
+    
+    # also store a string label for each constraint
+    all_labels = []
 
     ######## Constraint for H capacity
     for ag in range(0,num_age_groups):
@@ -655,10 +664,39 @@ def calculate_all_constraints(dynModel):
         
         Gamma_u[curr_constr,BHg_idx] = -1
 
-        # store right-hand-sides K(t) for every time t
-        K[curr_constr,:] = dynModel.parameters['global-parameters']['C_H']
+    # store right-hand-sides K(t) for every time t
+    K[curr_constr,:] = dynModel.parameters['global-parameters']['C_H']
         
+    all_labels += ["H_capacity"]
     curr_constr += 1
+
+    ################ Constraints for BH, for each age group
+    for ag in range(num_age_groups):
+        
+        curr_group = dynModel.groups[age_groups[ag]]
+    
+        #Useful indices for the elements of Gamma_x
+        Hg_idx = ag*num_compartments + SEIR_groups.index('H_g')
+        Ig_idx = ag*num_compartments + SEIR_groups.index('I_g')
+        Issg_idx = ag*num_compartments + SEIR_groups.index('Iss_g')
+        ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
+    
+        #Useful indices for the elements of Gamma_u
+        BHg_idx = ag*num_controls + controls.index('BounceH_g')
+        BICUg_idx = ag*num_controls + controls.index('BounceICU_g')
+    
+        # parameters
+        mu_g = curr_group.parameters['mu']
+        pICU_g = curr_group.parameters['p_ICU']
+        pH_g = curr_group.parameters['p_H']
+    
+        Gamma_x[curr_constr,Ig_idx] = - mu_g * pH_g
+        Gamma_x[curr_constr,Issg_idx] = - mu_g * (pH_g / (pH_g + pICU_g))
+        Gamma_u[curr_constr,BHg_idx] = 1
+        
+        # right-hand-sides K(t) are all 0, so nothing to update
+        all_labels += ["BH_%s" %age_groups[ag]]
+        curr_constr += 1
 
     ######## Constraint for ICU capacity
     for ag in range(0,num_age_groups):
@@ -687,37 +725,11 @@ def calculate_all_constraints(dynModel):
         Gamma_x[curr_constr,ICUg_idx] = (1 - lambda_ICU_R_g - lambda_ICU_D_g)
         Gamma_u[curr_constr,BICUg_idx] = -1
 
-        # store right-hand-sides K(t) for every time t
-        K[curr_constr,:] = dynModel.parameters['global-parameters']['C_ICU']
+    # store right-hand-sides K(t) for every time t
+    K[curr_constr,:] = dynModel.parameters['global-parameters']['C_ICU']
 
+    all_labels += ["ICU_capacity"]
     curr_constr += 1
-
-    ################ Constraints for BH, for each age group
-    for ag in range(num_age_groups):
-        
-        curr_group = dynModel.groups[age_groups[ag]]
-    
-        #Useful indices for the elements of Gamma_x
-        Hg_idx = ag*num_compartments + SEIR_groups.index('H_g')
-        Ig_idx = ag*num_compartments + SEIR_groups.index('I_g')
-        Issg_idx = ag*num_compartments + SEIR_groups.index('Iss_g')
-        ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
-    
-        #Useful indices for the elements of Gamma_u
-        BHg_idx = ag*num_controls + controls.index('BounceH_g')
-        BICUg_idx = ag*num_controls + controls.index('BounceICU_g')
-    
-        # parameters
-        mu_g = curr_group.parameters['mu']
-        pICU_g = curr_group.parameters['p_ICU']
-        pH_g = curr_group.parameters['p_H']
-    
-        Gamma_x[curr_constr,Ig_idx] = - mu_g * pH_g
-        Gamma_x[curr_constr,Issg_idx] = - mu_g * (pH_g / (pH_g + pICU_g))
-        Gamma_u[curr_constr,BHg_idx] = 1
-        
-        # right-hand-sides K(t) are all 0, so nothing to update
-        curr_constr += 1
         
     ################ Constraints for BICU, for each age group
     for ag in range(num_age_groups):
@@ -746,20 +758,23 @@ def calculate_all_constraints(dynModel):
         Gamma_u[curr_constr,BICUg_idx] = 1
 
         # right-hand-sides K(t) are all 0, so nothing to update
+        all_labels += ["BICU_%s" %age_groups[ag]]
         curr_constr += 1
 
     ################ Constraint for M-test capacity
     Nmtestg_idx_all = slice(controls.index('Nmtest_g'),ut_dim,num_controls)
-    Gamma_x[curr_constr,Nmtestg_idx_all] = 1
+    Gamma_u[curr_constr,Nmtestg_idx_all] = 1
     K[curr_constr,:] = dynModel.parameters['global-parameters']['C_mtest']
 
+    all_labels += ["Mtest_cap"]
     curr_constr += 1
 
     ################ Constraint for A-test capacity
     Natestg_idx_all = slice(controls.index('Natest_g'),ut_dim,num_controls)
-    Gamma_x[curr_constr,Natestg_idx_all] = 1
+    Gamma_u[curr_constr,Natestg_idx_all] = 1
     K[curr_constr,:] = dynModel.parameters['global-parameters']['C_atest']
 
+    all_labels += ["Atest_cap"]
     curr_constr += 1
 
     ################ Constraints for lockdown decisions, for each group and each activity
@@ -770,10 +785,13 @@ def calculate_all_constraints(dynModel):
             Gamma_u[curr_constr,ag * num_controls + controls.index(act)] = 1
             
             K[curr_constr,:] = 1  # right-hand-sides
-
-        curr_constr += 1
+        
+            all_labels += ["lockdown_%s_%s" %(age_groups[ag],act)]
+            curr_constr += 1
     
-    return Gamma_x, Gamma_u, K
+    return Gamma_x, Gamma_u, K, all_labels
+
+
 
 ####################################
 # Calculate coefficients for each t period expression in the linearized objective
@@ -793,6 +811,7 @@ def calculate_objective_time_dependent_coefs(dynModel, k, xhat, uhat):
     d[:, T - 1 - k] =  eta
 
     return d, e
+
 
 ########################################
 # Consider a linear dynamical system of the form X(k+1)=Gamma_x(k) X(k) + Gamma_u((k) u(k) + K(k)
@@ -889,7 +908,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
 
         # Calculate coefficients for objective coefficient for u_t. Note that this is not the final coefficient of u_t.
         # Since the obkective adds linear terms over all k, k+1..., T-1, u_t will receive additional contributions to its coefficient
-        u_obj_coeffs[:,t] += e_matrix[:,t-k]
+        u_obj_coeffs[:,t-k] += e_matrix[:,t-k]
         
         # Initialize At_bar for tau=t-1
         At_bar[t-1] = np.eye(Xt_dim,Xt_dim)
@@ -900,7 +919,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
                 u_constr_coeffs[t][constr_index][:,tau-k] = Gamma_x[constr_index,:] @ At_bar[tau] @ Bt[tau]
                 
                 # coefs for u[t-1], u[t-2], ..., u[k] in the objective
-                u_obj_coeffs[:,tau] += d_matrix[:,tau-k] @ At_bar[tau] @ Bt[tau]
+                u_obj_coeffs[:,tau-k] += d_matrix[:,tau-k] @ At_bar[tau] @ Bt[tau]
 
             # Update At_bar for next round
             At_bar[tau-1] = At_bar[tau] @ At[tau]
@@ -908,10 +927,12 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
     At_bar[T-1] = np.eye(Xt_dim,Xt_dim)
     # Add up the contribution of eta * X_T in the coefficients of decision u_t, t = k, ..., T-1
     for tau in range(T-1,k-1,-1):
-        u_obj_coeffs[:,tau] += d_matrix[:,tau-k] @ At_bar[tau] @ Bt[tau]
+        u_obj_coeffs[:,tau-k] += d_matrix[:,tau-k] @ At_bar[tau] @ Bt[tau]
         At_bar[tau-1] = At_bar[tau] @ At[tau]
         
     return u_constr_coeffs, constr_constants, u_obj_coeffs
+
+
 
 ####################################
 # Main function: runs the linearization heuristic

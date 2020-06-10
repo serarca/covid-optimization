@@ -22,7 +22,7 @@ from heuristics import *
 # Global variables
 simulation_params = {
         'dt':1.0,
-        'days': 10,
+        'days': 3,
         'region': "Ile-de-France",
         'quar_freq': 1,
 }
@@ -97,7 +97,7 @@ assert( np.shape(eta) == (Xt_dim,) )
 
 #########
 # calculate all the constraints and store them
-A, B, K = calculate_all_constraints(dynModel)
+A, B, K, all_labels = calculate_all_constraints(dynModel)
 
 assert( np.shape(A) == (num_constraints,Xt_dim) )
 assert( np.shape(B) == (num_constraints,ut_dim) )
@@ -109,18 +109,24 @@ uopt_seq = np.zeros((ut_dim,T))
 # pick a starting u_hat sequence; for now, no testing
 uhat_seq = np.zeros((ut_dim,T))
 
+#print(dynModel.parameters['global-parameters']['ICU])
+#print(dynModel.parameters['global-parameters']['C_ICU'])
+
 for k in range(T):
 
     # calculate state trajectory X_hat
     Xhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq)
     assert( np.shape(Xhat_seq) == (Xt_dim,T-k) )
+    
+    ICUidx_all = slice(SEIR_groups.index('ICU_g'),Xt_dim,num_compartments)
+    print("\n\n TIME k= %d\nTotal people in ICU at start of %d: %.2f" %(k,k,np.sum(Xhat_seq[ICUidx_all,0])) )
 
     # calculate objective parameters d, e
     D,E = calculate_objective_time_dependent_coefs(dynModel, k, Xhat_seq, uhat_seq)
 
     # get coefficients for decisions in all constraints and objective
     constr_coefs, constr_consts, obj_coefs = calculate_all_coefs(dynModel,k,Xhat_seq,uhat_seq,A,B,D,E)
-
+    
     assert( np.shape(obj_coefs) == (ut_dim,T-k) )
     assert( len(constr_coefs) == T-k )
     assert( len(constr_consts) == T-k )
@@ -134,16 +140,46 @@ for k in range(T):
 
     # create empty model
     mod = gb.Model("Linearization Heuristic")
+    mod.Params.DualReductions = 0  # change this to get explicit infeasible or unbounded
 
     # add all decisions using matrix format, and also specify objective coefficients
-    u_vars = mod.addMVar(np.shape(uhat_seq), obj=obj_coefs, name="u")
+    # u_vars = mod.addMVar(np.shape(uhat_seq), obj=obj_coefs, name="u")
+    obj_vec = np.reshape(obj_coefs, (ut_dim*(T-k),), 'F')  # reshape by reading along rows first
+    u_vars_vec = mod.addMVar( np.shape(obj_vec), obj=obj_vec, name="u")
     
-    ones_row = np.ones(ut_dim)
-    ones_col = np.ones(T-k)
+    x_feas = np.zeros( (len(obj_vec),) )  # a feasible solution
+    
     for t in range(k,T):
+        #print("Time %d number of constraints %d" %(t,len(constr_coefs[t])))
         for con in range(num_constraints):
-            mod.addConstr( ones_row @ (u_vars*constr_coefs[t][con]) @ ones_col + constr_consts[t][con] <= K[con,t] )
+            cons_vec = np.reshape(constr_coefs[t][con], (len(obj_vec),), 'F')
+            cname = ("%s[t=%d]" %(all_labels[con],t))
+            mod.addConstr( u_vars_vec @ cons_vec + constr_consts[t][con] <= K[con,t], name=cname)
+
+    mod.write("LP_lineariz_model.lp")
 
     # optimize the model
     mod.optimize()
+    
+    if( mod.Status ==  gb.GRB.INFEASIBLE ):
+        # model was infeasible
+        mod.computeIIS()  # irreducible system of infeasible inequalities
+        mod.write("LP_lineariz_IIS.ilp")
+        assert(False)
 
+    # extract decisions for current period (testing and alphas)
+    uvars_opt = np.reshape(u_vars_vec.X, np.shape(obj_coefs), 'F')
+    uopt_seq[:,k] = uvars_opt[:,0]
+    uk_opt_dict, alphak_opt_dict = buildAlphaDict(uvars_opt[:,0])
+
+    m_tests = {}
+    a_tests = {}
+    for ag in age_groups:
+        m_tests[ag] = uk_opt_dict[ag]['Nmtest_g']
+        a_tests[ag] = uk_opt_dict[ag]['Natest_g']
+        
+    # take one time step in dynamical system
+    dynModel.take_time_step(m_tests, a_tests, alphak_opt_dict)
+
+    # update uhat_sequence
+    uhat_seq = uvars_opt[:,1:]
