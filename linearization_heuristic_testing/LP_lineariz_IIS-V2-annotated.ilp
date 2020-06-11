@@ -1,0 +1,42 @@
+\ Model Linearization Heuristic V2_copy
+\ LP format - for model browsing. Use MPS format to capture full model detail.
+Minimize
+
+Subject To
+ Initial_Conditions: x_vars_time_1['age_group_70_79', I] = 40605.26381204874
+ Initial_Conditions: x_vars_time_1['age_group_70_79', Iss] = 115.8355801444043
+ Initial_Conditions: x_vars_time_1['age_group_70_79', H] = 4125.12896
+ Initial_Conditions: x_vars_time_1['age_group_70_79', ICU] = 244.71104
+ Initial_Conditions: x_vars_time_1['age_group_70_79', D] = -0
+
+
+ Dynamics_const_time_2['age_group_70_79', D]:
+
+ - u_vars_time_1['age_group_70_79', BH] - u_vars_time_1['age_group_70_79', BICU]
+   - 0.0241037376048818 x_vars_time_1['age_group_70_79', H]
+   - 0.0165705296276875 x_vars_time_1['age_group_70_79', ICU] - x_vars_time_1['age_group_70_79', D]
+   + x_vars_time_2['age_group_70_79', D] = -7534.763312969357
+
+
+     x_vars_time_2['age_group_70_79', D] =  u_vars_time_1['age_group_70_79', BH] + u_vars_time_1['age_group_70_79', BICU]
+       - 7431.277295392676
+
+
+ All_const_time_1[9]:
+
+ u_vars_time_1['age_group_70_79', BH] - 0.07552 x_vars_time_1['age_group_70_79', I]
+   - 0.236 x_vars_time_1['age_group_70_79', Iss] <= -0
+
+ All_const_time_1[19]: u_vars_time_1['age_group_70_79', BICU] - 0.00448 x_vars_time_1['age_group_70_79', I]
+   - 0.014 x_vars_time_1['age_group_70_79', Iss] <= -0
+
+
+Bounds
+ u_vars_time_1['age_group_70_79', BH] free
+ u_vars_time_1['age_group_70_79', BICU] free
+ x_vars_time_1['age_group_70_79', I] free
+ x_vars_time_1['age_group_70_79', Iss] free
+ x_vars_time_1['age_group_70_79', H] free
+ x_vars_time_1['age_group_70_79', ICU] free
+ x_vars_time_1['age_group_70_79', D] free
+End

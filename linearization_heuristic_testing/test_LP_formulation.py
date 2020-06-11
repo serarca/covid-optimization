@@ -117,7 +117,7 @@ for k in range(T):
     # calculate state trajectory X_hat
     Xhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq)
     assert( np.shape(Xhat_seq) == (Xt_dim,T-k) )
-    
+
     ICUidx_all = slice(SEIR_groups.index('ICU_g'),Xt_dim,num_compartments)
     print("\n\n TIME k= %d\nTotal people in ICU at start of %d: %.2f" %(k,k,np.sum(Xhat_seq[ICUidx_all,0])) )
 
@@ -126,7 +126,7 @@ for k in range(T):
 
     # get coefficients for decisions in all constraints and objective
     constr_coefs, constr_consts, obj_coefs = calculate_all_coefs(dynModel,k,Xhat_seq,uhat_seq,A,B,D,E)
-    
+
     assert( np.shape(obj_coefs) == (ut_dim,T-k) )
     assert( len(constr_coefs) == T-k )
     assert( len(constr_consts) == T-k )
@@ -146,9 +146,11 @@ for k in range(T):
     # u_vars = mod.addMVar(np.shape(uhat_seq), obj=obj_coefs, name="u")
     obj_vec = np.reshape(obj_coefs, (ut_dim*(T-k),), 'F')  # reshape by reading along rows first
     u_vars_vec = mod.addMVar( np.shape(obj_vec), obj=obj_vec, name="u")
-    
+
+    mod.ModelSense = -1
+
     x_feas = np.zeros( (len(obj_vec),) )  # a feasible solution
-    
+
     for t in range(k,T):
         #print("Time %d number of constraints %d" %(t,len(constr_coefs[t])))
         for con in range(num_constraints):
@@ -160,7 +162,7 @@ for k in range(T):
 
     # optimize the model
     mod.optimize()
-    
+
     if( mod.Status ==  gb.GRB.INFEASIBLE ):
         # model was infeasible
         mod.computeIIS()  # irreducible system of infeasible inequalities
@@ -177,7 +179,7 @@ for k in range(T):
     for ag in age_groups:
         m_tests[ag] = uk_opt_dict[ag]['Nmtest_g']
         a_tests[ag] = uk_opt_dict[ag]['Natest_g']
-        
+
     # take one time step in dynamical system
     dynModel.take_time_step(m_tests, a_tests, alphak_opt_dict)
 

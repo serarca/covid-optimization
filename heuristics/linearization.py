@@ -16,7 +16,7 @@ sys.path.insert(0, parent_dir)
 from group import *
 from forecasting_heuristic import no_tests
 
-age_groups = [ 'age_group_0_9', 'age_group_10_19', 'age_group_20_29', 'age_group_30_39', 'age_group_40_49', 'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus' ]
+age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29','age_group_30_39', 'age_group_40_49', 'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
 SEIR_groups = [ 'S_g', 'E_g', 'I_g', 'R_g', 'N_g', 'Ia_g', 'Ips_g', \
        'Ims_g', 'Iss_g', 'Rq_g', 'H_g', 'ICU_g', 'D_g' ]
 activities = ['home','leisure','other','school','transport','work']
@@ -348,7 +348,7 @@ def get_X_hat_sequence(dynModel, k, u_hat_sequence):
     T = dynModel.time_steps
 
     X_hat_sequence = np.zeros((num_compartments * num_age_groups, T-k))
-    
+
     for t in range(T-k):
         if t!=0:
             # Write the values of u_hat at time t-1 in dict form
@@ -460,6 +460,10 @@ def get_F(dynModel, X, u):
     B_ICU = {}
     for g in age_groups:
         B_H[g] = u_hat_dict[g]['BounceH_g']
+        # print("*****************************")
+        # print("Bouncing from H for group {}: {}".format(g, B_H[g]))
+        # print("Flow into H of group {}: {}".format(g, dynModel.groups[g].flow_H(initial_time_of_model)))
+
         B_ICU[g] = u_hat_dict[g]['BounceICU_g']
 
     # Add the current state to the dynModel
@@ -481,12 +485,16 @@ def get_F(dynModel, X, u):
         Dg_idx = ag*num_compartments + SEIR_groups.index('D_g')
 
     # Run a step of the dyn model
+
+
+    # dynModel.take_time_step(m_tests, a_tests, alphas, B_H, B_ICU)
+
     dynModel.take_time_step(m_tests, a_tests, alphas)
 
-    # Get the current state (not sure if it shold be t or t-1)
+    # Get the current state
     state_next_step = dynModel.get_state(dynModel.t)
 
-    #X_next_step = np.zeros((1, num_compartments * num_age_groups))
+
     X_next_step = np.zeros(num_compartments * num_age_groups)
 
     for ag in range(num_age_groups):
@@ -607,7 +615,7 @@ def calculate_M_gamma_and_eta(dynModel):
 # K is stored as a dictionary with a key for every time t
 def calculate_all_constraints(dynModel):
     """Calculate the matrices Gamma_x, Gamma_u and vectors K(t) that yield all the constraints"""
-    
+
     # shorthand for a few useful parameters
     T = dynModel.time_steps
     Xt_dim = num_compartments * num_age_groups
@@ -626,13 +634,13 @@ def calculate_all_constraints(dynModel):
     # initialize Gamma_x and Gamma_u matrices with zeros
     Gamma_x = np.zeros((num_constraints, Xt_dim))
     Gamma_u = np.zeros((num_constraints, ut_dim))
-    
+
     # right-hand-sides are time-varying; we store them in a matrix with one column for each time t
     K = np.zeros((num_constraints,T))
 
     # index for current constraint
-    curr_constr = 0 
-    
+    curr_constr = 0
+
     # also store a string label for each constraint
     all_labels = []
 
@@ -640,7 +648,7 @@ def calculate_all_constraints(dynModel):
     for ag in range(0,num_age_groups):
 
         curr_group = dynModel.groups[age_groups[ag]]
-        
+
         # Useful indices for elements of Gamma_x
         Hg_idx = ag*num_compartments + SEIR_groups.index('H_g')
         Ig_idx = ag*num_compartments + SEIR_groups.index('I_g')
@@ -650,50 +658,50 @@ def calculate_all_constraints(dynModel):
         # Useful indices for elements of Gamma_u
         BHg_idx = ag*num_controls + controls.index('BounceH_g')
         BICUg_idx = ag*num_controls + controls.index('BounceICU_g')
-        
+
         # parameters
         mu_g = curr_group.parameters['mu']
         pICU_g = curr_group.parameters['p_ICU']
         pH_g = curr_group.parameters['p_H']
         lambda_H_R_g = curr_group.parameters['lambda_H_R']
         lambda_H_D_g = curr_group.parameters['lambda_H_D']
-        
+
         Gamma_x[curr_constr,Ig_idx] = mu_g * pH_g
         Gamma_x[curr_constr,Issg_idx] = mu_g * (pH_g / (pH_g + pICU_g))
         Gamma_x[curr_constr,Hg_idx] = (1 - lambda_H_R_g - lambda_H_D_g)
-        
+
         Gamma_u[curr_constr,BHg_idx] = -1
 
     # store right-hand-sides K(t) for every time t
     K[curr_constr,:] = dynModel.parameters['global-parameters']['C_H']
-        
+
     all_labels += ["H_capacity"]
     curr_constr += 1
 
     ################ Constraints for BH, for each age group
     for ag in range(num_age_groups):
-        
+
         curr_group = dynModel.groups[age_groups[ag]]
-    
+
         #Useful indices for the elements of Gamma_x
         Hg_idx = ag*num_compartments + SEIR_groups.index('H_g')
         Ig_idx = ag*num_compartments + SEIR_groups.index('I_g')
         Issg_idx = ag*num_compartments + SEIR_groups.index('Iss_g')
         ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
-    
+
         #Useful indices for the elements of Gamma_u
         BHg_idx = ag*num_controls + controls.index('BounceH_g')
         BICUg_idx = ag*num_controls + controls.index('BounceICU_g')
-    
+
         # parameters
         mu_g = curr_group.parameters['mu']
         pICU_g = curr_group.parameters['p_ICU']
         pH_g = curr_group.parameters['p_H']
-    
+
         Gamma_x[curr_constr,Ig_idx] = - mu_g * pH_g
         Gamma_x[curr_constr,Issg_idx] = - mu_g * (pH_g / (pH_g + pICU_g))
         Gamma_u[curr_constr,BHg_idx] = 1
-        
+
         # right-hand-sides K(t) are all 0, so nothing to update
         all_labels += ["BH_%s" %age_groups[ag]]
         curr_constr += 1
@@ -730,29 +738,29 @@ def calculate_all_constraints(dynModel):
 
     all_labels += ["ICU_capacity"]
     curr_constr += 1
-        
+
     ################ Constraints for BICU, for each age group
     for ag in range(num_age_groups):
-        
+
         curr_group = dynModel.groups[age_groups[ag]]
-        
+
         #Useful indices for the elements of Gamma_x
         Hg_idx = ag*num_compartments + SEIR_groups.index('H_g')
         Ig_idx = ag*num_compartments + SEIR_groups.index('I_g')
         Issg_idx = ag*num_compartments + SEIR_groups.index('Iss_g')
         ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
-    
+
         #Useful indices for the elements of Gamma_u
         BHg_idx = ag*num_controls + controls.index('BounceH_g')
         BICUg_idx = ag*num_controls + controls.index('BounceICU_g')
-    
+
         # Useful coefficients for Gamma_x and Gamma_u
         mu_g = curr_group.parameters['mu']
         pICU_g = curr_group.parameters['p_ICU']
         pH_g = curr_group.parameters['p_H']
         lambda_ICU_R_g = curr_group.parameters['lambda_ICU_R']
         lambda_ICU_D_g = curr_group.parameters['lambda_ICU_D']
-    
+
         Gamma_x[curr_constr,Ig_idx] = - mu_g * pICU_g
         Gamma_x[curr_constr,Issg_idx] = - mu_g * (pICU_g / (pH_g + pICU_g))
         Gamma_u[curr_constr,BICUg_idx] = 1
@@ -783,12 +791,12 @@ def calculate_all_constraints(dynModel):
         # loop over all activities
         for act in activities:
             Gamma_u[curr_constr,ag * num_controls + controls.index(act)] = 1
-            
+
             K[curr_constr,:] = 1  # right-hand-sides
-        
+
             all_labels += ["lockdown_%s_%s" %(age_groups[ag],act)]
             curr_constr += 1
-    
+
     return Gamma_x, Gamma_u, K, all_labels
 
 
@@ -803,11 +811,11 @@ def calculate_objective_time_dependent_coefs(dynModel, k, xhat, uhat):
 
     d = np.zeros((num_compartments * num_age_groups, T - k + 1))
     e = np.zeros((num_controls * num_age_groups, T - k + 1))
-    
+
     for t in  range(k, T - 1):
         d[:, t - k] = uhat[:, t - k] @ M + gamma
         e[:, t - k] = xhat[:, t - k] @ np.transpose(M)
-        
+
     d[:, T - 1 - k] =  eta
 
     return d, e
@@ -820,12 +828,12 @@ def calculate_objective_time_dependent_coefs(dynModel, k, xhat, uhat):
 # appearing in all constraints and objective
 def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_matrix, e_matrix):
     """Get coefficients for decisions appearing in a generic linear constraint in each period k,k+1,...
-    Gamma_x and Gamma_u are matrices, for now. Can change to dictionaries later. 
+    Gamma_x and Gamma_u are matrices, for now. Can change to dictionaries later.
     Gamma_x: rows = number of "types" of constraints, columns = num_compartments * num_age_groups
     Gamma_u: rows = number of "types" of constraints, columns = num_controls * num_age_groups"""
-    
+
     # shorthand for a few useful parameters
-    T = dynModel.time_steps   
+    T = dynModel.time_steps
     Xt_dim = num_compartments * num_age_groups
     ut_dim = num_controls * num_age_groups
     num_constraints = Gamma_x.shape[0]
@@ -851,7 +859,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
 
         jacob_X = get_Jacobian_X(dynModel, Xhat_t, uhat_t, mixing_method)
         jacob_u = get_Jacobian_u(dynModel, Xhat_t, uhat_t, mixing_method)
-        
+
         # Calculate linearization coefficients for X(t+1)
         At[t] = np.eye(Xt_dim) + dynModel.dt * jacob_X
         Bt[t] = dynModel.dt * jacob_u
@@ -865,13 +873,13 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
     # all the controls u(k),...,u(T) appearing in the expression a*X(t) + b*u(t).
     u_constr_coeffs = {}
 
-    # The linear expression for a constraint also has constants, which we store in a separate dictionary: constants. 
+    # The linear expression for a constraint also has constants, which we store in a separate dictionary: constants.
     # The constr_constants dictionary has a key for each period in {k,k+1,...,T}. The value for key t stores, in turn, another dictionary,
     # which holds the constants of the constraints indexed with t.
-    # In that dictionary, the key is the index of a constraint "type", and the value is the constant corresponding to the specific 
+    # In that dictionary, the key is the index of a constraint "type", and the value is the constant corresponding to the specific
     # constraint type index and time period.
     constr_constants = {}
-    
+
     # Initialize with zeros. (May want to try using sparse matrices here!)
     for t in np.arange(k,T):
         u_constr_coeffs[t] = {}
@@ -892,11 +900,11 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
     Xt_bar = Xhat_seq[:,0]      # initialize with X(k)=Xhat(k)
 
     for t in range(k,T): # loop over times k, k+1, ..., T - 1 to model constraints indexed with t
-        
+
         # Calculate constants for period t
         for constr_index in range(num_constraints):
             constr_constants[t][constr_index] = Gamma_x[constr_index,:] @ Xt_bar
-        
+
         # Update auxiliary vector Xt_bar
         Xt_bar = At[t] @ Xt_bar + ct[t]
 
@@ -909,15 +917,15 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
         # Calculate coefficients for objective coefficient for u_t. Note that this is not the final coefficient of u_t.
         # Since the obkective adds linear terms over all k, k+1..., T-1, u_t will receive additional contributions to its coefficient
         u_obj_coeffs[:,t-k] += e_matrix[:,t-k]
-        
+
         # Initialize At_bar for tau=t-1
         At_bar[t-1] = np.eye(Xt_dim,Xt_dim)
-            
+
         for tau in range(t-1,k-1,-1):
             for constr_index in range(num_constraints):
                 # coefs for u[t-1], u[t-2], ..., u[k] in the constraints
                 u_constr_coeffs[t][constr_index][:,tau-k] = Gamma_x[constr_index,:] @ At_bar[tau] @ Bt[tau]
-                
+
                 # coefs for u[t-1], u[t-2], ..., u[k] in the objective
                 u_obj_coeffs[:,tau-k] += d_matrix[:,tau-k] @ At_bar[tau] @ Bt[tau]
 
@@ -929,7 +937,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
     for tau in range(T-1,k-1,-1):
         u_obj_coeffs[:,tau-k] += d_matrix[:,tau-k] @ At_bar[tau] @ Bt[tau]
         At_bar[tau-1] = At_bar[tau] @ At[tau]
-        
+
     return u_constr_coeffs, constr_constants, u_obj_coeffs
 
 
@@ -954,7 +962,7 @@ def run_heuristic_linearization(dynModel, mixing_method):
     #########
     # calculate all the constraints and store them
     Gamma_x, Gamma_u, K = calculate_all_constraints(dynModel)
-    
+
     assert( np.shape(Gamma_x) == (num_constraints,Xt_dim) )
     assert( np.shape(Gamma_u) == (num_constraints,ut_dim) )
     assert( np.shape(K) == (num_constraints,T) )
@@ -993,7 +1001,7 @@ def run_heuristic_linearization(dynModel, mixing_method):
 
         # add all decisions using matrix format, and also specify objective coefficients
         u_vars = mod.addMVar(np.shape(uhat_seq), obj=obj_coefs, name="u")
-        
+
         ones_row = np.ones(ut_dim)
         ones_col = np.ones(T-k)
         for t in range(k,T):
@@ -1012,7 +1020,7 @@ def run_heuristic_linearization(dynModel, mixing_method):
         for ag in age_groups:
             m_tests[ag] = uk_opt_dict[ag]['Nmtest_g']
             a_tests[ag] = uk_opt_dict[ag]['Natest_g']
-            
+
         # take one time step in dynamical system
         dynModel.take_time_step(m_tests, a_tests, alphak_opt_dict)
 

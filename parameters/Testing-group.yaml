@@ -2,42 +2,84 @@ global-parameters:
   C_H: 20000000.0
   C_ICU: 2500.0
 seir-groups:
-  age_group_30_39:
-    contacts:
-      home:
-        age_group_30_39: 0.60844724
-
-      leisure:
-        age_group_30_39: 0.55920476
-
-      other:
-        age_group_30_39: 0.79037431
-
-      school:
-        age_group_30_39: 0.22717866
-
-      transport:
-        age_group_30_39: 0.0310989706065815
-
-      work:
-        age_group_30_39: 1.06898578570271
-
-    economics:
-      death_value: 1000000.0
-      lockdown_fraction: 0.5
-      work_value: 85.28878053728769
-    name: age_group_30_39
-    parameters:
-      beta: 0.060606045273519614
-      lambda_H_D: 0.0014492753623188406
-      lambda_H_R: 0.0748283752860412
-      lambda_ICU_D: 0.0009963293130571577
-      lambda_ICU_R: 0.051442055584687986
-      mu: 0.25
-      p_H: 0.010933000000000002
-      p_ICU: 0.0020670000000000003
-      p_Ia: 0.4935
-      p_Ims: 0.24675
-      p_Ips: 0.24675
-      p_Iss: 0.013000000000000001
-      sigma: 0.25
+    age_group_0_9:
+      contacts:
+        home:
+          age_group_0_9: 0.76006371
+          age_group_10_19: 0.44479731
+          age_group_20_29: 0.43559855
+          age_group_30_39: 1.38703699
+          age_group_40_49: 0.3647168
+          age_group_50_59: 0.33455628
+          age_group_60_69: 0.29478122
+          age_group_70_79: 0.08853997
+          age_group_80_plus: 0.00440379
+        leisure:
+          age_group_0_9: 0.73206541
+          age_group_10_19: 0.28361546
+          age_group_20_29: 0.22528785
+          age_group_30_39: 0.22051879
+          age_group_40_49: 0.07642178
+          age_group_50_59: 0.21112904
+          age_group_60_69: 0.06157411
+          age_group_70_79: 0.01695735
+          age_group_80_plus: 0.00648341
+        other:
+          age_group_0_9: 0.28308712
+          age_group_10_19: 0.10394056
+          age_group_20_29: 0.19966821
+          age_group_30_39: 0.23451427
+          age_group_40_49: 0.14737842
+          age_group_50_59: 0.18522621
+          age_group_60_69: 0.13863237
+          age_group_70_79: 0.10713767
+          age_group_80_plus: 0.00576282
+        school:
+          age_group_0_9: 1.1993121
+          age_group_10_19: 0.15685899
+          age_group_20_29: 0.0683617
+          age_group_30_39: 0.2137205
+          age_group_40_49: 0.05684338
+          age_group_50_59: 0.02174258
+          age_group_60_69: 0.00245147
+          age_group_70_79: 0.0037715
+          age_group_80_plus: 0.0
+        transport:
+          age_group_0_9: 0.0383467890754782
+          age_group_10_19: 0.0344533382143179
+          age_group_20_29: 0.00800797201608791
+          age_group_30_39: 0.0442089629010889
+          age_group_40_49: 0.0295486303682382
+          age_group_50_59: 0.0227510394236871
+          age_group_60_69: 0.0203922410687652
+          age_group_70_79: 0.0
+          age_group_80_plus: 0.0
+        work:
+          age_group_0_9: 0.00490294370663362
+          age_group_10_19: 0.00950510294162061
+          age_group_20_29: 0.0126076178089004
+          age_group_30_39: 0.0332307630900972
+          age_group_40_49: 0.0621859457904829
+          age_group_50_59: 0.0196101392608413
+          age_group_60_69: 0.0
+          age_group_70_79: 0.0
+          age_group_80_plus: 0.0
+      economics:
+        death_value: 1000000.0
+        lockdown_fraction: 0.5
+        work_value: 0.0
+      name: age_group_0_9
+      parameters:
+        beta: 0.060606045273519614
+        lambda_H_D: 0.0004576659038901602
+        lambda_H_R: 0.07581998474446987
+        lambda_ICU_D: 0.0003146303093864709
+        lambda_ICU_R: 0.052123754588358676
+        mu: 0.25
+        p_H: 0.001556
+        p_ICU: 0.000444
+        p_Ia: 0.499
+        p_Ims: 0.2495
+        p_Ips: 0.2495
+        p_Iss: 0.002
+        sigma: 0.25

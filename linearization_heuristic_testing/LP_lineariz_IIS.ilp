@@ -1,0 +1,49 @@
+\ Model Linearization Heuristic_copy
+\ LP format - for model browsing. Use MPS format to capture full model detail.
+Maximize
+ 
+Subject To
+ BICU_age_group_0_9[t=1]: u[3] <= 13.2771762
+ BICU_age_group_10_19[t=1]: u[13] <= 12.871357425
+ BICU_age_group_20_29[t=1]: u[23] <= 21.3716761875
+ BICU_age_group_30_39[t=1]: u[33] <= 68.12759654999999
+ BICU_age_group_40_49[t=1]: u[43] <= 118.3015258875
+ BICU_age_group_50_59[t=1]: u[53] <= 278.6854455000001
+ BICU_age_group_60_69[t=1]: u[63] <= 482.944256025
+ BICU_age_group_70_79[t=1]: u[73] <= 418.3419711375
+ BICU_age_group_80_plus[t=1]: u[83] <= 183.53328
+ ICU_capacity[t=2]: - 0.9475616151022548 u[3] - 0.9475616151022548 u[13]
+   - 0.9475616151022548 u[23] - 0.9475616151022549 u[33]
+   - 0.9475616151022549 u[43] - 0.9475616151022549 u[53]
+   - 0.9475616151022548 u[63] - 0.9475616151022549 u[73]
+   - 0.9475616151022549 u[83] - u[93] - u[103] - u[113] - u[123] - u[133]
+   - u[143] - u[153] - u[163] - u[173] <= -8287.856783317378
+ BICU_age_group_0_9[t=2]: u[93] <= 23.23505835
+ BICU_age_group_10_19[t=2]: u[103] <= 22.52487549375
+ BICU_age_group_20_29[t=2]: u[113] <= 38.57236785567438
+ BICU_age_group_30_39[t=2]: u[123] <= 123.1605783497134
+ BICU_age_group_40_49[t=2]: u[133] <= 213.8539097624787
+ BICU_age_group_50_59[t=2]: u[143] <= 499.1463330974232
+ BICU_age_group_60_69[t=2]: u[153] <= 849.6140953365303
+ BICU_age_group_70_79[t=2]: u[163] <= 732.0984494906249
+ BICU_age_group_80_plus[t=2]: u[173] <= 321.18324
+Bounds
+ u[3] free
+ u[13] free
+ u[23] free
+ u[33] free
+ u[43] free
+ u[53] free
+ u[63] free
+ u[73] free
+ u[83] free
+ u[93] free
+ u[103] free
+ u[113] free
+ u[123] free
+ u[133] free
+ u[143] free
+ u[153] free
+ u[163] free
+ u[173] free
+End
