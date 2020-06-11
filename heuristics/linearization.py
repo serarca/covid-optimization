@@ -447,6 +447,38 @@ def get_F(dynModel, X, u):
     initial_time_of_model = dynModel.t
     initial_state_dict = dynModel.get_state(dynModel.t)
 
+    # We create an object to store X as a dictionary, then write X into dynModel instead of the current state
+    X_dict = {}
+    for ag in range(num_age_groups):
+        X_dict[age_groups[ag]] = {}
+        Sg_idx = ag*num_compartments + SEIR_groups.index('S_g')
+        Eg_idx = ag*num_compartments + SEIR_groups.index('E_g')
+        Ig_idx = ag*num_compartments + SEIR_groups.index('I_g')
+        Ng_idx = ag*num_compartments + SEIR_groups.index('N_g')
+        Rg_idx = ag*num_compartments + SEIR_groups.index('R_g')
+        Iag_idx = ag*num_compartments + SEIR_groups.index('Ia_g')
+        Ipsg_idx = ag*num_compartments + SEIR_groups.index('Ips_g')
+        Imsg_idx = ag*num_compartments + SEIR_groups.index('Ims_g')
+        Issg_idx = ag*num_compartments + SEIR_groups.index('Iss_g')
+        Rqg_idx = ag*num_compartments + SEIR_groups.index('Rq_g')
+        Hg_idx = ag*num_compartments + SEIR_groups.index('H_g')
+        ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
+        Dg_idx = ag*num_compartments + SEIR_groups.index('D_g')
+
+        X_dict[age_groups[ag]]['S'] = X[Sg_idx]
+        X_dict[age_groups[ag]]['E'] = X[Eg_idx]
+        X_dict[age_groups[ag]]['I'] = X[Ig_idx]
+        X_dict[age_groups[ag]]['R'] = X[Ng_idx]
+        X_dict[age_groups[ag]]['N'] = X[Rg_idx]
+        X_dict[age_groups[ag]]['Ia'] = X[Iag_idx]
+        X_dict[age_groups[ag]]['Ips'] = X[Ipsg_idx]
+        X_dict[age_groups[ag]]['Ims'] = X[Imsg_idx]
+        X_dict[age_groups[ag]]['Iss'] = X[Issg_idx]
+        X_dict[age_groups[ag]]['Rq'] = X[Rqg_idx]
+        X_dict[age_groups[ag]]['H'] = X[Hg_idx]
+        X_dict[age_groups[ag]]['ICU'] = X[ICUg_idx]
+        X_dict[age_groups[ag]]['D'] = X[Dg_idx]
+
     #Determine the testing at time t given by u
     u_hat_dict, alphas = buildAlphaDict(u)
 
@@ -463,37 +495,17 @@ def get_F(dynModel, X, u):
         # print("*****************************")
         # print("Bouncing from H for group {}: {}".format(g, B_H[g]))
         # print("Flow into H of group {}: {}".format(g, dynModel.groups[g].flow_H(initial_time_of_model)))
-
         B_ICU[g] = u_hat_dict[g]['BounceICU_g']
 
-    # Add the current state to the dynModel
-    for ag in range(num_age_groups):
-        Sg_idx = ag*num_compartments + SEIR_groups.index('S_g')
-        Eg_idx = ag*num_compartments + SEIR_groups.index('E_g')
-        Ig_idx = ag*num_compartments + SEIR_groups.index('I_g')
-        Ng_idx = ag*num_compartments + SEIR_groups.index('N_g')
-        Rg_idx = ag*num_compartments + SEIR_groups.index('R_g')
-        Iag_idx = ag*num_compartments + SEIR_groups.index('Ia_g')
-        Ipsg_idx = ag*num_compartments + SEIR_groups.index('Ips_g')
-        Imsg_idx = ag*num_compartments + SEIR_groups.index('Ims_g')
-        Issg_idx = ag*num_compartments + SEIR_groups.index('Iss_g')
-        Nmtestg_idx = ag*num_controls + controls.index('Nmtest_g')
-        Natestg_idx = ag*num_controls + controls.index('Natest_g')
-        Rqg_idx = ag*num_compartments + SEIR_groups.index('Rq_g')
-        Hg_idx = ag*num_compartments + SEIR_groups.index('H_g')
-        ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
-        Dg_idx = ag*num_compartments + SEIR_groups.index('D_g')
+    # Write X_dict as current state of dynModel
+    dynModel.write_state(dynModel.t, X_dict)
 
     # Run a step of the dyn model
-
-
     # dynModel.take_time_step(m_tests, a_tests, alphas, B_H, B_ICU)
-
     dynModel.take_time_step(m_tests, a_tests, alphas)
 
     # Get the current state
     state_next_step = dynModel.get_state(dynModel.t)
-
 
     X_next_step = np.zeros(num_compartments * num_age_groups)
 
@@ -507,8 +519,6 @@ def get_F(dynModel, X, u):
         Ipsg_idx = ag*num_compartments + SEIR_groups.index('Ips_g')
         Imsg_idx = ag*num_compartments + SEIR_groups.index('Ims_g')
         Issg_idx = ag*num_compartments + SEIR_groups.index('Iss_g')
-        Nmtestg_idx = ag*num_controls + controls.index('Nmtest_g')
-        Natestg_idx = ag*num_controls + controls.index('Natest_g')
         Rqg_idx = ag*num_compartments + SEIR_groups.index('Rq_g')
         Hg_idx = ag*num_compartments + SEIR_groups.index('H_g')
         ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
