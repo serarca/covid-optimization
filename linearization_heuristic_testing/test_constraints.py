@@ -137,12 +137,12 @@ for k in range(T):
         Bt[t] = dynModel.dt * jacob_u
         ct[t] = dynModel.dt * (get_F(dynModel, Xhat_t, uhat_t) - jacob_X @ Xhat_t - jacob_u @ uhat_t)
 
-        print(get_F(dynModel, Xhat_t, uhat_t)[116])
-        print((jacob_X @ Xhat_t)[116])
-
-        print("BH_hat for group 8 at time {}: {}".format(t, uhat_t[8*num_controls+2]))
-        print((jacob_u @ uhat_t)[116])
-        print(ct[t][116])
+        # print(get_F(dynModel, Xhat_t, uhat_t)[116])
+        # print((jacob_X @ Xhat_t)[116])
+        #
+        # print("BH_hat for group 8 at time {}: {}".format(t, uhat_t[8*num_controls+2]))
+        # print((jacob_u @ uhat_t)[116])
+        # print(ct[t][116])
 
         #Dynamic constraints binding x(t+1) with x(t) and u(t)
         dynamicConst[t] = M.addConstr(x_vars[t+1] == At[t] @ x_vars[t] + Bt[t] @ u_vars[t] + ct[t], name="Dynamics_const_time_{}".format(t))
@@ -167,12 +167,16 @@ for k in range(T):
 
     m_tests = {}
     a_tests = {}
+    BH = {}
+    BICU = {}
     for ag in age_groups:
+        BH[ag] = uk_opt_dict[ag]['BounceH_g']
+        BICU[ag] = uk_opt_dict[ag]['BounceICU_g']
         m_tests[ag] = uk_opt_dict[ag]['Nmtest_g']
         a_tests[ag] = uk_opt_dict[ag]['Natest_g']
 
     # take one time step in dynamical system
-    dynModel.take_time_step(m_tests, a_tests, alphak_opt_dict)
+    dynModel.take_time_step(m_tests, a_tests, alphak_opt_dict, BH, BICU)
 
     # update uhat_sequence
     uhat_seq = np.zeros((ut_dim, T-k-1))
