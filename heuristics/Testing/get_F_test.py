@@ -122,12 +122,26 @@ for g in age_groups:
 	u_hat_dict[g]['BounceICU_g'] = False
 X = initial_X
 u = dict_to_u(u_hat_dict, alphas_vec[0])
+
 for i in range(100):
 	X = get_F(dynModel,X,u)
 
 assert(np.all(X == final_X))
+assert(dynModel.t == 100)
 
+### We test by transitioning first 100 times
+dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method)
 
+X = initial_X
+for i in range(100):
+	X = get_F(dynModel,X,u)
+
+for i in range(100):
+	dynModel.take_time_step(m_tests, a_tests, alphas_vec[0])
+final_X = dict_to_X(dynModel.get_state(100))
+
+assert(np.all(X == final_X))
+assert(dynModel.t == 100)
 
 
 
