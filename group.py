@@ -69,7 +69,8 @@ class DynamicalModel:
 		for n in self.groups:
 			self.groups[n].update_total_contacts(time_of_flow, alphas)
 
-		if B_H and B_ICU:
+		if (B_H is not False) and (B_ICU is not False):
+			print("Hello")
 			B_H, B_ICU = self.cap_bounce_variables(B_H, B_ICU)
 			# Verify that the bouncing variables satisfy the required bounds
 #			for n,g in self.groups.items():
@@ -101,8 +102,8 @@ class DynamicalModel:
 			for n in self.groups:
 				self.groups[n].take_time_step(m_tests[n], a_tests[n], self.beds, self.icus, B_H[n], B_ICU[n])
 		else:
-			print('group.py(). Taking a step at t={}.'.format(time_of_flow))
-			print('Total in ICU: {}'.format(sum(self.groups[n].ICU[time_of_flow] for n in self.groups)))
+			# print('group.py(). Taking a step at t={}.'.format(time_of_flow))
+			# print('Total in ICU: {}'.format(sum(self.groups[n].ICU[time_of_flow] for n in self.groups)))
 			for n in self.groups:
 				self.groups[n].take_time_step(m_tests[n], a_tests[n], self.beds, self.icus, False, False)
 
@@ -327,7 +328,6 @@ class SEIR_group:
 		self.initialize_vars(self.initial_conditions)
 
 		# Time step
-		self.t = 0
 		self.dt = dt
 
 
@@ -364,6 +364,10 @@ class SEIR_group:
 		# Contacts
 		self.total_contacts = []
 		self.IR = []
+
+		# Bouncing variables
+		self.B_H = []
+		self.B_ICU = []
 
 
 	def update_total_contacts(self, t, alphas):
@@ -403,11 +407,10 @@ class SEIR_group:
 		self.update_ICU(m_tests, a_tests, h_cap, icu_cap, B_ICU)
 		self.update_D(m_tests, a_tests, h_cap, icu_cap, B_H, B_ICU)
 
-		self.t += 1
 
 	# Reset the time to a past time
 	def reset_time(self, new_time):
-		if(new_time > self.t):
+		if(new_time > self.parent.t):
 			assert(False)
 		self.S = self.S[0:new_time+1]
 		self.E = self.E[0:new_time+1]
@@ -423,157 +426,160 @@ class SEIR_group:
 		self.ICU = self.ICU[0:new_time+1]
 		self.D = self.D[0:new_time+1]
 		self.total_contacts = self.total_contacts[0:new_time]
-
-		self.t = new_time
+		self.B_ICU = self.B_ICU[0:new_time]
+		self.B_H = self.B_H[0:new_time]
 
 
 	# Gives flow of how many people flowing to H
 	# NOTE! time_of_flow here may correspond to ANOTHER group that is being updated, so
 	# it may not be equal to self.t
-	def flow_H(self, time_of_flow):
+	def flow_H(self):
 		if self.parameters['p_H'] != 0.0:
-			return self.parameters['mu']*self.parameters['p_H']*(self.I[time_of_flow]+self.Iss[time_of_flow]/(self.parameters['p_H']+self.parameters['p_ICU']))
+			return self.parameters['mu']*self.parameters['p_H']*(self.I[self.parent.t]+self.Iss[self.parent.t]/(self.parameters['p_H']+self.parameters['p_ICU']))
 		else:
 			return 0.0
 
 	# Gives flow of how many people flowing to ICU
 	# Same issue with time_of_flow as for H
-	def flow_ICU(self, time_of_flow):
+	def flow_ICU(self):
 		if self.parameters['p_ICU'] != 0.0:
 			# print('flow_ICU(). In group {}, time from self is {}, time being updated is {}'.format(self.name,self.t,time_of_flow))
-			return self.parameters['mu']*self.parameters['p_ICU']*(self.I[time_of_flow]+self.Iss[time_of_flow]/(self.parameters['p_H']+self.parameters['p_ICU']))
+			return self.parameters['mu']*self.parameters['p_ICU']*(self.I[self.parent.t]+self.Iss[self.parent.t]/(self.parameters['p_H']+self.parameters['p_ICU']))
 		else:
 			return 0.0
 
 	# Updates N
 	def update_N(self, m_tests, a_tests):
 		delta_N = (
-			- m_tests*self.I[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6)
-			- a_tests*self.R[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6)
-			- self.parameters['mu']*(self.parameters['p_H'] + self.parameters['p_ICU'])*self.I[self.t]
+			- m_tests*self.I[self.parent.t]/(self.N[self.parent.t] if self.N[self.parent.t]!=0 else 10e-6)
+			- a_tests*self.R[self.parent.t]/(self.N[self.parent.t] if self.N[self.parent.t]!=0 else 10e-6)
+			- self.parameters['mu']*(self.parameters['p_H'] + self.parameters['p_ICU'])*self.I[self.parent.t]
 		)
-		self.N += [self.N[self.t]+delta_N*self.dt]
+		self.N += [self.N[self.parent.t]+delta_N*self.dt]
 
 	# Updates S
 	def update_S(self, m_tests, a_tests):
-		delta_S = -self.parameters['beta']*self.total_contacts[self.t]
-		self.S += [self.S[self.t]+delta_S*self.dt]
+		delta_S = -self.parameters['beta']*self.total_contacts[self.parent.t]
+		self.S += [self.S[self.parent.t]+delta_S*self.dt]
 
 	# Updates Exposed
 	def update_E(self, m_tests, a_tests):
-		delta_E = self.parameters['beta']*self.total_contacts[self.t] - self.parameters['sigma']*self.E[self.t]
-		self.E += [self.E[self.t]+delta_E*self.dt]
+		delta_E = self.parameters['beta']*self.total_contacts[self.parent.t] - self.parameters['sigma']*self.E[self.parent.t]
+		self.E += [self.E[self.parent.t]+delta_E*self.dt]
 
 
 	# Updates infected
 	def update_I(self, m_tests, a_tests):
-		delta_I = self.parameters['sigma']*self.E[self.t] - self.parameters['mu']*self.I[self.t] - m_tests*self.I[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6)
-		self.I += [self.I[self.t]+delta_I*self.dt]
+		delta_I = self.parameters['sigma']*self.E[self.parent.t] - self.parameters['mu']*self.I[self.parent.t] - m_tests*self.I[self.parent.t]/(self.N[self.parent.t] if self.N[self.parent.t]!=0 else 10e-6)
+		self.I += [self.I[self.parent.t]+delta_I*self.dt]
 
 
 	# Updates recovered
 	def update_R(self, m_tests, a_tests):
-		delta_R = self.parameters['mu']*(1-self.parameters["p_H"]-self.parameters["p_ICU"])*self.I[self.t] - a_tests*self.R[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6)
-		self.R += [self.R[self.t]+delta_R*self.dt]
+		delta_R = self.parameters['mu']*(1-self.parameters["p_H"]-self.parameters["p_ICU"])*self.I[self.parent.t] - a_tests*self.R[self.parent.t]/(self.N[self.parent.t] if self.N[self.parent.t]!=0 else 10e-6)
+		self.R += [self.R[self.parent.t]+delta_R*self.dt]
 
 
 	# Updates infected in quarantine
 	def update_Ia(self, m_tests, a_tests):
-		delta_Ia = self.parameters['p_Ia']*m_tests*self.I[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6) - self.parameters['mu']*self.Ia[self.t]
-		self.Ia += [self.Ia[self.t]+delta_Ia*self.dt]
+		delta_Ia = self.parameters['p_Ia']*m_tests*self.I[self.parent.t]/(self.N[self.parent.t] if self.N[self.parent.t]!=0 else 10e-6) - self.parameters['mu']*self.Ia[self.parent.t]
+		self.Ia += [self.Ia[self.parent.t]+delta_Ia*self.dt]
 
 	def update_Ips(self, m_tests, a_tests):
-		delta_Ips = self.parameters['p_Ips']*m_tests*self.I[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6) - self.parameters['mu']*self.Ips[self.t]
-		self.Ips += [self.Ips[self.t]+delta_Ips*self.dt]
+		delta_Ips = self.parameters['p_Ips']*m_tests*self.I[self.parent.t]/(self.N[self.parent.t] if self.N[self.parent.t]!=0 else 10e-6) - self.parameters['mu']*self.Ips[self.parent.t]
+		self.Ips += [self.Ips[self.parent.t]+delta_Ips*self.dt]
 
 	def update_Ims(self, m_tests, a_tests):
-		delta_Ims = self.parameters['p_Ims']*m_tests*self.I[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6) - self.parameters['mu']*self.Ims[self.t]
-		self.Ims += [self.Ims[self.t]+delta_Ims*self.dt]
+		delta_Ims = self.parameters['p_Ims']*m_tests*self.I[self.parent.t]/(self.N[self.parent.t] if self.N[self.parent.t]!=0 else 10e-6) - self.parameters['mu']*self.Ims[self.parent.t]
+		self.Ims += [self.Ims[self.parent.t]+delta_Ims*self.dt]
 
 	def update_Iss(self, m_tests, a_tests):
-		delta_Iss = self.parameters['p_Iss']*m_tests*self.I[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6) - self.parameters['mu']*self.Iss[self.t]
-		self.Iss += [self.Iss[self.t]+delta_Iss*self.dt]
+		delta_Iss = self.parameters['p_Iss']*m_tests*self.I[self.parent.t]/(self.N[self.parent.t] if self.N[self.parent.t]!=0 else 10e-6) - self.parameters['mu']*self.Iss[self.parent.t]
+		self.Iss += [self.Iss[self.parent.t]+delta_Iss*self.dt]
 
 
 	# Update recovered in quarentine
 	def update_Rq(self, m_tests, a_tests):
 		delta_Rq = (
-			self.parameters['mu']*(self.Ia[self.t]+self.Ips[self.t]+self.Ims[self.t]) +
-			self.parameters['lambda_H_R']*self.H[self.t] +
-			self.parameters['lambda_ICU_R']*self.ICU[self.t] +
-			a_tests*self.R[self.t]/(self.N[self.t] if self.N[self.t]!=0 else 10e-6)
+			self.parameters['mu']*(self.Ia[self.parent.t]+self.Ips[self.parent.t]+self.Ims[self.parent.t]) +
+			self.parameters['lambda_H_R']*self.H[self.parent.t] +
+			self.parameters['lambda_ICU_R']*self.ICU[self.parent.t] +
+			a_tests*self.R[self.parent.t]/(self.N[self.parent.t] if self.N[self.parent.t]!=0 else 10e-6)
 		)
-		self.Rq += [self.Rq[self.t]+delta_Rq*self.dt]
+		self.Rq += [self.Rq[self.parent.t]+delta_Rq*self.dt]
 
 
 	def update_H(self, m_tests, a_tests, h_cap, icu_cap, B_H):
 		tol = 1e-7
 		# For each group, calculate the entering amount
-		time_of_flow = self.t  # the time at which this group (current group) is updated
 		entering_h = {}
 		summ_entering_h = 0
 		summ_staying_h = 0
 		for n,g in self.all_groups.items():
-			entering_h[n] = self.all_groups[n].flow_H(time_of_flow)
+			entering_h[n] = self.all_groups[n].flow_H()
 			summ_entering_h += entering_h[n]
-			summ_staying_h += (1-g.parameters['lambda_H_R']-g.parameters['lambda_H_D'])*g.H[time_of_flow]
+			summ_staying_h += (1-g.parameters['lambda_H_R']-g.parameters['lambda_H_D'])*g.H[self.parent.t]
 
 		if B_H is False:
 			B_H = entering_h[self.name]*(summ_entering_h-h_cap+summ_staying_h if summ_entering_h-h_cap+summ_staying_h>0 else 0)/(summ_entering_h if summ_entering_h!=0 else 10e-6)
 
+		# Update bouncing variables
+		self.B_H += [B_H]
+
 		delta_H = (
-			- (self.parameters["lambda_H_R"] + self.parameters["lambda_H_D"])*self.H[time_of_flow]
+			- (self.parameters["lambda_H_R"] + self.parameters["lambda_H_D"])*self.H[self.parent.t]
 			+ (1-tol) * entering_h[self.name]
 			- B_H
 		)
-		self.H += [self.H[time_of_flow]+delta_H*self.dt]
+		self.H += [self.H[self.parent.t]+delta_H*self.dt]
 
 
 	def update_ICU(self, m_tests, a_tests, h_cap, icu_cap, B_ICU):
 		tol = 1e-7
 		# For each group, calculate the entering amount
-		time_of_flow = self.t  # the time at which this group (current group) is updated
 		entering_icu = {}
 		summ_entering_icu = 0
 		summ_staying_icu = 0
 		for n,g in self.all_groups.items():
-			entering_icu[n] = self.all_groups[n].flow_ICU(time_of_flow)
+			entering_icu[n] = self.all_groups[n].flow_ICU()
 			summ_entering_icu += entering_icu[n]
-			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[time_of_flow]
+			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[self.parent.t]
 
 		#print('update_ICU(): Total entering ICU calculated from group {} is:{}'.format(self.name,summ_entering_icu))
 		if B_ICU is False:
 			#print("group.py(): FALSE branch for B_ICU")
 			B_ICU = entering_icu[self.name]*(summ_entering_icu-icu_cap+summ_staying_icu if summ_entering_icu-icu_cap+summ_staying_icu>0 else 0)/(summ_entering_icu if summ_entering_icu!=0 else 10e-6)
 
+		# Update bouncing variables
+		self.B_ICU = [B_ICU]
+
 		delta_ICU = (
-			- (self.parameters["lambda_ICU_R"] + self.parameters["lambda_ICU_D"])*self.ICU[time_of_flow]
+			- (self.parameters["lambda_ICU_R"] + self.parameters["lambda_ICU_D"])*self.ICU[self.parent.t]
 			+ (1-tol) * entering_icu[self.name]
 			- B_ICU
 		)
-		self.ICU += [self.ICU[time_of_flow]+delta_ICU*self.dt]
+		self.ICU += [self.ICU[self.parent.t]+delta_ICU*self.dt]
 		#print("update_ICU(): ICU occupancy at end of period t={} for group {} IS {}".format(time_of_flow, self.name,self.ICU[-1]))
 
 
 
 	def update_D(self, m_tests, a_tests, h_cap, icu_cap, B_H, B_ICU):
 		# For each group, calculate the entering amount
-		time_of_flow = self.t  # the time at which this group (current group) is updated
 		entering_h = {}
 		summ_entering_h = 0
 		summ_staying_h = 0
 		for n,g in self.all_groups.items():
-			entering_h[n] = self.all_groups[n].flow_H(time_of_flow)
+			entering_h[n] = self.all_groups[n].flow_H()
 			summ_entering_h += entering_h[n]
-			summ_staying_h += (1-g.parameters['lambda_H_R']-g.parameters['lambda_H_D'])*g.H[time_of_flow]
+			summ_staying_h += (1-g.parameters['lambda_H_R']-g.parameters['lambda_H_D'])*g.H[self.parent.t]
 
 		entering_icu = {}
 		summ_entering_icu = 0
 		summ_staying_icu = 0
 		for n,g in self.all_groups.items():
-			entering_icu[n] = self.all_groups[n].flow_ICU(time_of_flow)
+			entering_icu[n] = self.all_groups[n].flow_ICU()
 			summ_entering_icu += entering_icu[n]
-			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[time_of_flow]
+			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[self.parent.t]
 
 		if B_H is False:
 			B_H = entering_h[self.name]*(summ_entering_h-h_cap+summ_staying_h if summ_entering_h-h_cap+summ_staying_h>0 else 0)/(summ_entering_h if summ_entering_h!=0 else 10e-6)
@@ -582,10 +588,10 @@ class SEIR_group:
 
 
 		delta_D = (
-			self.parameters["lambda_H_D"]*self.H[time_of_flow]
-			+ self.parameters["lambda_ICU_D"]*self.ICU[time_of_flow]
+			self.parameters["lambda_H_D"]*self.H[self.parent.t]
+			+ self.parameters["lambda_ICU_D"]*self.ICU[self.parent.t]
 			+ B_H
 			+ B_ICU
 		)
 
-		self.D += [self.D[time_of_flow]+delta_D*self.dt]
+		self.D += [self.D[self.parent.t]+delta_D*self.dt]

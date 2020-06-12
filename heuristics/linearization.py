@@ -448,8 +448,8 @@ def dict_to_u(u_hat_dict, alphas):
     for ag in range(0, num_age_groups):
         u_hat_array[ag * num_controls + controls.index('Nmtest_g')] = u_hat_dict[age_groups[ag]]['Nmtest_g']
         u_hat_array[ag * num_controls + controls.index('Natest_g')] = u_hat_dict[age_groups[ag]]['Natest_g']
-        u_hat_array[ag * num_controls + controls.index('BounceH_g')] = u_hat_dict[age_groups[ag]]['BounceH_g'] if u_hat_dict[age_groups[ag]]['BounceH_g'] is not False else -1
-        u_hat_array[ag * num_controls + controls.index('BounceICU_g')] = u_hat_dict[age_groups[ag]]['BounceICU_g'] if u_hat_dict[age_groups[ag]]['BounceICU_g'] is not False else -1
+        u_hat_array[ag * num_controls + controls.index('BounceH_g')] = u_hat_dict[age_groups[ag]]['BounceH_g'] if (u_hat_dict[age_groups[ag]]['BounceH_g'] is not False) else -1
+        u_hat_array[ag * num_controls + controls.index('BounceICU_g')] = u_hat_dict[age_groups[ag]]['BounceICU_g'] if (u_hat_dict[age_groups[ag]]['BounceICU_g'] is not False) else -1
 
         u_hat_array[ag * num_controls + controls.index('home')] = alphas[age_groups[ag]]['home']
         u_hat_array[ag * num_controls + controls.index('leisure')] = alphas[age_groups[ag]]['leisure']
@@ -566,17 +566,27 @@ def get_F(dynModel, X, u):
     B_H = {}
     B_ICU = {}
     for g in age_groups:
-        B_H[g] = u_hat_dict[g]['BounceH_g'] if u_hat_dict[g]['BounceH_g'] != -1 else False
+        B_H[g] = u_hat_dict[g]['BounceH_g'] if (u_hat_dict[g]['BounceH_g'] != -1) else False
         # print("*****************************")
         # print("Bouncing from H for group {}: {}".format(g, B_H[g]))
         # print("Flow into H of group {}: {}".format(g, dynModel.groups[g].flow_H(initial_time_of_model)))
-        B_ICU[g] = u_hat_dict[g]['BounceICU_g'] if u_hat_dict[g]['BounceICU_g'] != -1 else False
+        B_ICU[g] = u_hat_dict[g]['BounceICU_g'] if (u_hat_dict[g]['BounceICU_g'] != -1) else False
+
+    # Check if the bouncing strategy is prorrated
+    prorrated = True
+    for g in age_groups:
+        if (B_H[g] is not False) or (B_ICU[g] is not False):
+            prorrated = True
+
 
     # Write X_dict as current state of dynModel
     dynModel.write_state(dynModel.t, X_dict)
 
     # Run a step of the dyn model
-    dynModel.take_time_step(m_tests, a_tests, alphas, B_H, B_ICU)
+    if prorrated:
+        dynModel.take_time_step(m_tests, a_tests, alphas, False, False)
+    else:
+        dynModel.take_time_step(m_tests, a_tests, alphas, B_H, B_ICU)
     #dynModel.take_time_step(m_tests, a_tests, alphas)
 
     # Get the current state
