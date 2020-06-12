@@ -907,8 +907,8 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
         Xhat_t = Xhat_seq[:,t-k]
         uhat_t = uhat_seq[:,t-k]
 
-        jacob_X = get_Jacobian_X(dynModel, Xhat_t, uhat_t, mixing_method)
-        jacob_u = get_Jacobian_u(dynModel, Xhat_t, uhat_t, mixing_method)
+        jacob_X = get_Jacobian_X(dynModel, Xhat_t, uhat_t, dynModel.mixing_method)
+        jacob_u = get_Jacobian_u(dynModel, Xhat_t, uhat_t, dynModel.mixing_method)
 
         # Calculate linearization coefficients for X(t+1)
         At[t] = np.eye(Xt_dim) + dynModel.dt * jacob_X
