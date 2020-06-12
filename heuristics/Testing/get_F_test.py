@@ -143,5 +143,4 @@ final_X = dict_to_X(dynModel.get_state(100))
 assert(np.all(X == final_X))
 assert(dynModel.t == 100)
 
-
-
+print(X)
