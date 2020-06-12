@@ -463,7 +463,7 @@ class SEIR_group:
 			summ_entering_h += entering_h[n]
 			summ_staying_h += (1-g.parameters['lambda_H_R']-g.parameters['lambda_H_D'])*g.H[self.t]
 		
-		if not B_H:
+		if B_H is False:
 			B_H = entering_h[self.name]*(summ_entering_h-h_cap+summ_staying_h if summ_entering_h-h_cap+summ_staying_h>0 else 0)/(summ_entering_h if summ_entering_h!=0 else 10e-6)
 
 		delta_H = (
@@ -484,7 +484,7 @@ class SEIR_group:
 			summ_entering_icu += entering_icu[n]
 			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[self.t]
 
-		if not B_ICU:
+		if B_ICU is False:
 			B_ICU = entering_icu[self.name]*(summ_entering_icu-icu_cap+summ_staying_icu if summ_entering_icu-icu_cap+summ_staying_icu>0 else 0)/(summ_entering_icu if summ_entering_icu!=0 else 10e-6)
 
 		delta_ICU = (
@@ -514,9 +514,9 @@ class SEIR_group:
 			summ_entering_icu += entering_icu[n]
 			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[self.t]
 
-		if not B_H:
+		if B_H is False:
 			B_H = entering_h[self.name]*(summ_entering_h-h_cap+summ_staying_h if summ_entering_h-h_cap+summ_staying_h>0 else 0)/(summ_entering_h if summ_entering_h!=0 else 10e-6)
-		if not B_ICU:
+		if B_ICU is False:
 			B_ICU = entering_icu[self.name]*(summ_entering_icu-icu_cap+summ_staying_icu if summ_entering_icu-icu_cap+summ_staying_icu>0 else 0)/(summ_entering_icu if summ_entering_icu!=0 else 10e-6)
 
 

@@ -412,12 +412,12 @@ def buildAlphaDict(u_hat_array):
         u_hat_dict[age_groups[ag]]['Natest_g'] = u_hat_array[ag * num_controls + controls.index('Natest_g')]
         u_hat_dict[age_groups[ag]]['BounceH_g'] = u_hat_array[ag * num_controls + controls.index('BounceH_g')]
         u_hat_dict[age_groups[ag]]['BounceICU_g'] = u_hat_array[ag * num_controls + controls.index('BounceICU_g')]
-        u_hat_dict[age_groups[ag]]['home'] = u_hat_array[ag * num_controls + controls.index('home')]
-        u_hat_dict[age_groups[ag]]['leisure'] = u_hat_array[ag * num_controls + controls.index('leisure')]
-        u_hat_dict[age_groups[ag]]['other'] = u_hat_array[ag * num_controls + controls.index('other')]
-        u_hat_dict[age_groups[ag]]['school'] = u_hat_array[ag * num_controls + controls.index('school')]
-        u_hat_dict[age_groups[ag]]['transport'] = u_hat_array[ag * num_controls + controls.index('transport')]
-        u_hat_dict[age_groups[ag]]['work'] = u_hat_array[ag * num_controls + controls.index('work')]
+        # u_hat_dict[age_groups[ag]]['home'] = u_hat_array[ag * num_controls + controls.index('home')]
+        # u_hat_dict[age_groups[ag]]['leisure'] = u_hat_array[ag * num_controls + controls.index('leisure')]
+        # u_hat_dict[age_groups[ag]]['other'] = u_hat_array[ag * num_controls + controls.index('other')]
+        # u_hat_dict[age_groups[ag]]['school'] = u_hat_array[ag * num_controls + controls.index('school')]
+        # u_hat_dict[age_groups[ag]]['transport'] = u_hat_array[ag * num_controls + controls.index('transport')]
+        # u_hat_dict[age_groups[ag]]['work'] = u_hat_array[ag * num_controls + controls.index('work')]
 
         alphas[age_groups[ag]]['home'] = u_hat_array[ag * num_controls + controls.index('home')]
         alphas[age_groups[ag]]['leisure'] = u_hat_array[ag * num_controls + controls.index('leisure')]
@@ -429,25 +429,29 @@ def buildAlphaDict(u_hat_array):
     return u_hat_dict, alphas
 
 
-####################################
-# Function that returns f(X(t), u(t))  = X(t+1). Does not change dynModel.
-def get_F(dynModel, X, u):
-    ''' Will return the next states given the state X and
-    controls u. For this, it replaces the current state in
-    dynModel for X, runs one step with controls u, extracts the
-    resulting states, and re-starts the model to it's original
-    state. Assumes as all functions above that X is ordered by
-    compartment and then by group, and u by control and then by group.
-    '''
+# Takes a dictionary of testing and bouncing variables, and a dictionary of alphas, and builds an array of u
+def dict_to_u(u_hat_dict, alphas):
 
-    assert(X.shape == (num_compartments * num_age_groups, ))
-    assert(u.shape == (num_controls * num_age_groups, ))
+    u_hat_array = np.zeros(num_controls * num_age_groups)
 
-    # We save the initial time of dynModel to revert back to
-    initial_time_of_model = dynModel.t
-    initial_state_dict = dynModel.get_state(dynModel.t)
+    for ag in range(0, num_age_groups):
+        u_hat_array[ag * num_controls + controls.index('Nmtest_g')] = u_hat_dict[age_groups[ag]]['Nmtest_g']
+        u_hat_array[ag * num_controls + controls.index('Natest_g')] = u_hat_dict[age_groups[ag]]['Natest_g']
+        u_hat_array[ag * num_controls + controls.index('BounceH_g')] = u_hat_dict[age_groups[ag]]['BounceH_g'] if u_hat_dict[age_groups[ag]]['BounceH_g'] is not False else -1
+        u_hat_array[ag * num_controls + controls.index('BounceICU_g')] = u_hat_dict[age_groups[ag]]['BounceICU_g'] if u_hat_dict[age_groups[ag]]['BounceICU_g'] is not False else -1
 
-    # We create an object to store X as a dictionary, then write X into dynModel instead of the current state
+        u_hat_array[ag * num_controls + controls.index('home')] = alphas[age_groups[ag]]['home']
+        u_hat_array[ag * num_controls + controls.index('leisure')] = alphas[age_groups[ag]]['leisure']
+        u_hat_array[ag * num_controls + controls.index('other')] = alphas[age_groups[ag]]['other']
+        u_hat_array[ag * num_controls + controls.index('school')] = alphas[age_groups[ag]]['school']
+        u_hat_array[ag * num_controls + controls.index('transport')] = alphas[age_groups[ag]]['transport']
+        u_hat_array[ag * num_controls + controls.index('work')] = alphas[age_groups[ag]]['work']
+
+    return u_hat_array
+
+
+# Converts an array of X into a dictionary that can be understood by dynModel as a state
+def X_to_dict(X):
     X_dict = {}
     for ag in range(num_age_groups):
         X_dict[age_groups[ag]] = {}
@@ -468,8 +472,8 @@ def get_F(dynModel, X, u):
         X_dict[age_groups[ag]]['S'] = X[Sg_idx]
         X_dict[age_groups[ag]]['E'] = X[Eg_idx]
         X_dict[age_groups[ag]]['I'] = X[Ig_idx]
-        X_dict[age_groups[ag]]['R'] = X[Ng_idx]
-        X_dict[age_groups[ag]]['N'] = X[Rg_idx]
+        X_dict[age_groups[ag]]['R'] = X[Rg_idx]
+        X_dict[age_groups[ag]]['N'] = X[Ng_idx]
         X_dict[age_groups[ag]]['Ia'] = X[Iag_idx]
         X_dict[age_groups[ag]]['Ips'] = X[Ipsg_idx]
         X_dict[age_groups[ag]]['Ims'] = X[Imsg_idx]
@@ -479,35 +483,11 @@ def get_F(dynModel, X, u):
         X_dict[age_groups[ag]]['ICU'] = X[ICUg_idx]
         X_dict[age_groups[ag]]['D'] = X[Dg_idx]
 
-    #Determine the testing at time t given by u
-    u_hat_dict, alphas = buildAlphaDict(u)
+    return X_dict
 
-    m_tests = {}
-    a_tests = {}
-    for g in age_groups:
-        m_tests[g] = u_hat_dict[g]['Nmtest_g']
-        a_tests[g] = u_hat_dict[g]['Natest_g']
-
-    B_H = {}
-    B_ICU = {}
-    for g in age_groups:
-        B_H[g] = u_hat_dict[g]['BounceH_g']
-        # print("*****************************")
-        # print("Bouncing from H for group {}: {}".format(g, B_H[g]))
-        # print("Flow into H of group {}: {}".format(g, dynModel.groups[g].flow_H(initial_time_of_model)))
-        B_ICU[g] = u_hat_dict[g]['BounceICU_g']
-
-    # Write X_dict as current state of dynModel
-    dynModel.write_state(dynModel.t, X_dict)
-
-    # Run a step of the dyn model
-    # dynModel.take_time_step(m_tests, a_tests, alphas, B_H, B_ICU)
-    dynModel.take_time_step(m_tests, a_tests, alphas)
-
-    # Get the current state
-    state_next_step = dynModel.get_state(dynModel.t)
-
-    X_next_step = np.zeros(num_compartments * num_age_groups)
+# Converts a dictionary into an X array
+def dict_to_X(X_dict):
+    X = np.zeros(num_compartments * num_age_groups)
 
     for ag in range(num_age_groups):
         Sg_idx = ag*num_compartments + SEIR_groups.index('S_g')
@@ -524,19 +504,75 @@ def get_F(dynModel, X, u):
         ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
         Dg_idx = ag*num_compartments + SEIR_groups.index('D_g')
 
-        X_next_step[Sg_idx] = state_next_step[age_groups[ag]]['S']
-        X_next_step[Eg_idx] = state_next_step[age_groups[ag]]['E']
-        X_next_step[Ig_idx] = state_next_step[age_groups[ag]]['I']
-        X_next_step[Rg_idx] = state_next_step[age_groups[ag]]['R']
-        X_next_step[Ng_idx] = state_next_step[age_groups[ag]]['N']
-        X_next_step[Iag_idx] = state_next_step[age_groups[ag]]['Ia']
-        X_next_step[Ipsg_idx] = state_next_step[age_groups[ag]]['Ips']
-        X_next_step[Imsg_idx] = state_next_step[age_groups[ag]]['Ims']
-        X_next_step[Issg_idx] = state_next_step[age_groups[ag]]['Iss']
-        X_next_step[Rqg_idx] = state_next_step[age_groups[ag]]['Rq']
-        X_next_step[Hg_idx] = state_next_step[age_groups[ag]]['H']
-        X_next_step[ICUg_idx] = state_next_step[age_groups[ag]]['ICU']
-        X_next_step[Dg_idx] = state_next_step[age_groups[ag]]['D']
+        X[Sg_idx] = X_dict[age_groups[ag]]['S']
+        X[Eg_idx] = X_dict[age_groups[ag]]['E']
+        X[Ig_idx] = X_dict[age_groups[ag]]['I']
+        X[Rg_idx] = X_dict[age_groups[ag]]['R']
+        X[Ng_idx] = X_dict[age_groups[ag]]['N']
+        X[Iag_idx] = X_dict[age_groups[ag]]['Ia']
+        X[Ipsg_idx] = X_dict[age_groups[ag]]['Ips']
+        X[Imsg_idx] = X_dict[age_groups[ag]]['Ims']
+        X[Issg_idx] = X_dict[age_groups[ag]]['Iss']
+        X[Rqg_idx] = X_dict[age_groups[ag]]['Rq']
+        X[Hg_idx] = X_dict[age_groups[ag]]['H']
+        X[ICUg_idx] = X_dict[age_groups[ag]]['ICU']
+        X[Dg_idx] = X_dict[age_groups[ag]]['D']
+
+    return X
+
+
+
+####################################
+# Function that returns f(X(t), u(t))  = X(t+1). Does not change dynModel.
+def get_F(dynModel, X, u):
+    ''' Will return the next states given the state X and
+    controls u. For this, it replaces the current state in
+    dynModel for X, runs one step with controls u, extracts the
+    resulting states, and re-starts the model to it's original
+    state. Assumes as all functions above that X is ordered by
+    compartment and then by group, and u by control and then by group.
+    '''
+
+    assert(X.shape == (num_compartments * num_age_groups, ))
+    assert(u.shape == (num_controls * num_age_groups, ))
+
+    # We save the initial time of dynModel to revert back to
+    initial_time_of_model = dynModel.t
+    initial_state_dict = dynModel.get_state(dynModel.t)
+
+    # Covert array into dictionary
+    X_dict = X_to_dict(X)
+
+    #Determine the testing at time t given by u
+    u_hat_dict, alphas = buildAlphaDict(u)
+
+    m_tests = {}
+    a_tests = {}
+    for g in age_groups:
+        m_tests[g] = u_hat_dict[g]['Nmtest_g']
+        a_tests[g] = u_hat_dict[g]['Natest_g']
+
+    B_H = {}
+    B_ICU = {}
+    for g in age_groups:
+        B_H[g] = u_hat_dict[g]['BounceH_g'] if u_hat_dict[g]['BounceH_g'] != -1 else False
+        # print("*****************************")
+        # print("Bouncing from H for group {}: {}".format(g, B_H[g]))
+        # print("Flow into H of group {}: {}".format(g, dynModel.groups[g].flow_H(initial_time_of_model)))
+        B_ICU[g] = u_hat_dict[g]['BounceICU_g'] if u_hat_dict[g]['BounceICU_g'] != -1 else False
+
+    # Write X_dict as current state of dynModel
+    dynModel.write_state(dynModel.t, X_dict)
+
+    # Run a step of the dyn model
+    # dynModel.take_time_step(m_tests, a_tests, alphas, B_H, B_ICU)
+    dynModel.take_time_step(m_tests, a_tests, alphas)
+
+    # Get the current state
+    state_next_step = dynModel.get_state(dynModel.t)
+
+    # Make the dictionary into an array
+    X_next_step = dict_to_X(state_next_step)
 
     # Erase the states after t so as to reset the dyn model, also populate t with correct state
     dynModel.reset_time(initial_time_of_model)
@@ -1042,51 +1078,51 @@ def run_heuristic_linearization(dynModel, mixing_method):
 ####################################
 # TESTING
 # Global variables
-simulation_params = {
-        'dt':1.0,
-        'days': 182,
-        'region': "Ile-de-France",
-        'quar_freq': 182,
-}
+# simulation_params = {
+#         'dt':1.0,
+#         'days': 182,
+#         'region': "Ile-de-France",
+#         'quar_freq': 182,
+# }
 
 
-# Define time variables
-simulation_params['time_periods'] = int(math.ceil(simulation_params["days"]/simulation_params["dt"]))
+# # Define time variables
+# simulation_params['time_periods'] = int(math.ceil(simulation_params["days"]/simulation_params["dt"]))
 
-# Define mixing method
-mixing_method = {
-    "name":"mult",
-    "param_alpha":1.0,
-    "param_beta":0.5,
-    #"param":float(args.mixing_param) if args.mixing_param else 0.0,
-}
+# # Define mixing method
+# mixing_method = {
+#     "name":"mult",
+#     "param_alpha":1.0,
+#     "param_beta":0.5,
+#     #"param":float(args.mixing_param) if args.mixing_param else 0.0,
+# }
 
-# Read group parameters
-with open("../parameters/"+simulation_params["region"]+".yaml") as file:
-    # The FullLoader parameter handles the conversion from YAML
-    # scalar values to Python the dictionary format
-    universe_params = yaml.load(file, Loader=yaml.FullLoader)
+# # Read group parameters
+# with open("../parameters/"+simulation_params["region"]+".yaml") as file:
+#     # The FullLoader parameter handles the conversion from YAML
+#     # scalar values to Python the dictionary format
+#     universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
-# Read initialization
-with open("../initialization/initialization.yaml") as file:
-    # The FullLoader parameter handles the conversion from YAML
-    # scalar values to Python the dictionary format
-    initialization = yaml.load(file, Loader=yaml.FullLoader)
+# # Read initialization
+# with open("../initialization/initialization.yaml") as file:
+#     # The FullLoader parameter handles the conversion from YAML
+#     # scalar values to Python the dictionary format
+#     initialization = yaml.load(file, Loader=yaml.FullLoader)
 
-# Define policy
-with open('../benchmarks/static_infected_10.yaml') as file:
-    # The FullLoader parameter handles the conversion from YAML
-    # scalar values to Python the dictionary format
-    policy_file = yaml.load(file, Loader=yaml.FullLoader)
-alphas_vec = policy_file['alphas_vec']
+# # Define policy
+# with open('../benchmarks/static_infected_10.yaml') as file:
+#     # The FullLoader parameter handles the conversion from YAML
+#     # scalar values to Python the dictionary format
+#     policy_file = yaml.load(file, Loader=yaml.FullLoader)
+# alphas_vec = policy_file['alphas_vec']
 
-# Percentage infected at time 0
-perc_infected = 10
-# Move population to infected (without this there is no epidem.)
-for group in initialization:
-	change = initialization[group]["S"]*perc_infected/100
-	initialization[group]["S"] = initialization[group]["S"] - change
-	initialization[group]["I"] = initialization[group]["I"] + change
+# # Percentage infected at time 0
+# perc_infected = 10
+# # Move population to infected (without this there is no epidem.)
+# for group in initialization:
+# 	change = initialization[group]["S"]*perc_infected/100
+# 	initialization[group]["S"] = initialization[group]["S"] - change
+# 	initialization[group]["I"] = initialization[group]["I"] + change
 
 # Create environment
 # dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method)
