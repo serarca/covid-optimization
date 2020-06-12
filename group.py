@@ -64,36 +64,47 @@ class DynamicalModel:
 			self.n_contacts = [{g_name1:{g_name2:float('inf') for g_name2 in self.groups} for g_name1 in self.groups} for i in range(self.time_steps)]
 
 	def take_time_step(self, m_tests, a_tests, alphas, B_H = False, B_ICU = False):
+		# store time when current group is being updated
+		time_of_flow = self.t
 		for n in self.groups:
-			self.groups[n].update_total_contacts(self.t, alphas)
+			self.groups[n].update_total_contacts(time_of_flow, alphas)
+
 		if B_H and B_ICU:
+			B_H, B_ICU = self.cap_bounce_variables(B_H, B_ICU)
 			# Verify that the bouncing variables satisfy the required bounds
-			for n,g in self.groups.items():
-				print("BH for {}: {} Flow H: {}".format(n,B_H[n],g.flow_H(self.t)))
-				assert(B_H[n]<=g.flow_H(self.t))
-
-				print("BICU for {}: {} Flow ICU: {}".format(n,B_ICU[n],g.flow_ICU(self.t)))
-				assert(B_ICU[n]<=g.flow_ICU(self.t))
-
-			assert(
-				sum([group.flow_H(self.t)-B_H[name] for name,group in self.groups.items()])<=
-				self.beds
-				- sum([(1-group.parameters["lambda_H_R"]-group.parameters["lambda_H_D"])*group.H[self.t] for name,group in self.groups.items()])
-			)
-			# assert(
-			# 	sum([group.flow_ICU(self.t)-B_ICU[name] for name,group in self.groups.items()])<=
-			# 	self.icus
-			# 	- sum([(1-group.parameters["lambda_ICU_R"]-group.parameters["lambda_ICU_D"])*group.ICU[self.t] for name,group in self.groups.items()])
-			# )
+#			for n,g in self.groups.items():
+#				# print("BH for {}: {} Flow H: {}".format(n,B_H[n],g.flow_H(self.t)))
+#				# assert(B_H[n]<=g.flow_H(self.t))
+#				if (B_H[n] > g.flow_H(time_of_flow)):
+#					print('WARNING.group.py() Capping B_H for group {} at time {}'.format(n,time_of_flow))
+#					print('Difference in %: {}'.format(B_H[n]/g.flow_H(time_of_flow)-1.0))
+#					B_H[n] = g.flow_H(time_of_flow)
+#
+#				#print("BICU for {}: {} Flow ICU: {}".format(n,B_ICU[n],g.flow_ICU(self.t)))
+#				#assert(B_ICU[n]<=g.flow_ICU(self.t))
+#				if (B_ICU[n] > g.flow_ICU(time_of_flow)):
+#					print('WARNING. group.py() Capping B_ICU for group {} at time {}'.format(n,time_of_flow))
+#					print('Difference in %: {}'.format(B_ICU[n]/g.flow_ICU(time_of_flow)-1.0))
+#					B_ICU[n] = g.flow_ICU(time_of_flow)
+#
+#			assert(
+#				sum([group.flow_H(time_of_flow)-B_H[name] for name,group in self.groups.items()])<=
+#				self.beds
+#				- sum([(1-group.parameters["lambda_H_R"]-group.parameters["lambda_H_D"])*group.H[time_of_flow] for name,group in self.groups.items()])
+#			)
+#
+#			total_ICU_patients = sum([(1-group.parameters["lambda_ICU_R"]-group.parameters["lambda_ICU_D"])*group.ICU[time_of_flow] + group.flow_ICU(time_of_flow) - B_ICU[name] for name,group in self.groups.items()])
+#			print("take_time_step(): Total ICU patients end of period {}: {}".format(time_of_flow,total_ICU_patients))
+#			print("total_ICU_patients - self.icus =", total_ICU_patients - self.icus)
+#			assert(total_ICU_patients < self.icus)
 
 			for n in self.groups:
 				self.groups[n].take_time_step(m_tests[n], a_tests[n], self.beds, self.icus, B_H[n], B_ICU[n])
 		else:
+			print('group.py(). Taking a step at t={}.'.format(time_of_flow))
+			print('Total in ICU: {}'.format(sum(self.groups[n].ICU[time_of_flow] for n in self.groups)))
 			for n in self.groups:
 				self.groups[n].take_time_step(m_tests[n], a_tests[n], self.beds, self.icus, False, False)
-
-
-
 
 		# Calculate economic values
 		state = self.get_state(self.t+1)
@@ -117,6 +128,42 @@ class DynamicalModel:
 		# Update time
 		self.t += 1
 		return result
+
+	# Cap bounce variables to ensure feasibility
+	def cap_bounce_variables(self, B_H, B_ICU):
+		tol = 1e-7  # bounce a bit more, to make sure capacities are met
+		time_of_flow = self.t # use dynModel t as clock
+
+		# Increase the bounce level so as not to violate C^H / C^ICU
+		# check whether there is overflow in H
+		H_patients = sum([g.H[time_of_flow] for n,g in self.groups.items()])
+		if( H_patients > self.beds ):
+			# extra bounces done proportionally in each group
+			print("\nWARNING. Total in H at t=%d = %.2f > capacity = %d. Bouncing more, proportionally." %(time_of_flow,H_patients,self.beds) )
+			extra_bounced = (1+tol) * (H_patients - self.beds)
+			for n,g in self.groups.items():
+				B_H[n] += extra_bounced * g.H[time_of_flow]/H_patients
+
+		# check whether there is overflow in ICU
+		ICU_patients = sum([g.ICU[time_of_flow] for n,g in self.groups.items()])
+		if( ICU_patients > self.icus ):
+			# extra bounces done proportionally in each group
+			print("\nWARNING. Total in H at t=%d = %.2f > capacity = %d. Bouncing more, proportionally." %(time_of_flow,ICU_patients,self.icus) )
+			extra_bounced = (1+tol) * (ICU_patients - self.icus)
+			for n,g in self.groups.items():
+				B_ICU[n] += extra_bounced * g.ICU[time_of_flow]/ICU_patients
+
+		# Cap bounces at no more than the level of flow_H / flow_ICU
+		for n,g in self.groups.items():
+			if (B_H[n] > g.flow_H(time_of_flow)):
+				print('WARNING.group.py() Capping B_H for group {} at time {}'.format(n,time_of_flow))
+				B_H[n] = g.flow_H(time_of_flow)
+
+			if (B_ICU[n] > g.flow_ICU(time_of_flow)):
+				print('WARNING. group.py() Capping B_ICU for group {} at time {}'.format(n,time_of_flow))
+				B_ICU[n] = g.flow_ICU(time_of_flow)
+
+		return B_H, B_ICU
 
 	# Reset the overall simulation time
 	def reset_time(self, new_time):
@@ -381,16 +428,20 @@ class SEIR_group:
 
 
 	# Gives flow of how many people flowing to H
-	def flow_H(self, t):
+	# NOTE! time_of_flow here may correspond to ANOTHER group that is being updated, so
+	# it may not be equal to self.t
+	def flow_H(self, time_of_flow):
 		if self.parameters['p_H'] != 0.0:
-			return self.parameters['mu']*self.parameters['p_H']*(self.I[self.t]+self.Iss[self.t]/(self.parameters['p_H']+self.parameters['p_ICU']))
+			return self.parameters['mu']*self.parameters['p_H']*(self.I[time_of_flow]+self.Iss[time_of_flow]/(self.parameters['p_H']+self.parameters['p_ICU']))
 		else:
 			return 0.0
 
 	# Gives flow of how many people flowing to ICU
-	def flow_ICU(self, t):
+	# Same issue with time_of_flow as for H
+	def flow_ICU(self, time_of_flow):
 		if self.parameters['p_ICU'] != 0.0:
-			return self.parameters['mu']*self.parameters['p_ICU']*(self.I[self.t]+self.Iss[self.t]/(self.parameters['p_H']+self.parameters['p_ICU']))
+			# print('flow_ICU(). In group {}, time from self is {}, time being updated is {}'.format(self.name,self.t,time_of_flow))
+			return self.parameters['mu']*self.parameters['p_ICU']*(self.I[time_of_flow]+self.Iss[time_of_flow]/(self.parameters['p_H']+self.parameters['p_ICU']))
 		else:
 			return 0.0
 
@@ -456,66 +507,73 @@ class SEIR_group:
 
 
 	def update_H(self, m_tests, a_tests, h_cap, icu_cap, B_H):
-
+		tol = 1e-7
 		# For each group, calculate the entering amount
+		time_of_flow = self.t  # the time at which this group (current group) is updated
 		entering_h = {}
 		summ_entering_h = 0
 		summ_staying_h = 0
 		for n,g in self.all_groups.items():
-			entering_h[n] = self.all_groups[n].flow_H(self.t)
+			entering_h[n] = self.all_groups[n].flow_H(time_of_flow)
 			summ_entering_h += entering_h[n]
-			summ_staying_h += (1-g.parameters['lambda_H_R']-g.parameters['lambda_H_D'])*g.H[self.t]
+			summ_staying_h += (1-g.parameters['lambda_H_R']-g.parameters['lambda_H_D'])*g.H[time_of_flow]
 
 		if B_H is False:
 			B_H = entering_h[self.name]*(summ_entering_h-h_cap+summ_staying_h if summ_entering_h-h_cap+summ_staying_h>0 else 0)/(summ_entering_h if summ_entering_h!=0 else 10e-6)
 
 		delta_H = (
-			- (self.parameters["lambda_H_R"] + self.parameters["lambda_H_D"])*self.H[self.t]
-			+ entering_h[self.name]
+			- (self.parameters["lambda_H_R"] + self.parameters["lambda_H_D"])*self.H[time_of_flow]
+			+ (1-tol) * entering_h[self.name]
 			- B_H
 		)
-		self.H += [self.H[self.t]+delta_H*self.dt]
+		self.H += [self.H[time_of_flow]+delta_H*self.dt]
 
 
 	def update_ICU(self, m_tests, a_tests, h_cap, icu_cap, B_ICU):
+		tol = 1e-7
 		# For each group, calculate the entering amount
+		time_of_flow = self.t  # the time at which this group (current group) is updated
 		entering_icu = {}
 		summ_entering_icu = 0
 		summ_staying_icu = 0
 		for n,g in self.all_groups.items():
-			entering_icu[n] = self.all_groups[n].flow_ICU(self.t)
+			entering_icu[n] = self.all_groups[n].flow_ICU(time_of_flow)
 			summ_entering_icu += entering_icu[n]
-			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[self.t]
+			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[time_of_flow]
 
+		#print('update_ICU(): Total entering ICU calculated from group {} is:{}'.format(self.name,summ_entering_icu))
 		if B_ICU is False:
+			#print("group.py(): FALSE branch for B_ICU")
 			B_ICU = entering_icu[self.name]*(summ_entering_icu-icu_cap+summ_staying_icu if summ_entering_icu-icu_cap+summ_staying_icu>0 else 0)/(summ_entering_icu if summ_entering_icu!=0 else 10e-6)
 
 		delta_ICU = (
-			- (self.parameters["lambda_ICU_R"] + self.parameters["lambda_ICU_D"])*self.ICU[self.t]
-			+ entering_icu[self.name]
+			- (self.parameters["lambda_ICU_R"] + self.parameters["lambda_ICU_D"])*self.ICU[time_of_flow]
+			+ (1-tol) * entering_icu[self.name]
 			- B_ICU
 		)
-		self.ICU += [self.ICU[self.t]+delta_ICU*self.dt]
+		self.ICU += [self.ICU[time_of_flow]+delta_ICU*self.dt]
+		#print("update_ICU(): ICU occupancy at end of period t={} for group {} IS {}".format(time_of_flow, self.name,self.ICU[-1]))
 
 
 
 	def update_D(self, m_tests, a_tests, h_cap, icu_cap, B_H, B_ICU):
 		# For each group, calculate the entering amount
+		time_of_flow = self.t  # the time at which this group (current group) is updated
 		entering_h = {}
 		summ_entering_h = 0
 		summ_staying_h = 0
 		for n,g in self.all_groups.items():
-			entering_h[n] = self.all_groups[n].flow_H(self.t)
+			entering_h[n] = self.all_groups[n].flow_H(time_of_flow)
 			summ_entering_h += entering_h[n]
-			summ_staying_h += (1-g.parameters['lambda_H_R']-g.parameters['lambda_H_D'])*g.H[self.t]
+			summ_staying_h += (1-g.parameters['lambda_H_R']-g.parameters['lambda_H_D'])*g.H[time_of_flow]
 
 		entering_icu = {}
 		summ_entering_icu = 0
 		summ_staying_icu = 0
 		for n,g in self.all_groups.items():
-			entering_icu[n] = self.all_groups[n].flow_ICU(self.t)
+			entering_icu[n] = self.all_groups[n].flow_ICU(time_of_flow)
 			summ_entering_icu += entering_icu[n]
-			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[self.t]
+			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[time_of_flow]
 
 		if B_H is False:
 			B_H = entering_h[self.name]*(summ_entering_h-h_cap+summ_staying_h if summ_entering_h-h_cap+summ_staying_h>0 else 0)/(summ_entering_h if summ_entering_h!=0 else 10e-6)
@@ -524,10 +582,10 @@ class SEIR_group:
 
 
 		delta_D = (
-			self.parameters["lambda_H_D"]*self.H[self.t]
-			+ self.parameters["lambda_ICU_D"]*self.ICU[self.t]
+			self.parameters["lambda_H_D"]*self.H[time_of_flow]
+			+ self.parameters["lambda_ICU_D"]*self.ICU[time_of_flow]
 			+ B_H
 			+ B_ICU
 		)
 
-		self.D += [self.D[self.t]+delta_D*self.dt]
+		self.D += [self.D[time_of_flow]+delta_D*self.dt]

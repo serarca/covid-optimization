@@ -7,6 +7,7 @@ Created on Tue Jun  9 16:08:59 2020
 
 import os.path
 import sys
+import numpy as np
 from inspect import getsourcefile
 from random import *
 
@@ -22,7 +23,7 @@ from heuristics import *
 # Global variables
 simulation_params = {
         'dt':1.0,
-        'days': 3,
+        'days': 5,
         'region': "Ile-de-France",
         'quar_freq': 1,
 }
@@ -112,15 +113,20 @@ uhat_seq = np.zeros((ut_dim,T))
 #print(dynModel.parameters['global-parameters']['ICU])
 #print(dynModel.parameters['global-parameters']['C_ICU'])
 
+use_bounce_var = False   # whether to use bounce variables
+cap_X_hat = True      # whether to apply H/ICU capacity in case X_hat returned by dynModel exceeds them
+
 for k in range(T):
 
+    print("\n\n TIME k= {}.".format(k))
+
     # calculate state trajectory X_hat
-    Xhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq)
+    Xhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq, use_bounce_var, cap_X_hat)
     assert( np.shape(Xhat_seq) == (Xt_dim,T-k) )
 
     ICUidx_all = slice(SEIR_groups.index('ICU_g'),Xt_dim,num_compartments)
-    print("\n\n TIME k= %d\nTotal people in ICU at start of %d: %.2f" %(k,k,np.sum(Xhat_seq[ICUidx_all,0])) )
-
+    print("Total people in ICU at start of period k={}".format(np.sum(Xhat_seq[ICUidx_all,0])))
+    
     # calculate objective parameters d, e
     D,E = calculate_objective_time_dependent_coefs(dynModel, k, Xhat_seq, uhat_seq)
 
@@ -140,6 +146,7 @@ for k in range(T):
 
     # create empty model
     mod = gb.Model("Linearization Heuristic")
+    mod.setParam( 'OutputFlag', False )     # make Gurobi silent
     mod.Params.DualReductions = 0  # change this to get explicit infeasible or unbounded
 
     # add all decisions using matrix format, and also specify objective coefficients
@@ -158,7 +165,7 @@ for k in range(T):
             cname = ("%s[t=%d]" %(all_labels[con],t))
             mod.addConstr( u_vars_vec @ cons_vec + constr_consts[t][con] <= K[con,t], name=cname)
 
-    mod.write("LP_lineariz_model.lp")
+    mod.write("LP_lineariz_model.lp")       # write the LP to a file
 
     # optimize the model
     mod.optimize()
@@ -167,6 +174,7 @@ for k in range(T):
         # model was infeasible
         mod.computeIIS()  # irreducible system of infeasible inequalities
         mod.write("LP_lineariz_IIS.ilp")
+        print("ERROR. Problem infeasible at time k={}. Halting...".format(k))
         assert(False)
 
     # extract decisions for current period (testing and alphas)
@@ -185,9 +193,11 @@ for k in range(T):
         a_tests[ag] = uk_opt_dict[ag]['Natest_g']
 
     # take one time step in dynamical system
-    print("Calling Time Step at The end of the for loop")
-    dynModel.take_time_step(m_tests, a_tests, alphak_opt_dict, BH, BICU)
-
+    #print("Calling Time Step at The end of the for loop")
+    if(use_bounce_var):
+        dynModel.take_time_step(m_tests, a_tests, alphak_opt_dict, BH, BICU)
+    else:
+        dynModel.take_time_step(m_tests, a_tests, alphak_opt_dict)
 
     # update uhat_sequence
     uhat_seq = uvars_opt[:,1:]

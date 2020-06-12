@@ -331,16 +331,20 @@ def get_Jacobian_u(dynModel, X_hat, u_hat, mixing_method):
     return jacob
 
 ####################################
-# Build X_hat given a dynModel, a starting point k, and a
-# sequence of controls u_hats
-def get_X_hat_sequence(dynModel, k, u_hat_sequence):
+# Build X_hat given a dynModel, a starting point k, and a sequence of controls u_hat
+def get_X_hat_sequence(dynModel, k, u_hat_sequence, use_bounce, cap_seq):
     """Given a dynamical model, a starting point k, and the controls for time periods k to T-1 for tests and lockdowns, we start the dynamical model at time k, and then run it until time T-1 with the controls in u_hat.
     This produces the nominal trajectory X_hat_sequence. X_hat_sequence is a np.array of shape (num_compartments * num_age_groups, T-k), where each column represents the X_hat at time k, k+1,...
     This assumes that the dynamical model has already been run up to point k (it takes the states at time k as the starting points for the new nominal trajectory).
     We assume as well that u_hat_sequence is a 2-d numpy array with shape (num_controls * num_age_groups, T-k) with each column corresponding to a u_hat at time k, k+1,..., T-1. Hence, u_hat_sequence[:,k] gives the u_hat at time k.
     Note we are not using the bouncing variables in forecasting X_hat_sequence.
-    Note: we return x_hat[k], x_hat[k+1], ..., x_hat[T-1]
+    Note: we return x_hat[k], x_hat[k+1], ..., x_hat[T-1].
     """
+    #NOTE. There are a few extra arguments, as follows:
+    # Argument 'cap_seq' specifies whether this should cap the sequence using 
+    # hospital and capacity constraints so as to make it feasible.
+    # Argument 'use_bounce' determines whether to use bounce variables or not
+
     # Erase the states after k so as to reset the dyn model
     dynModel.reset_time(k)
 
@@ -348,11 +352,15 @@ def get_X_hat_sequence(dynModel, k, u_hat_sequence):
     T = dynModel.time_steps
 
     X_hat_sequence = np.zeros((num_compartments * num_age_groups, T-k))
+    Hidx_all = slice(SEIR_groups.index('H_g'),np.shape(X_hat_sequence)[0],num_compartments)
+    ICUidx_all = slice(SEIR_groups.index('ICU_g'),np.shape(X_hat_sequence)[0],num_compartments)
 
     for t in range(T-k):
         if t!=0:
             # Write the values of u_hat at time t-1 in dict form
+            # WHY IS THIS t-1 ??? WEIRD INDEXING?
             u_hat_dict, alphas = buildAlphaDict(u_hat_sequence[:,t-1])
+
             #Create m and a tests in the format taken by dynModel
             m_tests = {}
             a_tests = {}
@@ -364,40 +372,45 @@ def get_X_hat_sequence(dynModel, k, u_hat_sequence):
                 m_tests[ag] = u_hat_dict[ag]['Nmtest_g']
                 a_tests[ag] = u_hat_dict[ag]['Natest_g']
 
-            # take one time step in dynamical system Note that we ARE using the bouncing variables
-            dynModel.take_time_step(m_tests, a_tests, alphas, BH, BICU)
+            # take one time step in dynamical system.
+            if(use_bounce):
+                dynModel.take_time_step(m_tests, a_tests, alphas, BH, BICU)
+            else:
+                dynModel.take_time_step(m_tests, a_tests, alphas)
 
+        # get the state from the dynamic model
         state = dynModel.get_state(t + k)
 
-        for ag in range(num_age_groups):
-            Sg_idx = ag*num_compartments + SEIR_groups.index('S_g')
-            Eg_idx = ag*num_compartments + SEIR_groups.index('E_g')
-            Ig_idx = ag*num_compartments + SEIR_groups.index('I_g')
-            Ng_idx = ag*num_compartments + SEIR_groups.index('N_g')
-            Rg_idx = ag*num_compartments + SEIR_groups.index('R_g')
-            Iag_idx = ag*num_compartments + SEIR_groups.index('Ia_g')
-            Ipsg_idx = ag*num_compartments + SEIR_groups.index('Ips_g')
-            Imsg_idx = ag*num_compartments + SEIR_groups.index('Ims_g')
-            Issg_idx = ag*num_compartments + SEIR_groups.index('Iss_g')
-            Rqg_idx = ag*num_compartments + SEIR_groups.index('Rq_g')
-            Hg_idx = ag*num_compartments + SEIR_groups.index('H_g')
-            ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
-            Dg_idx = ag*num_compartments + SEIR_groups.index('D_g')
+        # write it into X_hat
+        X_hat_sequence[:,t] = dict_to_X(state)
+        
+        # check whether any capping in H or ICU should be done
+        if( cap_seq ):
+            
+            tol = 1e-7  # bounce a bit more, to make sure capacities are met
+            # check whether there is overflow in H
+            H_patients = np.sum(X_hat_sequence[Hidx_all,t])
+            if( H_patients > dynModel.parameters['global-parameters']['C_H'] ):
+                print("\nWARNING. get_X_hat_seq(). Total in H at t=%d = %.2f > capacity = %d. Bouncing more, proportionally." \
+                      %(t,H_patients,dynModel.parameters['global-parameters']['C_H']) )
+                # extra bounces done proportionally in each group
+                extra_bounced = tol + (H_patients - dynModel.parameters['global-parameters']['C_H'])
+                extra_bounced_g = extra_bounced * X_hat_sequence[Hidx_all,t]/H_patients
+                X_hat_sequence[Hidx_all,t] -= extra_bounced_g
 
-            X_hat_sequence[Sg_idx, t] = state[age_groups[ag]]['S']
-            X_hat_sequence[Eg_idx, t] = state[age_groups[ag]]['E']
-            X_hat_sequence[Ig_idx, t] = state[age_groups[ag]]['I']
-            X_hat_sequence[Rg_idx, t] = state[age_groups[ag]]['R']
-            X_hat_sequence[Ng_idx, t] = state[age_groups[ag]]['N']
-            X_hat_sequence[Iag_idx, t] = state[age_groups[ag]]['Ia']
-            X_hat_sequence[Ipsg_idx, t] = state[age_groups[ag]]['Ips']
-            X_hat_sequence[Imsg_idx, t] = state[age_groups[ag]]['Ims']
-            X_hat_sequence[Issg_idx, t] = state[age_groups[ag]]['Iss']
-            X_hat_sequence[Rqg_idx, t] = state[age_groups[ag]]['Rq']
-            X_hat_sequence[Hg_idx, t] = state[age_groups[ag]]['H']
-            X_hat_sequence[ICUg_idx, t] = state[age_groups[ag]]['ICU']
-            X_hat_sequence[Dg_idx, t] = state[age_groups[ag]]['D']
+            # check whether there is overflow in ICU
+            ICU_patients = np.sum(X_hat_sequence[ICUidx_all,t])
+            if( ICU_patients > dynModel.parameters['global-parameters']['C_ICU'] ):
+                print("\nWARNING. get_X_hat_seq(). Total in ICU at t=%d = %.2f > capacity = %d. Bouncing more, proportionally." \
+                      %(t,ICU_patients,dynModel.parameters['global-parameters']['C_ICU']) )
+                # extra bounces done proportionally in each group
+                extra_bounced = tol + (ICU_patients - dynModel.parameters['global-parameters']['C_ICU'])
+                extra_bounced_g = extra_bounced * X_hat_sequence[ICUidx_all,t]/ICU_patients
+                X_hat_sequence[ICUidx_all,t] -= extra_bounced_g
 
+            # NOTE. IT IS UNCLEAR WHETHER WE SHOULD ALSO ROLL BACK DYNMODEL AND UPDATE STATE TO REFLECT CLIPPING
+            # FOR NOW, WE DO NOT.
+            
     # Erase the states after k so as to reset the dyn model
     dynModel.reset_time(k)
 
@@ -414,14 +427,8 @@ def buildAlphaDict(u_hat_array):
         alphas[age_groups[ag]] = {}
         u_hat_dict[age_groups[ag]]['Nmtest_g'] = u_hat_array[ag * num_controls + controls.index('Nmtest_g')]
         u_hat_dict[age_groups[ag]]['Natest_g'] = u_hat_array[ag * num_controls + controls.index('Natest_g')]
-        u_hat_dict[age_groups[ag]]['BounceH_g'] = u_hat_array[ag * num_controls + controls.index('BounceH_g')]
-        u_hat_dict[age_groups[ag]]['BounceICU_g'] = u_hat_array[ag * num_controls + controls.index('BounceICU_g')]
-        # u_hat_dict[age_groups[ag]]['home'] = u_hat_array[ag * num_controls + controls.index('home')]
-        # u_hat_dict[age_groups[ag]]['leisure'] = u_hat_array[ag * num_controls + controls.index('leisure')]
-        # u_hat_dict[age_groups[ag]]['other'] = u_hat_array[ag * num_controls + controls.index('other')]
-        # u_hat_dict[age_groups[ag]]['school'] = u_hat_array[ag * num_controls + controls.index('school')]
-        # u_hat_dict[age_groups[ag]]['transport'] = u_hat_array[ag * num_controls + controls.index('transport')]
-        # u_hat_dict[age_groups[ag]]['work'] = u_hat_array[ag * num_controls + controls.index('work')]
+        u_hat_dict[age_groups[ag]]['BounceH_g'] = u_hat_array[ag * num_controls + controls.index('BounceH_g')] if u_hat_array[ag * num_controls + controls.index('BounceH_g')] != -1 else False
+        u_hat_dict[age_groups[ag]]['BounceICU_g'] = u_hat_array[ag * num_controls + controls.index('BounceICU_g')] if u_hat_array[ag * num_controls + controls.index('BounceICU_g')] != -1 else False
 
         alphas[age_groups[ag]]['home'] = u_hat_array[ag * num_controls + controls.index('home')]
         alphas[age_groups[ag]]['leisure'] = u_hat_array[ag * num_controls + controls.index('leisure')]
