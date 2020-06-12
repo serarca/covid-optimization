@@ -5,7 +5,7 @@ import pandas as pd
 import math
 
 def n_contacts(group_g, group_h, alphas, mixing_method):
-	
+
 	n = 0
 	if mixing_method['name'] == "maxmin":
 		for activity in alphas[group_g.name]:
@@ -69,7 +69,10 @@ class DynamicalModel:
 		if B_H and B_ICU:
 			# Verify that the bouncing variables satisfy the required bounds
 			for n,g in self.groups.items():
+				print("BH for {}: {} Flow H: {}".format(n,B_H[n],g.flow_H(self.t)))
 				assert(B_H[n]<=g.flow_H(self.t))
+
+				print("BICU for {}: {} Flow ICU: {}".format(n,B_ICU[n],g.flow_ICU(self.t)))
 				assert(B_ICU[n]<=g.flow_ICU(self.t))
 
 			assert(
@@ -77,11 +80,11 @@ class DynamicalModel:
 				self.beds
 				- sum([(1-group.parameters["lambda_H_R"]-group.parameters["lambda_H_D"])*group.H[self.t] for name,group in self.groups.items()])
 			)
-			assert(
-				sum([group.flow_ICU(self.t)-B_ICU[name] for name,group in self.groups.items()])<=
-				self.icus
-				- sum([(1-group.parameters["lambda_ICU_R"]-group.parameters["lambda_ICU_D"])*group.ICU[self.t] for name,group in self.groups.items()])
-			)
+			# assert(
+			# 	sum([group.flow_ICU(self.t)-B_ICU[name] for name,group in self.groups.items()])<=
+			# 	self.icus
+			# 	- sum([(1-group.parameters["lambda_ICU_R"]-group.parameters["lambda_ICU_D"])*group.ICU[self.t] for name,group in self.groups.items()])
+			# )
 
 			for n in self.groups:
 				self.groups[n].take_time_step(m_tests[n], a_tests[n], self.beds, self.icus, B_H[n], B_ICU[n])
@@ -89,7 +92,7 @@ class DynamicalModel:
 			for n in self.groups:
 				self.groups[n].take_time_step(m_tests[n], a_tests[n], self.beds, self.icus, False, False)
 
-				
+
 
 
 		# Calculate economic values
@@ -373,7 +376,7 @@ class SEIR_group:
 		self.ICU = self.ICU[0:new_time+1]
 		self.D = self.D[0:new_time+1]
 		self.total_contacts = self.total_contacts[0:new_time]
-		
+
 		self.t = new_time
 
 
@@ -453,7 +456,7 @@ class SEIR_group:
 
 
 	def update_H(self, m_tests, a_tests, h_cap, icu_cap, B_H):
-		
+
 		# For each group, calculate the entering amount
 		entering_h = {}
 		summ_entering_h = 0
@@ -462,7 +465,7 @@ class SEIR_group:
 			entering_h[n] = self.all_groups[n].flow_H(self.t)
 			summ_entering_h += entering_h[n]
 			summ_staying_h += (1-g.parameters['lambda_H_R']-g.parameters['lambda_H_D'])*g.H[self.t]
-		
+
 		if B_H is False:
 			B_H = entering_h[self.name]*(summ_entering_h-h_cap+summ_staying_h if summ_entering_h-h_cap+summ_staying_h>0 else 0)/(summ_entering_h if summ_entering_h!=0 else 10e-6)
 

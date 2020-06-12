@@ -356,12 +356,16 @@ def get_X_hat_sequence(dynModel, k, u_hat_sequence):
             #Create m and a tests in the format taken by dynModel
             m_tests = {}
             a_tests = {}
-            for g in age_groups:
-                m_tests[g] = u_hat_dict[g]['Nmtest_g']
-                a_tests[g] = u_hat_dict[g]['Natest_g']
+            BH = {}
+            BICU = {}
+            for ag in age_groups:
+                BH[ag] = u_hat_dict[ag]['BounceH_g']
+                BICU[ag] = u_hat_dict[ag]['BounceICU_g']
+                m_tests[ag] = u_hat_dict[ag]['Nmtest_g']
+                a_tests[ag] = u_hat_dict[ag]['Natest_g']
 
-            #Using the controls u_hat for time t-1, take time step. Note: we don't use bouncing variable to create X_hat
-            dynModel.take_time_step(m_tests, a_tests, alphas)
+            # take one time step in dynamical system Note that we ARE using the bouncing variables
+            dynModel.take_time_step(m_tests, a_tests, alphas, BH, BICU)
 
         state = dynModel.get_state(t + k)
 
@@ -565,8 +569,8 @@ def get_F(dynModel, X, u):
     dynModel.write_state(dynModel.t, X_dict)
 
     # Run a step of the dyn model
-    # dynModel.take_time_step(m_tests, a_tests, alphas, B_H, B_ICU)
-    dynModel.take_time_step(m_tests, a_tests, alphas)
+    dynModel.take_time_step(m_tests, a_tests, alphas, B_H, B_ICU)
+    #dynModel.take_time_step(m_tests, a_tests, alphas)
 
     # Get the current state
     state_next_step = dynModel.get_state(dynModel.t)
