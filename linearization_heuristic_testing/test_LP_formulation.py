@@ -176,12 +176,18 @@ for k in range(T):
 
     m_tests = {}
     a_tests = {}
+    BH = {}
+    BICU = {}
     for ag in age_groups:
+        BH[ag] = uk_opt_dict[ag]['BounceH_g']
+        BICU[ag] = uk_opt_dict[ag]['BounceICU_g']
         m_tests[ag] = uk_opt_dict[ag]['Nmtest_g']
         a_tests[ag] = uk_opt_dict[ag]['Natest_g']
 
     # take one time step in dynamical system
-    dynModel.take_time_step(m_tests, a_tests, alphak_opt_dict)
+    print("Calling Time Step at The end of the for loop")
+    dynModel.take_time_step(m_tests, a_tests, alphak_opt_dict, BH, BICU)
+
 
     # update uhat_sequence
     uhat_seq = uvars_opt[:,1:]
