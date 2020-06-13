@@ -79,6 +79,7 @@ for group in initialization:
 dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method)
 
 initial_state = dynModel.get_state(0)
+initial_X = dict_to_X(initial_state)
 
 ##### Test X_to_dict and dict_to_X
 new_state = X_to_dict(dict_to_X(initial_state))
@@ -105,7 +106,7 @@ for group in new_alphas:
 		assert(new_u_hat_dict[group][control] == u_hat_dict[group][control])
 
 ### Test the getF function, we start by transitioning 100 times
-initial_X = dict_to_X(initial_state)
+
 
 # Run it once
 m_tests = {}
@@ -149,6 +150,7 @@ assert(dynModel.t == 100)
 
 
 ## Now we test with bouncing variables
+iterations = 50
 u = random.randint(1000, size = (num_controls * num_age_groups))
 u_hat_dict, alphas = buildAlphaDict(u)
 
@@ -169,53 +171,57 @@ for g in age_groups:
     B_H[g] = u_hat_dict[g]['BounceH_g'] if (u_hat_dict[g]['BounceH_g'] != -1) else False
     B_ICU[g] = u_hat_dict[g]['BounceICU_g'] if (u_hat_dict[g]['BounceICU_g'] != -1) else False
 
-for i in range(100):
+for i in range(iterations):
 	dynModel.take_time_step(m_tests, a_tests, alphas_vec[0], B_H, B_ICU)
 
-final_X = dict_to_X(dynModel.get_state(100))
+final_X = dict_to_X(dynModel.get_state(iterations))
 
 # Run it again
 X = initial_X
 u = dict_to_u(u_hat_dict, alphas_vec[0])
-
-for i in range(100):
+print(u)
+for i in range(iterations):
 	X = get_F(dynModel,X,u)
-print(X-final_X)
+
 assert(np.all(X == final_X))
-assert(dynModel.t == 100)
+assert(dynModel.t == iterations)
 
 
 
 
 
 
-
-# # Now we check that the Jacobians are being calculated properly
-# X = initial_X
-
-
-# epsilon = 1e-8
-
-# numerical_jacobian = np.zeros((num_age_groups*num_compartments, num_age_groups*num_compartments))
-# for i in range(num_age_groups*num_compartments):
-# 	one = np.zeros(num_age_groups*num_compartments)
-# 	one[i] = epsilon
-# 	partial = (get_F(dynModel,initial_X+one,u) - get_F(dynModel,initial_X,u))/epsilon
-# 	numerical_jacobian[:,i] = partial
-
-# real_jacobian = get_Jacobian_X(dynModel, initial_X, u, mixing_method)
-
-# distance = (numerical_jacobian-real_jacobian-np.identity(num_age_groups*num_compartments))
-# sum_matrices = real_jacobian+np.identity(num_age_groups*num_compartments)
-# scaled = np.zeros((num_age_groups*num_compartments, num_age_groups*num_compartments))
-# for i in range(num_age_groups*num_compartments):
-# 	for j in range(num_age_groups*num_compartments):
-# 		scaled[i,j] = distance[i,j]/sum_matrices[i,j] if sum_matrices[i,j]!=0 else distance[i,j]
+# Now we check that the Jacobians are being calculated properly
+dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method)
 
 
-# print(real_jacobian[25,24])
-# print(numerical_jacobian[25,24])
+X = initial_X
+u = random.randint(1000, size = (num_controls * num_age_groups))
 
+
+
+epsilon = 1e-6
+
+numerical_jacobian = np.zeros((num_age_groups*num_compartments, num_age_groups*num_compartments))
+for i in range(num_age_groups*num_compartments):
+	one = np.zeros(num_age_groups*num_compartments)
+	F = get_F(dynModel,initial_X,u)
+	one[i] = F[i]*epsilon
+	Fdt = get_F(dynModel,initial_X+one,u)
+	
+	partial = (Fdt - F)/(epsilon*F[i])
+	numerical_jacobian[:,i] = partial
+
+real_jacobian = get_Jacobian_X(dynModel, initial_X, u, mixing_method) + np.identity(num_age_groups*num_compartments)
+
+distance = (numerical_jacobian-real_jacobian)
+scaled = np.zeros((num_age_groups*num_compartments, num_age_groups*num_compartments))
+for i in range(num_age_groups*num_compartments):
+	for j in range(num_age_groups*num_compartments):
+		scaled[i,j] = distance[i,j]/real_jacobian[i,j] if real_jacobian[i,j]!=0 else distance[i,j]
+
+print(np.max(scaled))
+print(np.where(scaled==np.amax(scaled)))
 
 
 

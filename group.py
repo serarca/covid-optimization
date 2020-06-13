@@ -72,31 +72,31 @@ class DynamicalModel:
 		if (B_H is not False) and (B_ICU is not False):
 			B_H, B_ICU = self.cap_bounce_variables(B_H, B_ICU)
 			# Verify that the bouncing variables satisfy the required bounds
-#			for n,g in self.groups.items():
-#				# print("BH for {}: {} Flow H: {}".format(n,B_H[n],g.flow_H(self.t)))
-#				# assert(B_H[n]<=g.flow_H(self.t))
-#				if (B_H[n] > g.flow_H(time_of_flow)):
-#					print('WARNING.group.py() Capping B_H for group {} at time {}'.format(n,time_of_flow))
-#					print('Difference in %: {}'.format(B_H[n]/g.flow_H(time_of_flow)-1.0))
-#					B_H[n] = g.flow_H(time_of_flow)
-#
-#				#print("BICU for {}: {} Flow ICU: {}".format(n,B_ICU[n],g.flow_ICU(self.t)))
-#				#assert(B_ICU[n]<=g.flow_ICU(self.t))
-#				if (B_ICU[n] > g.flow_ICU(time_of_flow)):
-#					print('WARNING. group.py() Capping B_ICU for group {} at time {}'.format(n,time_of_flow))
-#					print('Difference in %: {}'.format(B_ICU[n]/g.flow_ICU(time_of_flow)-1.0))
-#					B_ICU[n] = g.flow_ICU(time_of_flow)
-#
-#			assert(
-#				sum([group.flow_H(time_of_flow)-B_H[name] for name,group in self.groups.items()])<=
-#				self.beds
-#				- sum([(1-group.parameters["lambda_H_R"]-group.parameters["lambda_H_D"])*group.H[time_of_flow] for name,group in self.groups.items()])
-#			)
-#
-#			total_ICU_patients = sum([(1-group.parameters["lambda_ICU_R"]-group.parameters["lambda_ICU_D"])*group.ICU[time_of_flow] + group.flow_ICU(time_of_flow) - B_ICU[name] for name,group in self.groups.items()])
-#			print("take_time_step(): Total ICU patients end of period {}: {}".format(time_of_flow,total_ICU_patients))
-#			print("total_ICU_patients - self.icus =", total_ICU_patients - self.icus)
-#			assert(total_ICU_patients < self.icus)
+			for n,g in self.groups.items():
+				# print("BH for {}: {} Flow H: {}".format(n,B_H[n],g.flow_H(self.t)))
+				# assert(B_H[n]<=g.flow_H(self.t))
+				if (B_H[n] > g.flow_H(time_of_flow)):
+					print('WARNING.group.py() Capping B_H for group {} at time {}'.format(n,time_of_flow))
+					print('Difference in %: {}'.format(B_H[n]/g.flow_H(time_of_flow)-1.0))
+					B_H[n] = g.flow_H(time_of_flow)
+
+				#print("BICU for {}: {} Flow ICU: {}".format(n,B_ICU[n],g.flow_ICU(self.t)))
+				#assert(B_ICU[n]<=g.flow_ICU(self.t))
+				if (B_ICU[n] > g.flow_ICU(time_of_flow)):
+					print('WARNING. group.py() Capping B_ICU for group {} at time {}'.format(n,time_of_flow))
+					print('Difference in %: {}'.format(B_ICU[n]/g.flow_ICU(time_of_flow)-1.0))
+					B_ICU[n] = g.flow_ICU(time_of_flow)
+
+			assert(
+				sum([group.flow_H(time_of_flow)-B_H[name] for name,group in self.groups.items()])<=
+				self.beds
+				- sum([(1-group.parameters["lambda_H_R"]-group.parameters["lambda_H_D"])*group.H[time_of_flow] for name,group in self.groups.items()])
+			)
+
+			total_ICU_patients = sum([(1-group.parameters["lambda_ICU_R"]-group.parameters["lambda_ICU_D"])*group.ICU[time_of_flow] + group.flow_ICU(time_of_flow) - B_ICU[name] for name,group in self.groups.items()])
+			print("take_time_step(): Total ICU patients end of period {}: {}".format(time_of_flow,total_ICU_patients))
+			print("total_ICU_patients - self.icus =", total_ICU_patients - self.icus)
+			assert(total_ICU_patients < self.icus)
 
 			for n in self.groups:
 				self.groups[n].take_time_step(m_tests[n], a_tests[n], self.beds, self.icus, B_H[n], B_ICU[n])
@@ -134,34 +134,34 @@ class DynamicalModel:
 		tol = 1e-7  # bounce a bit more, to make sure capacities are met
 		time_of_flow = self.t # use dynModel t as clock
 
-		# Increase the bounce level so as not to violate C^H / C^ICU
-		# check whether there is overflow in H
-		H_patients = sum([g.H[time_of_flow] for n,g in self.groups.items()])
-		if( H_patients > self.beds ):
-			# extra bounces done proportionally in each group
-			print("\nWARNING. Total in H at t=%d = %.2f > capacity = %d. Bouncing more, proportionally." %(time_of_flow,H_patients,self.beds) )
-			extra_bounced = (1+tol) * (H_patients - self.beds)
-			for n,g in self.groups.items():
-				B_H[n] += extra_bounced * g.H[time_of_flow]/H_patients
+		# # Increase the bounce level so as not to violate C^H / C^ICU
+		# # check whether there is overflow in H
+		# H_patients = sum([g.H[time_of_flow] for n,g in self.groups.items()])
+		# if( H_patients > self.beds ):
+		# 	# extra bounces done proportionally in each group
+		# 	print("\nWARNING. Total in H at t=%d = %.2f > capacity = %d. Bouncing more, proportionally." %(time_of_flow,H_patients,self.beds) )
+		# 	extra_bounced = (1+tol) * (H_patients - self.beds)
+		# 	for n,g in self.groups.items():
+		# 		B_H[n] += extra_bounced * g.H[time_of_flow]/H_patients
 
-		# check whether there is overflow in ICU
-		ICU_patients = sum([g.ICU[time_of_flow] for n,g in self.groups.items()])
-		if( ICU_patients > self.icus ):
-			# extra bounces done proportionally in each group
-			print("\nWARNING. Total in H at t=%d = %.2f > capacity = %d. Bouncing more, proportionally." %(time_of_flow,ICU_patients,self.icus) )
-			extra_bounced = (1+tol) * (ICU_patients - self.icus)
-			for n,g in self.groups.items():
-				B_ICU[n] += extra_bounced * g.ICU[time_of_flow]/ICU_patients
+		# # check whether there is overflow in ICU
+		# ICU_patients = sum([g.ICU[time_of_flow] for n,g in self.groups.items()])
+		# if( ICU_patients > self.icus ):
+		# 	# extra bounces done proportionally in each group
+		# 	print("\nWARNING. Total in H at t=%d = %.2f > capacity = %d. Bouncing more, proportionally." %(time_of_flow,ICU_patients,self.icus) )
+		# 	extra_bounced = (1+tol) * (ICU_patients - self.icus)
+		# 	for n,g in self.groups.items():
+		# 		B_ICU[n] += extra_bounced * g.ICU[time_of_flow]/ICU_patients
 
-		# Cap bounces at no more than the level of flow_H / flow_ICU
-		for n,g in self.groups.items():
-			if (B_H[n] > g.flow_H()):
-				print('WARNING.group.py() Capping B_H for group {} at time {}'.format(n,time_of_flow))
-				B_H[n] = g.flow_H()
+		# # Cap bounces at no more than the level of flow_H / flow_ICU
+		# for n,g in self.groups.items():
+		# 	if (B_H[n] > g.flow_H()):
+		# 		print('WARNING.group.py() Capping B_H for group {} at time {}'.format(n,time_of_flow))
+		# 		B_H[n] = g.flow_H()
 
-			if (B_ICU[n] > g.flow_ICU()):
-				print('WARNING. group.py() Capping B_ICU for group {} at time {}'.format(n,time_of_flow))
-				B_ICU[n] = g.flow_ICU()
+		# 	if (B_ICU[n] > g.flow_ICU()):
+		# 		print('WARNING. group.py() Capping B_ICU for group {} at time {}'.format(n,time_of_flow))
+		# 		B_ICU[n] = g.flow_ICU()
 
 		return B_H, B_ICU
 

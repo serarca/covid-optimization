@@ -576,7 +576,7 @@ def get_F(dynModel, X, u):
     prorrated = True
     for g in age_groups:
         if (B_H[g] is not False) or (B_ICU[g] is not False):
-            prorrated = True
+            prorrated = False
 
 
     # Write X_dict as current state of dynModel
