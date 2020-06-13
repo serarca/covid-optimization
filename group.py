@@ -15,7 +15,7 @@ def n_contacts(group_g, group_h, alphas, mixing_method):
 				)
 	elif mixing_method['name'] == "mult":
 		for activity in alphas[group_g.name]:
-			n += group_g.contacts[activity][group_h.name]*alphas[group_g.name][activity]*alphas[group_h.name][activity]
+			n += group_g.contacts[activity][group_h.name]*(alphas[group_g.name][activity]**mixing_method['param_alpha'])*(alphas[group_h.name][activity]**mixing_method['param_beta'])
 	elif mixing_method['name'] == "min":
 		for activity in alphas[group_g.name]:
 			n += group_g.contacts[activity][group_h.name]*min(alphas[group_g.name][activity],alphas[group_h.name][activity])
@@ -72,31 +72,31 @@ class DynamicalModel:
 		if (B_H is not False) and (B_ICU is not False):
 			B_H, B_ICU = self.cap_bounce_variables(B_H, B_ICU)
 			# Verify that the bouncing variables satisfy the required bounds
-			for n,g in self.groups.items():
-				# print("BH for {}: {} Flow H: {}".format(n,B_H[n],g.flow_H(self.t)))
-				# assert(B_H[n]<=g.flow_H(self.t))
-				if (B_H[n] > g.flow_H(time_of_flow)):
-					print('WARNING.group.py() Capping B_H for group {} at time {}'.format(n,time_of_flow))
-					print('Difference in %: {}'.format(B_H[n]/g.flow_H(time_of_flow)-1.0))
-					B_H[n] = g.flow_H(time_of_flow)
-
-				#print("BICU for {}: {} Flow ICU: {}".format(n,B_ICU[n],g.flow_ICU(self.t)))
-				#assert(B_ICU[n]<=g.flow_ICU(self.t))
-				if (B_ICU[n] > g.flow_ICU(time_of_flow)):
-					print('WARNING. group.py() Capping B_ICU for group {} at time {}'.format(n,time_of_flow))
-					print('Difference in %: {}'.format(B_ICU[n]/g.flow_ICU(time_of_flow)-1.0))
-					B_ICU[n] = g.flow_ICU(time_of_flow)
-
-			assert(
-				sum([group.flow_H(time_of_flow)-B_H[name] for name,group in self.groups.items()])<=
-				self.beds
-				- sum([(1-group.parameters["lambda_H_R"]-group.parameters["lambda_H_D"])*group.H[time_of_flow] for name,group in self.groups.items()])
-			)
-
-			total_ICU_patients = sum([(1-group.parameters["lambda_ICU_R"]-group.parameters["lambda_ICU_D"])*group.ICU[time_of_flow] + group.flow_ICU(time_of_flow) - B_ICU[name] for name,group in self.groups.items()])
-			print("take_time_step(): Total ICU patients end of period {}: {}".format(time_of_flow,total_ICU_patients))
-			print("total_ICU_patients - self.icus =", total_ICU_patients - self.icus)
-			assert(total_ICU_patients < self.icus)
+#			for n,g in self.groups.items():
+#				# print("BH for {}: {} Flow H: {}".format(n,B_H[n],g.flow_H(self.t)))
+#				# assert(B_H[n]<=g.flow_H(self.t))
+#				if (B_H[n] > g.flow_H(time_of_flow)):
+#					print('WARNING.group.py() Capping B_H for group {} at time {}'.format(n,time_of_flow))
+#					print('Difference in %: {}'.format(B_H[n]/g.flow_H(time_of_flow)-1.0))
+#					B_H[n] = g.flow_H(time_of_flow)
+#
+#				#print("BICU for {}: {} Flow ICU: {}".format(n,B_ICU[n],g.flow_ICU(self.t)))
+#				#assert(B_ICU[n]<=g.flow_ICU(self.t))
+#				if (B_ICU[n] > g.flow_ICU(time_of_flow)):
+#					print('WARNING. group.py() Capping B_ICU for group {} at time {}'.format(n,time_of_flow))
+#					print('Difference in %: {}'.format(B_ICU[n]/g.flow_ICU(time_of_flow)-1.0))
+#					B_ICU[n] = g.flow_ICU(time_of_flow)
+#
+#			assert(
+#				sum([group.flow_H(time_of_flow)-B_H[name] for name,group in self.groups.items()])<=
+#				self.beds
+#				- sum([(1-group.parameters["lambda_H_R"]-group.parameters["lambda_H_D"])*group.H[time_of_flow] for name,group in self.groups.items()])
+#			)
+#
+#			total_ICU_patients = sum([(1-group.parameters["lambda_ICU_R"]-group.parameters["lambda_ICU_D"])*group.ICU[time_of_flow] + group.flow_ICU(time_of_flow) - B_ICU[name] for name,group in self.groups.items()])
+#			print("take_time_step(): Total ICU patients end of period {}: {}".format(time_of_flow,total_ICU_patients))
+#			print("total_ICU_patients - self.icus =", total_ICU_patients - self.icus)
+#			assert(total_ICU_patients < self.icus)
 
 			for n in self.groups:
 				self.groups[n].take_time_step(m_tests[n], a_tests[n], self.beds, self.icus, B_H[n], B_ICU[n])

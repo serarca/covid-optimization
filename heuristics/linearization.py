@@ -305,17 +305,27 @@ def get_Jacobian_u(dynModel, X_hat, u_hat, mixing_method):
                 lha = u_hat[lha_idx]
 
                 if (mixing_method['name']=="mult"):
-                    partial_contacts_g_array[ah] = alpha*dynModel.groups[age_groups[ag]].contacts[activities[act-offset]][age_groups[ah]]\
-                        *(0 if lga==0 else lga**(alpha-1))*(lha**(beta))
-                    partial_contacts_h = beta*dynModel.groups[age_groups[ag]].contacts[activities[act-offset]][age_groups[ah]]\
-                        *(lga**(alpha))*(0 if lha==0 else lha**(beta-1))
+                    if ah != ag:
+                        partial_contacts_g_array[ah] = alpha*dynModel.groups[age_groups[ag]].contacts[activities[act-offset]][age_groups[ah]]\
+                            *(0 if lga==0 else lga**(alpha-1))*(lha**(beta))
+                        partial_contacts_h = beta*dynModel.groups[age_groups[ag]].contacts[activities[act-offset]][age_groups[ah]]\
+                            *(lga**(alpha))*(0 if lha==0 else lha**(beta-1))
+                    else:
+                        partial_contacts_g_array[ah] = (alpha+beta)*dynModel.groups[age_groups[ag]].contacts[activities[act-offset]][age_groups[ah]]\
+                            *(0 if lga==0 else lga**(alpha-1))*(lha**(beta))
+                        partial_contacts_h = (alpha+beta)*dynModel.groups[age_groups[ag]].contacts[activities[act-offset]][age_groups[ah]]\
+                            *(lga**(alpha))*(0 if lha==0 else lha**(beta-1))
                 if (mixing_method['name']=="maxmin"):
                     explga = math.exp(alpha * lga)
                     explha = math.exp(alpha * lha)
-                    partial_contacts_g_array[ah] = dynModel.groups[age_groups[ag]].contacts[activities[act-offset]][age_groups[ah]] \
-                        * ((alpha * lga * explga * explha - alpha * explga * lha * explha + explga * explha + explga**2)/ ((explga + explha)**2))
-                    partial_contacts_h = dynModel.groups[age_groups[ag]].contacts[activities[act-offset]][age_groups[ah]] \
-                        * ((alpha * lha * explha * explga - alpha * explha * lga * explga + explha * explga + explha**2)/ ((explga + explha)**2))
+                    if ah != ag:
+                        partial_contacts_g_array[ah] = dynModel.groups[age_groups[ag]].contacts[activities[act-offset]][age_groups[ah]] \
+                            * ((alpha * lga * explga * explha - alpha * explga * lha * explha + explga * explha + explga**2)/ ((explga + explha)**2))
+                        partial_contacts_h = dynModel.groups[age_groups[ag]].contacts[activities[act-offset]][age_groups[ah]] \
+                            * ((alpha * lha * explha * explga - alpha * explha * lga * explga + explha * explga + explha**2)/ ((explga + explha)**2))
+                    else:
+                        partial_contacts_g_array[ah] = dynModel.groups[age_groups[ag]].contacts[activities[act-offset]][age_groups[ah]]
+                        partial_contacts_h = dynModel.groups[age_groups[ag]].contacts[activities[act-offset]][age_groups[ah]]
 
                 # S:
                 jacob[Sg_idx,lha_idx] = -dynModel.groups[age_groups[ag]].parameters['beta']*X_hat[Sg_idx]*partial_contacts_h\

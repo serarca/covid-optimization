@@ -10,7 +10,7 @@ import math
 import yaml
 import random
 
-from linearization import get_F, X_to_dict, dict_to_X, buildAlphaDict, dict_to_u, get_Jacobian_X
+from linearization import get_F, X_to_dict, dict_to_X, buildAlphaDict, dict_to_u, get_Jacobian_X, get_Jacobian_u
 from group import *
 from numpy import random
 
@@ -21,6 +21,7 @@ SEIR_groups = [ 'S_g', 'E_g', 'I_g', 'R_g', 'N_g', 'Ia_g', 'Ips_g', \
 activities = ['home','leisure','other','school','transport','work']
 controls = [ 'Nmtest_g', 'Natest_g', 'BounceH_g', 'BounceICU_g' ]
 controls.extend(activities)
+print(controls)
 
 num_age_groups = len(age_groups)
 num_compartments = len(SEIR_groups)
@@ -40,9 +41,10 @@ simulation_params['time_periods'] = int(math.ceil(simulation_params["days"]/simu
 
 # Define mixing method
 mixing_method = {
-    "name":"mult",
+    "name":"maxmin",
     "param_alpha":1.0,
     "param_beta":0.5,
+    "param":1.0
     #"param":float(args.mixing_param) if args.mixing_param else 0.0,
 }
 
@@ -75,6 +77,14 @@ for group in initialization:
 		if chamber != "N":
 			initialization[group][chamber] = random.randint(1000)
 	initialization[group]["N"] = initialization[group]["S"] + initialization[group]["E"] + initialization[group]["I"] + initialization[group]["R"]
+
+# Randomly assign alphas_vec
+for group in alphas_vec[0]:
+	for activity in alphas_vec[0][group]:
+		alphas_vec[0][group][activity] = random.uniform(0,1)
+
+
+
 
 dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method)
 
@@ -151,7 +161,7 @@ assert(dynModel.t == 100)
 
 ## Now we test with bouncing variables
 iterations = 50
-u = random.randint(1000, size = (num_controls * num_age_groups))
+u = random.randint(1,1000, size = (num_controls * num_age_groups))
 u_hat_dict, alphas = buildAlphaDict(u)
 
 dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method)
@@ -179,7 +189,6 @@ final_X = dict_to_X(dynModel.get_state(iterations))
 # Run it again
 X = initial_X
 u = dict_to_u(u_hat_dict, alphas_vec[0])
-print(u)
 for i in range(iterations):
 	X = get_F(dynModel,X,u)
 
@@ -191,14 +200,14 @@ assert(dynModel.t == iterations)
 
 
 
-# Now we check that the Jacobians are being calculated properly
+# Now we check that the Jacobian with respect to X is calculated properly
 dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method)
 
 
 X = initial_X
-u = random.randint(1000, size = (num_controls * num_age_groups))
-
-
+u = random.randint(1,1000, size = (num_controls * num_age_groups))
+u_hat_dict, alphas = buildAlphaDict(u)
+u = dict_to_u(u_hat_dict, alphas_vec[0])
 
 epsilon = 1e-6
 
@@ -218,13 +227,43 @@ distance = (numerical_jacobian-real_jacobian)
 scaled = np.zeros((num_age_groups*num_compartments, num_age_groups*num_compartments))
 for i in range(num_age_groups*num_compartments):
 	for j in range(num_age_groups*num_compartments):
-		scaled[i,j] = distance[i,j]/real_jacobian[i,j] if real_jacobian[i,j]!=0 else distance[i,j]
+		scaled[i,j] = np.abs(distance[i,j]/real_jacobian[i,j]) if real_jacobian[i,j]!=0 else np.abs(distance[i,j])
 
 print(np.max(scaled))
 print(np.where(scaled==np.amax(scaled)))
 
+# Now the Jacobian with respect to u
+dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method)
 
 
+X = initial_X
+u = random.randint(1,1000, size = (num_controls * num_age_groups))
+u_hat_dict, alphas = buildAlphaDict(u)
+u = dict_to_u(u_hat_dict, alphas_vec[0])
 
+
+epsilon = 1e-5
+
+numerical_jacobian = np.zeros((num_age_groups*num_compartments,num_age_groups*num_controls))
+for i in range(num_age_groups*num_controls):
+	one = np.zeros(num_age_groups*num_controls)
+
+	F = get_F(dynModel,initial_X,u)
+	one[i] = u[i]*epsilon
+	Fdt = get_F(dynModel,initial_X,u+one)
+	partial = (Fdt - F)/(epsilon*u[i])
+	numerical_jacobian[:,i] = partial
+
+
+real_jacobian = get_Jacobian_u(dynModel, initial_X, u, mixing_method)
+
+distance = (numerical_jacobian-real_jacobian)
+scaled = np.zeros((num_age_groups*num_compartments,num_age_groups*num_controls))
+for i in range(num_age_groups*num_compartments):
+	for j in range(num_age_groups*num_controls):
+		scaled[i,j] = np.abs(distance[i,j]/real_jacobian[i,j]) if real_jacobian[i,j]!=0 else np.abs(distance[i,j])
+
+print(np.max(scaled))
+print(np.where(scaled==np.amax(scaled)))
 
 
