@@ -70,7 +70,6 @@ class DynamicalModel:
 			self.groups[n].update_total_contacts(time_of_flow, alphas)
 
 		if (B_H is not False) and (B_ICU is not False):
-			print("Hello")
 			B_H, B_ICU = self.cap_bounce_variables(B_H, B_ICU)
 			# Verify that the bouncing variables satisfy the required bounds
 #			for n,g in self.groups.items():
@@ -156,13 +155,13 @@ class DynamicalModel:
 
 		# Cap bounces at no more than the level of flow_H / flow_ICU
 		for n,g in self.groups.items():
-			if (B_H[n] > g.flow_H(time_of_flow)):
+			if (B_H[n] > g.flow_H()):
 				print('WARNING.group.py() Capping B_H for group {} at time {}'.format(n,time_of_flow))
-				B_H[n] = g.flow_H(time_of_flow)
+				B_H[n] = g.flow_H()
 
-			if (B_ICU[n] > g.flow_ICU(time_of_flow)):
+			if (B_ICU[n] > g.flow_ICU()):
 				print('WARNING. group.py() Capping B_ICU for group {} at time {}'.format(n,time_of_flow))
-				B_ICU[n] = g.flow_ICU(time_of_flow)
+				B_ICU[n] = g.flow_ICU()
 
 		return B_H, B_ICU
 
