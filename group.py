@@ -207,21 +207,43 @@ class DynamicalModel:
 	def get_state(self, t):
 		state = {}
 		for name,group in self.groups.items():
-			state[name] = {
-				"S": group.S[t],
-				"E": group.E[t],
-				"I": group.I[t],
-				"R": group.R[t],
-				"N": group.N[t],
-				"Ia": group.Ia[t],
-				"Ips": group.Ips[t],
-				"Ims": group.Ims[t],
-				"Iss": group.Iss[t],
-				"Rq": group.Rq[t],
-				"H": group.H[t],
-				"ICU": group.ICU[t],
-				"D": group.D[t],
-			}
+			
+			if t == 0:
+				state[name] = {
+					"S": group.S[t],
+					"E": group.E[t],
+					"I": group.I[t],
+					"R": group.R[t],
+					"N": group.N[t],
+					"Ia": group.Ia[t],
+					"Ips": group.Ips[t],
+					"Ims": group.Ims[t],
+					"Iss": group.Iss[t],
+					"Rq": group.Rq[t],
+					"H": group.H[t],
+					"ICU": group.ICU[t],
+					"D": group.D[t]
+					#This t-1 is still strange, but it's because at time t we keep the decisions made at time t-1...
+				}
+			else:
+				state[name] = {
+					"S": group.S[t],
+					"E": group.E[t],
+					"I": group.I[t],
+					"R": group.R[t],
+					"N": group.N[t],
+					"Ia": group.Ia[t],
+					"Ips": group.Ips[t],
+					"Ims": group.Ims[t],
+					"Iss": group.Iss[t],
+					"Rq": group.Rq[t],
+					"H": group.H[t],
+					"ICU": group.ICU[t],
+					"D": group.D[t],
+					"B_H": group.B_H[t-1],
+					"B_ICU": group.B_ICU[t-1]
+					#This t-1 is still strange, but it's because at time t we keep the decisions made at time t-1...
+				}
 		return state
 
 	def write_state(self, t, X):
@@ -550,7 +572,7 @@ class SEIR_group:
 			B_ICU = entering_icu[self.name]*(summ_entering_icu-icu_cap+summ_staying_icu if summ_entering_icu-icu_cap+summ_staying_icu>0 else 0)/(summ_entering_icu if summ_entering_icu!=0 else 10e-6)
 
 		# Update bouncing variables
-		self.B_ICU = [B_ICU]
+		self.B_ICU += [B_ICU]
 
 		delta_ICU = (
 			- (self.parameters["lambda_ICU_R"] + self.parameters["lambda_ICU_D"])*self.ICU[self.parent.t]

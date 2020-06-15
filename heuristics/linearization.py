@@ -329,6 +329,91 @@ def get_Jacobian_u(dynModel, X_hat, u_hat, mixing_method):
             jacob[Eg_idx,lga_idx] = - jacob[Sg_idx,lga_idx]
 
     return jacob
+####################################
+# Return Nominal Trajectory, the x_hat and the u_hat corresponding to this X_hat
+def get_nominal_trajectory(dynModel, k, u_hat_sequence):
+    """Given a dynamical model, a starting point k, and the controls for time periods k to T-1 for tests and lockdowns, we start the dynamical model at time k, and then run it until time T-1 with the controls in u_hat.
+    This produces the nominal trajectory X_hat_sequence. X_hat_sequence is a np.array of shape (num_compartments * num_age_groups, T-k), where each column represents the X_hat at time k, k+1,... Also, because we might not take exactly the same bouncing decisions as the input u_hat_sequence, we return the actual u_hat used to generate x_hat.
+
+    This assumes that the dynamical model has already been run up to point k (it takes the states at time k as the starting points for the new nominal trajectory).
+    We assume as well that u_hat_sequence is a 2-d numpy array with shape (num_controls * num_age_groups, T-k) with each column corresponding to a u_hat at time k, k+1,..., T-1. Hence, u_hat_sequence[:,k] gives the u_hat at time k.
+    Note we are not using the bouncing variables in forecasting X_hat_sequence.
+    Note: we return x_hat[k], x_hat[k+1], ..., x_hat[T-1], and u_hat[k],..., u_hat[T-1], where the u_hat is equal to u_hat_sequence in it's testing decisions, but has the actual bouncing decisions used to produce x_hat.
+    """
+    #NOTE. There are a few extra arguments, as follows:
+    # Argument 'cap_seq' specifies whether this should cap the sequence using
+    # hospital and capacity constraints so as to make it feasible.
+    # Argument 'use_bounce' determines whether to use bounce variables or not
+
+    # Erase the states after k so as to reset the dyn model
+    dynModel.reset_time(k)
+
+    # The total time horizon for the dynamical model
+    T = dynModel.time_steps
+
+    X_hat_sequence = np.zeros((num_compartments * num_age_groups, T-k))
+    u_hat_nominal_sequence = np.zeros(np.shape(u_hat_sequence))
+
+    for t in range(T-k):
+        if t!=0:
+            # Write the values of u_hat at time t-1 in dict form
+            # WHY IS THIS t-1 ??? WEIRD INDEXING?
+            u_hat_dict, alphas = buildAlphaDict(u_hat_sequence[:,t-1])
+
+            #Create m and a tests in the format taken by dynModel
+            m_tests = {}
+            a_tests = {}
+            BH = {}
+            BICU = {}
+            for ag in age_groups:
+                BH[ag] = u_hat_dict[ag]['BounceH_g']
+                BICU[ag] = u_hat_dict[ag]['BounceICU_g']
+                m_tests[ag] = u_hat_dict[ag]['Nmtest_g']
+                a_tests[ag] = u_hat_dict[ag]['Natest_g']
+
+            # take one time step in dynamical system.
+
+            dynModel.take_time_step(m_tests, a_tests, alphas, BH, BICU)
+
+
+        # get the state from the dynamic model
+        state = dynModel.get_state(t + k)
+
+        # write it into X_hat
+        X_hat_sequence[:,t] = dict_to_X(state)
+        if t > 0:
+            u_hat_nominal_sequence[:,t] = extract_nominal_u_hat(u_hat_sequence, state, t)
+
+
+    # Erase the states after k so as to reset the dyn model
+    dynModel.reset_time(k)
+
+    return X_hat_sequence, u_hat_nominal_sequence
+
+#####################################
+
+def extract_nominal_u_hat(u_hat_sequence, states,t):
+    ''' Given the u_hat_sequence and the actual decisions taken by dynModel, returns the full set of controls for period t.'''
+
+    u_hat_nominal = u_hat_sequence[:, t]
+
+    assert(np.shape(u_hat_nominal) == (num_age_groups* num_controls,))
+
+    for ag in range(num_age_groups):
+
+        BounceHg_idx = ag*num_controls + controls.index('BounceH_g')
+        BounceICUg_idx = ag*num_controls + controls.index('BounceICU_g')
+
+        u_hat_nominal[BounceHg_idx] = states[age_groups[ag]]["B_H"]
+
+        u_hat_nominal[BounceICUg_idx] = states[age_groups[ag]]["B_ICU"]
+
+    return u_hat_nominal
+
+
+
+
+
 
 ####################################
 # Build X_hat given a dynModel, a starting point k, and a sequence of controls u_hat
@@ -341,7 +426,7 @@ def get_X_hat_sequence(dynModel, k, u_hat_sequence, use_bounce, cap_seq):
     Note: we return x_hat[k], x_hat[k+1], ..., x_hat[T-1].
     """
     #NOTE. There are a few extra arguments, as follows:
-    # Argument 'cap_seq' specifies whether this should cap the sequence using 
+    # Argument 'cap_seq' specifies whether this should cap the sequence using
     # hospital and capacity constraints so as to make it feasible.
     # Argument 'use_bounce' determines whether to use bounce variables or not
 
@@ -383,10 +468,10 @@ def get_X_hat_sequence(dynModel, k, u_hat_sequence, use_bounce, cap_seq):
 
         # write it into X_hat
         X_hat_sequence[:,t] = dict_to_X(state)
-        
+
         # check whether any capping in H or ICU should be done
         if( cap_seq ):
-            
+
             tol = 1e-7  # bounce a bit more, to make sure capacities are met
             # check whether there is overflow in H
             H_patients = np.sum(X_hat_sequence[Hidx_all,t])
@@ -410,7 +495,7 @@ def get_X_hat_sequence(dynModel, k, u_hat_sequence, use_bounce, cap_seq):
 
             # NOTE. IT IS UNCLEAR WHETHER WE SHOULD ALSO ROLL BACK DYNMODEL AND UPDATE STATE TO REFLECT CLIPPING
             # FOR NOW, WE DO NOT.
-            
+
     # Erase the states after k so as to reset the dyn model
     dynModel.reset_time(k)
 

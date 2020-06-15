@@ -121,12 +121,15 @@ for k in range(T):
     print("\n\n TIME k= {}.".format(k))
 
     # calculate state trajectory X_hat
-    Xhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq, use_bounce_var, cap_X_hat)
+    # Xhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq, use_bounce_var, cap_X_hat)
+
+    Xhat_seq, uhat_seq = get_nominal_trajectory(dynModel, k, uhat_seq)
     assert( np.shape(Xhat_seq) == (Xt_dim,T-k) )
+    assert(np.shape(uhat_seq) == (ut_dim, T-k))
 
     ICUidx_all = slice(SEIR_groups.index('ICU_g'),Xt_dim,num_compartments)
     print("Total people in ICU at start of period k={}".format(np.sum(Xhat_seq[ICUidx_all,0])))
-    
+
     # calculate objective parameters d, e
     D,E = calculate_objective_time_dependent_coefs(dynModel, k, Xhat_seq, uhat_seq)
 
