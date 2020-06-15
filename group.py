@@ -15,7 +15,7 @@ def n_contacts(group_g, group_h, alphas, mixing_method):
 				)
 	elif mixing_method['name'] == "mult":
 		for activity in alphas[group_g.name]:
-			n += group_g.contacts[activity][group_h.name]*alphas[group_g.name][activity]*alphas[group_h.name][activity]
+			n += group_g.contacts[activity][group_h.name]*(alphas[group_g.name][activity]**mixing_method['param_alpha'])*(alphas[group_h.name][activity]**mixing_method['param_beta'])
 	elif mixing_method['name'] == "min":
 		for activity in alphas[group_g.name]:
 			n += group_g.contacts[activity][group_h.name]*min(alphas[group_g.name][activity],alphas[group_h.name][activity])
