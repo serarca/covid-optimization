@@ -1023,12 +1023,15 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
     At_bar = {}
     Xt_bar = Xhat_seq[:,0]      # initialize with X(k)=Xhat(k)
 
+    print("Computing constants for all periods.")
+
     for t in range(k,T): # loop over times k, k+1, ..., T - 1 to model constraints indexed with t
 
         # Calculate constants for period t
         for constr_index in range(num_constraints):
             constr_constants[t][constr_index] = Gamma_x[constr_index,:] @ Xt_bar
 
+        print("Calculated constants for time {}".format(t))
         # Update auxiliary vector Xt_bar
         Xt_bar = At[t] @ Xt_bar + ct[t]
 
@@ -1037,6 +1040,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
         for constr_index in range(num_constraints):
             # coefs for u[t]
             u_constr_coeffs[t][constr_index][:,t-k] = Gamma_u[constr_index,:]
+
 
         # Calculate coefficients for objective coefficient for u_t. Note that this is not the final coefficient of u_t.
         # Since the objective adds linear terms over all k, k+1..., T-1, u_t will receive additional contributions to its coefficient
@@ -1055,6 +1059,8 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
 
             # Update At_bar for next round
             At_bar[tau-1] = At_bar[tau] @ At[tau]
+
+        print("Computed constraint and obj coeff for time {}".format(t))
 
     At_bar[T-1] = np.eye(Xt_dim,Xt_dim)
     # Add up the contribution of eta * X_T in the coefficients of decision u_t, t = k, ..., T-1

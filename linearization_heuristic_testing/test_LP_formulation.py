@@ -10,6 +10,7 @@ import sys
 import numpy as np
 from inspect import getsourcefile
 from random import *
+import time
 
 current_path = os.path.abspath(getsourcefile(lambda:0))
 current_dir = os.path.dirname(current_path)
@@ -20,10 +21,12 @@ sys.path.insert(0, parent_dir+"/heuristics")
 from linearization import *
 from heuristics import *
 
+start_time = time.time()
+
 # Global variables
 simulation_params = {
         'dt':1.0,
-        'days': 20,
+        'days': 50,
         'region': "Ile-de-France",
         'quar_freq': 1,
 }
@@ -176,9 +179,12 @@ for k in range(T):
             assert( np.shape(constr_coefs[t][i])==np.shape(uhat_seq) )
             assert( np.shape(constr_consts[t][i])==() )
 
+    print("Started creating Model")
+    print("*/*/*/*/*/*/*/*/*/*/*/")
+
     # create empty model
     mod = gb.Model("Linearization Heuristic")
-    mod.setParam( 'OutputFlag', False )     # make Gurobi silent
+    # mod.setParam( 'OutputFlag', False )     # make Gurobi silent
     mod.Params.DualReductions = 0  # change this to get explicit infeasible or unbounded
 
     # add all decisions using matrix format, and also specify objective coefficients
@@ -186,6 +192,7 @@ for k in range(T):
     obj_vec = np.reshape(obj_coefs, (ut_dim*(T-k),), 'F')  # reshape by reading along rows first
     u_vars_vec = mod.addMVar( np.shape(obj_vec), obj=obj_vec, name="u")
 
+    # Sense -1 indicates a maximization problem
     mod.ModelSense = -1
 
     x_feas = np.zeros( (len(obj_vec),) )  # a feasible solution
@@ -197,8 +204,10 @@ for k in range(T):
             cname = ("%s[t=%d]" %(all_labels[con],t))
             mod.addConstr( u_vars_vec @ cons_vec + constr_consts[t][con] <= K[con,t], name=cname)
 
-    mod.write("LP_lineariz_model.lp")       # write the LP to a file
+    # mod.write("LP_lineariz_model.lp")       # write the LP to a file
 
+    print("Optimizing Model")
+    print("><><><><><><><><")
     # optimize the model
     mod.optimize()
 
@@ -233,3 +242,7 @@ for k in range(T):
 
     # update uhat_sequence
     uhat_seq = uvars_opt[:,1:]
+
+end_time = time.time()
+
+print("Total running time for {} days is {}".format(simulation_params['days'], end_time - start_time))
