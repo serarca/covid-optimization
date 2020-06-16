@@ -108,6 +108,12 @@ class DynamicalModel:
 
 		# Calculate economic values
 		state = self.get_state(self.t+1)
+
+		print("People at the ICU in the next state: {}".format(sum(state[n]["ICU"] for n in self.groups)))
+		print("Total beds at the ICU: {}".format(self.icus))
+		assert(self.icus - sum(state[n]["ICU"] for n in self.groups) > - 1e-10 )
+
+
 		deaths = sum([group.D[self.t+1]-group.D[self.t] for name,group in self.groups.items()])
 		deaths_value = sum([(group.D[self.t+1]-group.D[self.t])*group.economics['death_value'] for name,group in self.groups.items()])
 		economic_value = self.get_economic_value(state, alphas)
@@ -131,27 +137,8 @@ class DynamicalModel:
 
 	# Cap bounce variables to ensure feasibility
 	def cap_bounce_variables(self, B_H, B_ICU):
-		tol = 1e-7  # bounce a bit more, to make sure capacities are met
+		tol = 1e-8  # bounce a bit more, to make sure capacities are met
 		time_of_flow = self.t # use dynModel t as clock
-
-		# Increase the bounce level so as not to violate C^H / C^ICU
-		# check whether there is overflow in H
-		H_patients = sum([g.H[time_of_flow] for n,g in self.groups.items()])
-		if( H_patients > self.beds ):
-			# extra bounces done proportionally in each group
-			print("\nWARNING. Total in H at t=%d = %.2f > capacity = %d. Bouncing more, proportionally." %(time_of_flow,H_patients,self.beds) )
-			extra_bounced = (1+tol) * (H_patients - self.beds)
-			for n,g in self.groups.items():
-				B_H[n] += extra_bounced * g.H[time_of_flow]/H_patients
-
-		# check whether there is overflow in ICU
-		ICU_patients = sum([g.ICU[time_of_flow] for n,g in self.groups.items()])
-		if( ICU_patients > self.icus ):
-			# extra bounces done proportionally in each group
-			print("\nWARNING. Total in H at t=%d = %.2f > capacity = %d. Bouncing more, proportionally." %(time_of_flow,ICU_patients,self.icus) )
-			extra_bounced = (1+tol) * (ICU_patients - self.icus)
-			for n,g in self.groups.items():
-				B_ICU[n] += extra_bounced * g.ICU[time_of_flow]/ICU_patients
 
 		# Cap bounces at no more than the level of flow_H / flow_ICU
 		for n,g in self.groups.items():
@@ -162,6 +149,38 @@ class DynamicalModel:
 			if (B_ICU[n] > g.flow_ICU()):
 				print('WARNING. group.py() Capping B_ICU for group {} at time {}'.format(n,time_of_flow))
 				B_ICU[n] = g.flow_ICU()
+
+
+		# Increase the bounce level so as not to violate C^H / C^ICU
+		# check whether there is overflow in H
+		remaining_H_patients = sum([g.H[time_of_flow] * (1-g.parameters["lambda_H_D"] - g.parameters["lambda_H_R"])  for n,g in self.groups.items()])
+
+		total_inflow_H_after_bounce = sum([g.flow_H() - B_H[n]  for n,g in self.groups.items()])
+
+		if( remaining_H_patients + total_inflow_H_after_bounce > self.beds ):
+			# extra bounces done proportionally in each group
+			print("\nWARNING.group.py() Total entering H at t=%d = %.2f > remaining available capacity = %d. Bouncing more, proportionally." %(time_of_flow,total_inflow_H_after_bounce,self.beds-remaining_H_patients) )
+
+			extra_bounced = (1+tol) * (remaining_H_patients + total_inflow_H_after_bounce - self.beds)
+			for n,g in self.groups.items():
+				B_H[n] += extra_bounced * (g.flow_H()-B_H[n])/(total_inflow_H_after_bounce if total_inflow_H_after_bounce > 0 else 10e-10)
+
+		# check whether there is overflow in ICU
+		remaining_ICU_patients = sum([g.ICU[time_of_flow] * (1-g.parameters["lambda_ICU_D"] - g.parameters["lambda_ICU_R"])  for n,g in self.groups.items()])
+
+		total_inflow_ICU_after_bounce = sum([g.flow_ICU() - B_ICU[n]  for n,g in self.groups.items()])
+
+		if( remaining_ICU_patients + total_inflow_ICU_after_bounce > self.icus ):
+			# extra bounces done proportionally in each group
+			print("\nWARNING.group.py() Total entering ICU at t=%d = %.2f > remaining available capacity = %d. Bouncing more, proportionally." %(time_of_flow,total_inflow_ICU_after_bounce,self.icus-remaining_ICU_patients) )
+
+			extra_bounced = (1+tol) * (remaining_ICU_patients + total_inflow_ICU_after_bounce - self.icus)
+			for n,g in self.groups.items():
+				B_ICU[n] += extra_bounced * (g.flow_ICU()-B_ICU[n])/(total_inflow_ICU_after_bounce if total_inflow_ICU_after_bounce > 0 else 10e-10)
+
+		total_inflow_ICU_after_new_bounce = sum([g.flow_ICU() - B_ICU[n]  for n,g in self.groups.items()])
+
+		print("After capping the Bouncing var total ICU should be: {}".format(remaining_ICU_patients + total_inflow_ICU_after_new_bounce))
 
 		return B_H, B_ICU
 
@@ -207,44 +226,43 @@ class DynamicalModel:
 	def get_state(self, t):
 		state = {}
 		for name,group in self.groups.items():
-			
-			if t == 0:
-				state[name] = {
-					"S": group.S[t],
-					"E": group.E[t],
-					"I": group.I[t],
-					"R": group.R[t],
-					"N": group.N[t],
-					"Ia": group.Ia[t],
-					"Ips": group.Ips[t],
-					"Ims": group.Ims[t],
-					"Iss": group.Iss[t],
-					"Rq": group.Rq[t],
-					"H": group.H[t],
-					"ICU": group.ICU[t],
-					"D": group.D[t]
-					#This t-1 is still strange, but it's because at time t we keep the decisions made at time t-1...
-				}
-			else:
-				state[name] = {
-					"S": group.S[t],
-					"E": group.E[t],
-					"I": group.I[t],
-					"R": group.R[t],
-					"N": group.N[t],
-					"Ia": group.Ia[t],
-					"Ips": group.Ips[t],
-					"Ims": group.Ims[t],
-					"Iss": group.Iss[t],
-					"Rq": group.Rq[t],
-					"H": group.H[t],
-					"ICU": group.ICU[t],
-					"D": group.D[t],
-					"B_H": group.B_H[t-1],
-					"B_ICU": group.B_ICU[t-1]
-					#This t-1 is still strange, but it's because at time t we keep the decisions made at time t-1...
-				}
+			state[name] = {
+				"S": group.S[t],
+				"E": group.E[t],
+				"I": group.I[t],
+				"R": group.R[t],
+				"N": group.N[t],
+				"Ia": group.Ia[t],
+				"Ips": group.Ips[t],
+				"Ims": group.Ims[t],
+				"Iss": group.Iss[t],
+				"Rq": group.Rq[t],
+				"H": group.H[t],
+				"ICU": group.ICU[t],
+				"D": group.D[t],
+			}
 		return state
+
+	def get_delta_X(self, t):
+		delta = {}
+		for name,group in self.groups.items():
+			delta[name] = {
+				"S": (group.S[t] - group.S[t-1]),
+				"E": (group.E[t] - group.E[t-1]),
+				"I": (group.I[t] - group.I[t-1]),
+				"R": (group.R[t] - group.R[t-1]),
+				"N": (group.N[t] - group.N[t-1]),
+				"Ia": (group.Ia[t] - group.Ia[t-1]),
+				"Ips": (group.Ips[t] - group.Ips[t-1]),
+				"Ims": (group.Ims[t] - group.Ims[t-1]),
+				"Iss": (group.Iss[t] - group.Iss[t-1]),
+				"Rq": (group.Rq[t] - group.Rq[t-1]),
+				"H": (group.H[t] - group.H[t-1]),
+				"ICU": (group.ICU[t] - group.ICU[t-1]),
+				"D": (group.D[t] - group.D[t-1]),
+			}
+		return delta
+
 
 	def write_state(self, t, X):
 		for group_name in X.keys():
@@ -263,6 +281,14 @@ class DynamicalModel:
 			self.groups[group_name].D[t] = X[group_name]['D']
 		return 1
 
+	def get_bounce(self, t):
+		bounce_vars = {}
+		for name,group in self.groups.items():
+			bounce_vars[name] = {
+				"B_H": group.B_H[t],
+				"B_ICU": group.B_ICU[t],
+			}
+		return bounce_vars
 
 	# Returns state but in OpenAIGym Format
 	def get_normalized_state(self, t):
@@ -531,7 +557,7 @@ class SEIR_group:
 
 
 	def update_H(self, m_tests, a_tests, h_cap, icu_cap, B_H):
-		tol = 1e-7
+		tol = 0
 		# For each group, calculate the entering amount
 		entering_h = {}
 		summ_entering_h = 0
@@ -542,7 +568,7 @@ class SEIR_group:
 			summ_staying_h += (1-g.parameters['lambda_H_R']-g.parameters['lambda_H_D'])*g.H[self.parent.t]
 
 		if B_H is False:
-			B_H = entering_h[self.name]*(summ_entering_h-h_cap+summ_staying_h if summ_entering_h-h_cap+summ_staying_h>0 else 0)/(summ_entering_h if summ_entering_h!=0 else 10e-6)
+			B_H = entering_h[self.name]*((summ_entering_h-h_cap+summ_staying_h) if summ_entering_h-h_cap+summ_staying_h>0 else 0)/(summ_entering_h if summ_entering_h!=0 else 10e-6)
 
 		# Update bouncing variables
 		self.B_H += [B_H]
@@ -556,7 +582,7 @@ class SEIR_group:
 
 
 	def update_ICU(self, m_tests, a_tests, h_cap, icu_cap, B_ICU):
-		tol = 1e-7
+		tol = 0
 		# For each group, calculate the entering amount
 		entering_icu = {}
 		summ_entering_icu = 0
@@ -569,14 +595,14 @@ class SEIR_group:
 		#print('update_ICU(): Total entering ICU calculated from group {} is:{}'.format(self.name,summ_entering_icu))
 		if B_ICU is False:
 			#print("group.py(): FALSE branch for B_ICU")
-			B_ICU = entering_icu[self.name]*(summ_entering_icu-icu_cap+summ_staying_icu if summ_entering_icu-icu_cap+summ_staying_icu>0 else 0)/(summ_entering_icu if summ_entering_icu!=0 else 10e-6)
+			B_ICU = entering_icu[self.name]*((summ_entering_icu-icu_cap+summ_staying_icu) if summ_entering_icu-icu_cap+summ_staying_icu>0 else 0)/(summ_entering_icu if summ_entering_icu!=0 else 10e-6)
 
 		# Update bouncing variables
 		self.B_ICU += [B_ICU]
 
 		delta_ICU = (
 			- (self.parameters["lambda_ICU_R"] + self.parameters["lambda_ICU_D"])*self.ICU[self.parent.t]
-			+ (1-tol) * entering_icu[self.name]
+			+ (1-tol) * self.flow_ICU()
 			- B_ICU
 		)
 		self.ICU += [self.ICU[self.parent.t]+delta_ICU*self.dt]

@@ -23,7 +23,7 @@ from heuristics import *
 # Global variables
 simulation_params = {
         'dt':1.0,
-        'days': 5,
+        'days': 20,
         'region': "Ile-de-France",
         'quar_freq': 1,
 }
@@ -81,8 +81,16 @@ tests = {
 dynModel.parameters['global-parameters']['C_mtest'] = 10000
 dynModel.parameters['global-parameters']['C_atest'] = 10000
 
+
+
+
+
 # ##############################################################################
 # Testing the construction of a typical LP
+
+# some boolean flags for running the heuristic
+use_bounce_var = True   # whether to use the optimal bounce variables when forecasting the new X_hat
+bounce_existing = False   # whether to allow bouncing existing patients
 
 # shorthand for a few useful parameters
 T = dynModel.time_steps
@@ -98,43 +106,64 @@ assert( np.shape(eta) == (Xt_dim,) )
 
 #########
 # calculate all the constraints and store them
-A, B, K, all_labels = calculate_all_constraints(dynModel)
+Gamma_x, Gamma_u, K, all_labels = calculate_all_constraints(dynModel,bounce_existing)
 
-assert( np.shape(A) == (num_constraints,Xt_dim) )
-assert( np.shape(B) == (num_constraints,ut_dim) )
+assert( np.shape(Gamma_x) == (num_constraints,Xt_dim) )
+assert( np.shape(Gamma_u) == (num_constraints,ut_dim) )
 assert( np.shape(K) == (num_constraints,T) )
 
 # uptimal decisions
 uopt_seq = np.zeros((ut_dim,T))
 
-# pick a starting u_hat sequence; for now, no testing
+# pick a starting u_hat sequence
 uhat_seq = np.zeros((ut_dim,T))
+# for now, homogenous testing
+Nmtestg_idx_all = slice(controls.index('Nmtest_g'),ut_dim,num_controls)
+uhat_seq[Nmtestg_idx_all,:] = dynModel.parameters['global-parameters']['C_mtest']/num_age_groups
 
-#print(dynModel.parameters['global-parameters']['ICU])
-#print(dynModel.parameters['global-parameters']['C_ICU'])
+Natestg_idx_all = slice(controls.index('Natest_g'),ut_dim,num_controls)
+uhat_seq[Natestg_idx_all,:] = dynModel.parameters['global-parameters']['C_atest']/num_age_groups
 
-use_bounce_var = False   # whether to use bounce variables
-cap_X_hat = True      # whether to apply H/ICU capacity in case X_hat returned by dynModel exceeds them
+# and home lockdown variables all 1
+lock_home_idx_all = slice(controls.index('home'),ut_dim,num_controls)
+uhat_seq[lock_home_idx_all,:] = 1.0
 
 for k in range(T):
 
     print("\n\n TIME k= {}.".format(k))
 
-    # calculate state trajectory X_hat
-    # Xhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq, use_bounce_var, cap_X_hat)
 
-    Xhat_seq, uhat_seq = get_nominal_trajectory(dynModel, k, uhat_seq)
+    # calculate state trajectory X_hat and corresponging controls new_uhat
+    Xhat_seq, new_uhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq, use_bounce_var)
+
+    print("Finished getting nominal trajectory for time {}".format(k))
+    print("-----------------------")
+
     assert( np.shape(Xhat_seq) == (Xt_dim,T-k) )
-    assert(np.shape(uhat_seq) == (ut_dim, T-k))
+    assert( np.shape(new_uhat_seq) == (ut_dim,T-k) )
+
+    # overwrite uhat with the updated one (with new bounce variables)
+    #print("\nOld uhat at 1:")
+    #print(uhat_seq[:,1])
+    #print("\nNew uhat at 1")
+    #print(new_uhat_seq[:,1])
+
+    uhat_seq = new_uhat_seq
 
     ICUidx_all = slice(SEIR_groups.index('ICU_g'),Xt_dim,num_compartments)
-    print("Total people in ICU at start of period k={}".format(np.sum(Xhat_seq[ICUidx_all,0])))
+    print("Total people in ICU at start of period k: {}".format(np.sum(Xhat_seq[ICUidx_all,0])))
 
     # calculate objective parameters d, e
     D,E = calculate_objective_time_dependent_coefs(dynModel, k, Xhat_seq, uhat_seq)
 
+    print("Calculated obj. time dep coeff for time {}".format(k))
+    print("-----------------------")
+
     # get coefficients for decisions in all constraints and objective
-    constr_coefs, constr_consts, obj_coefs = calculate_all_coefs(dynModel,k,Xhat_seq,uhat_seq,A,B,D,E)
+    constr_coefs, constr_consts, obj_coefs = calculate_all_coefs(dynModel,k,Xhat_seq,uhat_seq,Gamma_x,Gamma_u,D,E)
+
+
+
 
     assert( np.shape(obj_coefs) == (ut_dim,T-k) )
     assert( len(constr_coefs) == T-k )
