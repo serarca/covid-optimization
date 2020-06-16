@@ -3,6 +3,7 @@ from bound import Bounds
 import numpy as np
 import pandas as pd
 import math
+import gurobipy as gb
 
 def n_contacts(group_g, group_h, alphas, mixing_method):
 
@@ -37,6 +38,7 @@ class DynamicalModel:
 		self.initialization = initialization
 		self.mixing_method = mixing_method
 		self.extra_data = extra_data
+		self.use_gurobi_vars = False
 
 		# Create groups from parameters
 		self.groups = {}
@@ -70,33 +72,8 @@ class DynamicalModel:
 			self.groups[n].update_total_contacts(time_of_flow, alphas)
 
 		if (B_H is not False) and (B_ICU is not False):
+			#if ()
 			B_H, B_ICU = self.cap_bounce_variables(B_H, B_ICU)
-			# Verify that the bouncing variables satisfy the required bounds
-#			for n,g in self.groups.items():
-#				# print("BH for {}: {} Flow H: {}".format(n,B_H[n],g.flow_H(self.t)))
-#				# assert(B_H[n]<=g.flow_H(self.t))
-#				if (B_H[n] > g.flow_H(time_of_flow)):
-#					print('WARNING.group.py() Capping B_H for group {} at time {}'.format(n,time_of_flow))
-#					print('Difference in %: {}'.format(B_H[n]/g.flow_H(time_of_flow)-1.0))
-#					B_H[n] = g.flow_H(time_of_flow)
-#
-#				#print("BICU for {}: {} Flow ICU: {}".format(n,B_ICU[n],g.flow_ICU(self.t)))
-#				#assert(B_ICU[n]<=g.flow_ICU(self.t))
-#				if (B_ICU[n] > g.flow_ICU(time_of_flow)):
-#					print('WARNING. group.py() Capping B_ICU for group {} at time {}'.format(n,time_of_flow))
-#					print('Difference in %: {}'.format(B_ICU[n]/g.flow_ICU(time_of_flow)-1.0))
-#					B_ICU[n] = g.flow_ICU(time_of_flow)
-#
-#			assert(
-#				sum([group.flow_H(time_of_flow)-B_H[name] for name,group in self.groups.items()])<=
-#				self.beds
-#				- sum([(1-group.parameters["lambda_H_R"]-group.parameters["lambda_H_D"])*group.H[time_of_flow] for name,group in self.groups.items()])
-#			)
-#
-#			total_ICU_patients = sum([(1-group.parameters["lambda_ICU_R"]-group.parameters["lambda_ICU_D"])*group.ICU[time_of_flow] + group.flow_ICU(time_of_flow) - B_ICU[name] for name,group in self.groups.items()])
-#			print("take_time_step(): Total ICU patients end of period {}: {}".format(time_of_flow,total_ICU_patients))
-#			print("total_ICU_patients - self.icus =", total_ICU_patients - self.icus)
-#			assert(total_ICU_patients < self.icus)
 
 			for n in self.groups:
 				self.groups[n].take_time_step(m_tests[n], a_tests[n], self.beds, self.icus, B_H[n], B_ICU[n])
@@ -109,9 +86,10 @@ class DynamicalModel:
 		# Calculate economic values
 		state = self.get_state(self.t+1)
 
-		print("People at the ICU in the next state: {}".format(sum(state[n]["ICU"] for n in self.groups)))
-		print("Total beds at the ICU: {}".format(self.icus))
-		assert(self.icus - sum(state[n]["ICU"] for n in self.groups) > - 1e-10 )
+		#print("People at the ICU in the next state: {}".format(sum(state[n]["ICU"] for n in self.groups)))
+		#print("Total beds at the ICU: {}".format(self.icus))
+		if( self.use_gurobi_vars==False ):
+			assert(self.icus - sum(state[n]["ICU"] for n in self.groups) > - 1e-10 )
 
 
 		deaths = sum([group.D[self.t+1]-group.D[self.t] for name,group in self.groups.items()])
@@ -142,6 +120,11 @@ class DynamicalModel:
 
 		# Cap bounces at no more than the level of flow_H / flow_ICU
 		for n,g in self.groups.items():
+			if( isinstance(B_H[n], gb.Var) or isinstance(B_ICU[n], gb.Var) ):
+				print("cap_bounce(): B_H and B_ICU are gurobi variables. Skipping bounding.")
+				self.use_gurobi_vars = True
+				return B_H, B_ICU
+
 			if (B_H[n] > g.flow_H()):
 				print('WARNING.group.py() Capping B_H for group {} at time {}'.format(n,time_of_flow))
 				B_H[n] = g.flow_H()
@@ -244,6 +227,7 @@ class DynamicalModel:
 		return state
 
 	def get_delta_X(self, t):
+		assert(t>0)  # should never call this with t=0
 		delta = {}
 		for name,group in self.groups.items():
 			delta[name] = {
@@ -421,7 +405,12 @@ class SEIR_group:
 		if (len(self.total_contacts) == t):
 			summ_contacts = 0
 			for n,g in self.all_groups.items():
-				pop_g = g.N[t] + g.Rq[t]
+				if(self.parent.use_gurobi_vars == True):
+					# when using gurobi vars, set total population to initial N
+					# print("WARNING. update_total_contacts(): Using initial population Ng(0) + Rgq(0) due to gurobi vars in dynModel.")
+					pop_g = g.N[0] + g.Rq[0]
+				else:
+					pop_g = g.N[t] + g.Rq[t]
 				new_contacts = n_contacts(self, g, alphas, self.mixing_method)
 				summ_contacts += new_contacts*g.I[t]/(pop_g if pop_g!=0 else 10e-6)
 				if self.parent.extra_data:
@@ -557,7 +546,7 @@ class SEIR_group:
 
 
 	def update_H(self, m_tests, a_tests, h_cap, icu_cap, B_H):
-		tol = 0
+		tol = 1e-8
 		# For each group, calculate the entering amount
 		entering_h = {}
 		summ_entering_h = 0
@@ -569,7 +558,8 @@ class SEIR_group:
 
 		if B_H is False:
 			B_H = entering_h[self.name]*((summ_entering_h-h_cap+summ_staying_h) if summ_entering_h-h_cap+summ_staying_h>0 else 0)/(summ_entering_h if summ_entering_h!=0 else 10e-6)
-
+			# ALTERNATIVE CLEANER EXPRESSION: (EASIER TO READ AND AVOIDS THE 1e-6 IN DENOMINATOR)
+			# B_H = (0 if entering_h[self.name]==0 else (entering_h[self.name]/summ_entering_h*max(0,summ_entering_h-h_cap+summ_staying_h)))
 		# Update bouncing variables
 		self.B_H += [B_H]
 
@@ -582,7 +572,7 @@ class SEIR_group:
 
 
 	def update_ICU(self, m_tests, a_tests, h_cap, icu_cap, B_ICU):
-		tol = 0
+		tol = 1e-8
 		# For each group, calculate the entering amount
 		entering_icu = {}
 		summ_entering_icu = 0
@@ -602,7 +592,7 @@ class SEIR_group:
 
 		delta_ICU = (
 			- (self.parameters["lambda_ICU_R"] + self.parameters["lambda_ICU_D"])*self.ICU[self.parent.t]
-			+ (1-tol) * self.flow_ICU()
+			+ (1-tol) * entering_icu[self.name]
 			- B_ICU
 		)
 		self.ICU += [self.ICU[self.parent.t]+delta_ICU*self.dt]

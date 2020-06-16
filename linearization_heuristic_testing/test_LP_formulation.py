@@ -26,7 +26,7 @@ start_time = time.time()
 # Global variables
 simulation_params = {
         'dt':1.0,
-        'days': 50,
+        'days': 5,
         'region': "Ile-de-France",
         'quar_freq': 1,
 }
@@ -127,13 +127,16 @@ uhat_seq[Nmtestg_idx_all,:] = dynModel.parameters['global-parameters']['C_mtest'
 Natestg_idx_all = slice(controls.index('Natest_g'),ut_dim,num_controls)
 uhat_seq[Natestg_idx_all,:] = dynModel.parameters['global-parameters']['C_atest']/num_age_groups
 
-# and home lockdown variables all 1
+# set all home lockdown variables all 1
 lock_home_idx_all = slice(controls.index('home'),ut_dim,num_controls)
 uhat_seq[lock_home_idx_all,:] = 1.0
 
+# a python list with the indices for all home lockdown decisions for all groups and periods
+lock_home_idx_all_times = [controls.index('home') + i*num_controls for i in range(T*num_age_groups)]
+
 for k in range(T):
 
-    print("\n\n TIME k= {}.".format(k))
+    print("\n\n HEURISTIC RUNNING FOR TIME k= {}.".format(k))
 
 
     # calculate state trajectory X_hat and corresponging controls new_uhat
@@ -144,12 +147,6 @@ for k in range(T):
 
     assert( np.shape(Xhat_seq) == (Xt_dim,T-k) )
     assert( np.shape(new_uhat_seq) == (ut_dim,T-k) )
-
-    # overwrite uhat with the updated one (with new bounce variables)
-    #print("\nOld uhat at 1:")
-    #print(uhat_seq[:,1])
-    #print("\nNew uhat at 1")
-    #print(new_uhat_seq[:,1])
 
     uhat_seq = new_uhat_seq
 
@@ -164,9 +161,6 @@ for k in range(T):
 
     # get coefficients for decisions in all constraints and objective
     constr_coefs, constr_consts, obj_coefs = calculate_all_coefs(dynModel,k,Xhat_seq,uhat_seq,Gamma_x,Gamma_u,D,E)
-
-
-
 
     assert( np.shape(obj_coefs) == (ut_dim,T-k) )
     assert( len(constr_coefs) == T-k )
@@ -187,15 +181,16 @@ for k in range(T):
     # mod.setParam( 'OutputFlag', False )     # make Gurobi silent
     mod.Params.DualReductions = 0  # change this to get explicit infeasible or unbounded
 
+    # Sense -1 indicates a maximization problem
+    mod.ModelSense = -1
+
     # add all decisions using matrix format, and also specify objective coefficients
     # u_vars = mod.addMVar(np.shape(uhat_seq), obj=obj_coefs, name="u")
     obj_vec = np.reshape(obj_coefs, (ut_dim*(T-k),), 'F')  # reshape by reading along rows first
     u_vars_vec = mod.addMVar( np.shape(obj_vec), obj=obj_vec, name="u")
 
-    # Sense -1 indicates a maximization problem
-    mod.ModelSense = -1
-
-    x_feas = np.zeros( (len(obj_vec),) )  # a feasible solution
+    # set the home lockdown to 1 for all groups and all times
+    mod.addConstrs((u_vars_vec[i]==1 for i in lock_home_idx_all_times if i < len(obj_vec)), name=("home_lock"))
 
     for t in range(k,T):
         #print("Time %d number of constraints %d" %(t,len(constr_coefs[t])))
@@ -204,7 +199,7 @@ for k in range(T):
             cname = ("%s[t=%d]" %(all_labels[con],t))
             mod.addConstr( u_vars_vec @ cons_vec + constr_consts[t][con] <= K[con,t], name=cname)
 
-    # mod.write("LP_lineariz_model.lp")       # write the LP to a file
+    #mod.write("LP_lineariz_model_{}.lp".format(k))       # write the LP to a file
 
     print("Optimizing Model")
     print("><><><><><><><><")
