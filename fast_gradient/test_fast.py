@@ -125,27 +125,27 @@ final_X = dynModel.get_state(1)
 
 # Convert alphas and testing and state to matrices
 def state_to_matrix(state):
-	m = np.zeros((len(age_groups),len(cont)))
+	m = np.zeros((len(age_groups),len(cont)), order="C")
 	for i in range(len(age_groups)):
 		for c in range(len(cont)):
 			m[i,c] = state[age_groups[i]][cont[c]]
 	return m
 
 def tests_to_vector(tests):
-	v = np.zeros(len(age_groups))
+	v = np.zeros(len(age_groups), order="C")
 	for i in range(len(age_groups)):
 		v[i] = tests[age_groups[i]]
 	return v
 
 def alphas_to_matrix(alphas):
-	m = np.zeros((len(age_groups),len(activities)))
+	m = np.zeros((len(age_groups),len(activities)), order="C")
 	for i in range(len(age_groups)):
 		for a in range(len(activities)):
 			m[i,a] = alphas[age_groups[i]][activities[a]]
 	return m
 
 def state_to_matrix(state_dict):
-	m = np.zeros((len(age_groups), len(cont)))
+	m = np.zeros((len(age_groups), len(cont)), order="C")
 	for i in range(len(age_groups)):
 		for j in range(len(cont)):
 			m[i,j] = state_dict[age_groups[i]][cont[j]]
@@ -156,11 +156,11 @@ m_tests_vec = tests_to_vector(m_tests)
 a_tests_vec = tests_to_vector(a_tests)
 alphas_matrix = alphas_to_matrix(alphas_vec[0])
 
-fast = FastDynamicalModel(universe_params, initialization, simulation_params['dt'], mixing_method)
-new_state = fast.take_time_step(state_matrix, m_tests_vec, a_tests_vec, alphas_matrix)
+fast = FastDynamicalModel(universe_params, simulation_params['dt'], mixing_method)
+new_state, econs = fast.take_time_step(state_matrix, m_tests_vec, a_tests_vec, alphas_matrix)
 
 
-slow_total_contacts = np.zeros(len(age_groups))
+slow_total_contacts = np.zeros(len(age_groups), order="C")
 for i,group in enumerate(age_groups):
 	slow_total_contacts[i] = dynModel.groups[group].total_contacts[0]
 
@@ -185,22 +185,53 @@ def main1():
 
 # Same thing
 
-fast = FastDynamicalModel(universe_params, initialization, simulation_params['dt'], mixing_method)
+fast = FastDynamicalModel(universe_params, simulation_params['dt'], mixing_method)
 
 def main2():
 	state = state_to_matrix(initial_state)
 
 	t0 = time.time()
 	for i in range(200):
-		state = fast.take_time_step(state, m_tests_vec, a_tests_vec, alphas_matrix)
+		if (i%14 == 0):
+			update_contacts = True
+		else:
+			update_contacts = False
+		state, econs = fast.take_time_step(state, m_tests_vec, a_tests_vec, alphas_matrix, update_contacts=update_contacts)
 	t1 = time.time()
 	print(t1-t0)
 
-cProfile.run('main1()')
-cProfile.run('main2()')
+# cProfile.run('main1()')
+# cProfile.run('main2()')
+
+# Now we test the models for a larger horizon
+# Construct model
+dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method)
+initial_state = dynModel.get_state(0)
+
+# Run model for one step
+iters = 10
+for i in range(iters):
+	dynModel.take_time_step(m_tests, a_tests, alphas_vec[0])
+final_X = dynModel.get_state(iters)
+total_reward = np.sum(dynModel.rewards[1:])
 
 
+state_matrix = state_to_matrix(initial_state)
+m_tests_vec = tests_to_vector(m_tests)
+a_tests_vec = tests_to_vector(a_tests)
+alphas_matrix = alphas_to_matrix(alphas_vec[0])
 
+fast = FastDynamicalModel(universe_params, simulation_params['dt'], mixing_method)
+state = state_matrix
+fast_total_reward = 0
+for i in range(iters):
+	state, econs = fast.take_time_step(state, m_tests_vec, a_tests_vec, alphas_matrix)
+	fast_total_reward += econs["reward"]
+
+print("Norm of matrix difference:", np.linalg.norm((state-state_to_matrix(final_X))/state_to_matrix(final_X)))
+# print((state-state_to_matrix(final_X))/state_to_matrix(final_X))
+# print(state_to_matrix(final_X))
+print("Difference of rewards:",(total_reward-fast_total_reward)/total_reward)
 
 
 

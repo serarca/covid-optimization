@@ -1,5 +1,4 @@
 from collections import defaultdict
-from bound import Bounds
 import numpy as np
 import pandas as pd
 import math
@@ -11,30 +10,26 @@ activities = ['home','leisure','other','school','transport','work']
 
 
 class FastDynamicalModel:
-	def __init__(self, parameters, initialization, dt, mixing_method):
+	def __init__(self, parameters, dt, mixing_method):
 		self.parameters = parameters
 		self.dt = dt
-		self.initialization = initialization
 		self.mixing_method = mixing_method
 
 		# Create groups from parameters
 		self.groups = {}
 		for n in parameters['seir-groups']:
-			self.groups[n] = SEIR_group(parameters['seir-groups'][n], initialization[n], self.dt, self.mixing_method, self)
+			self.groups[n] = SEIR_group(parameters['seir-groups'][n], self.dt, self.mixing_method, self)
 
 
 		# Fix number of beds and icus
 		self.beds = self.parameters['global-parameters']['C_H']
 		self.icus = self.parameters['global-parameters']['C_ICU']
 
-		# Initialize total population
-		self.total_population = sum([sum([initialization[group][cat] for cat in initialization[group].keys()]) for group in initialization.keys()])
-
 		# Initialize M matrix
 		self.initialize_M()
 
 		# Initialize arrays
-		self.contact_matrix = np.zeros((len(age_groups),len(age_groups)))
+		self.contact_matrix = np.zeros((len(age_groups),len(age_groups)), order = "C")
 
 		# Initialize parameters vectors
 		self.p_H = self.params_vector("p_H")
@@ -50,23 +45,26 @@ class FastDynamicalModel:
 		self.lambda_ICU_R = self.params_vector("lambda_ICU_R")
 		self.lambda_H_D = self.params_vector("lambda_H_D")
 		self.lambda_ICU_D = self.params_vector("lambda_ICU_D")
+		self.work_value = self.params_vector("work_value")
+		self.lockdown_fraction = self.params_vector("lockdown_fraction")
+		self.death_value = self.params_vector("death_value")
 
 	def params_vector(self, param):
-		v = np.zeros(len(age_groups))
+		v = np.zeros(len(age_groups), order = "C")
 		for i in range(len(age_groups)):
 			v[i] = self.groups[age_groups[i]].parameters[param]
 		return v
 
 
 	def initialize_M(self):
-		self.M = np.zeros((len(age_groups),len(age_groups), len(activities)))
+		self.M = np.zeros((len(age_groups),len(age_groups), len(activities)), order = "C")
 		for g1 in range(len(age_groups)):
 			for g2 in range(len(age_groups)):
 				for act in range(len(activities)):
 					self.M[g1,g2,act] = self.groups[age_groups[g1]].contacts[activities[act]][age_groups[g2]]
 
 
-	def take_time_step(self, state, m_tests, a_tests, alphas, B_H = False, B_ICU = False):
+	def take_time_step(self, state, m_tests, a_tests, alphas, update_contacts = True, B_H = False, B_ICU = False):
 
 		# Store variables
 		self.state = state
@@ -77,10 +75,11 @@ class FastDynamicalModel:
 		self.B_ICU = B_ICU
 
 		# Create new state
-		self.new_state = np.zeros((len(age_groups),len(cont)))
+		self.new_state = np.zeros((len(age_groups),len(cont)), order = "C")
 
 		# Update contact matric
-		self.update_contact_matrix()
+		if update_contacts:
+			self.update_contact_matrix()
 
 		# Update total contacts
 		pop = self.state[:,cont.index("N")] + self.state[:,cont.index("Rq")]
@@ -135,12 +134,17 @@ class FastDynamicalModel:
 		self.update_ICU()
 		self.update_D()
 
-		# # Get new economic value
-		# self.economic_value = self.get_economic_value()
-		# self.deaths = self.get_deaths()
-		# self.reward = self.get_reward()
+		# # Get new economic values
+		self.economic_value = self.get_economic_value()
+		self.deaths = self.get_deaths()
+		self.reward = self.get_reward()
 
-		return self.new_state
+
+		return self.new_state, {
+			"economic_value":self.economic_value,
+			"deaths":self.deaths,
+			"reward":self.reward,
+		}
 
 		# return {
 		# 	"new_state": self.new_state,
@@ -254,35 +258,34 @@ class FastDynamicalModel:
 			+ self.B_ICU
 		)*self.dt
 
+	def get_economic_value(self):
+		values = self.work_value*(self.alphas[:,activities.index('work')]+
+			self.lockdown_fraction*(1-self.alphas[:,activities.index('work')])
+		)*(
+		self.new_state[:,cont.index("S")]+self.new_state[:,cont.index("E")]+self.new_state[:,cont.index("R")]
+		)*self.dt
 
+		values += self.new_state[:,cont.index("Rq")]*self.work_value*self.dt
+		return np.sum(values)
 
-	# # Given a state and set of alphas, returns the economic value
-	# def get_economic_value(self, state, alphas):
-	# 	value = 0
-	# 	for group in state:
-	# 		value = value + (
-	# 			self.groups[group].economics['work_value']*(
-	# 				alphas[group]['work']+
-	# 				self.groups[group].economics['lockdown_fraction']*(1-alphas[group]['work'])
-	# 			)*
-	# 			(state[group]["S"] + state[group]["E"] + state[group]["R"])
-	# 			* self.dt
-	# 		)
-	# 		# Liberate people in Rq group
-	# 		value = value + state[group]["Rq"]*self.groups[group].economics['work_value']* self.dt
-	# 	return value
+	def get_deaths(self):
+		return np.sum(self.new_state[:,cont.index("D")] - self.state[:,cont.index("D")])
+
+	def get_reward(self):
+		return self.economic_value - np.sum(self.death_value*(self.new_state[:,cont.index("D")] - self.state[:,cont.index("D")]))
 
 
 
 class SEIR_group:
 	# Time step
-	def __init__(self, group_parameters, group_initialization, dt, mixing_method, parent):
+	def __init__(self, group_parameters, dt, mixing_method, parent):
 		# Group name
 		self.name = group_parameters['name']
 		self.parameters = group_parameters['parameters']
 		self.contacts = group_parameters['contacts']
-		self.economics = group_parameters['economics']
-		self.initial_conditions = group_initialization
+		self.parameters['work_value'] = group_parameters['economics']['work_value']
+		self.parameters['lockdown_fraction'] = group_parameters['economics']['lockdown_fraction']
+		self.parameters['death_value'] = group_parameters['economics']['death_value']
 		self.mixing_method = mixing_method
 		self.parent = parent
 
