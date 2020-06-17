@@ -28,6 +28,10 @@ num_compartments = len(SEIR_groups)
 num_controls = len(controls)
 num_activities = len(activities)
 
+Xt_dim = num_compartments * num_age_groups
+ut_dim = num_controls * num_age_groups
+
+
 #def get_index_X(ag_name, SEIRg_name, age_groups, SEIR_groups):
 #    return age_groups.index(ag_name)*len(SEIR_groups) + SEIR_groups.index(SEIRg_name)
 
@@ -1074,14 +1078,22 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
 
 ####################################
 # Main function: runs the linearization heuristic
-def run_heuristic_linearization(dynModel, mixing_method):
-    """Run the heuristic based on linearization"""
+def run_heuristic_linearization(dynModel):
+    """Run the heuristic based on linearization. Takes a dynamical model, resets the time to 0, and runs it following the linearization heuristic. Returns the dynamical model after running it."""
+
+    dynModel.reset_time(0)
 
     # shorthand for a few useful parameters
     T = dynModel.time_steps
     Xt_dim = num_compartments * num_age_groups
     ut_dim = num_controls * num_age_groups
     num_constraints = 4 + 2*num_age_groups + num_age_groups*num_activities
+
+    # some boolean flags for running the heuristic
+    use_bounce_var = True   # whether to use the optimal bounce variables when forecasting the new X_hat
+    bounce_existing = False   # whether to allow bouncing existing patients
+
+
 
     # calculate M, gamma, eta
     M, gamma, eta = calculate_M_gamma_and_eta(dynModel)
@@ -1091,24 +1103,46 @@ def run_heuristic_linearization(dynModel, mixing_method):
 
     #########
     # calculate all the constraints and store them
-    Gamma_x, Gamma_u, K = calculate_all_constraints(dynModel)
+    Gamma_x, Gamma_u, K, all_labels = calculate_all_constraints(dynModel,bounce_existing)
 
     assert( np.shape(Gamma_x) == (num_constraints,Xt_dim) )
     assert( np.shape(Gamma_u) == (num_constraints,ut_dim) )
     assert( np.shape(K) == (num_constraints,T) )
 
+
     # uptimal decisions
     uopt_seq = np.zeros((ut_dim,T))
 
-    # pick a starting u_hat sequence; for now, no testing
+    # pick a starting u_hat sequence
     uhat_seq = np.zeros((ut_dim,T))
+    # for now, homogenous testing
+    Nmtestg_idx_all = slice(controls.index('Nmtest_g'),ut_dim,num_controls)
+    uhat_seq[Nmtestg_idx_all,:] = dynModel.parameters['global-parameters']['C_mtest']/num_age_groups
+
+    Natestg_idx_all = slice(controls.index('Natest_g'),ut_dim,num_controls)
+    uhat_seq[Natestg_idx_all,:] = dynModel.parameters['global-parameters']['C_atest']/num_age_groups
+
+    # and home lockdown variables all 1
+    lock_home_idx_all = slice(controls.index('home'),ut_dim,num_controls)
+    uhat_seq[lock_home_idx_all,:] = 1.0
+
+    # a python list with the indices for all home lockdown decisions for all groups and periods
+    lock_home_idx_all_times = [controls.index('home') + i*num_controls for i in range(T*num_age_groups)]
 
     for k in range(T):
 
-        # calculate state trajectory X_hat
-        Xhat_seq, new_uhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq)
+        print("\n\n HEURISTIC RUNNING FOR TIME k= {}.".format(k))
+
+
+        # calculate state trajectory X_hat and corresponging controls new_uhat
+        Xhat_seq, new_uhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq, use_bounce_var)
+
         assert( np.shape(Xhat_seq) == (Xt_dim,T-k) )
         assert( np.shape(new_uhat_seq) == (ut_dim,T-k) )
+
+        uhat_seq = new_uhat_seq
+
+        ICUidx_all = slice(SEIR_groups.index('ICU_g'),Xt_dim,num_compartments)
 
         # calculate objective parameters d, e
         D,E = calculate_objective_time_dependent_coefs(dynModel, k, Xhat_seq, uhat_seq)
@@ -1129,36 +1163,60 @@ def run_heuristic_linearization(dynModel, mixing_method):
 
         # create empty model
         mod = gb.Model("Linearization Heuristic")
+        # mod.setParam( 'OutputFlag', False )     # make Gurobi silent
+        mod.Params.DualReductions = 0  # change this to get explicit infeasible or unbounded
 
         # add all decisions using matrix format, and also specify objective coefficients
-        u_vars = mod.addMVar(np.shape(uhat_seq), obj=obj_coefs, name="u")
+        obj_vec = np.reshape(obj_coefs, (ut_dim*(T-k),), 'F')  # reshape by reading along rows first
+        u_vars_vec = mod.addMVar( np.shape(obj_vec), obj=obj_vec, name="u")
 
-        ones_row = np.ones(ut_dim)
-        ones_col = np.ones(T-k)
+        # Sense -1 indicates a maximization problem
+        mod.ModelSense = -1
+
+        mod.addConstrs((u_vars_vec[i]==1 for i in lock_home_idx_all_times if i < len(obj_vec)), name=("home_lock"))
+
         for t in range(k,T):
+            #print("Time %d number of constraints %d" %(t,len(constr_coefs[t])))
             for con in range(num_constraints):
-                mod.addConstr( ones_row @ (u_vars*constr_coefs[t][con]) @ ones_col + constr_consts[t][con] <= K[con,t] )
+                cons_vec = np.reshape(constr_coefs[t][con], (len(obj_vec),), 'F')
+                cname = ("%s[t=%d]" %(all_labels[con],t))
+                mod.addConstr( u_vars_vec @ cons_vec + constr_consts[t][con] <= K[con,t], name=cname)
 
         # optimize the model
         mod.optimize()
 
+        if( mod.Status ==  gb.GRB.INFEASIBLE ):
+            # model was infeasible
+            mod.computeIIS()  # irreducible system of infeasible inequalities
+            mod.write("LP_lineariz_IIS.ilp")
+            print("ERROR. Problem infeasible at time k={}. Halting...".format(k))
+            assert(False)
+
         # extract decisions for current period (testing and alphas)
-        uopt_seq[:,k] = u_vars.X[:,0]
-        uk_opt_dict, alphak_opt_dict = buildAlphaDict(u_vars.X[:,0])
+        uvars_opt = np.reshape(u_vars_vec.X, np.shape(obj_coefs), 'F')
+        uopt_seq[:,k] = uvars_opt[:,0]
+        uk_opt_dict, alphak_opt_dict = buildAlphaDict(uvars_opt[:,0])
 
         m_tests = {}
         a_tests = {}
+        BH = {}
+        BICU = {}
         for ag in age_groups:
+            BH[ag] = uk_opt_dict[ag]['BounceH_g']
+            BICU[ag] = uk_opt_dict[ag]['BounceICU_g']
             m_tests[ag] = uk_opt_dict[ag]['Nmtest_g']
             a_tests[ag] = uk_opt_dict[ag]['Natest_g']
 
         # take one time step in dynamical system
-        dynModel.take_time_step(m_tests, a_tests, alphak_opt_dict)
+        if(use_bounce_var):
+            dynModel.take_time_step(m_tests, a_tests, alphak_opt_dict, BH, BICU)
+        else:
+            dynModel.take_time_step(m_tests, a_tests, alphak_opt_dict)
 
         # update uhat_sequence
-        uhat_seq = u_vars.X[:,1:]
+        uhat_seq = uvars_opt[:,1:]
 
-    return uopt_seq
+    return dynModel
 
 ####################################
 # TESTING

@@ -39,6 +39,9 @@ class DynamicalModel:
 		self.mixing_method = mixing_method
 		self.extra_data = extra_data
 		self.use_gurobi_vars = False
+		self.lockdown_controls = []
+		self.m_tests_controls = []
+		self.a_tests_controls = []
 
 		# Create groups from parameters
 		self.groups = {}
@@ -71,7 +74,17 @@ class DynamicalModel:
 		for n in self.groups:
 			self.groups[n].update_total_contacts(time_of_flow, alphas)
 
-		if (B_H is not False) and (B_ICU is not False):
+			if (B_H is not False) and (B_ICU is not False):
+				if(isinstance(B_H[n], gb.Var) or isinstance(B_ICU[n], gb.Var) ):
+					print("Take Time Step: B_H and B_ICU are gurobi variables. Skipping bounding and capcity assertion checks.")
+					self.use_gurobi_vars = True
+
+		# Store Lockdown and testing controls for time t
+		self.lockdown_controls += [alphas]
+		self.m_tests_controls += [m_tests]
+		self.a_tests_controls += [a_tests]
+
+		if (B_H is not False) and (B_ICU is not False) and (self.use_gurobi_vars is not True):
 			#if ()
 			B_H, B_ICU = self.cap_bounce_variables(B_H, B_ICU)
 
@@ -88,7 +101,7 @@ class DynamicalModel:
 
 		#print("People at the ICU in the next state: {}".format(sum(state[n]["ICU"] for n in self.groups)))
 		#print("Total beds at the ICU: {}".format(self.icus))
-		if( self.use_gurobi_vars==False ):
+		if( self.use_gurobi_vars is not True ):
 			assert(self.icus - sum(state[n]["ICU"] for n in self.groups) > - 1e-10 )
 
 
@@ -120,10 +133,6 @@ class DynamicalModel:
 
 		# Cap bounces at no more than the level of flow_H / flow_ICU
 		for n,g in self.groups.items():
-			if( isinstance(B_H[n], gb.Var) or isinstance(B_ICU[n], gb.Var) ):
-				print("cap_bounce(): B_H and B_ICU are gurobi variables. Skipping bounding.")
-				self.use_gurobi_vars = True
-				return B_H, B_ICU
 
 			if (B_H[n] > g.flow_H()):
 				print('WARNING.group.py() Capping B_H for group {} at time {}'.format(n,time_of_flow))
@@ -171,17 +180,36 @@ class DynamicalModel:
 	def reset_time(self, new_time):
 		"""Resets the current time of the simulation to an earlier time point"""
 
-		if(new_time > self.t):
-			assert(False)
 
-		# reset the time in each group
+		assert(new_time <= self.t)
+
+
+		self.use_gurobi_vars = False
+
+		# reset the time in each group and check if we are using gurobi variables for the bouncing decisions.
 		for n in self.groups:
 			self.groups[n].reset_time(new_time)
+
+			if(
+			isinstance(self.groups[n].H[new_time], gb.Var)
+			or
+			isinstance(self.groups[n].ICU[new_time], gb.Var)
+			or
+			isinstance(self.groups[n].H[new_time], gb.LinExpr)
+			or
+			isinstance(self.groups[n].ICU[new_time], gb.LinExpr)):
+				print("Reset Time: B_H and B_ICU are gurobi variables. Fixing the use_gurobi_vars flag to True.")
+				self.use_gurobi_vars = True
 
 		# reset internal calculations of econ values, deaths, rewards
 		self.economic_values = self.economic_values[0:new_time+1]
 		self.deaths = self.deaths[0:new_time+1]
 		self.rewards = self.rewards[0:new_time+1]
+
+		# reset controls to time new_time
+		self.lockdown_controls = self.lockdown_controls[0:new_time]
+		self.m_tests_controls = self.m_tests_controls[0:new_time]
+		self.a_tests_controls = self.a_tests_controls[0:new_time]
 
 		self.t = new_time
 
@@ -405,7 +433,7 @@ class SEIR_group:
 		if (len(self.total_contacts) == t):
 			summ_contacts = 0
 			for n,g in self.all_groups.items():
-				if(self.parent.use_gurobi_vars == True):
+				if(self.parent.use_gurobi_vars is True):
 					# when using gurobi vars, set total population to initial N
 					# print("WARNING. update_total_contacts(): Using initial population Ng(0) + Rgq(0) due to gurobi vars in dynModel.")
 					pop_g = g.N[0] + g.Rq[0]
@@ -446,8 +474,8 @@ class SEIR_group:
 
 	# Reset the time to a past time
 	def reset_time(self, new_time):
-		if(new_time > self.parent.t):
-			assert(False)
+		assert(new_time <= self.parent.t)
+
 		self.S = self.S[0:new_time+1]
 		self.E = self.E[0:new_time+1]
 		self.I = self.I[0:new_time+1]

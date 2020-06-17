@@ -140,7 +140,7 @@ for k in range(T):
     Xhat_seq, new_uhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq, use_bounce_var)
     assert( np.shape(Xhat_seq) == (Xt_dim,T-k) )
     assert( np.shape(new_uhat_seq) == (ut_dim,T-k) )
-    
+
     # overwrite uhat with the updated one (with new bounce variables)
     #print("\nOld uhat at 1:")
     #print(uhat_seq[:,1])
@@ -151,7 +151,7 @@ for k in range(T):
 
     ICUidx_all = slice(SEIR_groups.index('ICU_g'),Xt_dim,num_compartments)
     # print("Total people in ICU at start of period k: {}".format(np.sum(Xhat_seq[ICUidx_all,0])))
-    
+
     # calculate objective parameters d, e
     D,E = calculate_objective_time_dependent_coefs(dynModel, k, Xhat_seq, uhat_seq)
 
@@ -226,7 +226,7 @@ for k in range(T):
 
     # update uhat_sequence
     uhat_seq = uvars_opt[:,1:]
-    
+
 
 
 # ##############################################################################
@@ -236,9 +236,9 @@ u_all_opt_dict = {}
 alpha_all_opt_dict = {}
 for t in range(T):
     u_all_opt_dict[t], alpha_all_opt_dict[t] = buildAlphaDict(uopt_seq[:,t])
-    
+
 # Retrieve optimal lockdown decisions
-# Express as dictionary where given an age group, an activity key corresponds to an np.array of length T. 
+# Express as dictionary where given an age group, an activity key corresponds to an np.array of length T.
 # That array holds the optimal lockdown decisions for that age group and that activity.
 lockdowns_opt = {}
 for ag in age_groups:
@@ -357,17 +357,3 @@ figure = plt.gcf() # get current figure
 figure.set_size_inches(7*len(groups),24)
 figure.suptitle('Region: %s, Linearization Heuristic with Total Days: %s, Initial Infected percentage: %s, M-test daily capacity: %s, A-test daily capacity: %s, Mixing: %s'%(simulation_params['region'],T,perc_infected,K_mtest,K_atest,mixing_method["name"]), fontsize=22)
 plt.savefig("../results_runs/optimization/"+simulation_params['region']+"_linearization_heuristic"+"_n_days_"+str(T)+"_initial_infected_percentage_"+str(perc_infected)+"_m_tests_"+str(dynModel.parameters['global-parameters']['C_mtest'])+"_a_tests_"+str(dynModel.parameters['global-parameters']['C_atest'])+"_mixing_"+mixing_method["name"]+".pdf")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
