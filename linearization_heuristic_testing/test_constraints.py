@@ -12,10 +12,16 @@ sys.path.insert(0, parent_dir+"/heuristics")
 from linearization import *
 from heuristics import *
 
+
+
 # Global variables
+
+bounce_existing = False
+use_bounce_var = True
+
 simulation_params = {
         'dt':1.0,
-        'days': 3,
+        'days': 181,
         'region': "Ile-de-France",
         'quar_freq': 1,
 }
@@ -85,7 +91,18 @@ num_constraints = 4 + 2*num_age_groups + num_age_groups*num_activities
 # uptimal decisions
 uopt_seq = np.zeros((ut_dim,T))
 
+# pick a starting u_hat sequence
 uhat_seq = np.zeros((ut_dim,T))
+# for now, homogenous testing
+Nmtestg_idx_all = slice(controls.index('Nmtest_g'),ut_dim,num_controls)
+uhat_seq[Nmtestg_idx_all,:] = dynModel.parameters['global-parameters']['C_mtest']/num_age_groups
+
+Natestg_idx_all = slice(controls.index('Natest_g'),ut_dim,num_controls)
+uhat_seq[Natestg_idx_all,:] = dynModel.parameters['global-parameters']['C_atest']/num_age_groups
+
+# and home lockdown variables all 1
+lock_home_idx_all = slice(controls.index('home'),ut_dim,num_controls)
+uhat_seq[lock_home_idx_all,:] = 1.0
 
 for k in range(T):
     M = gb.Model("Linearization Heuristic V2")
@@ -102,15 +119,33 @@ for k in range(T):
 
 
 
-    Gamma_x, Gamma_u, K, all_labels = calculate_all_constraints(dynModel)
+    Gamma_x, Gamma_u, K, all_labels = calculate_all_constraints(dynModel, bounce_existing)
 
-    Xhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq)
+    # Xhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq)
+
+
+    Xhat_seq, new_uhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq, use_bounce_var)
+
+    print("Finished getting nominal trajectory for time {}".format(k))
+    print("-----------------------")
+
+    assert( np.shape(Xhat_seq) == (Xt_dim,T-k) )
+    assert( np.shape(new_uhat_seq) == (ut_dim,T-k) )
+
+    # overwrite uhat with the updated one (with new bounce variables)
+    #print("\nOld uhat at 1:")
+    #print(uhat_seq[:,1])
+    #print("\nNew uhat at 1")
+    #print(new_uhat_seq[:,1])
+
+    uhat_seq = new_uhat_seq
+
 
     d, e = calculate_objective_time_dependent_coefs(dynModel, k, Xhat_seq, uhat_seq)
 
-    # M.setObjective(sum(d[:,t-k] @ x_vars[t] + e[:,t-k] @ u_vars[t] for t in range(k, T-1)) + d[:,T-k-1] @ x_vars[T], gb.GRB.MAXIMIZE)
+    M.setObjective(sum(d[:,t-k] @ x_vars[t] + e[:,t-k] @ u_vars[t] for t in range(k, T-1)) + d[:,T-k-1] @ x_vars[T], gb.GRB.MAXIMIZE)
 
-    M.setObjective(0)
+    # M.setObjective(0)
 
     At = {}
     Bt = {}

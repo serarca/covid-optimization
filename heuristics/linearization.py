@@ -339,95 +339,10 @@ def get_Jacobian_u(dynModel, X_hat, u_hat, mixing_method):
             jacob[Eg_idx,lga_idx] = - jacob[Sg_idx,lga_idx]
 
     return jacob
-####################################
-# Return Nominal Trajectory, the x_hat and the u_hat corresponding to this X_hat
-def get_nominal_trajectory(dynModel, k, u_hat_sequence):
-    """Given a dynamical model, a starting point k, and the controls for time periods k to T-1 for tests and lockdowns, we start the dynamical model at time k, and then run it until time T-1 with the controls in u_hat.
-    This produces the nominal trajectory X_hat_sequence. X_hat_sequence is a np.array of shape (num_compartments * num_age_groups, T-k), where each column represents the X_hat at time k, k+1,... Also, because we might not take exactly the same bouncing decisions as the input u_hat_sequence, we return the actual u_hat used to generate x_hat.
-
-    This assumes that the dynamical model has already been run up to point k (it takes the states at time k as the starting points for the new nominal trajectory).
-    We assume as well that u_hat_sequence is a 2-d numpy array with shape (num_controls * num_age_groups, T-k) with each column corresponding to a u_hat at time k, k+1,..., T-1. Hence, u_hat_sequence[:,k] gives the u_hat at time k.
-    Note we are not using the bouncing variables in forecasting X_hat_sequence.
-    Note: we return x_hat[k], x_hat[k+1], ..., x_hat[T-1], and u_hat[k],..., u_hat[T-1], where the u_hat is equal to u_hat_sequence in it's testing decisions, but has the actual bouncing decisions used to produce x_hat.
-    """
-    #NOTE. There are a few extra arguments, as follows:
-    # Argument 'cap_seq' specifies whether this should cap the sequence using
-    # hospital and capacity constraints so as to make it feasible.
-    # Argument 'use_bounce' determines whether to use bounce variables or not
-
-    # Erase the states after k so as to reset the dyn model
-    dynModel.reset_time(k)
-
-    # The total time horizon for the dynamical model
-    T = dynModel.time_steps
-
-    X_hat_sequence = np.zeros((num_compartments * num_age_groups, T-k))
-    u_hat_nominal_sequence = np.zeros(np.shape(u_hat_sequence))
-
-    for t in range(T-k):
-        if t!=0:
-            # Write the values of u_hat at time t-1 in dict form
-            # WHY IS THIS t-1 ??? WEIRD INDEXING?
-            u_hat_dict, alphas = buildAlphaDict(u_hat_sequence[:,t-1])
-
-            #Create m and a tests in the format taken by dynModel
-            m_tests = {}
-            a_tests = {}
-            BH = {}
-            BICU = {}
-            for ag in age_groups:
-                BH[ag] = u_hat_dict[ag]['BounceH_g']
-                BICU[ag] = u_hat_dict[ag]['BounceICU_g']
-                m_tests[ag] = u_hat_dict[ag]['Nmtest_g']
-                a_tests[ag] = u_hat_dict[ag]['Natest_g']
-
-            # take one time step in dynamical system.
-
-            dynModel.take_time_step(m_tests, a_tests, alphas, BH, BICU)
-
-
-        # get the state from the dynamic model
-        state = dynModel.get_state(t + k)
-
-        # write it into X_hat
-        X_hat_sequence[:,t] = dict_to_X(state)
-        if t > 0:
-            u_hat_nominal_sequence[:,t] = extract_nominal_u_hat(u_hat_sequence, state, t)
-
-
-    # Erase the states after k so as to reset the dyn model
-    dynModel.reset_time(k)
-
-    return X_hat_sequence, u_hat_nominal_sequence
-
-#####################################
-
-def extract_nominal_u_hat(u_hat_sequence, states,t):
-    ''' Given the u_hat_sequence and the actual decisions taken by dynModel, returns the full set of controls for period t.'''
-
-    u_hat_nominal = u_hat_sequence[:, t]
-
-    assert(np.shape(u_hat_nominal) == (num_age_groups* num_controls,))
-
-    for ag in range(num_age_groups):
-
-        BounceHg_idx = ag*num_controls + controls.index('BounceH_g')
-        BounceICUg_idx = ag*num_controls + controls.index('BounceICU_g')
-
-        u_hat_nominal[BounceHg_idx] = states[age_groups[ag]]["B_H"]
-
-        u_hat_nominal[BounceICUg_idx] = states[age_groups[ag]]["B_ICU"]
-
-    return u_hat_nominal
-
-
-
-
-
 
 ####################################
 # Build X_hat given a dynModel, a starting point k, and a sequence of controls u_hat
-def get_X_hat_sequence(dynModel, k, u_hat_sequence, use_bounce, cap_seq):
+def get_X_hat_sequence(dynModel, k, u_hat_sequence, use_bounce):
     """Given a dynamical model, a starting point k, and the controls for time periods k to T-1 for tests and lockdowns, we start the dynamical model at time k, and then run it until time T-1 with the controls in u_hat.
     This produces the nominal trajectory X_hat_sequence. X_hat_sequence is a np.array of shape (num_compartments * num_age_groups, T-k), where each column represents the X_hat at time k, k+1,...
     This assumes that the dynamical model has already been run up to point k (it takes the states at time k as the starting points for the new nominal trajectory).
@@ -436,8 +351,6 @@ def get_X_hat_sequence(dynModel, k, u_hat_sequence, use_bounce, cap_seq):
     Note: we return x_hat[k], x_hat[k+1], ..., x_hat[T-1].
     """
     #NOTE. There are a few extra arguments, as follows:
-    # Argument 'cap_seq' specifies whether this should cap the sequence using
-    # hospital and capacity constraints so as to make it feasible.
     # Argument 'use_bounce' determines whether to use bounce variables or not
 
     # Erase the states after k so as to reset the dyn model
@@ -447,31 +360,12 @@ def get_X_hat_sequence(dynModel, k, u_hat_sequence, use_bounce, cap_seq):
     T = dynModel.time_steps
 
     X_hat_sequence = np.zeros((num_compartments * num_age_groups, T-k))
+    new_uhat_sequence = u_hat_sequence  # initialized with the old one
+
     Hidx_all = slice(SEIR_groups.index('H_g'),np.shape(X_hat_sequence)[0],num_compartments)
     ICUidx_all = slice(SEIR_groups.index('ICU_g'),np.shape(X_hat_sequence)[0],num_compartments)
 
     for t in range(T-k):
-        if t!=0:
-            # Write the values of u_hat at time t-1 in dict form
-            # WHY IS THIS t-1 ??? WEIRD INDEXING?
-            u_hat_dict, alphas = buildAlphaDict(u_hat_sequence[:,t-1])
-
-            #Create m and a tests in the format taken by dynModel
-            m_tests = {}
-            a_tests = {}
-            BH = {}
-            BICU = {}
-            for ag in age_groups:
-                BH[ag] = u_hat_dict[ag]['BounceH_g']
-                BICU[ag] = u_hat_dict[ag]['BounceICU_g']
-                m_tests[ag] = u_hat_dict[ag]['Nmtest_g']
-                a_tests[ag] = u_hat_dict[ag]['Natest_g']
-
-            # take one time step in dynamical system.
-            if(use_bounce):
-                dynModel.take_time_step(m_tests, a_tests, alphas, BH, BICU)
-            else:
-                dynModel.take_time_step(m_tests, a_tests, alphas)
 
         # get the state from the dynamic model
         state = dynModel.get_state(t + k)
@@ -479,37 +373,37 @@ def get_X_hat_sequence(dynModel, k, u_hat_sequence, use_bounce, cap_seq):
         # write it into X_hat
         X_hat_sequence[:,t] = dict_to_X(state)
 
-        # check whether any capping in H or ICU should be done
-        if( cap_seq ):
+        # build a dictionary of decisions/controls
+        u_hat_dict, alphas = buildAlphaDict(u_hat_sequence[:,t])
 
-            tol = 1e-7  # bounce a bit more, to make sure capacities are met
-            # check whether there is overflow in H
-            H_patients = np.sum(X_hat_sequence[Hidx_all,t])
-            if( H_patients > dynModel.parameters['global-parameters']['C_H'] ):
-                print("\nWARNING. get_X_hat_seq(). Total in H at t=%d = %.2f > capacity = %d. Bouncing more, proportionally." \
-                      %(t,H_patients,dynModel.parameters['global-parameters']['C_H']) )
-                # extra bounces done proportionally in each group
-                extra_bounced = tol + (H_patients - dynModel.parameters['global-parameters']['C_H'])
-                extra_bounced_g = extra_bounced * X_hat_sequence[Hidx_all,t]/H_patients
-                X_hat_sequence[Hidx_all,t] -= extra_bounced_g
+        #Create m and a tests in the format taken by dynModel
+        m_tests = {}
+        a_tests = {}
+        BH = {}
+        BICU = {}
+        for ag in age_groups:
+            BH[ag] = u_hat_dict[ag]['BounceH_g']
+            BICU[ag] = u_hat_dict[ag]['BounceICU_g']
+            m_tests[ag] = u_hat_dict[ag]['Nmtest_g']
+            a_tests[ag] = u_hat_dict[ag]['Natest_g']
 
-            # check whether there is overflow in ICU
-            ICU_patients = np.sum(X_hat_sequence[ICUidx_all,t])
-            if( ICU_patients > dynModel.parameters['global-parameters']['C_ICU'] ):
-                print("\nWARNING. get_X_hat_seq(). Total in ICU at t=%d = %.2f > capacity = %d. Bouncing more, proportionally." \
-                      %(t,ICU_patients,dynModel.parameters['global-parameters']['C_ICU']) )
-                # extra bounces done proportionally in each group
-                extra_bounced = tol + (ICU_patients - dynModel.parameters['global-parameters']['C_ICU'])
-                extra_bounced_g = extra_bounced * X_hat_sequence[ICUidx_all,t]/ICU_patients
-                X_hat_sequence[ICUidx_all,t] -= extra_bounced_g
+        # take one time step in dynamical system.
+        if(use_bounce):
+            dynModel.take_time_step(m_tests, a_tests, alphas, BH, BICU)
+        else:
+            dynModel.take_time_step(m_tests, a_tests, alphas)
 
-            # NOTE. IT IS UNCLEAR WHETHER WE SHOULD ALSO ROLL BACK DYNMODEL AND UPDATE STATE TO REFLECT CLIPPING
-            # FOR NOW, WE DO NOT.
+        # get the updated bounce variables and write them in new control
+        new_bounce = dynModel.get_bounce(t + k)
+        for ag in range(num_age_groups):
+            #print("ICU: Age group {}: bouncing {}".format(age_groups[ag],new_bounce[age_groups[ag]]['B_ICU']))
+            new_uhat_sequence[ag * num_controls + controls.index('BounceH_g'),t] = new_bounce[age_groups[ag]]['B_H']
+            new_uhat_sequence[ag * num_controls + controls.index('BounceICU_g'),t] = new_bounce[age_groups[ag]]['B_ICU']
 
     # Erase the states after k so as to reset the dyn model
     dynModel.reset_time(k)
 
-    return X_hat_sequence
+    return X_hat_sequence, new_uhat_sequence
 
 ####################################
 # builds a dictionary with decisions from a large numpy array (for a given period)
@@ -642,14 +536,20 @@ def get_F(dynModel, X, u):
     assert(X.shape == (num_compartments * num_age_groups, ))
     assert(u.shape == (num_controls * num_age_groups, ))
 
+    print("Started Get F")
+    print("*-*-*-*-*-*-*-*-*-*")
+
     # We save the initial time of dynModel to revert back to
     initial_time_of_model = dynModel.t
+    print("Initial time of model: {}".format(initial_time_of_model))
+
+
     initial_state_dict = dynModel.get_state(dynModel.t)
 
     # Covert array into dictionary
     X_dict = X_to_dict(X)
 
-    #Determine the testing at time t given by u
+    # Determine the testing at time t given by u
     u_hat_dict, alphas = buildAlphaDict(u)
 
     m_tests = {}
@@ -660,6 +560,11 @@ def get_F(dynModel, X, u):
 
     B_H = {}
     B_ICU = {}
+
+    #########################################
+    # Below seems deprecated, because even if get_X_hat sequence does not use the bouncing variables,
+    # it will still output controls B_H and B_ICU in new_u_hat_sequence.
+    # To clean later.
     for g in age_groups:
         B_H[g] = u_hat_dict[g]['BounceH_g'] if (u_hat_dict[g]['BounceH_g'] != -1) else False
         # print("*****************************")
@@ -673,6 +578,8 @@ def get_F(dynModel, X, u):
         if (B_H[g] is not False) or (B_ICU[g] is not False):
             prorrated = False
 
+    print("prorrated is", prorrated)
+    ########################################
 
     # Write X_dict as current state of dynModel
     dynModel.write_state(dynModel.t, X_dict)
@@ -685,14 +592,25 @@ def get_F(dynModel, X, u):
     #dynModel.take_time_step(m_tests, a_tests, alphas)
 
     # Get the current state
-    state_next_step = dynModel.get_state(dynModel.t)
+    # state_next_step = dynModel.get_state(dynModel.t)
+
+    delta_x_next_step = dynModel.get_delta_X(dynModel.t)
+
+    print("Time of Model after taking a step = {}".format(dynModel.t))
 
     # Make the dictionary into an array
-    X_next_step = dict_to_X(state_next_step)
+    X_next_step = dict_to_X(delta_x_next_step)
 
     # Erase the states after t so as to reset the dyn model, also populate t with correct state
     dynModel.reset_time(initial_time_of_model)
+
+    print("Time of Model after taking resseting the clock = {}".format(dynModel.t))
+
     dynModel.write_state(dynModel.t, initial_state_dict)
+
+    print("Finished Running get_F")
+    print("*-*-*-*-*-*-*-*-*-*-*-*-*")
+
 
     # Return dynModel to initial state
     return X_next_step
@@ -775,7 +693,9 @@ def calculate_M_gamma_and_eta(dynModel):
 # This function determines Gamma_x, Gamma_u and K(t). Gamma_x and Gamma_u are stored as matrices with
 # one row for each constraint, compatible with calculate_all_constraint_coefs(.)
 # K is stored as a dictionary with a key for every time t
-def calculate_all_constraints(dynModel):
+# The boolean flag 'bounce_existing' determines whether to apply the more relaxed
+# version of the capacity constraints, where existing patients can also be bounced
+def calculate_all_constraints(dynModel, bounce_existing):
     """Calculate the matrices Gamma_x, Gamma_u and vectors K(t) that yield all the constraints"""
 
     # shorthand for a few useful parameters
@@ -864,6 +784,10 @@ def calculate_all_constraints(dynModel):
         Gamma_x[curr_constr,Issg_idx] = - mu_g * (pH_g / (pH_g + pICU_g))
         Gamma_u[curr_constr,BHg_idx] = 1
 
+        # check whether to allow bouncing existing patients
+        if (bounce_existing):
+            Gamma_x[curr_constr,Hg_idx] = -(1 - lambda_H_R_g - lambda_H_D_g)
+
         # right-hand-sides K(t) are all 0, so nothing to update
         all_labels += ["BH_%s" %age_groups[ag]]
         curr_constr += 1
@@ -926,6 +850,9 @@ def calculate_all_constraints(dynModel):
         Gamma_x[curr_constr,Ig_idx] = - mu_g * pICU_g
         Gamma_x[curr_constr,Issg_idx] = - mu_g * (pICU_g / (pH_g + pICU_g))
         Gamma_u[curr_constr,BICUg_idx] = 1
+
+        if (bounce_existing):
+            Gamma_x[curr_constr,ICUg_idx] = -(1 - lambda_ICU_R_g - lambda_ICU_D_g)
 
         # right-hand-sides K(t) are all 0, so nothing to update
         all_labels += ["BICU_%s" %age_groups[ag]]
@@ -1015,9 +942,11 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
     ct = {}
     #for t in range(k,T+1):
     for t in range(k,T):
+        print("calculate_all_coefs for loop, t = ", t)
         # get Xhat(t) and uhat(t)
         Xhat_t = Xhat_seq[:,t-k]
         uhat_t = uhat_seq[:,t-k]
+        #print("uhat_t is", uhat_t)
 
         jacob_X = get_Jacobian_X(dynModel, Xhat_t, uhat_t, dynModel.mixing_method)
         jacob_u = get_Jacobian_u(dynModel, Xhat_t, uhat_t, dynModel.mixing_method)
@@ -1025,7 +954,40 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
         # Calculate linearization coefficients for X(t+1)
         At[t] = np.eye(Xt_dim) + dynModel.dt * jacob_X
         Bt[t] = dynModel.dt * jacob_u
+        print("Calculating C(t) for t = {}".format(t))
+        print("The time in the dynamical model is: {}".format(dynModel.t))
+        print("********************************")
+
+
+
         ct[t] = dynModel.dt * (get_F(dynModel, Xhat_t, uhat_t) - jacob_X @ Xhat_t - jacob_u @ uhat_t)
+
+        tol = 1e-7
+        mu_g = dynModel.groups[age_groups[1]].parameters['mu']
+        pICU_g = dynModel.groups[age_groups[1]].parameters['p_ICU']
+        pH_g = dynModel.groups[age_groups[1]].parameters['p_H']
+        lambda_ICU_R_g = dynModel.groups[age_groups[1]].parameters['lambda_ICU_R']
+        lambda_ICU_D_g = dynModel.groups[age_groups[1]].parameters['lambda_ICU_D']
+
+        #print("1-lambda_ICU_R_g - lambda_ICU_R_g term = ", 1 - lambda_ICU_R_g - lambda_ICU_D_g)
+        #print("mu_g p_ICU_g term = ", mu_g * pICU_g)
+        #print("mu_g p_ICU_g / p_ICU_g + p_H_g term = ", mu_g * pICU_g / (pICU_g + pH_g))
+        print("calculation of At,Bt,ct for t = ", t)
+        gf_vec = get_F(dynModel, Xhat_t, uhat_t)
+        x_approx = jacob_X @ Xhat_t
+        u_approx = jacob_u @ uhat_t
+        for ag in range(num_age_groups):
+            ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
+            BounceICUg_idx = ag*num_controls + controls.index('BounceICU_g')
+            #print("At[t][ICU] is equal to", At[t][ICUg_idx,:])
+            #print("Bt[t][ICU] is equal to", Bt[t][ICUg_idx,:])
+            print("for group", ag, age_groups[ag], "ct[t][ICU] is equal to", ct[t][ICUg_idx])
+            print("components are", gf_vec[ICUg_idx], x_approx[ICUg_idx], u_approx[ICUg_idx])
+            assert(abs(ct[t][ICUg_idx]) < 0.0001)
+
+            #if (abs(ct[t][ICUg_idx]) > tol):
+            #    print("ct[t][ICU] is not zero and equal to", ct[t][ICUg_idx])
+
 
     # All constraint coefficients are stored in dictionary u_constr_coeffs: u_coeffs has a key for each
     # period t in {k,k+1,...,T}. The value for key t stores, in turn, another dictionary, which holds the constraint coefficients
@@ -1061,12 +1023,15 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
     At_bar = {}
     Xt_bar = Xhat_seq[:,0]      # initialize with X(k)=Xhat(k)
 
+    print("Computing constants for all periods.")
+
     for t in range(k,T): # loop over times k, k+1, ..., T - 1 to model constraints indexed with t
 
         # Calculate constants for period t
         for constr_index in range(num_constraints):
             constr_constants[t][constr_index] = Gamma_x[constr_index,:] @ Xt_bar
 
+        print("Calculated constants for time {}".format(t))
         # Update auxiliary vector Xt_bar
         Xt_bar = At[t] @ Xt_bar + ct[t]
 
@@ -1076,8 +1041,9 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
             # coefs for u[t]
             u_constr_coeffs[t][constr_index][:,t-k] = Gamma_u[constr_index,:]
 
+
         # Calculate coefficients for objective coefficient for u_t. Note that this is not the final coefficient of u_t.
-        # Since the obkective adds linear terms over all k, k+1..., T-1, u_t will receive additional contributions to its coefficient
+        # Since the objective adds linear terms over all k, k+1..., T-1, u_t will receive additional contributions to its coefficient
         u_obj_coeffs[:,t-k] += e_matrix[:,t-k]
 
         # Initialize At_bar for tau=t-1
@@ -1093,6 +1059,8 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
 
             # Update At_bar for next round
             At_bar[tau-1] = At_bar[tau] @ At[tau]
+
+        print("Computed constraint and obj coeff for time {}".format(t))
 
     At_bar[T-1] = np.eye(Xt_dim,Xt_dim)
     # Add up the contribution of eta * X_T in the coefficients of decision u_t, t = k, ..., T-1
@@ -1138,8 +1106,9 @@ def run_heuristic_linearization(dynModel, mixing_method):
     for k in range(T):
 
         # calculate state trajectory X_hat
-        Xhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq)
+        Xhat_seq, new_uhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq)
         assert( np.shape(Xhat_seq) == (Xt_dim,T-k) )
+        assert( np.shape(new_uhat_seq) == (ut_dim,T-k) )
 
         # calculate objective parameters d, e
         D,E = calculate_objective_time_dependent_coefs(dynModel, k, Xhat_seq, uhat_seq)

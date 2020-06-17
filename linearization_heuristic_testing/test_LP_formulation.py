@@ -10,6 +10,7 @@ import sys
 import numpy as np
 from inspect import getsourcefile
 from random import *
+import time
 
 current_path = os.path.abspath(getsourcefile(lambda:0))
 current_dir = os.path.dirname(current_path)
@@ -19,6 +20,8 @@ sys.path.insert(0, parent_dir+"/heuristics")
 
 from linearization import *
 from heuristics import *
+
+start_time = time.time()
 
 # Global variables
 simulation_params = {
@@ -81,8 +84,16 @@ tests = {
 dynModel.parameters['global-parameters']['C_mtest'] = 10000
 dynModel.parameters['global-parameters']['C_atest'] = 10000
 
+
+
+
+
 # ##############################################################################
 # Testing the construction of a typical LP
+
+# some boolean flags for running the heuristic
+use_bounce_var = True   # whether to use the optimal bounce variables when forecasting the new X_hat
+bounce_existing = False   # whether to allow bouncing existing patients
 
 # shorthand for a few useful parameters
 T = dynModel.time_steps
@@ -98,43 +109,58 @@ assert( np.shape(eta) == (Xt_dim,) )
 
 #########
 # calculate all the constraints and store them
-A, B, K, all_labels = calculate_all_constraints(dynModel)
+Gamma_x, Gamma_u, K, all_labels = calculate_all_constraints(dynModel,bounce_existing)
 
-assert( np.shape(A) == (num_constraints,Xt_dim) )
-assert( np.shape(B) == (num_constraints,ut_dim) )
+assert( np.shape(Gamma_x) == (num_constraints,Xt_dim) )
+assert( np.shape(Gamma_u) == (num_constraints,ut_dim) )
 assert( np.shape(K) == (num_constraints,T) )
 
 # uptimal decisions
 uopt_seq = np.zeros((ut_dim,T))
 
-# pick a starting u_hat sequence; for now, no testing
+# pick a starting u_hat sequence
 uhat_seq = np.zeros((ut_dim,T))
+# for now, homogenous testing
+Nmtestg_idx_all = slice(controls.index('Nmtest_g'),ut_dim,num_controls)
+uhat_seq[Nmtestg_idx_all,:] = dynModel.parameters['global-parameters']['C_mtest']/num_age_groups
 
-#print(dynModel.parameters['global-parameters']['ICU])
-#print(dynModel.parameters['global-parameters']['C_ICU'])
+Natestg_idx_all = slice(controls.index('Natest_g'),ut_dim,num_controls)
+uhat_seq[Natestg_idx_all,:] = dynModel.parameters['global-parameters']['C_atest']/num_age_groups
 
-use_bounce_var = False   # whether to use bounce variables
-cap_X_hat = True      # whether to apply H/ICU capacity in case X_hat returned by dynModel exceeds them
+# set all home lockdown variables all 1
+lock_home_idx_all = slice(controls.index('home'),ut_dim,num_controls)
+uhat_seq[lock_home_idx_all,:] = 1.0
+
+# a python list with the indices for all home lockdown decisions for all groups and periods
+lock_home_idx_all_times = [controls.index('home') + i*num_controls for i in range(T*num_age_groups)]
 
 for k in range(T):
 
-    print("\n\n TIME k= {}.".format(k))
+    print("\n\n HEURISTIC RUNNING FOR TIME k= {}.".format(k))
 
-    # calculate state trajectory X_hat
-    # Xhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq, use_bounce_var, cap_X_hat)
 
-    Xhat_seq, uhat_seq = get_nominal_trajectory(dynModel, k, uhat_seq)
+    # calculate state trajectory X_hat and corresponging controls new_uhat
+    Xhat_seq, new_uhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq, use_bounce_var)
+
+    print("Finished getting nominal trajectory for time {}".format(k))
+    print("-----------------------")
+
     assert( np.shape(Xhat_seq) == (Xt_dim,T-k) )
-    assert(np.shape(uhat_seq) == (ut_dim, T-k))
+    assert( np.shape(new_uhat_seq) == (ut_dim,T-k) )
+
+    uhat_seq = new_uhat_seq
 
     ICUidx_all = slice(SEIR_groups.index('ICU_g'),Xt_dim,num_compartments)
-    print("Total people in ICU at start of period k={}".format(np.sum(Xhat_seq[ICUidx_all,0])))
+    print("Total people in ICU at start of period k: {}".format(np.sum(Xhat_seq[ICUidx_all,0])))
 
     # calculate objective parameters d, e
     D,E = calculate_objective_time_dependent_coefs(dynModel, k, Xhat_seq, uhat_seq)
 
+    print("Calculated obj. time dep coeff for time {}".format(k))
+    print("-----------------------")
+
     # get coefficients for decisions in all constraints and objective
-    constr_coefs, constr_consts, obj_coefs = calculate_all_coefs(dynModel,k,Xhat_seq,uhat_seq,A,B,D,E)
+    constr_coefs, constr_consts, obj_coefs = calculate_all_coefs(dynModel,k,Xhat_seq,uhat_seq,Gamma_x,Gamma_u,D,E)
 
     assert( np.shape(obj_coefs) == (ut_dim,T-k) )
     assert( len(constr_coefs) == T-k )
@@ -147,19 +173,24 @@ for k in range(T):
             assert( np.shape(constr_coefs[t][i])==np.shape(uhat_seq) )
             assert( np.shape(constr_consts[t][i])==() )
 
+    print("Started creating Model")
+    print("*/*/*/*/*/*/*/*/*/*/*/")
+
     # create empty model
     mod = gb.Model("Linearization Heuristic")
-    mod.setParam( 'OutputFlag', False )     # make Gurobi silent
+    # mod.setParam( 'OutputFlag', False )     # make Gurobi silent
     mod.Params.DualReductions = 0  # change this to get explicit infeasible or unbounded
+
+    # Sense -1 indicates a maximization problem
+    mod.ModelSense = -1
 
     # add all decisions using matrix format, and also specify objective coefficients
     # u_vars = mod.addMVar(np.shape(uhat_seq), obj=obj_coefs, name="u")
     obj_vec = np.reshape(obj_coefs, (ut_dim*(T-k),), 'F')  # reshape by reading along rows first
     u_vars_vec = mod.addMVar( np.shape(obj_vec), obj=obj_vec, name="u")
 
-    mod.ModelSense = -1
-
-    x_feas = np.zeros( (len(obj_vec),) )  # a feasible solution
+    # set the home lockdown to 1 for all groups and all times
+    mod.addConstrs((u_vars_vec[i]==1 for i in lock_home_idx_all_times if i < len(obj_vec)), name=("home_lock"))
 
     for t in range(k,T):
         #print("Time %d number of constraints %d" %(t,len(constr_coefs[t])))
@@ -168,8 +199,10 @@ for k in range(T):
             cname = ("%s[t=%d]" %(all_labels[con],t))
             mod.addConstr( u_vars_vec @ cons_vec + constr_consts[t][con] <= K[con,t], name=cname)
 
-    mod.write("LP_lineariz_model.lp")       # write the LP to a file
+    #mod.write("LP_lineariz_model_{}.lp".format(k))       # write the LP to a file
 
+    print("Optimizing Model")
+    print("><><><><><><><><")
     # optimize the model
     mod.optimize()
 
@@ -204,3 +237,7 @@ for k in range(T):
 
     # update uhat_sequence
     uhat_seq = uvars_opt[:,1:]
+
+end_time = time.time()
+
+print("Total running time for {} days is {}".format(simulation_params['days'], end_time - start_time))
