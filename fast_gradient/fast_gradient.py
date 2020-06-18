@@ -22,13 +22,7 @@ import collections
 import numpy as np
 
 from fast_group import FastDynamicalModel
-
-def state_to_matrix(state):
-	m = np.zeros((len(age_groups),len(cont)), order="C")
-	for i in range(len(age_groups)):
-		for c in range(len(cont)):
-			m[i,c] = state[age_groups[i]][cont[c]]
-	return m
+from aux import *
 
 
 # Global variables
@@ -44,7 +38,7 @@ cont = [ 'S', 'E', 'I', 'R', 'N', 'Ia', 'Ips', \
 
 # Define time variables
 simulation_params['time_periods'] = int(math.ceil(simulation_params["days"]/simulation_params["dt"]))
-
+bouncing = True
 
 
 # Parse parameters
@@ -110,10 +104,14 @@ intervention_times = [t*simulation_params['quar_freq'] for t in range(int(simula
 
 # Initialize parameters
 x0_testing = np.zeros(len(intervention_times)*len(age_groups)*2) + 0.5
-# x0_bouncing = np.zeros(len(intervention_times)*len(age_groups)*2) + 0.5
 x0_lockdown = np.zeros(len(intervention_times)*len(age_groups)*len(rel_activities)) + 0.5
-# x0 = np.append(np.append(x0_testing, x0_bouncing), x0_lockdown)
-x0 = np.append(x0_testing, x0_lockdown)
+if bouncing:
+	x0_bouncing_icu = np.zeros(len(intervention_times)*len(age_groups)) + 0.5
+
+if bouncing:
+	x0 = np.append(np.append(x0_testing, x0_lockdown), x0_bouncing_icu)
+else:
+	x0 = np.append(x0_testing, x0_lockdown)
 
 # Create dynamical model
 fastModel = FastDynamicalModel(universe_params, simulation_params['dt'], mixing_method)
@@ -133,11 +131,17 @@ def simulate(x):
 	x_m_testing = x_m_testing/np.sum(x_m_testing)*max_m_tests
 	x_a_testing = x_a_testing/np.sum(x_a_testing)*max_a_tests
 
-	# x_bouncing = np.reshape(
-	# 	x[len(intervention_times)*len(age_groups)*2+len(intervention_times)*len(age_groups)*len(rel_activities):
-	# 	len(intervention_times)*len(age_groups)*4+len(intervention_times)*len(age_groups)*len(rel_activities)],
-	# 	(len(intervention_times),len(age_groups),2)
-	# )
+	if bouncing:
+		x_bouncing_icu = np.reshape(
+			x[len(intervention_times)*len(age_groups)*2+len(intervention_times)*len(age_groups)*len(rel_activities):
+			len(intervention_times)*len(age_groups)*3+len(intervention_times)*len(age_groups)*len(rel_activities)],
+			(len(intervention_times),len(age_groups))
+		)
+
+		# Convert bouncing variables to percentages
+		x_bouncing_perc_icu = x_bouncing_icu/np.sum(x_bouncing_icu)
+
+
 	state = initial_state
 	total_reward = 0
 	for t in range(simulation_params['time_periods']):
@@ -155,7 +159,9 @@ def simulate(x):
 			x_lockdown_all,
 			update_contacts = update_contacts, 
 			B_H = False, 
-			B_ICU = False
+			B_ICU = False,
+			B_H_perc = False,
+			B_ICU_perc = x_bouncing_perc_icu[int(t/simulation_params['quar_freq']),:] if bouncing else False,
 		)
 		total_reward += econs['reward']
 
@@ -165,13 +171,86 @@ def simulate(x):
 
 # Create bounds on the variables
 from scipy.optimize import Bounds,minimize,LinearConstraint
-full_bounds = Bounds(
-	np.zeros(len(intervention_times)*len(age_groups)*2+len(intervention_times)*len(age_groups)*len(rel_activities)),
-	np.zeros(len(intervention_times)*len(age_groups)*2+len(intervention_times)*len(age_groups)*len(rel_activities)) + 1.0
-)
+
+if bouncing:
+	full_bounds = Bounds(
+		np.zeros(len(intervention_times)*len(age_groups)*3+len(intervention_times)*len(age_groups)*len(rel_activities)),
+		np.zeros(len(intervention_times)*len(age_groups)*3+len(intervention_times)*len(age_groups)*len(rel_activities)) + 1.0
+	)
+else:
+	full_bounds = Bounds(
+		np.zeros(len(intervention_times)*len(age_groups)*2+len(intervention_times)*len(age_groups)*len(rel_activities)),
+		np.zeros(len(intervention_times)*len(age_groups)*2+len(intervention_times)*len(age_groups)*len(rel_activities)) + 1.0
+	)
 
 
+import time
+
+t0 = time.time()
 result_lockdown = minimize(simulate, x0, method='L-BFGS-B',bounds=full_bounds,options={'eps':10e-8})
+t1 = time.time()
+
+
+# Convert results to vectors 
+x_m_testing = np.reshape(result_lockdown.x[0:len(intervention_times)*len(age_groups)],(len(intervention_times),len(age_groups)))
+x_a_testing = np.reshape(result_lockdown.x[len(intervention_times)*len(age_groups):len(intervention_times)*len(age_groups)*2],(len(intervention_times),len(age_groups)))
+x_lockdown = np.reshape(
+	result_lockdown.x[len(intervention_times)*len(age_groups)*2:
+	len(intervention_times)*len(age_groups)*2+len(intervention_times)*len(age_groups)*len(rel_activities)],
+	(len(intervention_times),len(age_groups),len(rel_activities))
+)
+# Convert testing variables into real testing
+x_m_testing = x_m_testing/np.sum(x_m_testing)*max_m_tests
+x_a_testing = x_a_testing/np.sum(x_a_testing)*max_a_tests
+
+if bouncing:
+	x_bouncing_icu = np.reshape(
+		result_lockdown.x[len(intervention_times)*len(age_groups)*2+len(intervention_times)*len(age_groups)*len(rel_activities):
+		len(intervention_times)*len(age_groups)*3+len(intervention_times)*len(age_groups)*len(rel_activities)],
+		(len(intervention_times),len(age_groups))
+	)
+
+	# Convert bouncing variables to percentages
+	x_bouncing_perc_icu = x_bouncing_icu/np.sum(x_bouncing_icu)
+
+# Use these variables to construct dictionaries
+alphas = matrix_to_alphas(x_lockdown, simulation_params['quar_freq'])
+m_tests = matrix_to_vect_of_dict(x_m_testing, simulation_params['quar_freq'])
+a_tests = matrix_to_vect_of_dict(x_a_testing, simulation_params['quar_freq'])
+B_ICU_perc = matrix_to_vect_of_dict(x_bouncing_perc_icu, simulation_params['quar_freq']) if bouncing else False
+
+optimal_value = float(-simulate(result_lockdown.x))
+print("Optimal Value: ", optimal_value)
+
+policy = {
+	"alphas":alphas,
+	"m_tests":m_tests,
+	"a_tests":a_tests,
+	"B_H_perc":False,
+	"B_ICU_perc":B_ICU_perc,
+	"B_H":False,
+	"B_ICU":False,
+	"initialization":initialization,
+	"metadata":{
+		"quar_freq":simulation_params['quar_freq'],
+		"dt":simulation_params['dt'],
+		"days":simulation_params['days'],
+		"region":simulation_params['region'],
+		"time_periods":simulation_params['time_periods'],
+	},
+	"optimal_value": optimal_value,
+	"mixing_method": mixing_method,
+	"max_m_tests": float(args.m_tests),
+	"max_a_tests": float(args.a_tests),
+	"time": t1-t0
+}
+
+
+with open('./results/'+args.policy+"_infected_"+args.perc_infected+"_m_tests_"+args.m_tests+"_a_tests_"+args.a_tests+"_bouncing_"+str(bouncing)+'.yaml', 'w') as file:
+    yaml.dump(policy, file)
+
+
+
 
 
 

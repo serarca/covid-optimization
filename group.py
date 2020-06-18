@@ -68,7 +68,7 @@ class DynamicalModel:
 		if extra_data:
 			self.n_contacts = [{g_name1:{g_name2:float('inf') for g_name2 in self.groups} for g_name1 in self.groups} for i in range(self.time_steps)]
 
-	def take_time_step(self, m_tests, a_tests, alphas, B_H = False, B_ICU = False):
+	def take_time_step(self, m_tests, a_tests, alphas, B_H = False, B_ICU = False, B_ICU_perc = False):
 		# store time when current group is being updated
 		time_of_flow = self.t
 		for n in self.groups:
@@ -90,6 +90,9 @@ class DynamicalModel:
 
 			for n in self.groups:
 				self.groups[n].take_time_step(m_tests[n], a_tests[n], self.beds, self.icus, B_H[n], B_ICU[n])
+		elif (B_ICU_perc is not False):
+			for n in self.groups:
+				self.groups[n].take_time_step(m_tests[n], a_tests[n], self.beds, self.icus, False, False, B_ICU_perc = B_ICU_perc[n])
 		else:
 			# print('group.py(). Taking a step at t={}.'.format(time_of_flow))
 			# print('Total in ICU: {}'.format(sum(self.groups[n].ICU[time_of_flow] for n in self.groups)))
@@ -456,7 +459,7 @@ class SEIR_group:
 		self.all_groups = all_groups
 
 	# Advances one time step, given the m_tests and a_tests variable
-	def take_time_step(self, m_tests, a_tests, h_cap, icu_cap, B_H, B_ICU):
+	def take_time_step(self, m_tests, a_tests, h_cap, icu_cap, B_H, B_ICU, B_ICU_perc = False):
 		self.update_N(m_tests, a_tests)
 		self.update_S(m_tests, a_tests)
 		self.update_E(m_tests, a_tests)
@@ -468,8 +471,8 @@ class SEIR_group:
 		self.update_Iss(m_tests, a_tests)
 		self.update_Rq(m_tests, a_tests)
 		self.update_H(m_tests, a_tests, h_cap, icu_cap, B_H)
-		self.update_ICU(m_tests, a_tests, h_cap, icu_cap, B_ICU)
-		self.update_D(m_tests, a_tests, h_cap, icu_cap, B_H, B_ICU)
+		self.update_ICU(m_tests, a_tests, h_cap, icu_cap, B_ICU, B_ICU_perc)
+		self.update_D(m_tests, a_tests, h_cap, icu_cap, B_H, B_ICU, B_ICU_perc)
 
 
 	# Reset the time to a past time
@@ -599,7 +602,7 @@ class SEIR_group:
 		self.H += [self.H[self.parent.t]+delta_H*self.dt]
 
 
-	def update_ICU(self, m_tests, a_tests, h_cap, icu_cap, B_ICU):
+	def update_ICU(self, m_tests, a_tests, h_cap, icu_cap, B_ICU, B_ICU_perc):
 		tol = 1e-8
 		# For each group, calculate the entering amount
 		entering_icu = {}
@@ -611,7 +614,10 @@ class SEIR_group:
 			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[self.parent.t]
 
 		#print('update_ICU(): Total entering ICU calculated from group {} is:{}'.format(self.name,summ_entering_icu))
-		if B_ICU is False:
+
+		if B_ICU_perc is not False:
+			B_ICU = B_ICU_perc*((summ_entering_icu-icu_cap+summ_staying_icu) if summ_entering_icu-icu_cap+summ_staying_icu>0 else 0)
+		elif B_ICU is False:
 			#print("group.py(): FALSE branch for B_ICU")
 			B_ICU = entering_icu[self.name]*((summ_entering_icu-icu_cap+summ_staying_icu) if summ_entering_icu-icu_cap+summ_staying_icu>0 else 0)/(summ_entering_icu if summ_entering_icu!=0 else 10e-6)
 
@@ -628,7 +634,7 @@ class SEIR_group:
 
 
 
-	def update_D(self, m_tests, a_tests, h_cap, icu_cap, B_H, B_ICU):
+	def update_D(self, m_tests, a_tests, h_cap, icu_cap, B_H, B_ICU, B_ICU_perc):
 		# For each group, calculate the entering amount
 		entering_h = {}
 		summ_entering_h = 0
@@ -648,7 +654,9 @@ class SEIR_group:
 
 		if B_H is False:
 			B_H = entering_h[self.name]*(summ_entering_h-h_cap+summ_staying_h if summ_entering_h-h_cap+summ_staying_h>0 else 0)/(summ_entering_h if summ_entering_h!=0 else 10e-6)
-		if B_ICU is False:
+		if B_ICU_perc is not False:
+			B_ICU = B_ICU_perc*((summ_entering_icu-icu_cap+summ_staying_icu) if summ_entering_icu-icu_cap+summ_staying_icu>0 else 0)
+		elif B_ICU is False:
 			B_ICU = entering_icu[self.name]*(summ_entering_icu-icu_cap+summ_staying_icu if summ_entering_icu-icu_cap+summ_staying_icu>0 else 0)/(summ_entering_icu if summ_entering_icu!=0 else 10e-6)
 
 

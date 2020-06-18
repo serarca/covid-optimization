@@ -64,7 +64,7 @@ class FastDynamicalModel:
 					self.M[g1,g2,act] = self.groups[age_groups[g1]].contacts[activities[act]][age_groups[g2]]
 
 
-	def take_time_step(self, state, m_tests, a_tests, alphas, update_contacts = True, B_H = False, B_ICU = False):
+	def take_time_step(self, state, m_tests, a_tests, alphas, update_contacts = True, B_H = False, B_ICU = False, B_H_perc = False, B_ICU_perc = False):
 
 		# Store variables
 		self.state = state
@@ -94,24 +94,40 @@ class FastDynamicalModel:
 		self.flow_ICU = self.get_flow_ICU()
 
 		# # Construct prorrated bouncing
-		if ((B_H is False) or (B_ICU is False)):
+		if ((B_H is False) and (B_H_perc is False)):
 			# Bouncing for H
 			summ_entering_h = np.sum(self.flow_H)
 			summ_staying_h = np.sum((1-self.lambda_H_R-self.lambda_H_D)*self.state[:,cont.index("H")])
-
 			overflow_h = summ_entering_h - self.beds + summ_staying_h if summ_entering_h - self.beds + summ_staying_h>0 else 0
 			summ_entering_h = summ_entering_h if summ_entering_h!=0 else 1e-6
 			
 			self.B_H = self.flow_H*overflow_h/summ_entering_h
 
+		elif B_H_perc is not False:
+			# Bouncing for H
+			summ_entering_h = np.sum(self.flow_H)
+			summ_staying_h = np.sum((1-self.lambda_H_R-self.lambda_H_D)*self.state[:,cont.index("H")])
+			overflow_h = summ_entering_h - self.beds + summ_staying_h if summ_entering_h - self.beds + summ_staying_h>0 else 0
+
+			self.B_H = overflow_h*B_H_perc
+
+		# # Construct prorrated bouncing
+		if ((B_ICU is False) and (B_ICU_perc is False)):
 			# Bouncing for ICU
 			summ_entering_icu = np.sum(self.flow_ICU)
 			summ_staying_icu = np.sum((1-self.lambda_ICU_R-self.lambda_ICU_D)*self.state[:,cont.index("ICU")])
-
 			overflow_icu = summ_entering_icu - self.icus + summ_staying_icu if summ_entering_icu - self.icus + summ_staying_icu>0 else 0
 			summ_entering_icu = summ_entering_icu if summ_entering_icu!=0 else 1e-6
 			
 			self.B_ICU = self.flow_ICU*overflow_icu/summ_entering_icu
+
+		elif B_ICU_perc is not False:
+			summ_entering_icu = np.sum(self.flow_ICU)
+			summ_staying_icu = np.sum((1-self.lambda_ICU_R-self.lambda_ICU_D)*self.state[:,cont.index("ICU")])
+			overflow_icu = summ_entering_icu - self.icus + summ_staying_icu if summ_entering_icu - self.icus + summ_staying_icu>0 else 0
+
+			self.B_ICU = overflow_icu*B_ICU_perc
+
 
 
 		# Create a population variable, this is useful to avoid division by zero
