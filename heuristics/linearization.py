@@ -1129,6 +1129,10 @@ def run_heuristic_linearization(dynModel):
     # a python list with the indices for all home lockdown decisions for all groups and periods
     lock_home_idx_all_times = [controls.index('home') + i*num_controls for i in range(T*num_age_groups)]
 
+    lock_work_idx_all_times = [controls.index('work') + i*num_controls for i in range(T*num_age_groups)]
+
+    lock_transport_idx_all_times = [controls.index('transport') + i*num_controls for i in range(T*num_age_groups)]
+
     for k in range(T):
 
         print("\n\n HEURISTIC RUNNING FOR TIME k= {}.".format(k))
@@ -1174,6 +1178,12 @@ def run_heuristic_linearization(dynModel):
         mod.ModelSense = -1
 
         mod.addConstrs((u_vars_vec[i]==1 for i in lock_home_idx_all_times if i < len(obj_vec)), name=("home_lock"))
+
+        mod.addConstrs((u_vars_vec[i]>=0.24 for i in lock_work_idx_all_times if i < len(obj_vec)), name=("work_lock_lb"))
+
+        mod.addConstrs((u_vars_vec[lock_transport_idx_all_times[i]] >= dynModel.transport_lb_work_fraction * u_vars_vec[lock_work_idx_all_times[i]] for i in range((T-k)*num_age_groups)), name=("transport_lock_lb"))
+
+
 
         for t in range(k,T):
             #print("Time %d number of constraints %d" %(t,len(constr_coefs[t])))

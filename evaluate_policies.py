@@ -48,13 +48,6 @@ def run_linearization_heuristic(simulation_params):
         # scalar values to Python the dictionary format
         initialization = yaml.load(file, Loader=yaml.FullLoader)
 
-    # Define policy
-    with open('benchmarks/static_infected_10.yaml') as file:
-        # The FullLoader parameter handles the conversion from YAML
-        # scalar values to Python the dictionary format
-        policy_file = yaml.load(file, Loader=yaml.FullLoader)
-    alphas_vec = policy_file['alphas_vec']
-
     # Percentage infected at time 0
     perc_infected = simulation_params['perc_infected']
     # Move population to infected (without this there is no epidem.)
@@ -63,7 +56,7 @@ def run_linearization_heuristic(simulation_params):
     	initialization[group]["S"] = initialization[group]["S"] - change
     	initialization[group]["I"] = initialization[group]["I"] + change
 
-    dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt'], num_time_periods, mixing_method)
+    dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt'], num_time_periods, mixing_method, simulation_params['transport_lb_work_fraction'])
 
     # add parameters for testing capacity
     dynModel.parameters['global-parameters']['C_mtest'] = simulation_params['mtest_cap']
@@ -194,7 +187,7 @@ def main():
         'dt':1.0,
         'region': "Ile-de-France",
         'quar_freq': 1,
-        'num_days' : 30,
+        'num_days' : 5,
         'initial_infected_count' : 1,
         'perc_infected' : 10,
         'mixing_method' : {
@@ -204,7 +197,8 @@ def main():
         'mtest_cap' : 100,
         'atest_cap' : 100,
         'work_full_lockdown_factor' : 0.24,
-        'heuristic': 'linearization'
+        'heuristic': 'linearization',
+        'transport_lb_work_fraction': 0.25
     }
 
     # run_nl_l_heuristic(simulation_params_l_nl_heuristic)
