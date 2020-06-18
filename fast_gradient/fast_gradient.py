@@ -242,7 +242,8 @@ policy = {
 	"mixing_method": mixing_method,
 	"max_m_tests": float(args.m_tests),
 	"max_a_tests": float(args.a_tests),
-	"time": t1-t0
+	"time": t1-t0,
+	"gradient_success": result_lockdown.success,
 }
 
 
