@@ -30,7 +30,7 @@ def n_contacts(group_g, group_h, alphas, mixing_method):
 
 
 class DynamicalModel:
-	def __init__(self, parameters, initialization, dt, time_steps, mixing_method, extra_data = False):
+	def __init__(self, parameters, initialization, dt, time_steps, mixing_method, transport_lb_work_fraction = 0 , extra_data = False):
 		self.parameters = parameters
 		self.t = 0
 		self.dt = dt
@@ -42,6 +42,7 @@ class DynamicalModel:
 		self.lockdown_controls = []
 		self.m_tests_controls = []
 		self.a_tests_controls = []
+		self.transport_lb_work_fraction = transport_lb_work_fraction
 
 		# Create groups from parameters
 		self.groups = {}
