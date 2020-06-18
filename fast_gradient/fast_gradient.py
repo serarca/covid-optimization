@@ -247,6 +247,8 @@ policy = {
 	"gradient_success": result_lockdown.success,
 }
 
+print(result_lockdown)
+
 
 with open('./Results/'+args.policy+"_infected_"+args.perc_infected+"_m_tests_"+args.m_tests+"_a_tests_"+args.a_tests+"_bouncing_"+str(bouncing)+'.yaml', 'w') as file:
     yaml.dump(policy, file)

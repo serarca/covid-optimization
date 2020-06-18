@@ -22,7 +22,7 @@ import numpy as np
 
 
 
-policy_file = "static_infected_10_m_tests_1000_a_tests_1000_bouncing_True"
+policy_file = "dynamic_infected_10_m_tests_1000_a_tests_1000_bouncing_False"
 
 with open("./results/"+policy_file+".yaml") as file:
     # The FullLoader parameter handles the conversion from YAML
@@ -119,12 +119,12 @@ for i,group in enumerate(groups):
 	plt.ylim(-0.1,1.1)
 	plt.legend(loc='upper right')
 
-for i,group in enumerate(groups):
-	plt.subplot(10,len(groups),i+1+len(groups)*8)
-	plt.plot(range(0,int(policy["metadata"]['time_periods'])),
-		np.array(re_change_order(policy["B_ICU_perc"])[group]), label="ICU Bouncing Percentage")
-	plt.ylim(-1/10,1.0 +1/10)
-	plt.legend(loc='upper right')
+# for i,group in enumerate(groups):
+# 	plt.subplot(10,len(groups),i+1+len(groups)*8)
+# 	plt.plot(range(0,int(policy["metadata"]['time_periods'])),
+# 		np.array(re_change_order(policy["B_ICU_perc"])[group]), label="ICU Bouncing Percentage")
+# 	plt.ylim(-1/10,1.0 +1/10)
+# 	plt.legend(loc='upper right')
 
 
 
