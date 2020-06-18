@@ -150,5 +150,5 @@ figure = plt.gcf() # get current figure
 figure.set_size_inches(7*len(groups),24)
 
 
-plt.savefig("results/"+policy_file+".pdf")
+plt.savefig("Results/"+policy_file+".pdf")
 
