@@ -221,7 +221,7 @@ B_ICU_perc = matrix_to_vect_of_dict(x_bouncing_perc_icu, simulation_params['quar
 
 optimal_value = float(-simulate(result_lockdown.x))
 print("Optimal Value: ", optimal_value)
-pritn("Time: ", t1-t0)
+print("Time: ", t1-t0)
 
 policy = {
 	"alphas":alphas,
