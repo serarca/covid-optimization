@@ -92,10 +92,13 @@ def run_nl_l_heuristic(simulation_params):
         # scalar values to Python the dictionary format
         initialization = yaml.load(file, Loader=yaml.FullLoader)
 
-    # Update initialization
-    # Put exactly initial_infected infected individuals in age group 40-49. No infected individuals in other groups.
-    initialization["age_group_40_49"]["I"] = initialization["age_group_40_49"]["I"] + int(simulation_params['initial_infected_count'])
-    initialization["age_group_40_49"]["S"] = initialization["age_group_40_49"]["S"] - int(simulation_params['initial_infected_count'])
+    # Percentage infected at time 0
+    perc_infected = simulation_params['perc_infected']
+    # Move population to infected (without this there is no epidem.)
+    for group in initialization:
+    	change = initialization[group]["S"]*perc_infected/100
+    	initialization[group]["S"] = initialization[group]["S"] - change
+    	initialization[group]["I"] = initialization[group]["I"] + change
 
     # Read lockdown
     activities_non_home = ['leisure', 'other', 'school', 'transport', 'work']
@@ -201,13 +204,36 @@ def main():
         'transport_lb_work_fraction': 0.25
     }
 
+    simulation_params_no_lockdown_no_testing = {
+        'dt':1.0,
+        'region': "Ile-de-France",
+        'quar_freq': 1,
+        'num_days' : 5,
+        'num_daysToLockDown' : 5,
+        'num_daysAfterLockDown' : 0,
+        'initial_infected_count' : 1,
+        'perc_infected' : 10,
+        'mixing_method' : {
+            "name":"mult",
+            "param_alpha":1.0,
+            "param_beta":0.5,},
+        'mtest_cap' : 100,
+        'atest_cap' : 100,
+        'work_full_lockdown_factor' : 0.24,
+        'heuristic': 'no_lockdown_no_testing',
+        'testing_policy': 'no_tests',
+        'lockdown_policy': 'no_lockdown',
+        'transport_lb_work_fraction': 0.25
+    }
+
     # run_nl_l_heuristic(simulation_params_l_nl_heuristic)
     dynModel_linearization_heur = run_linearization_heuristic(simulation_params_linearization)
 
     plot_and_print_results(dynModel_linearization_heur, simulation_params_linearization)
 
+    dynModel_no_lockdown_no_testing = run_nl_l_heuristic(simulation_params_no_lockdown_no_testing)
 
-
+    plot_and_print_results(dynModel_no_lockdown_no_testing, simulation_params_no_lockdown_no_testing)
 
 def plot_and_print_results(dynModel, simulation_params):
     ##############################################################################
@@ -269,7 +295,7 @@ def plot_and_print_results(dynModel, simulation_params):
 
     groups = dynModel.groups.keys()
     groups = sorted(groups)
-    plt.figure(1)
+    fig = plt.figure()
     for i,group in enumerate(groups):
     	plt.subplot(13,len(groups),i+1)
     	plt.plot(time_axis, dynModel.groups[group].S, label="Susceptible")
