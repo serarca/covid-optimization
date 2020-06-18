@@ -38,7 +38,7 @@ cont = [ 'S', 'E', 'I', 'R', 'N', 'Ia', 'Ips', \
 
 # Define time variables
 simulation_params['time_periods'] = int(math.ceil(simulation_params["days"]/simulation_params["dt"]))
-bouncing = True
+bouncing = False
 
 
 # Parse parameters
