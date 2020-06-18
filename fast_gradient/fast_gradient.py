@@ -187,7 +187,7 @@ else:
 import time
 
 t0 = time.time()
-result_lockdown = minimize(simulate, x0, method='L-BFGS-B',bounds=full_bounds,options={'eps':10e-8})
+result_lockdown = minimize(simulate, x0, method='L-BFGS-B',bounds=full_bounds,options={'eps':10e-8,'maxfun':700000})
 t1 = time.time()
 
 
