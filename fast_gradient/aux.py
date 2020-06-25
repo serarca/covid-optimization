@@ -28,6 +28,13 @@ def matrix_to_alphas(m, freq):
 			alphas_vec.append(deepcopy(alphas))
 	return alphas_vec
 
+def alphas_to_matrix(alphas):
+	m = np.zeros((len(age_groups),len(all_activities)))
+	for i in range(len(age_groups)):
+		for j in range(len(all_activities)):
+			m[i,j] = alphas[age_groups[i]][all_activities[j]]
+	return m
+
 def matrix_to_vect_of_dict(v, freq):
 	vec = []
 	for t in range(v.shape[0]):
@@ -37,3 +44,11 @@ def matrix_to_vect_of_dict(v, freq):
 		for s in range(freq):
 			vec.append(deepcopy(d))
 	return vec
+
+def matrix_to_state(m):
+	state = {}
+	for i,age_group in enumerate(age_groups):
+		state[age_group] = {}
+		for j,c in enumerate(cont):
+			state[age_group][c] = m[i,j]
+	return state

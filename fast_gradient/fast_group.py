@@ -180,7 +180,7 @@ class FastDynamicalModel:
 								/(math.exp(self.alphas[g1,act]*self.mixing_method['param'])+math.exp(self.alphas[g2,act]*self.mixing_method['param']))
 							)
 					elif self.mixing_method['name'] == "mult":
-						self.contact_matrix[g1,g2] += self.M[g1,g2,act]*(self.alphas[g1,act]**self.mixing_method['param_alpha'])*(self.alphas[g2,act]**self.mixing_method['param_beta'])
+						self.contact_matrix[g1,g2] += self.mixing_method['param_gamma']*self.M[g1,g2,act]*(self.alphas[g1,act]**self.mixing_method['param_alpha'])*(self.alphas[g2,act]**self.mixing_method['param_beta'])
 					else:
 						assert(False)
 
