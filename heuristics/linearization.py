@@ -241,6 +241,7 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method):
 
 ####################################
 # Calculate the Jacobian with respect to u (decisions/controls)
+# @profile
 def get_Jacobian_u(dynModel, X_hat, u_hat, mixing_method):
     """ Calculates the Jacobian with respect to decisions, for a given control trajectory u_hat and corresponding state trajectory X_hat """
     # For now, for mult mixing this is done for the model with powers ell_g^alpha * ell_h^beta
@@ -942,7 +943,7 @@ def calculate_objective_time_dependent_coefs(dynModel, k, xhat, uhat):
 # and a linear expression of the form a*X(t)+b*u(t) for some a,b row vectors of suitable dimension.
 # This function returns the coefficients for all the decisions u(k),...,u(T-1)
 # appearing in all constraints and objective
-@profile
+# @profile
 # @log_execution_time
 def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_matrix, e_matrix):
     """Get coefficients for decisions appearing in a generic linear constraint in each period k,k+1,...
@@ -1066,6 +1067,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
 
         # Calculate coefficients for all controls appearing in the constraint for period t
         # NOTE: The coefficients for control u(tau) are stored on row indexed (tau-k) of the 2D array
+
         for constr_index in range(num_constraints):
             # coefs for u[t]
             u_constr_coeffs[t][constr_index][:,t-k] = Gamma_u[constr_index,:]
@@ -1080,9 +1082,10 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
 
         for tau in range(t-1,k-1,-1):
             At_bar_times_Bt = At_bar[tau] @ Bt[tau]
+            all_constraint_coefs_matrix = Gamma_x @ At_bar_times_Bt
             for constr_index in range(num_constraints):
                 # coefs for u[t-1], u[t-2], ..., u[k] in the constraints
-                u_constr_coeffs[t][constr_index][:,tau-k] = Gamma_x[constr_index,:] @ At_bar_times_Bt
+                u_constr_coeffs[t][constr_index][:,tau-k] = all_constraint_coefs_matrix[constr_index, :]
 
             # coefs for u[t-1], u[t-2], ..., u[k] in the objective
             u_obj_coeffs[:,tau-k] += d_matrix[:,tau-k] @ At_bar_times_Bt

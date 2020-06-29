@@ -99,7 +99,7 @@ def main():
     # 'testing_5_groups']
     # 'Testing-group', 'Ile-de-France']
     for region in regions:
-        for n_days in [60]:
+        for n_days in [180]:
             # logging.critical(f'{region}, {n_days}')
 
             simulation_params_linearization = {
