@@ -106,7 +106,7 @@ class DynamicalModel:
 		#print("People at the ICU in the next state: {}".format(sum(state[n]["ICU"] for n in self.groups)))
 		#print("Total beds at the ICU: {}".format(self.icus))
 		if( self.use_gurobi_vars is not True ):
-			assert(self.icus - sum(state[n]["ICU"] for n in self.groups) > - 1e-10 )
+			assert self.icus * self.dt - sum(state[n]["ICU"] for n in self.groups) > - 1e-10, f'Total ICU: {sum(state[n]["ICU"] for n in self.groups)}, total beds: {self.dt * self.icus}'
 
 
 		deaths = sum([group.D[self.t+1]-group.D[self.t] for name,group in self.groups.items()])
@@ -132,51 +132,51 @@ class DynamicalModel:
 
 	# Cap bounce variables to ensure feasibility
 	def cap_bounce_variables(self, B_H, B_ICU):
-		tol = 1e-8  # bounce a bit more, to make sure capacities are met
+		tol = 1e-4  # bounce a bit more, to make sure capacities are met
 		time_of_flow = self.t # use dynModel t as clock
 
 		# Cap bounces at no more than the level of flow_H / flow_ICU
 		for n,g in self.groups.items():
 
-			if (B_H[n] > g.flow_H()):
+			if (B_H[n] > self.dt * g.flow_H()):
 				print('WARNING.group.py() Capping B_H for group {} at time {}'.format(n,time_of_flow))
-				B_H[n] = g.flow_H()
+				B_H[n] = self.dt * g.flow_H()
 
-			if (B_ICU[n] > g.flow_ICU()):
+			if (B_ICU[n] > self.dt * g.flow_ICU()):
 				print('WARNING. group.py() Capping B_ICU for group {} at time {}'.format(n,time_of_flow))
-				B_ICU[n] = g.flow_ICU()
+				B_ICU[n] = self.dt * g.flow_ICU()
 
 
 		# Increase the bounce level so as not to violate C^H / C^ICU
 		# check whether there is overflow in H
-		remaining_H_patients = sum([g.H[time_of_flow] * (1-g.parameters["lambda_H_D"] - g.parameters["lambda_H_R"])  for n,g in self.groups.items()])
+		remaining_H_patients = sum([g.H[time_of_flow] * (1-self.dt * g.parameters["lambda_H_D"] - self.dt * g.parameters["lambda_H_R"])  for n,g in self.groups.items()])
 
-		total_inflow_H_after_bounce = sum([g.flow_H() - B_H[n]  for n,g in self.groups.items()])
+		total_inflow_H_after_bounce = sum([self.dt * g.flow_H() - B_H[n]  for n,g in self.groups.items()])
 
-		if( remaining_H_patients + total_inflow_H_after_bounce > self.beds ):
+		if( remaining_H_patients + total_inflow_H_after_bounce > self.beds * self.dt):
 			# extra bounces done proportionally in each group
-			print("\nWARNING.group.py() Total entering H at t=%d = %.2f > remaining available capacity = %d. Bouncing more, proportionally." %(time_of_flow,total_inflow_H_after_bounce,self.beds-remaining_H_patients) )
+			print("\nWARNING.group.py() Total entering H at t=%d = %.2f > remaining available capacity = %d. Bouncing more, proportionally." %(time_of_flow,total_inflow_H_after_bounce,self.beds * self.dt -remaining_H_patients) )
 
-			extra_bounced = (1+tol) * (remaining_H_patients + total_inflow_H_after_bounce - self.beds)
+			extra_bounced = (1+tol) * (remaining_H_patients + total_inflow_H_after_bounce - self.beds * self.dt)
 			for n,g in self.groups.items():
-				B_H[n] += extra_bounced * (g.flow_H()-B_H[n])/(total_inflow_H_after_bounce if total_inflow_H_after_bounce > 0 else 10e-10)
+				B_H[n] += extra_bounced * (self.dt * g.flow_H()-B_H[n])/(total_inflow_H_after_bounce if total_inflow_H_after_bounce > 0 else 10e-10)
 
 		# check whether there is overflow in ICU
-		remaining_ICU_patients = sum([g.ICU[time_of_flow] * (1-g.parameters["lambda_ICU_D"] - g.parameters["lambda_ICU_R"])  for n,g in self.groups.items()])
+		remaining_ICU_patients = sum([g.ICU[time_of_flow] * (1-self.dt * g.parameters["lambda_ICU_D"] - self.dt * g.parameters["lambda_ICU_R"])  for n,g in self.groups.items()])
 
-		total_inflow_ICU_after_bounce = sum([g.flow_ICU() - B_ICU[n]  for n,g in self.groups.items()])
+		total_inflow_ICU_after_bounce = sum([self.dt * g.flow_ICU() - B_ICU[n]  for n,g in self.groups.items()])
 
-		if( remaining_ICU_patients + total_inflow_ICU_after_bounce > self.icus ):
+		if( remaining_ICU_patients + total_inflow_ICU_after_bounce > self.icus * self.dt ):
 			# extra bounces done proportionally in each group
-			print("\nWARNING.group.py() Total entering ICU at t=%d = %.2f > remaining available capacity = %d. Bouncing more, proportionally." %(time_of_flow,total_inflow_ICU_after_bounce,self.icus-remaining_ICU_patients) )
+			print("\nWARNING.group.py() Total entering ICU at t=%d = %.2f > remaining available capacity = %d. Bouncing more, proportionally." %(time_of_flow,total_inflow_ICU_after_bounce,self.icus * self.dt -remaining_ICU_patients) )
 
-			extra_bounced = (1+tol) * (remaining_ICU_patients + total_inflow_ICU_after_bounce - self.icus)
+			extra_bounced = (1+tol) * (remaining_ICU_patients + total_inflow_ICU_after_bounce - self.icus * self.dt)
 			for n,g in self.groups.items():
-				B_ICU[n] += extra_bounced * (g.flow_ICU()-B_ICU[n])/(total_inflow_ICU_after_bounce if total_inflow_ICU_after_bounce > 0 else 10e-10)
+				B_ICU[n] += extra_bounced * (self.dt * g.flow_ICU()-B_ICU[n])/(total_inflow_ICU_after_bounce if total_inflow_ICU_after_bounce > 0 else 10e-10)
 
-		total_inflow_ICU_after_new_bounce = sum([g.flow_ICU() - B_ICU[n]  for n,g in self.groups.items()])
+		total_inflow_ICU_after_new_bounce = sum([self.dt * g.flow_ICU() - B_ICU[n]  for n,g in self.groups.items()])
 
-		print("After capping the Bouncing var total ICU should be: {}".format(remaining_ICU_patients + total_inflow_ICU_after_new_bounce))
+		# print("After capping the Bouncing var total ICU should be: {}".format(remaining_ICU_patients + total_inflow_ICU_after_new_bounce))
 
 		return B_H, B_ICU
 
@@ -258,24 +258,24 @@ class DynamicalModel:
 			}
 		return state
 
-	def get_delta_X(self, t):
+	def get_delta_X_over_delta_t(self, t):
 		assert(t>0)  # should never call this with t=0
 		delta = {}
 		for name,group in self.groups.items():
 			delta[name] = {
-				"S": (group.S[t] - group.S[t-1]),
-				"E": (group.E[t] - group.E[t-1]),
-				"I": (group.I[t] - group.I[t-1]),
-				"R": (group.R[t] - group.R[t-1]),
-				"N": (group.N[t] - group.N[t-1]),
-				"Ia": (group.Ia[t] - group.Ia[t-1]),
-				"Ips": (group.Ips[t] - group.Ips[t-1]),
-				"Ims": (group.Ims[t] - group.Ims[t-1]),
-				"Iss": (group.Iss[t] - group.Iss[t-1]),
-				"Rq": (group.Rq[t] - group.Rq[t-1]),
-				"H": (group.H[t] - group.H[t-1]),
-				"ICU": (group.ICU[t] - group.ICU[t-1]),
-				"D": (group.D[t] - group.D[t-1]),
+				"S": (group.S[t] - group.S[t-1])/self.dt,
+				"E": (group.E[t] - group.E[t-1])/self.dt,
+				"I": (group.I[t] - group.I[t-1])/self.dt,
+				"R": (group.R[t] - group.R[t-1])/self.dt,
+				"N": (group.N[t] - group.N[t-1])/self.dt,
+				"Ia": (group.Ia[t] - group.Ia[t-1])/self.dt,
+				"Ips": (group.Ips[t] - group.Ips[t-1])/self.dt,
+				"Ims": (group.Ims[t] - group.Ims[t-1])/self.dt,
+				"Iss": (group.Iss[t] - group.Iss[t-1])/self.dt,
+				"Rq": (group.Rq[t] - group.Rq[t-1])/self.dt,
+				"H": (group.H[t] - group.H[t-1])/self.dt,
+				"ICU": (group.ICU[t] - group.ICU[t-1])/self.dt,
+				"D": (group.D[t] - group.D[t-1])/self.dt,
 			}
 		return delta
 
@@ -503,7 +503,7 @@ class SEIR_group:
 	# it may not be equal to self.t
 	def flow_H(self):
 		if self.parameters['p_H'] != 0.0:
-			return self.parameters['mu']*self.parameters['p_H']*(self.I[self.parent.t]+self.Iss[self.parent.t]/(self.parameters['p_H']+self.parameters['p_ICU']))
+			return  (self.parameters['mu']*self.parameters['p_H']*(self.I[self.parent.t]+self.Iss[self.parent.t]/(self.parameters['p_H']+self.parameters['p_ICU'])))
 		else:
 			return 0.0
 
@@ -512,7 +512,7 @@ class SEIR_group:
 	def flow_ICU(self):
 		if self.parameters['p_ICU'] != 0.0:
 			# print('flow_ICU(). In group {}, time from self is {}, time being updated is {}'.format(self.name,self.t,time_of_flow))
-			return self.parameters['mu']*self.parameters['p_ICU']*(self.I[self.parent.t]+self.Iss[self.parent.t]/(self.parameters['p_H']+self.parameters['p_ICU']))
+			return ( self.parameters['mu']*self.parameters['p_ICU']*(self.I[self.parent.t]+self.Iss[self.parent.t]/(self.parameters['p_H']+self.parameters['p_ICU'])))
 		else:
 			return 0.0
 
@@ -539,6 +539,9 @@ class SEIR_group:
 	# Updates infected
 	def update_I(self, m_tests, a_tests):
 		delta_I = self.parameters['sigma']*self.E[self.parent.t] - self.parameters['mu']*self.I[self.parent.t] - m_tests*self.I[self.parent.t]/(self.N[self.parent.t] if self.N[self.parent.t]!=0 else 10e-6)
+
+		assert self.I[self.parent.t]+delta_I*self.dt >= 0, (f'Total infected is negative: {self.I[self.parent.t]+delta_I*self.dt}. \n  Total m_tests: {m_tests * self.dt * self.I[self.parent.t]/self.N[self.parent.t]}.\n  Total new infected: {self.dt * self.parameters["sigma"]*self.E[self.parent.t]}.\n  Total recovered or going to H, ICU: {self.dt * self.parameters["mu"]*self.I[self.parent.t]}')
+
 		self.I += [self.I[self.parent.t]+delta_I*self.dt]
 
 
@@ -578,7 +581,7 @@ class SEIR_group:
 
 
 	def update_H(self, m_tests, a_tests, h_cap, icu_cap, B_H):
-		tol = 1e-8
+		tol = 1e-9
 		# For each group, calculate the entering amount
 		entering_h = {}
 		summ_entering_h = 0
@@ -598,13 +601,14 @@ class SEIR_group:
 		delta_H = (
 			- (self.parameters["lambda_H_R"] + self.parameters["lambda_H_D"])*self.H[self.parent.t]
 			+ (1-tol) * entering_h[self.name]
-			- B_H
+
 		)
-		self.H += [self.H[self.parent.t]+delta_H*self.dt]
+		self.H += [self.H[self.parent.t]+delta_H*self.dt- B_H]
 
 
 	def update_ICU(self, m_tests, a_tests, h_cap, icu_cap, B_ICU, B_ICU_perc):
-		tol = 1e-8
+		tol = 1e-9
+
 		# For each group, calculate the entering amount
 		entering_icu = {}
 		summ_entering_icu = 0
@@ -628,9 +632,9 @@ class SEIR_group:
 		delta_ICU = (
 			- (self.parameters["lambda_ICU_R"] + self.parameters["lambda_ICU_D"])*self.ICU[self.parent.t]
 			+ (1-tol) * entering_icu[self.name]
-			- B_ICU
+
 		)
-		self.ICU += [self.ICU[self.parent.t]+delta_ICU*self.dt]
+		self.ICU += [self.ICU[self.parent.t]+delta_ICU*self.dt - B_ICU]
 		#print("update_ICU(): ICU occupancy at end of period t={} for group {} IS {}".format(time_of_flow, self.name,self.ICU[-1]))
 
 
@@ -664,8 +668,8 @@ class SEIR_group:
 		delta_D = (
 			self.parameters["lambda_H_D"]*self.H[self.parent.t]
 			+ self.parameters["lambda_ICU_D"]*self.ICU[self.parent.t]
-			+ B_H
-			+ B_ICU
+
 		)
 
-		self.D += [self.D[self.parent.t]+delta_D*self.dt]
+		self.D += [self.D[self.parent.t]+delta_D*self.dt+ B_H
+		+ B_ICU]

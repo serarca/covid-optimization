@@ -8,6 +8,10 @@ import pandas as pd
 import math
 import gurobipy as gb
 
+from time import time
+import logging
+
+
 current_path = os.path.abspath(getsourcefile(lambda:0))
 current_dir = os.path.dirname(current_path)
 parent_dir = current_dir[:current_dir.rfind(os.path.sep)]
@@ -15,6 +19,26 @@ sys.path.insert(0, parent_dir)
 
 from group import *
 from forecasting_heuristic import no_tests
+
+
+############### PROFILING CODE ##################
+
+def log_execution_time(function):
+    def timed(*args, **kw):
+        time_start = time()
+        return_value = function(*args, **kw)
+        time_end = time()
+
+        execution_time = time_end - time_start
+
+        message = f'{function.__name__}, {execution_time}'
+        logging.critical(message)
+
+        return return_value
+
+    return timed
+##################################################
+
 
 age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29','age_group_30_39', 'age_group_40_49', 'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
 SEIR_groups = [ 'S_g', 'E_g', 'I_g', 'R_g', 'N_g', 'Ia_g', 'Ips_g', \
@@ -217,6 +241,7 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method):
 
 ####################################
 # Calculate the Jacobian with respect to u (decisions/controls)
+# @profile
 def get_Jacobian_u(dynModel, X_hat, u_hat, mixing_method):
     """ Calculates the Jacobian with respect to decisions, for a given control trajectory u_hat and corresponding state trajectory X_hat """
     # For now, for mult mixing this is done for the model with powers ell_g^alpha * ell_h^beta
@@ -540,12 +565,12 @@ def get_F(dynModel, X, u):
     assert(X.shape == (num_compartments * num_age_groups, ))
     assert(u.shape == (num_controls * num_age_groups, ))
 
-    print("Started Get F")
-    print("*-*-*-*-*-*-*-*-*-*")
+    # print("Started Get F")
+    # print("*-*-*-*-*-*-*-*-*-*")
 
     # We save the initial time of dynModel to revert back to
     initial_time_of_model = dynModel.t
-    print("Initial time of model: {}".format(initial_time_of_model))
+    # print("Initial time of model: {}".format(initial_time_of_model))
 
 
     initial_state_dict = dynModel.get_state(dynModel.t)
@@ -582,7 +607,7 @@ def get_F(dynModel, X, u):
         if (B_H[g] is not False) or (B_ICU[g] is not False):
             prorrated = False
 
-    print("prorrated is", prorrated)
+    # print("prorrated is", prorrated)
     ########################################
 
     # Write X_dict as current state of dynModel
@@ -598,9 +623,9 @@ def get_F(dynModel, X, u):
     # Get the current state
     # state_next_step = dynModel.get_state(dynModel.t)
 
-    delta_x_next_step = dynModel.get_delta_X(dynModel.t)
+    delta_x_next_step = dynModel.get_delta_X_over_delta_t(dynModel.t)
 
-    print("Time of Model after taking a step = {}".format(dynModel.t))
+    # print("Time of Model after taking a step = {}".format(dynModel.t))
 
     # Make the dictionary into an array
     X_next_step = dict_to_X(delta_x_next_step)
@@ -608,12 +633,11 @@ def get_F(dynModel, X, u):
     # Erase the states after t so as to reset the dyn model, also populate t with correct state
     dynModel.reset_time(initial_time_of_model)
 
-    print("Time of Model after taking resseting the clock = {}".format(dynModel.t))
 
     dynModel.write_state(dynModel.t, initial_state_dict)
 
-    print("Finished Running get_F")
-    print("*-*-*-*-*-*-*-*-*-*-*-*-*")
+    # print("Finished Running get_F")
+    # print("*-*-*-*-*-*-*-*-*-*-*-*-*")
 
 
     # Return dynModel to initial state
@@ -759,7 +783,7 @@ def calculate_all_constraints(dynModel, bounce_existing):
         Gamma_u[curr_constr,BHg_idx] = -1
 
     # store right-hand-sides K(t) for every time t
-    K[curr_constr,:] = dynModel.parameters['global-parameters']['C_H']
+    K[curr_constr,:] = dynModel.parameters['global-parameters']['C_H'] * dynModel.dt
 
     all_labels += ["H_capacity"]
     curr_constr += 1
@@ -824,7 +848,7 @@ def calculate_all_constraints(dynModel, bounce_existing):
         Gamma_u[curr_constr,BICUg_idx] = -1
 
     # store right-hand-sides K(t) for every time t
-    K[curr_constr,:] = dynModel.parameters['global-parameters']['C_ICU']
+    K[curr_constr,:] = dynModel.parameters['global-parameters']['C_ICU'] * dynModel.dt
 
     all_labels += ["ICU_capacity"]
     curr_constr += 1
@@ -865,7 +889,7 @@ def calculate_all_constraints(dynModel, bounce_existing):
     ################ Constraint for M-test capacity
     Nmtestg_idx_all = slice(controls.index('Nmtest_g'),ut_dim,num_controls)
     Gamma_u[curr_constr,Nmtestg_idx_all] = 1
-    K[curr_constr,:] = dynModel.parameters['global-parameters']['C_mtest']
+    K[curr_constr,:] = dynModel.parameters['global-parameters']['C_mtest'] * dynModel.dt
 
     all_labels += ["Mtest_cap"]
     curr_constr += 1
@@ -873,7 +897,7 @@ def calculate_all_constraints(dynModel, bounce_existing):
     ################ Constraint for A-test capacity
     Natestg_idx_all = slice(controls.index('Natest_g'),ut_dim,num_controls)
     Gamma_u[curr_constr,Natestg_idx_all] = 1
-    K[curr_constr,:] = dynModel.parameters['global-parameters']['C_atest']
+    K[curr_constr,:] = dynModel.parameters['global-parameters']['C_atest'] * dynModel.dt
 
     all_labels += ["Atest_cap"]
     curr_constr += 1
@@ -919,6 +943,8 @@ def calculate_objective_time_dependent_coefs(dynModel, k, xhat, uhat):
 # and a linear expression of the form a*X(t)+b*u(t) for some a,b row vectors of suitable dimension.
 # This function returns the coefficients for all the decisions u(k),...,u(T-1)
 # appearing in all constraints and objective
+# @profile
+# @log_execution_time
 def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_matrix, e_matrix):
     """Get coefficients for decisions appearing in a generic linear constraint in each period k,k+1,...
     Gamma_x and Gamma_u are matrices, for now. Can change to dictionaries later.
@@ -946,7 +972,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
     ct = {}
     #for t in range(k,T+1):
     for t in range(k,T):
-        print("calculate_all_coefs for loop, t = ", t)
+        # print("calculate_all_coefs for loop, t = ", t)
         # get Xhat(t) and uhat(t)
         Xhat_t = Xhat_seq[:,t-k]
         uhat_t = uhat_seq[:,t-k]
@@ -958,26 +984,26 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
         # Calculate linearization coefficients for X(t+1)
         At[t] = np.eye(Xt_dim) + dynModel.dt * jacob_X
         Bt[t] = dynModel.dt * jacob_u
-        print("Calculating C(t) for t = {}".format(t))
-        print("The time in the dynamical model is: {}".format(dynModel.t))
-        print("********************************")
+        # print("Calculating C(t) for t = {}".format(t))
+        # print("The time in the dynamical model is: {}".format(dynModel.t))
+        # print("********************************")
 
 
+        gf_vec = get_F(dynModel, Xhat_t, uhat_t)
+        ct[t] = dynModel.dt * (gf_vec - jacob_X @ Xhat_t ) - jacob_u @ uhat_t
 
-        ct[t] = dynModel.dt * (get_F(dynModel, Xhat_t, uhat_t) - jacob_X @ Xhat_t - jacob_u @ uhat_t)
-
-        tol = 1e-7
-        mu_g = dynModel.groups[age_groups[1]].parameters['mu']
-        pICU_g = dynModel.groups[age_groups[1]].parameters['p_ICU']
-        pH_g = dynModel.groups[age_groups[1]].parameters['p_H']
-        lambda_ICU_R_g = dynModel.groups[age_groups[1]].parameters['lambda_ICU_R']
-        lambda_ICU_D_g = dynModel.groups[age_groups[1]].parameters['lambda_ICU_D']
+        tol = 1e-6
+        mu_g = dynModel.groups[age_groups[0]].parameters['mu']
+        pICU_g = dynModel.groups[age_groups[0]].parameters['p_ICU']
+        pH_g = dynModel.groups[age_groups[0]].parameters['p_H']
+        lambda_ICU_R_g = dynModel.groups[age_groups[0]].parameters['lambda_ICU_R']
+        lambda_ICU_D_g = dynModel.groups[age_groups[0]].parameters['lambda_ICU_D']
 
         #print("1-lambda_ICU_R_g - lambda_ICU_R_g term = ", 1 - lambda_ICU_R_g - lambda_ICU_D_g)
         #print("mu_g p_ICU_g term = ", mu_g * pICU_g)
         #print("mu_g p_ICU_g / p_ICU_g + p_H_g term = ", mu_g * pICU_g / (pICU_g + pH_g))
-        print("calculation of At,Bt,ct for t = ", t)
-        gf_vec = get_F(dynModel, Xhat_t, uhat_t)
+        # print("calculation of At,Bt,ct for t = ", t)
+
         x_approx = jacob_X @ Xhat_t
         u_approx = jacob_u @ uhat_t
         for ag in range(num_age_groups):
@@ -985,9 +1011,9 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
             BounceICUg_idx = ag*num_controls + controls.index('BounceICU_g')
             #print("At[t][ICU] is equal to", At[t][ICUg_idx,:])
             #print("Bt[t][ICU] is equal to", Bt[t][ICUg_idx,:])
-            print("for group", ag, age_groups[ag], "ct[t][ICU] is equal to", ct[t][ICUg_idx])
-            print("components are", gf_vec[ICUg_idx], x_approx[ICUg_idx], u_approx[ICUg_idx])
-            assert(abs(ct[t][ICUg_idx]) < 0.0001)
+            # print("for group", ag, age_groups[ag], "ct[t][ICU] is equal to", ct[t][ICUg_idx])
+            # print("components are", gf_vec[ICUg_idx], x_approx[ICUg_idx], u_approx[ICUg_idx])
+            assert(abs(ct[t][ICUg_idx]) < 0.01)
 
             #if (abs(ct[t][ICUg_idx]) > tol):
             #    print("ct[t][ICU] is not zero and equal to", ct[t][ICUg_idx])
@@ -1027,7 +1053,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
     At_bar = {}
     Xt_bar = Xhat_seq[:,0]      # initialize with X(k)=Xhat(k)
 
-    print("Computing constants for all periods.")
+    # print("Computing constants for all periods.")
 
     for t in range(k,T): # loop over times k, k+1, ..., T - 1 to model constraints indexed with t
 
@@ -1035,12 +1061,13 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
         for constr_index in range(num_constraints):
             constr_constants[t][constr_index] = Gamma_x[constr_index,:] @ Xt_bar
 
-        print("Calculated constants for time {}".format(t))
+        # print("Calculated constants for time {}".format(t))
         # Update auxiliary vector Xt_bar
         Xt_bar = At[t] @ Xt_bar + ct[t]
 
         # Calculate coefficients for all controls appearing in the constraint for period t
         # NOTE: The coefficients for control u(tau) are stored on row indexed (tau-k) of the 2D array
+
         for constr_index in range(num_constraints):
             # coefs for u[t]
             u_constr_coeffs[t][constr_index][:,t-k] = Gamma_u[constr_index,:]
@@ -1054,17 +1081,19 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
         At_bar[t-1] = np.eye(Xt_dim,Xt_dim)
 
         for tau in range(t-1,k-1,-1):
+            At_bar_times_Bt = At_bar[tau] @ Bt[tau]
+            all_constraint_coefs_matrix = Gamma_x @ At_bar_times_Bt
             for constr_index in range(num_constraints):
                 # coefs for u[t-1], u[t-2], ..., u[k] in the constraints
-                u_constr_coeffs[t][constr_index][:,tau-k] = Gamma_x[constr_index,:] @ At_bar[tau] @ Bt[tau]
+                u_constr_coeffs[t][constr_index][:,tau-k] = all_constraint_coefs_matrix[constr_index, :]
 
-                # coefs for u[t-1], u[t-2], ..., u[k] in the objective
-                u_obj_coeffs[:,tau-k] += d_matrix[:,tau-k] @ At_bar[tau] @ Bt[tau]
+            # coefs for u[t-1], u[t-2], ..., u[k] in the objective
+            u_obj_coeffs[:,tau-k] += d_matrix[:,tau-k] @ At_bar_times_Bt
 
             # Update At_bar for next round
             At_bar[tau-1] = At_bar[tau] @ At[tau]
 
-        print("Computed constraint and obj coeff for time {}".format(t))
+        # print("Computed constraint and obj coeff for time {}".format(t))
 
     At_bar[T-1] = np.eye(Xt_dim,Xt_dim)
     # Add up the contribution of eta * X_T in the coefficients of decision u_t, t = k, ..., T-1
@@ -1078,6 +1107,8 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
 
 ####################################
 # Main function: runs the linearization heuristic
+# @profile
+# @log_execution_time
 def run_heuristic_linearization(dynModel):
     """Run the heuristic based on linearization. Takes a dynamical model, resets the time to 0, and runs it following the linearization heuristic. Returns the dynamical model after running it."""
 
@@ -1167,31 +1198,67 @@ def run_heuristic_linearization(dynModel):
 
         # create empty model
         mod = gb.Model("Linearization Heuristic")
-        # mod.setParam( 'OutputFlag', False )     # make Gurobi silent
+
+        mod.setParam( 'OutputFlag', False )     # make Gurobi silent
+        mod.setParam( 'LogFile', "gurobi-log.txt" )     # make Gurobi silent
         mod.Params.DualReductions = 0  # change this to get explicit infeasible or unbounded
 
         # add all decisions using matrix format, and also specify objective coefficients
         obj_vec = np.reshape(obj_coefs, (ut_dim*(T-k),), 'F')  # reshape by reading along rows first
-        u_vars_vec = mod.addMVar( np.shape(obj_vec), obj=obj_vec, name="u")
+
+        upper_bounds = np.ones(np.shape(obj_vec)) * np.inf
+        lower_bounds = np.zeros(np.shape(obj_vec))
+
+        for i in range(len(obj_vec)):
+
+            if i in lock_home_idx_all_times:
+                upper_bounds[i] = 1
+                lower_bounds[i] = 1
+            if i in lock_work_idx_all_times:
+                lower_bounds[i] = 0.24
+
+
+        u_vars_vec = mod.addMVar( np.shape(obj_vec), lb=lower_bounds, ub=upper_bounds, obj=obj_vec, name="u")
 
         # Sense -1 indicates a maximization problem
         mod.ModelSense = -1
 
-        mod.addConstrs((u_vars_vec[i]==1 for i in lock_home_idx_all_times if i < len(obj_vec)), name=("home_lock"))
+        # mod.addConstrs((u_vars_vec[i]==1 for i in lock_home_idx_all_times if i < len(obj_vec)), name=("home_lock"))
+        #
+        # mod.addConstrs((u_vars_vec[i]>=0.24 for i in lock_work_idx_all_times if i < len(obj_vec)), name=("work_lock_lb"))
+        work_index = controls.index('work')
+        transport_index = controls.index('transport')
+        TransportConstMatrix = np.zeros((T-k, ut_dim * (T-k)))
+        TransportConstRHSVector = np.zeros((T-k,))
+        for t in range(T-k):
+            for i in range((T-k) * num_age_groups):
+                work_idx = work_index + i*num_controls
+                transport_idx = transport_index + i*num_controls
 
-        mod.addConstrs((u_vars_vec[i]>=0.24 for i in lock_work_idx_all_times if i < len(obj_vec)), name=("work_lock_lb"))
-
-        mod.addConstrs((u_vars_vec[lock_transport_idx_all_times[i]] >= dynModel.transport_lb_work_fraction * u_vars_vec[lock_work_idx_all_times[i]] for i in range((T-k)*num_age_groups)), name=("transport_lock_lb"))
-
+                TransportConstMatrix[t, work_idx] = -dynModel.transport_lb_work_fraction
+                TransportConstMatrix[t, transport_idx] = 1
 
 
+        mod.addMConstrs(TransportConstMatrix, u_vars_vec, ">", TransportConstRHSVector)
+
+        # mod.addConstrs((u_vars_vec[lock_transport_idx_all_times[i]] >= dynModel.transport_lb_work_fraction * u_vars_vec[lock_work_idx_all_times[i]] for i in range((T-k)*num_age_groups)), name=("transport_lock_lb"))
+        #
+
+        # mod.addConstrs((u_vars_vec @ np.reshape(constr_coefs[t][con], (len(obj_vec),), 'F') + constr_consts[t][con] <= K[con,t] for con in range(num_constraints) for t in range(k,T)), name="All Const")
+
+        ConstMatrix = np.zeros(((T-k) * num_constraints, ut_dim * (T-k)))
+
+        ConstRHS = np.zeros(((T-k) * num_constraints,))
         for t in range(k,T):
             #print("Time %d number of constraints %d" %(t,len(constr_coefs[t])))
             for con in range(num_constraints):
-                cons_vec = np.reshape(constr_coefs[t][con], (len(obj_vec),), 'F')
-                cname = ("%s[t=%d]" %(all_labels[con],t))
-                mod.addConstr( u_vars_vec @ cons_vec + constr_consts[t][con] <= K[con,t], name=cname)
-
+                cons_vec = np.reshape(constr_coefs[t][con], (ut_dim * (T-k),), 'F').transpose()
+                ConstMatrix[(t-k) * num_constraints + con, :] = cons_vec
+                ConstRHS[(t-k) * num_constraints + con] = K[con,t] -constr_consts[t][con]
+                # cname = ("%s[t=%d]" %(all_labels[con],t))
+                # expr = (u_vars_vec @ cons_vec) + (constr_consts[t][con])
+                # mod.addConstr((u_vars_vec @ cons_vec) + (constr_consts[t][con]) <= K[con,t], name=cname)
+        mod.addMConstrs(ConstMatrix, u_vars_vec, "<", ConstRHS)
         # optimize the model
         mod.optimize()
 

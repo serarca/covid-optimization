@@ -190,7 +190,7 @@ def main():
         'dt':1.0,
         'region': "Ile-de-France",
         'quar_freq': 1,
-        'num_days' : 5,
+        'num_days' : 180,
         'initial_infected_count' : 1,
         'perc_infected' : 10,
         'mixing_method' : {
@@ -206,10 +206,10 @@ def main():
 
     simulation_params_no_lockdown_no_testing = {
         'dt':1.0,
-        'region': "Ile-de-France",
+        'region': "Testing-group",
         'quar_freq': 1,
-        'num_days' : 5,
-        'num_daysToLockDown' : 5,
+        'num_days' : 10,
+        'num_daysToLockDown' : 10,
         'num_daysAfterLockDown' : 0,
         'initial_infected_count' : 1,
         'perc_infected' : 10,
@@ -229,11 +229,11 @@ def main():
     # run_nl_l_heuristic(simulation_params_l_nl_heuristic)
     dynModel_linearization_heur = run_linearization_heuristic(simulation_params_linearization)
 
-    plot_and_print_results(dynModel_linearization_heur, simulation_params_linearization)
+    # plot_and_print_results(dynModel_linearization_heur, simulation_params_linearization)
 
-    dynModel_no_lockdown_no_testing = run_nl_l_heuristic(simulation_params_no_lockdown_no_testing)
+    # dynModel_no_lockdown_no_testing = run_nl_l_heuristic(simulation_params_no_lockdown_no_testing)
 
-    plot_and_print_results(dynModel_no_lockdown_no_testing, simulation_params_no_lockdown_no_testing)
+    # plot_and_print_results(dynModel_no_lockdown_no_testing, simulation_params_no_lockdown_no_testing)
 
 def plot_and_print_results(dynModel, simulation_params):
     ##############################################################################
