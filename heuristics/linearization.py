@@ -1200,7 +1200,10 @@ def run_heuristic_linearization(dynModel):
         mod = gb.Model("Linearization Heuristic")
 
         mod.setParam( 'OutputFlag', False )     # make Gurobi silent
-        mod.setParam( 'LogFile', "gurobi-log.txt" )     # make Gurobi silent
+        mod.setParam( 'LogFile', "gurobi-log.txt" )
+
+        mod.setParam('Threads', 1)
+        
         mod.Params.DualReductions = 0  # change this to get explicit infeasible or unbounded
 
         # add all decisions using matrix format, and also specify objective coefficients
