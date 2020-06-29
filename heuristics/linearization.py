@@ -942,8 +942,8 @@ def calculate_objective_time_dependent_coefs(dynModel, k, xhat, uhat):
 # and a linear expression of the form a*X(t)+b*u(t) for some a,b row vectors of suitable dimension.
 # This function returns the coefficients for all the decisions u(k),...,u(T-1)
 # appearing in all constraints and objective
-# @profile
-@log_execution_time
+@profile
+# @log_execution_time
 def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_matrix, e_matrix):
     """Get coefficients for decisions appearing in a generic linear constraint in each period k,k+1,...
     Gamma_x and Gamma_u are matrices, for now. Can change to dictionaries later.
@@ -988,8 +988,8 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
         # print("********************************")
 
 
-
-        ct[t] = dynModel.dt * (get_F(dynModel, Xhat_t, uhat_t) - jacob_X @ Xhat_t ) - jacob_u @ uhat_t
+        gf_vec = get_F(dynModel, Xhat_t, uhat_t)
+        ct[t] = dynModel.dt * (gf_vec - jacob_X @ Xhat_t ) - jacob_u @ uhat_t
 
         tol = 1e-6
         mu_g = dynModel.groups[age_groups[0]].parameters['mu']
@@ -1002,7 +1002,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
         #print("mu_g p_ICU_g term = ", mu_g * pICU_g)
         #print("mu_g p_ICU_g / p_ICU_g + p_H_g term = ", mu_g * pICU_g / (pICU_g + pH_g))
         # print("calculation of At,Bt,ct for t = ", t)
-        gf_vec = get_F(dynModel, Xhat_t, uhat_t)
+
         x_approx = jacob_X @ Xhat_t
         u_approx = jacob_u @ uhat_t
         for ag in range(num_age_groups):
@@ -1079,12 +1079,13 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
         At_bar[t-1] = np.eye(Xt_dim,Xt_dim)
 
         for tau in range(t-1,k-1,-1):
+            At_bar_times_Bt = At_bar[tau] @ Bt[tau]
             for constr_index in range(num_constraints):
                 # coefs for u[t-1], u[t-2], ..., u[k] in the constraints
-                u_constr_coeffs[t][constr_index][:,tau-k] = Gamma_x[constr_index,:] @ At_bar[tau] @ Bt[tau]
+                u_constr_coeffs[t][constr_index][:,tau-k] = Gamma_x[constr_index,:] @ At_bar_times_Bt
 
-                # coefs for u[t-1], u[t-2], ..., u[k] in the objective
-                u_obj_coeffs[:,tau-k] += d_matrix[:,tau-k] @ At_bar[tau] @ Bt[tau]
+            # coefs for u[t-1], u[t-2], ..., u[k] in the objective
+            u_obj_coeffs[:,tau-k] += d_matrix[:,tau-k] @ At_bar_times_Bt
 
             # Update At_bar for next round
             At_bar[tau-1] = At_bar[tau] @ At[tau]
@@ -1104,7 +1105,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
 ####################################
 # Main function: runs the linearization heuristic
 # @profile
-@log_execution_time
+# @log_execution_time
 def run_heuristic_linearization(dynModel):
     """Run the heuristic based on linearization. Takes a dynamical model, resets the time to 0, and runs it following the linearization heuristic. Returns the dynamical model after running it."""
 

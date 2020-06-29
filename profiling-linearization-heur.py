@@ -39,7 +39,7 @@ def log_execution_time(function):
     return timed
 ##################################################
 
-@log_execution_time
+# @log_execution_time
 def run_linearization_heuristic(simulation_params):
 
     start_time = time()
@@ -90,17 +90,17 @@ def run_linearization_heuristic(simulation_params):
 
 def main():
 
-    logging.basicConfig(
-        level=logging.CRITICAL,
-        filename=f'profiling-linearized-heuristic/profiling-logging.txt',
-        format='%(message)s')
+    # logging.basicConfig(
+    #     level=logging.CRITICAL,
+    #     filename=f'profiling-linearized-heuristic/profiling-logging.txt',
+    #     format='%(message)s')
 
     regions = ['Ile-de-France']
     # 'testing_5_groups']
     # 'Testing-group', 'Ile-de-France']
     for region in regions:
-        for n_days in range(10, 50):
-            logging.critical(f'{region}, {n_days}')
+        for n_days in [60]:
+            # logging.critical(f'{region}, {n_days}')
 
             simulation_params_linearization = {
                 'dt':1.0,
@@ -121,9 +121,9 @@ def main():
             }
 
             dynModel_linearization_heur = run_linearization_heuristic(simulation_params_linearization)
-            logging.critical('*')
+            # logging.critical('*')
 
-    plot_logging('profiling-linearized-heuristic/profiling-logging.txt')
+    # plot_logging('profiling-linearized-heuristic/profiling-logging.txt')
 
 def plot_logging(file):
     number_of_groups = []
