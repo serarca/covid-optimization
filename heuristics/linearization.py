@@ -3,10 +3,16 @@ import yaml
 from inspect import getsourcefile
 import os.path
 import sys
+
+from threadpoolctl import threadpool_limits
 import numpy as np
+
+threadpool_limits(limits=4, user_api='blas')
+
 import pandas as pd
 import math
 import gurobipy as gb
+__gurobi_threads = 1
 
 from time import time
 import logging
@@ -1202,8 +1208,9 @@ def run_heuristic_linearization(dynModel):
         mod.setParam( 'OutputFlag', False )     # make Gurobi silent
         mod.setParam( 'LogFile', "gurobi-log.txt" )
 
-        mod.setParam('Threads', 1)
-        
+        # mod.setParam('Threads', 1)
+        mod.Params.threads = __gurobi_threads
+
         mod.Params.DualReductions = 0  # change this to get explicit infeasible or unbounded
 
         # add all decisions using matrix format, and also specify objective coefficients
@@ -1263,6 +1270,8 @@ def run_heuristic_linearization(dynModel):
                 # mod.addConstr((u_vars_vec @ cons_vec) + (constr_consts[t][con]) <= K[con,t], name=cname)
         mod.addMConstrs(ConstMatrix, u_vars_vec, "<", ConstRHS)
         # optimize the model
+
+        print(f"Optimizing model at time k = {k}")
         mod.optimize()
 
         if( mod.Status ==  gb.GRB.INFEASIBLE ):
