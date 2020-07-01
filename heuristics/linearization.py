@@ -1261,7 +1261,7 @@ def run_heuristic_linearization(dynModel):
 
     for k in range(T):
 
-        print("\n\n HEURISTIC RUNNING FOR TIME k= {}.".format(k))
+        # print("\n\n HEURISTIC RUNNING FOR TIME k= {}.".format(k))
 
 
         # calculate state trajectory X_hat and corresponging controls new_uhat
@@ -1375,7 +1375,7 @@ def run_heuristic_linearization(dynModel):
         all_const = mod.addMConstrs(ConstMatrix, u_vars_vec, "<", ConstRHS)
         # optimize the model
 
-        print(f"Optimizing model at time k = {k}")
+        # print(f"Optimizing model at time k = {k}")
         mod.optimize()
 
 

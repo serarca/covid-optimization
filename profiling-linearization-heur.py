@@ -113,6 +113,7 @@ def main():
     # 'testing_5_groups']
     # 'Testing-group', 'Ile-de-France']
     n_days = 180
+    final_time_step = 90
     region = 'fitted'
 
     Parallel(n_jobs=8)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region)
@@ -121,7 +122,7 @@ def main():
     for icus in params_to_try["icus"]
     for tests in params_to_try["tests"])
 
-    load_pickles_and_create_csv(n_days, params_to_try)
+    load_pickles_and_create_csv(n_days, params_to_try, final_time_step)
 
 def run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region):
 
@@ -156,7 +157,7 @@ def run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region):
     pickle.dump(dynModel_linearization_heur,open(f"linearization_heuristic_dyn_models/dynModel_linHeur_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","wb"))
 
 
-def load_pickles_and_create_csv(n_days, params_to_try):
+def load_pickles_and_create_csv(n_days, params_to_try, final_time_step):
     results = []
     for delta in params_to_try["delta_schooling"]:
         for xi in params_to_try["xi"]:
@@ -172,9 +173,9 @@ def load_pickles_and_create_csv(n_days, params_to_try):
                         "icus":icus,
                         "tests":tests,
                         "testing":"linearization_heuristic",
-                        "economics_value":dynModel.get_total_economic_value(),
-                        "deaths":dynModel.get_total_deaths(),
-                        "reward":dynModel.get_total_reward(),
+                        "economics_value":dynModel.get_total_economic_value(final_time_step),
+                        "deaths":dynModel.get_total_deaths(final_time_step),
+                        "reward":dynModel.get_total_reward(final_time_step),
                     })
 
     pd.DataFrame(results).to_csv("linearization_heuristic_dyn_models/linearization_heuristic_results.csv")

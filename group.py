@@ -350,21 +350,27 @@ class DynamicalModel:
 			] for name,group in self.groups.items()])
 		return norm_state.flatten()
 
-	def get_total_deaths(self):
+	def get_total_deaths(self, final_time_step=False):
+		if final_time_step == False:
+			final_time_step = self.time_steps
 		total = 0
-		for t in range(1,self.time_steps+1):
+		for t in range(1,final_time_step+1):
 			total += self.deaths[t]
 		return total
 
-	def get_total_economic_value(self):
+	def get_total_economic_value(self, final_time_step=False):
+		if final_time_step == False:
+			final_time_step = self.time_steps
 		total = 0
-		for t in range(1,self.time_steps+1):
+		for t in range(1,final_time_step+1):
 			total += self.economic_values[t]
 		return total
 
-	def get_total_reward(self):
+	def get_total_reward(self, final_time_step=False):
+		if final_time_step == False:
+			final_time_step = self.time_steps
 		total = 0
-		for t in range(1,self.time_steps+1):
+		for t in range(1,final_time_step+1):
 			total += self.rewards[t]
 		return total
 
