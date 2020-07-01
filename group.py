@@ -30,8 +30,9 @@ def n_contacts(group_g, group_h, alphas, mixing_method):
 
 
 class DynamicalModel:
-	def __init__(self, parameters, initialization, dt, time_steps, mixing_method, transport_lb_work_fraction = 0 , extra_data = False):
+	def __init__(self, parameters, econ_params, initialization, dt, time_steps, mixing_method, transport_lb_work_fraction = 0 , extra_data = False):
 		self.parameters = parameters
+		self.econ_params = econ_params
 		self.t = 0
 		self.dt = dt
 		self.time_steps = time_steps
@@ -110,7 +111,7 @@ class DynamicalModel:
 
 
 		deaths = sum([group.D[self.t+1]-group.D[self.t] for name,group in self.groups.items()])
-		deaths_value = sum([(group.D[self.t+1]-group.D[self.t])*group.economics['death_value'] for name,group in self.groups.items()])
+		deaths_value = sum([(group.D[self.t+1]-group.D[self.t])*(self.econ_params["econ_cost_death"][name]+self.econ_params["xi"]) for name,group in self.groups.items()])
 		economic_value = self.get_economic_value(state, alphas)
 		reward = economic_value - deaths_value
 		result = {
@@ -224,19 +225,32 @@ class DynamicalModel:
 
 	# Given a state and set of alphas, returns the economic value
 	def get_economic_value(self, state, alphas):
-		value = 0
-		for group in state:
-			value = value + (
-				self.groups[group].economics['work_value']*(
-					alphas[group]['work']+
-					self.groups[group].economics['lockdown_fraction']*(1-alphas[group]['work'])
-				)*
-				(state[group]["S"] + state[group]["E"] + state[group]["R"])
-				* self.dt
-			)
-			# Liberate people in Rq group
-			value = value + state[group]["Rq"]*self.groups[group].economics['work_value']* self.dt
-		return value
+		econ_activities = ["transport","leisure","other"]
+		v_employment = 0
+		v_schooling = 0
+		for age_group in state:
+			v_employment += sum(
+				[
+					self.econ_params["employment_params"]["v"][age_group][activity]*(
+						self.econ_params["employment_params"]["nu"][activity]*alphas[age_group]["work"]+
+						self.econ_params["employment_params"]["eta"][activity]*np.mean([alphas[ag][activity] for ag in alphas])+
+						self.econ_params["employment_params"]["gamma"][activity]
+					)
+					for activity in econ_activities 
+				]
+			)*(state[group]["S"] + state[group]["E"] + state[group]["R"])* self.dt/365
+			# Add contribution of people fully recovered
+			v_employment += sum(
+				[
+					self.econ_params["employment_params"]["v"][age_group][activity]
+					for activity in econ_activities 
+				]
+			)*state[group]["Rq"]* self.dt/365
+			# Add schooling contributions
+			v_schooling += self.econ_params['schooling_params'][age_group]*alphas[age_group]["school"]* self.dt/365
+
+		return v_employment + v_schooling
+
 
 	def get_state(self, t):
 		state = {}
