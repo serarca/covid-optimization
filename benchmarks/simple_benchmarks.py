@@ -201,5 +201,51 @@ for delta in params_to_try["delta_schooling"]:
 						"reward":dynModel.get_total_reward(),
 					})
 
+
+# Now we benchmark open
+alphas={ag:{
+	"home": 1.0,
+	"leisure": 1.0,
+	"other": 1.0,
+	"school": 1.0,
+	"transport": 1.0,
+	"work": 1.0
+} for ag in age_groups}
+
+
+for delta in params_to_try["delta_schooling"]:
+	for xi in params_to_try["xi"]:
+		for icus in params_to_try["icus"]:
+			for tests in params_to_try["tests"]:
+				for testing in params_to_try["testing"]:
+					experiment_params = {
+						'delta_schooling':delta,
+						'xi':xi,
+						'icus':icus,
+					}
+					# Create dynamical method
+					dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method)
+					if testing == "homogeneous":
+						m_tests = {ag:tests/len(age_groups) for ag in age_groups}
+						a_tests = {ag:tests/len(age_groups) for ag in age_groups}
+					elif testing in age_groups:
+						m_tests = {ag:tests if ag==testing else 0 for ag in age_groups}
+						a_tests = {ag:tests if ag==testing else 0 for ag in age_groups}
+
+					for t in range(simulation_params['time_periods']):
+						dynModel.take_time_step(m_tests, a_tests, alphas)
+
+					results.append({
+						"heuristic":"open",
+						"delta_schooling":delta,
+						"xi":xi,
+						"icus":icus,
+						"tests":tests,
+						"testing":testing,
+						"economics_value":dynModel.get_total_economic_value(),
+						"deaths":dynModel.get_total_deaths(),
+						"reward":dynModel.get_total_reward(),
+					})
+
 pd.DataFrame(results).to_csv("simulations.csv")
 

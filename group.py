@@ -30,9 +30,10 @@ def n_contacts(group_g, group_h, alphas, mixing_method):
 
 
 class DynamicalModel:
-	def __init__(self, parameters, econ_params, initialization, dt, time_steps, mixing_method, transport_lb_work_fraction = 0 , extra_data = False):
+	def __init__(self, parameters, econ_params, experiment_params, initialization, dt, time_steps, mixing_method, transport_lb_work_fraction = 0 , extra_data = False):
 		self.parameters = parameters
 		self.econ_params = econ_params
+		self.experiment_params = experiment_params
 		self.t = 0
 		self.dt = dt
 		self.time_steps = time_steps
@@ -56,7 +57,7 @@ class DynamicalModel:
 
 		# Fix number of beds and icus
 		self.beds = self.parameters['global-parameters']['C_H']
-		self.icus = self.parameters['global-parameters']['C_ICU']
+		self.icus = self.experiment_params['icus']
 
 		# Initialize objective values
 		self.economic_values = [float("nan")]
@@ -111,7 +112,7 @@ class DynamicalModel:
 
 
 		deaths = sum([group.D[self.t+1]-group.D[self.t] for name,group in self.groups.items()])
-		deaths_value = sum([(group.D[self.t+1]-group.D[self.t])*(self.econ_params["econ_cost_death"][name]+self.econ_params["xi"]) for name,group in self.groups.items()])
+		deaths_value = sum([(group.D[self.t+1]-group.D[self.t])*(self.econ_params["econ_cost_death"][name]+self.experiment_params["xi"]) for name,group in self.groups.items()])
 		economic_value = self.get_economic_value(state, alphas)
 		reward = economic_value - deaths_value
 		result = {
@@ -238,16 +239,16 @@ class DynamicalModel:
 					)
 					for activity in econ_activities 
 				]
-			)*(state[group]["S"] + state[group]["E"] + state[group]["R"])* self.dt/365
+			)*(state[age_group]["S"] + state[age_group]["E"] + state[age_group]["R"])* self.dt
 			# Add contribution of people fully recovered
 			v_employment += sum(
 				[
 					self.econ_params["employment_params"]["v"][age_group][activity]
 					for activity in econ_activities 
 				]
-			)*state[group]["Rq"]* self.dt/365
+			)*state[age_group]["Rq"]* self.dt
 			# Add schooling contributions
-			v_schooling += self.econ_params['schooling_params'][age_group]*alphas[age_group]["school"]* self.dt/365
+			v_schooling += self.experiment_params['delta_schooling']*self.econ_params['schooling_params'][age_group]*alphas[age_group]["school"]* self.dt
 
 		return v_employment + v_schooling
 
