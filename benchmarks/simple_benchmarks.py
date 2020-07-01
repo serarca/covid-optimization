@@ -55,7 +55,7 @@ params_to_try = {
 	"delta_schooling":[0.5],
 	"xi":[1 * 37199.03, 30 * 37199.03],
 	"icus":[2000,2500],
-	"tests":[0,60000],
+	"tests":[0,30000],
 	"testing":["homogeneous"]+age_groups
 }
 results = []
@@ -116,7 +116,7 @@ for delta in params_to_try["delta_schooling"]:
 
 
 
-# Now we benchmark government full lockdown 
+# Now we benchmark government full lockdown
 alphas={ag:gov_policy[start_lockdown_day] for ag in age_groups}
 
 
@@ -156,7 +156,7 @@ for delta in params_to_try["delta_schooling"]:
 
 
 
-# Now we benchmark zero full lockdown 
+# Now we benchmark zero full lockdown
 alphas={ag:{
 	"home": 1.0,
 	"leisure": 0.0,
@@ -248,4 +248,3 @@ for delta in params_to_try["delta_schooling"]:
 					})
 
 pd.DataFrame(results).to_csv("simulations.csv")
-

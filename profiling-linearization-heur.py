@@ -19,7 +19,11 @@ import math
 import pprint
 from time import time
 
+import pickle
+import pandas as pd
 import logging
+
+from joblib import Parallel, delayed
 
 ############### PROFILING CODE ##################
 
@@ -40,7 +44,7 @@ def log_execution_time(function):
 ##################################################
 
 # @log_execution_time
-def run_linearization_heuristic(simulation_params):
+def run_linearization_heuristic(simulation_params, experiment_params):
 
     start_time = time()
 
@@ -57,20 +61,24 @@ def run_linearization_heuristic(simulation_params):
         universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
         # Read initialization
-    with open("initialization/initialization.yaml") as file:
+    with open("initialization/fitted.yaml") as file:
         # The FullLoader parameter handles the conversion from YAML
         # scalar values to Python the dictionary format
         initialization = yaml.load(file, Loader=yaml.FullLoader)
+    # Read econ parameters
+
+    with open("parameters/econ.yaml") as file:
+        econ_params = yaml.load(file, Loader=yaml.FullLoader)
 
     # Percentage infected at time 0
     perc_infected = simulation_params['perc_infected']
     # Move population to infected (without this there is no epidem.)
     for group in initialization:
-    	change = initialization[group]["S"]*perc_infected/100
-    	initialization[group]["S"] = initialization[group]["S"] - change
-    	initialization[group]["I"] = initialization[group]["I"] + change
+        change = initialization[group]["S"]*perc_infected/100
+        initialization[group]["S"] = initialization[group]["S"] - change
+        initialization[group]["I"] = initialization[group]["I"] + change
 
-    dynModel = DynamicalModel(universe_params, initialization, simulation_params['dt'], num_time_periods, mixing_method, simulation_params['transport_lb_work_fraction'])
+    dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], num_time_periods, mixing_method, simulation_params['transport_lb_work_fraction'])
 
     # add parameters for testing capacity
     dynModel.parameters['global-parameters']['C_mtest'] = simulation_params['mtest_cap']
@@ -95,35 +103,85 @@ def main():
     #     filename=f'profiling-linearized-heuristic/profiling-logging.txt',
     #     format='%(message)s')
 
-    regions = ['Ile-de-France']
+    params_to_try = {
+        "delta_schooling":[0.5],
+        "xi":[1 * 37199.03, 30 * 37199.03],
+        "icus":[2000,2500],
+        "tests":[0,60000],
+    }
+    regions = ['fitted']
     # 'testing_5_groups']
     # 'Testing-group', 'Ile-de-France']
-    for region in regions:
-        for n_days in [180]:
-            # logging.critical(f'{region}, {n_days}')
+    n_days = 180
+    region = 'fitted'
 
-            simulation_params_linearization = {
-                'dt':1.0,
-                'region': region,
-                'quar_freq': 1,
-                'num_days' : n_days,
-                'initial_infected_count' : 1,
-                'perc_infected' : 10,
-                'mixing_method' : {
-                    "name":"mult",
-                    "param_alpha":1.0,
-                    "param_beta":0.5,},
-                'mtest_cap' : 100,
-                'atest_cap' : 100,
-                'work_full_lockdown_factor' : 0.24,
-                'heuristic': 'linearization',
-                'transport_lb_work_fraction': 0.25
-            }
+    Parallel(n_jobs=8)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region)
+    for delta in params_to_try["delta_schooling"]
+    for xi in params_to_try["xi"]
+    for icus in params_to_try["icus"]
+    for tests in params_to_try["tests"])
 
-            dynModel_linearization_heur = run_linearization_heuristic(simulation_params_linearization)
-            # logging.critical('*')
+    load_pickles_and_create_csv(n_days, params_to_try)
 
-    # plot_logging('profiling-linearized-heuristic/profiling-logging.txt')
+def run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region):
+
+    experiment_params = {
+        'delta_schooling':delta,
+        'xi':xi,
+        'icus':icus,
+    }
+    # logging.critical(f'{region}, {n_days}')
+
+    simulation_params_linearization = {
+        'dt':1.0,
+        'region': region,
+        'quar_freq': 1,
+        'num_days' : n_days,
+        'initial_infected_count' : 1,
+        'perc_infected' : 10,
+        'mixing_method' : {
+            "name":"mult",
+            "param_alpha":1.0,
+            "param_beta":0.5,},
+        'mtest_cap' : 100,
+        'atest_cap' : 100,
+        'work_full_lockdown_factor' : 0.24,
+        'heuristic': 'linearization',
+        'transport_lb_work_fraction': 0.25
+    }
+
+    dynModel_linearization_heur = run_linearization_heuristic(simulation_params_linearization, experiment_params)
+    # logging.critical('*')
+
+    pickle.dump(dynModel_linearization_heur,open(f"linearization_heuristic_dyn_models/dynModel_linHeur_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","wb"))
+
+
+def load_pickles_and_create_csv(n_days, params_to_try):
+    results = []
+    for delta in params_to_try["delta_schooling"]:
+        for xi in params_to_try["xi"]:
+            for icus in params_to_try["icus"]:
+                for tests in params_to_try["tests"]:
+
+                    dynModel = pickle.load(open(f"linearization_heuristic_dyn_models/dynModel_linHeur_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","rb"))
+
+                    results.append({
+                        "heuristic":"linearization_heuristic",
+                        "delta_schooling":delta,
+                        "xi":xi,
+                        "icus":icus,
+                        "tests":tests,
+                        "testing":"linearization_heuristic",
+                        "economics_value":dynModel.get_total_economic_value(),
+                        "deaths":dynModel.get_total_deaths(),
+                        "reward":dynModel.get_total_reward(),
+                    })
+
+    pd.DataFrame(results).to_csv("linearization_heuristic_dyn_models/linearization_heuristic_results.csv")
+
+
+
+
 
 def plot_logging(file):
     number_of_groups = []
