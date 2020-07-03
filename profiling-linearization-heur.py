@@ -105,9 +105,9 @@ def main():
 
     params_to_try = {
         "delta_schooling":[0.5],
-    	"xi":[1 * 37199.03, 30 * 37199.03],
-    	"icus":[2000,2500],
-    	"tests":[0,30000]
+        "xi":[1 * 37199.03, 30 * 37199.03],
+        "icus":[2000,2500],
+        "tests":[0,30000]
     }
     regions = ['fitted']
     # 'testing_5_groups']
@@ -116,11 +116,13 @@ def main():
     final_time_step = 90
     region = 'fitted'
 
-    Parallel(n_jobs=8)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region)
-    for delta in params_to_try["delta_schooling"]
-    for xi in params_to_try["xi"]
-    for icus in params_to_try["icus"]
-    for tests in params_to_try["tests"])
+    # Parallel(n_jobs=8)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region)
+    # for delta in params_to_try["delta_schooling"]
+    # for xi in params_to_try["xi"]
+    # for icus in params_to_try["icus"]
+    # for tests in params_to_try["tests"])
+
+    run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try, simulation_params)
 
     # load_pickles_and_create_csv(n_days, params_to_try, final_time_step)
 
@@ -177,28 +179,89 @@ def run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region):
     pickle.dump(dynModel_linearization_heur,open(f"linearization_heuristic_dyn_models/dynModel_linHeur_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","wb"))
 
 
+
+def run_dyn_model_with_no_bouncing_and_pickle(pickled_dyn_model):
+
+    dynModel = pickle.load(open(pickled_dyn_model))
+
+    n_days = dynModel.num_days * dynModel.dt
+    delta = dynModel.experiment_params['delta_schooling']
+    xi = dynModel.experiment_params['xi']
+    icus = dynModel.icus
+    tests = dynModel.parameters['global-parameters']['C_mtest']
+
+    experiment_params = {
+        'delta_schooling':delta,
+        'xi':xi,
+        'icus':icus,
+    }
+    # logging.critical(f'{region}, {n_days}')
+
+    simulation_params_linearization = {
+        'dt':1.0,
+        'region': region,
+        'quar_freq': 1,
+        'num_days' : n_days,
+        'initial_infected_count' : 1,
+        'perc_infected' : 10,
+        'mixing_method' : {
+            "name":"mult",
+            "param_alpha":1.0,
+            "param_beta":0.5,},
+        'mtest_cap' : tests,
+        'atest_cap' : tests,
+        'work_full_lockdown_factor' : 0.24,
+        'heuristic': 'linearization',
+        'transport_lb_work_fraction': 0.25
+    }
+
+    lockdowns = dynModel.lockdown_controls
+    m_tests_cont = dynModel.m_tests_controls
+    a_tests_cont = dynModel.a_tests_controls
+
+    dynModel.reset_time(0)
+    dynModel.simulate(m_tests_cont, a_tests_cont, lockdowns)
+
+
+    pickle.dump(dynModel_linearization_heur,open(f"linearization_heuristic_dyn_models/dynModel_linHeur-Prop_Bouncing-_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","wb"))
+
+
+
+
+
 def load_pickles_and_create_csv(n_days, params_to_try, final_time_step):
     results = []
     for delta in params_to_try["delta_schooling"]:
         for xi in params_to_try["xi"]:
             for icus in params_to_try["icus"]:
                 for tests in params_to_try["tests"]:
+                    for heur in ["","-Prop_Bouncing-"]
+                        dynModel = pickle.load(open(f"linearization_heuristic_dyn_models/dynModel_linHeur{heur}_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","rb"))
 
-                    dynModel = pickle.load(open(f"linearization_heuristic_dyn_models/dynModel_linHeur_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","rb"))
-
-                    results.append({
-                        "heuristic":"linearization_heuristic",
-                        "delta_schooling":delta,
-                        "xi":xi,
-                        "icus":icus,
-                        "tests":tests,
-                        "testing":"linearization_heuristic",
-                        "economics_value":dynModel.get_total_economic_value(final_time_step),
-                        "deaths":dynModel.get_total_deaths(final_time_step),
-                        "reward":dynModel.get_total_reward(final_time_step),
-                    })
+                        results.append({
+                            "heuristic":f"linearization_heuristic{heur}",
+                            "delta_schooling":delta,
+                            "xi":xi,
+                            "icus":icus,
+                            "tests":tests,
+                            "testing":"linearization_heuristic",
+                            "economics_value":dynModel.get_total_economic_value(final_time_step),
+                            "deaths":dynModel.get_total_deaths(final_time_step),
+                            "reward":dynModel.get_total_reward(final_time_step),
+                        })
 
     pd.DataFrame(results).to_excel("linearization_heuristic_dyn_models/linearization_heuristic_results.xlsx")
+
+def run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try, simulation_params):
+    for delta in params_to_try["delta_schooling"]:
+        for xi in params_to_try["xi"]:
+            for icus in params_to_try["icus"]:
+                for tests in params_to_try["tests"]:
+                    pickled_dyn_model = f"linearization_heuristic_dyn_models/dynModel_linHeur_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","rb")
+
+                    run_dyn_model_with_no_bouncing_and_pickle(pickled_dyn_model)
+
+
 
 def unpickle_plot_and_print_results(n_days, params_to_try, simulation_params):
     ##############################################################################
@@ -271,47 +334,47 @@ def unpickle_plot_and_print_results(n_days, params_to_try, simulation_params):
                     groups = sorted(groups)
                     fig = plt.figure()
                     for i,group in enumerate(groups):
-                    	plt.subplot(13,len(groups),i+1)
-                    	plt.plot(time_axis, dynModel.groups[group].S, label="Susceptible")
-                    	plt.title(group)
-                    	plt.legend(loc='upper right')
-                    	plt.ylim(-1,np.max([np.max(dynModel.groups[group].S) for group in groups]))
+                        plt.subplot(13,len(groups),i+1)
+                        plt.plot(time_axis, dynModel.groups[group].S, label="Susceptible")
+                        plt.title(group)
+                        plt.legend(loc='upper right')
+                        plt.ylim(-1,np.max([np.max(dynModel.groups[group].S) for group in groups]))
 
                     for i,group in enumerate(groups):
-                    	plt.subplot(13,len(groups),i+1+len(groups))
-                    	plt.plot(time_axis, dynModel.groups[group].E, label="Exposed")
-                    	plt.plot(time_axis, dynModel.groups[group].I, label="Infected")
-                    	plt.legend(loc='upper right')
-                    	plt.ylim(-1,np.max([max(np.max(dynModel.groups[group].E),np.max(dynModel.groups[group].I)) for group in groups]))
+                        plt.subplot(13,len(groups),i+1+len(groups))
+                        plt.plot(time_axis, dynModel.groups[group].E, label="Exposed")
+                        plt.plot(time_axis, dynModel.groups[group].I, label="Infected")
+                        plt.legend(loc='upper right')
+                        plt.ylim(-1,np.max([max(np.max(dynModel.groups[group].E),np.max(dynModel.groups[group].I)) for group in groups]))
 
                     for i,group in enumerate(groups):
-                    	plt.subplot(13,len(groups),i+1+len(groups)*2)
-                    	plt.plot(time_axis, dynModel.groups[group].R, label="Recovered")
-                    	plt.ylim(-1,np.max([np.max(dynModel.groups[group].R) for group in groups]))
-                    	plt.legend(loc='upper right')
+                        plt.subplot(13,len(groups),i+1+len(groups)*2)
+                        plt.plot(time_axis, dynModel.groups[group].R, label="Recovered")
+                        plt.ylim(-1,np.max([np.max(dynModel.groups[group].R) for group in groups]))
+                        plt.legend(loc='upper right')
 
                     for i,group in enumerate(groups):
-                    	plt.subplot(13,len(groups),i+1+len(groups)*3)
-                    	plt.plot(time_axis, dynModel.groups[group].Rq, label="Recovered Q")
-                    	plt.ylim(-1,np.max([np.max(dynModel.groups[group].Rq) for group in groups]))
-                    	plt.legend(loc='upper right')
+                        plt.subplot(13,len(groups),i+1+len(groups)*3)
+                        plt.plot(time_axis, dynModel.groups[group].Rq, label="Recovered Q")
+                        plt.ylim(-1,np.max([np.max(dynModel.groups[group].Rq) for group in groups]))
+                        plt.legend(loc='upper right')
 
                     for i,group in enumerate(groups):
-                    	plt.subplot(13,len(groups),i+1+len(groups)*4)
-                    	plt.plot(time_axis, dynModel.groups[group].Ia, label="Infected A-Q")
-                    	plt.plot(time_axis, dynModel.groups[group].Ips, label="Infected PS-Q")
-                    	plt.plot(time_axis, dynModel.groups[group].Ims, label="Infected MS-Q")
-                    	plt.plot(time_axis, dynModel.groups[group].Iss, label="Infected SS-Q")
-                    	plt.ylim(-1,np.max([max(np.max(dynModel.groups[group].Ia),np.max(dynModel.groups[group].Ips),np.max(dynModel.groups[group].Ims),np.max(dynModel.groups[group].Iss)) for group in groups]))
-                    	plt.legend(loc='upper right')
+                        plt.subplot(13,len(groups),i+1+len(groups)*4)
+                        plt.plot(time_axis, dynModel.groups[group].Ia, label="Infected A-Q")
+                        plt.plot(time_axis, dynModel.groups[group].Ips, label="Infected PS-Q")
+                        plt.plot(time_axis, dynModel.groups[group].Ims, label="Infected MS-Q")
+                        plt.plot(time_axis, dynModel.groups[group].Iss, label="Infected SS-Q")
+                        plt.ylim(-1,np.max([max(np.max(dynModel.groups[group].Ia),np.max(dynModel.groups[group].Ips),np.max(dynModel.groups[group].Ims),np.max(dynModel.groups[group].Iss)) for group in groups]))
+                        plt.legend(loc='upper right')
 
                     for i,group in enumerate(groups):
-                    	plt.subplot(13,len(groups),i+1+len(groups)*5)
-                    	plt.plot(time_axis, dynModel.groups[group].H, label="Hospital")
-                    	plt.plot(time_axis, dynModel.groups[group].ICU, label="ICU")
-                    	plt.plot(time_axis, dynModel.groups[group].D, label="Dead")
-                    	plt.ylim(-1,np.max([max(np.max(dynModel.groups[group].H),np.max(dynModel.groups[group].ICU),np.max(dynModel.groups[group].D)) for group in groups]))
-                    	plt.legend(loc='upper right')
+                        plt.subplot(13,len(groups),i+1+len(groups)*5)
+                        plt.plot(time_axis, dynModel.groups[group].H, label="Hospital")
+                        plt.plot(time_axis, dynModel.groups[group].ICU, label="ICU")
+                        plt.plot(time_axis, dynModel.groups[group].D, label="Dead")
+                        plt.ylim(-1,np.max([max(np.max(dynModel.groups[group].H),np.max(dynModel.groups[group].ICU),np.max(dynModel.groups[group].D)) for group in groups]))
+                        plt.legend(loc='upper right')
 
 
                     for i,group in enumerate(groups):
@@ -336,11 +399,11 @@ def unpickle_plot_and_print_results(n_days, params_to_try, simulation_params):
                         plt.legend(loc='upper right')
 
                     for i,group in enumerate(groups):
-                    	plt.subplot(13,len(groups),i+1+len(groups)*8)
-                    	plt.plot(time_axis_controls, dynModel.groups[group].B_H, label="Bounced H")
-                    	plt.plot(time_axis_controls, dynModel.groups[group].B_ICU, label="Bounced ICU")
-                    	plt.ylim(-1,np.max([max(np.max(dynModel.groups[group].B_H),np.max(dynModel.groups[group].B_ICU)) for group in groups]))
-                    	plt.legend(loc='upper right')
+                        plt.subplot(13,len(groups),i+1+len(groups)*8)
+                        plt.plot(time_axis_controls, dynModel.groups[group].B_H, label="Bounced H")
+                        plt.plot(time_axis_controls, dynModel.groups[group].B_ICU, label="Bounced ICU")
+                        plt.ylim(-1,np.max([max(np.max(dynModel.groups[group].B_H),np.max(dynModel.groups[group].B_ICU)) for group in groups]))
+                        plt.legend(loc='upper right')
 
                     plt.subplot(13,2,19)
                     #plt.plot(time_axis, [sum([dynModel.groups[group].H[i] for group in groups]) for i in range(len(time_axis))], label="Total Hospital Beds")
