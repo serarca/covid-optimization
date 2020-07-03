@@ -724,7 +724,7 @@ def calculate_M_gamma_and_eta(dynModel):
         v_g_ones = v_g_schooling_ones + v_g_employment_ones
 
         vg_life_employment = dynModel.econ_params["econ_cost_death"][age_groups[ag]]
-        chi = dynModel.experiment_params["xi"]
+        xi = dynModel.experiment_params["xi"]
 
 
         # Matrix M should have only non-zero entries in the rows
@@ -795,7 +795,7 @@ def calculate_M_gamma_and_eta(dynModel):
         # Vector eta should have only nonzero elements in the
         # columns corresponding to D_g. We assume here that D(0)=0
         # but this should not change the decisions of the heur.
-        eta[Dg_idx] = -(vg_life_employment + chi)
+        eta[Dg_idx] = -(vg_life_employment + xi)
 
     return M, gamma, eta
 
