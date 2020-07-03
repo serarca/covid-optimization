@@ -117,10 +117,10 @@ def main():
     region = 'fitted'
 
     Parallel(n_jobs=8)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region)
-    # for delta in params_to_try["delta_schooling"]
-    # for xi in params_to_try["xi"]
-    # for icus in params_to_try["icus"]
-    # for tests in params_to_try["tests"])
+    for delta in params_to_try["delta_schooling"]
+    for xi in params_to_try["xi"]
+    for icus in params_to_try["icus"]
+    for tests in params_to_try["tests"])
 
     # load_pickles_and_create_csv(n_days, params_to_try, final_time_step)
 
