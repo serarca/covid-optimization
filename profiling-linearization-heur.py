@@ -122,9 +122,9 @@ def main():
     # for icus in params_to_try["icus"]
     # for tests in params_to_try["tests"])
 
-    run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try, simulation_params)
 
-    # load_pickles_and_create_csv(n_days, params_to_try, final_time_step)
+
+
 
     simulation_params_linearization = {
         'dt':1.0,
@@ -144,7 +144,11 @@ def main():
         'transport_lb_work_fraction': 0.25
     }
 
+    run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try, simulation_params_linearization)
+
     # unpickle_plot_and_print_results(n_days, params_to_try, simulation_params_linearization)
+
+    load_pickles_and_create_csv(n_days, params_to_try, final_time_step)
 
 def run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region):
 
@@ -182,9 +186,9 @@ def run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region):
 
 def run_dyn_model_with_no_bouncing_and_pickle(pickled_dyn_model):
 
-    dynModel = pickle.load(open(pickled_dyn_model))
+    dynModel = pickle.load(open(pickled_dyn_model,"rb"))
 
-    n_days = dynModel.num_days * dynModel.dt
+    n_days = int(dynModel.time_steps * dynModel.dt)
     delta = dynModel.experiment_params['delta_schooling']
     xi = dynModel.experiment_params['xi']
     icus = dynModel.icus
@@ -199,7 +203,7 @@ def run_dyn_model_with_no_bouncing_and_pickle(pickled_dyn_model):
 
     simulation_params_linearization = {
         'dt':1.0,
-        'region': region,
+        'region': 'fitted',
         'quar_freq': 1,
         'num_days' : n_days,
         'initial_infected_count' : 1,
@@ -223,7 +227,7 @@ def run_dyn_model_with_no_bouncing_and_pickle(pickled_dyn_model):
     dynModel.simulate(m_tests_cont, a_tests_cont, lockdowns)
 
 
-    pickle.dump(dynModel_linearization_heur,open(f"linearization_heuristic_dyn_models/dynModel_linHeur-Prop_Bouncing-_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","wb"))
+    pickle.dump(dynModel,open(f"linearization_heuristic_dyn_models/dynModel_linHeur_Prop_Bouncing_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","wb"))
 
 
 
@@ -235,7 +239,7 @@ def load_pickles_and_create_csv(n_days, params_to_try, final_time_step):
         for xi in params_to_try["xi"]:
             for icus in params_to_try["icus"]:
                 for tests in params_to_try["tests"]:
-                    for heur in ["","-Prop_Bouncing-"]
+                    for heur in ["","_Prop_Bouncing"]:
                         dynModel = pickle.load(open(f"linearization_heuristic_dyn_models/dynModel_linHeur{heur}_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","rb"))
 
                         results.append({
@@ -257,7 +261,7 @@ def run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try, simulation_pa
         for xi in params_to_try["xi"]:
             for icus in params_to_try["icus"]:
                 for tests in params_to_try["tests"]:
-                    pickled_dyn_model = f"linearization_heuristic_dyn_models/dynModel_linHeur_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","rb")
+                    pickled_dyn_model = f"linearization_heuristic_dyn_models/dynModel_linHeur_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p"
 
                     run_dyn_model_with_no_bouncing_and_pickle(pickled_dyn_model)
 
