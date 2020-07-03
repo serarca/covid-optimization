@@ -7,7 +7,7 @@ import sys
 from threadpoolctl import threadpool_limits
 import numpy as np
 
-threadpool_limits(limits=4, user_api='blas')
+threadpool_limits(limits=6, user_api='blas')
 
 import pandas as pd
 import math
@@ -725,7 +725,7 @@ def calculate_M_gamma_and_eta(dynModel):
 
         vg_life_employment = dynModel.econ_params["econ_cost_death"][age_groups[ag]]
         xi = dynModel.experiment_params["xi"]
-
+        # print(xi)
 
         # Matrix M should have only non-zero entries in the rows
         # corresponding to the lockdown decisions and the columns
@@ -1175,7 +1175,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
                 u_constr_coeffs[t][constr_index][:,tau-k] = all_constraint_coefs_matrix[constr_index, :]
 
             # coefs for u[t-1], u[t-2], ..., u[k] in the objective
-            u_obj_coeffs[:,tau-k] += d_matrix[:,tau-k] @ At_bar_times_Bt
+            u_obj_coeffs[:,tau-k] += d_matrix[:,t-k] @ At_bar_times_Bt
 
             # Update At_bar for next round
             At_bar[tau-1] = At_bar[tau] @ At[tau]
@@ -1185,7 +1185,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
     At_bar[T-1] = np.eye(Xt_dim,Xt_dim)
     # Add up the contribution of eta * X_T in the coefficients of decision u_t, t = k, ..., T-1
     for tau in range(T-1,k-1,-1):
-        u_obj_coeffs[:,tau-k] += d_matrix[:,tau-k] @ At_bar[tau] @ Bt[tau]
+        u_obj_coeffs[:,tau-k] += d_matrix[:,T-1-k] @ At_bar[tau] @ Bt[tau]
         At_bar[tau-1] = At_bar[tau] @ At[tau]
 
     return u_constr_coeffs, constr_constants, u_obj_coeffs
@@ -1377,6 +1377,7 @@ def run_heuristic_linearization(dynModel):
 
         # print(f"Optimizing model at time k = {k}")
         mod.optimize()
+
 
 
         step_shadow_prices = {}
