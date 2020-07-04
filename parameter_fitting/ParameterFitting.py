@@ -213,7 +213,7 @@ windows['alpha_mixing'] = (0.1,3.0)
 windows['gamma_mixing'] = (0.7,1.3)
 
 
-# In[74]:
+# In[97]:
 
 
 import copy
@@ -225,42 +225,43 @@ def error(v):
     beta_mixing = v[2]
     gamma_mixing = v[3]
     
-    dynModel.mu = v[4]*initial_params["mu"]
-    dynModel.sigma = v[5]*initial_params['sigma']
-    dynModel.p_H = v[6]*initial_params['p_H']
-    dynModel.p_ICU = v[7]*initial_params['p_ICU']
-    dynModel.lambda_H_R = v[8]*initial_params['lambda_H_R']
-    dynModel.lambda_H_D = v[9]*initial_params['lambda_H_D']
-    dynModel.lambda_ICU_R = v[10]*initial_params['lambda_ICU_R']
-    dynModel.lambda_ICU_D = v[11]*initial_params['lambda_ICU_D']
+    dynModel.mu = np.array(v[4:13])
+    dynModel.sigma = np.array(v[13:22])
+    dynModel.p_H = np.array(v[22:31])
+    dynModel.p_ICU = np.array(v[31:40])
+    dynModel.lambda_H_R = np.array(v[40:49])
+    dynModel.lambda_H_D = np.array(v[49:58])
+    dynModel.lambda_ICU_R = np.array(v[58:67])
+    dynModel.lambda_ICU_D = np.array(v[67:76])
 
-    upper_bound = v[12]
     
-    delta_transport = v[13]
-    delta_school = v[14]
+    upper_bound = v[76]
+    
+    delta_transport = v[77]
+    delta_school = v[78]
 
-    leisure_1 = v[15]
-    leisure_2 = v[16]
-    leisure_3 = v[17]
-    leisure_4 = v[18]
-    leisure_5 = v[19]
+    leisure_1 = v[79]
+    leisure_2 = v[80]
+    leisure_3 = v[81]
+    leisure_4 = v[82]
+    leisure_5 = v[83]
     leisure_denom = leisure_1+leisure_2+leisure_3+leisure_4+leisure_5
 
-    other_1 = v[20]
-    other_2 = v[21]
-    other_3 = v[22]
-    other_4 = v[23]
-    other_5 = v[24]
+    other_1 = v[84]
+    other_2 = v[85]
+    other_3 = v[86]
+    other_4 = v[87]
+    other_5 = v[88]
     other_denom = other_1+other_2+other_3+other_4+other_5
     
-    work_1 = v[25]
-    work_2 = v[26]
-    work_3 = v[27]
-    work_4 = v[28]
-    work_5 = v[29]
+    work_1 = v[89]
+    work_2 = v[90]
+    work_3 = v[91]
+    work_4 = v[92]
+    work_5 = v[93]
     work_denom = work_1+work_2+work_3+work_4+work_5
 
-    initial = v[30:39]
+    initial = v[94:103]
     
     # Construct initialization
     initialization = copy.deepcopy(original_initialization)
@@ -455,7 +456,7 @@ def error(v):
     error = error_beds_total
     error = mult_icus*error_icus_total
     error = mult_deaths*error_deaths_total
-    error = (error_beds_total + mult_icus*error_icus_total + mult_deaths*error_deaths_total)/3
+    error = (error_beds_total + mult_icus*error_icus_total*3 + mult_deaths*error_deaths_total)/3
     
     global best_error
     global best_v
@@ -469,15 +470,21 @@ def error(v):
 
 
 
-# In[75]:
+# In[98]:
 
 
 from scipy.optimize import minimize, Bounds, shgo, differential_evolution
 epsilon = 0.1
 result = differential_evolution(error, [(30,120),
-                                        windows['alpha_mixing'],windows['beta_mixing'],windows['gamma_mixing'],
-                                        windows['mu'],windows['sigma'],windows['p_H'],windows['p_ICU'],
-                                        windows['lambda_H_R'],windows['lambda_H_D'],windows['lambda_ICU_R'],windows['lambda_ICU_D']]+
+                                        windows['alpha_mixing'],windows['beta_mixing'],windows['gamma_mixing']]+
+                                        list(zip(
+                                            list(lower_params['mu'])+list(lower_params['sigma'])+list(lower_params['p_H'])+
+                                            list(lower_params['p_ICU'])+list(lower_params['lambda_H_R'])+list(lower_params['lambda_H_D'])+
+                                            list(lower_params['lambda_ICU_R'])+list(lower_params['lambda_ICU_D']),
+                                            list(upper_params['mu'])+list(upper_params['sigma'])+list(upper_params['p_H'])+
+                                            list(upper_params['p_ICU'])+list(upper_params['lambda_H_R'])+list(upper_params['lambda_H_D'])+
+                                            list(upper_params['lambda_ICU_R'])+list(upper_params['lambda_ICU_D'])
+                                        ))+
                                         [(0,1)]*18+[(0,2)]*9)
 
 
@@ -741,7 +748,22 @@ def error_grad(v):
 
 
 
-# In[77]:
+# In[84]:
+
+
+best_v = [5.15096166e+01, 1.77964781e+00, 1.43917742e+00, 1.28394332e+00,
+ 1.09829204e+00, 1.11440823e+00, 1.51229954e+00, 6.21574802e-01,
+ 9.76971066e-01, 9.57635029e-01, 1.02555720e+00, 9.68958707e-01,
+ 9.93369883e-01, 7.29547284e-01, 7.65882787e-01, 1.64308950e-02,
+ 7.40438932e-01, 8.16835480e-01, 9.15655600e-01, 6.64824377e-01,
+ 1.66077079e-01, 4.92378452e-01, 7.78097356e-01, 3.93167073e-01,
+ 5.38851209e-01, 5.92582542e-04, 4.49415795e-01, 6.41830395e-01,
+ 3.11477417e-01, 2.75094617e-01, 1.23721133e+00, 1.84373432e+00,
+ 2.88405513e-01, 1.40810587e+00, 1.27573252e+00, 9.34587622e-01,
+ 4.91067414e-01, 7.59348380e-01, 1.13745465e+00]
+
+
+# In[85]:
 
 
 v0 = (list(best_v[0:4]) + list(best_v[4]*initial_params["mu"]) + list(best_v[5]*initial_params['sigma']) + list(best_v[6]*initial_params['p_H'])+
@@ -750,7 +772,7 @@ v0 = (list(best_v[0:4]) + list(best_v[4]*initial_params["mu"]) + list(best_v[5]*
 error_grad(v0)
 
 
-# In[78]:
+# In[86]:
 
 
 lb= ([30,windows['alpha_mixing'][0],windows['beta_mixing'][0],windows['gamma_mixing'][0]]+
@@ -766,7 +788,7 @@ for i in range(len(v0)):
     assert(ub[i]>=v0[i])
 
 
-# In[79]:
+# In[87]:
 
 
 from scipy.optimize import minimize, Bounds, shgo, differential_evolution
@@ -782,7 +804,7 @@ result = minimize(error_grad, v0, bounds = bounds)
 
 
 
-# In[80]:
+# In[88]:
 
 
 v = best_v_grad
@@ -1030,7 +1052,7 @@ error = (error_beds_total + mult_icus*error_icus_total + mult_deaths*error_death
 print(error)
 
 
-# In[81]:
+# In[89]:
 
 
 get_ipython().run_line_magic('matplotlib', 'inline')
@@ -1040,7 +1062,7 @@ plt.plot(days_model, real_data_beds["total"], label="Model L1")
 plt.legend(loc='upper right')
 
 
-# In[82]:
+# In[90]:
 
 
 get_ipython().run_line_magic('matplotlib', 'inline')
@@ -1050,7 +1072,7 @@ plt.plot(days_model, real_data_icus["total"], label="Model L1")
 plt.legend(loc='upper right')
 
 
-# In[83]:
+# In[91]:
 
 
 get_ipython().run_line_magic('matplotlib', 'inline')
