@@ -141,11 +141,11 @@ class DynamicalModel:
 		for n,g in self.groups.items():
 
 			if (B_H[n] > self.dt * g.flow_H()):
-				print('WARNING.group.py() Capping B_H for group {} at time {}'.format(n,time_of_flow))
+				# print('WARNING.group.py() Capping B_H for group {} at time {}'.format(n,time_of_flow))
 				B_H[n] = self.dt * g.flow_H()
 
 			if (B_ICU[n] > self.dt * g.flow_ICU()):
-				print('WARNING. group.py() Capping B_ICU for group {} at time {}'.format(n,time_of_flow))
+				# print('WARNING. group.py() Capping B_ICU for group {} at time {}'.format(n,time_of_flow))
 				B_ICU[n] = self.dt * g.flow_ICU()
 
 
@@ -157,7 +157,7 @@ class DynamicalModel:
 
 		if( remaining_H_patients + total_inflow_H_after_bounce > self.beds * self.dt):
 			# extra bounces done proportionally in each group
-			print("\nWARNING.group.py() Total entering H at t=%d = %.2f > remaining available capacity = %d. Bouncing more, proportionally." %(time_of_flow,total_inflow_H_after_bounce,self.beds * self.dt -remaining_H_patients) )
+			# print("\nWARNING.group.py() Total entering H at t=%d = %.2f > remaining available capacity = %d. Bouncing more, proportionally." %(time_of_flow,total_inflow_H_after_bounce,self.beds * self.dt -remaining_H_patients) )
 
 			extra_bounced = (1+tol) * (remaining_H_patients + total_inflow_H_after_bounce - self.beds * self.dt)
 			for n,g in self.groups.items():
@@ -170,7 +170,7 @@ class DynamicalModel:
 
 		if( remaining_ICU_patients + total_inflow_ICU_after_bounce > self.icus * self.dt ):
 			# extra bounces done proportionally in each group
-			print("\nWARNING.group.py() Total entering ICU at t=%d = %.2f > remaining available capacity = %d. Bouncing more, proportionally." %(time_of_flow,total_inflow_ICU_after_bounce,self.icus * self.dt -remaining_ICU_patients) )
+			# print("\nWARNING.group.py() Total entering ICU at t=%d = %.2f > remaining available capacity = %d. Bouncing more, proportionally." %(time_of_flow,total_inflow_ICU_after_bounce,self.icus * self.dt -remaining_ICU_patients) )
 
 			extra_bounced = (1+tol) * (remaining_ICU_patients + total_inflow_ICU_after_bounce - self.icus * self.dt)
 			for n,g in self.groups.items():
@@ -237,14 +237,14 @@ class DynamicalModel:
 						self.econ_params["employment_params"]["eta"][activity]*np.mean([alphas[ag][activity] for ag in alphas])+
 						self.econ_params["employment_params"]["gamma"][activity]
 					)
-					for activity in econ_activities 
+					for activity in econ_activities
 				]
-			)*(state[age_group]["S"] + state[age_group]["E"] + state[age_group]["R"])* self.dt
+			)*(state[age_group]["S"] + state[age_group]["E"] + state[age_group]["I"] + state[age_group]["R"])* self.dt
 			# Add contribution of people fully recovered
 			v_employment += sum(
 				[
 					self.econ_params["employment_params"]["v"][age_group][activity]
-					for activity in econ_activities 
+					for activity in econ_activities
 				]
 			)*state[age_group]["Rq"]* self.dt
 			# Add schooling contributions
@@ -350,21 +350,27 @@ class DynamicalModel:
 			] for name,group in self.groups.items()])
 		return norm_state.flatten()
 
-	def get_total_deaths(self):
+	def get_total_deaths(self, final_time_step=False):
+		if final_time_step == False:
+			final_time_step = self.time_steps
 		total = 0
-		for t in range(1,self.time_steps+1):
+		for t in range(1,final_time_step+1):
 			total += self.deaths[t]
 		return total
 
-	def get_total_economic_value(self):
+	def get_total_economic_value(self, final_time_step=False):
+		if final_time_step == False:
+			final_time_step = self.time_steps
 		total = 0
-		for t in range(1,self.time_steps+1):
+		for t in range(1,final_time_step+1):
 			total += self.economic_values[t]
 		return total
 
-	def get_total_reward(self):
+	def get_total_reward(self, final_time_step=False):
+		if final_time_step == False:
+			final_time_step = self.time_steps
 		total = 0
-		for t in range(1,self.time_steps+1):
+		for t in range(1,final_time_step+1):
 			total += self.rewards[t]
 		return total
 

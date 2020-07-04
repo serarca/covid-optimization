@@ -7,7 +7,7 @@ import sys
 from threadpoolctl import threadpool_limits
 import numpy as np
 
-threadpool_limits(limits=4, user_api='blas')
+threadpool_limits(limits=6, user_api='blas')
 
 import pandas as pd
 import math
@@ -70,6 +70,7 @@ ut_dim = num_controls * num_age_groups
 
 ####################################
 # Calculate the Jacobian with respect to X (states)
+# @profile
 def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method):
     """ Calculates the Jacobian for a given control trajectory u_hat and corresponding state trajectory X_hat """
     # This assumes that the order of components in X_hat and u_hat is as follows:
@@ -679,16 +680,52 @@ def calculate_M_gamma_and_eta(dynModel):
         # Get all the useful indices for the columns
         Sg_idx = ag*num_compartments + SEIR_groups.index('S_g')
         Eg_idx = ag*num_compartments + SEIR_groups.index('E_g')
+        Ig_idx = ag*num_compartments + SEIR_groups.index('I_g')
         Rg_idx = ag*num_compartments + SEIR_groups.index('R_g')
         Rqg_idx = ag*num_compartments + SEIR_groups.index('Rq_g')
         Dg_idx = ag*num_compartments + SEIR_groups.index('D_g')
 
         LWorkg_idx = ag*num_controls + controls.index('work')
+        LSchoolingg_idx = ag*num_controls + controls.index('school')
+        LOtherg_idx = ag*num_controls + controls.index('other')
+        LTransportg_idx = ag*num_controls + controls.index('transport')
+        LLeisureg_idx = ag*num_controls + controls.index('leisure')
 
         # Rename parameters to make expressions similar to the Latex
-        theta = dynModel.groups[age_groups[ag]].economics['lockdown_fraction']
-        v_NLg = dynModel.groups[age_groups[ag]].economics['work_value']
-        v_Dg = dynModel.groups[age_groups[ag]].economics['death_value']
+
+        vg_other = dynModel.econ_params["employment_params"]["v"][age_groups[ag]]["other"]
+        vg_leisure = dynModel.econ_params["employment_params"]["v"][age_groups[ag]]["leisure"]
+        vg_transport = dynModel.econ_params["employment_params"]["v"][age_groups[ag]]["transport"]
+
+        nu_other = dynModel.econ_params["employment_params"]["nu"]["other"]
+        nu_leisure = dynModel.econ_params["employment_params"]["nu"]["leisure"]
+        nu_transport = dynModel.econ_params["employment_params"]["nu"]["transport"]
+
+        small_eta_other = dynModel.econ_params["employment_params"]["eta"]["other"]
+        small_eta_leisure = dynModel.econ_params["employment_params"]["eta"]["leisure"]
+        small_eta_transport = dynModel.econ_params["employment_params"]["eta"]["transport"]
+
+        school_value_g = dynModel.experiment_params['delta_schooling']*dynModel.econ_params['schooling_params'][age_groups[ag]]
+
+        # number_of_groups = len(dynModel.groups)
+        # assert number_of_groups == len(age_groups)
+
+        small_gamma_other = dynModel.econ_params["employment_params"]["gamma"]["other"]
+        small_gamma_leisure = dynModel.econ_params["employment_params"]["gamma"]["leisure"]
+        small_gamma_transport = dynModel.econ_params["employment_params"]["gamma"]["transport"]
+
+        v_g_schooling_ones = school_value_g
+        v_g_employment_ones = (
+                                vg_leisure
+                                + vg_other
+                                + vg_transport
+                                )
+
+        v_g_ones = v_g_schooling_ones + v_g_employment_ones
+
+        vg_life_employment = dynModel.econ_params["econ_cost_death"][age_groups[ag]]
+        xi = dynModel.experiment_params["xi"]
+        # print(xi)
 
         # Matrix M should have only non-zero entries in the rows
         # corresponding to the lockdown decisions and the columns
@@ -698,10 +735,44 @@ def calculate_M_gamma_and_eta(dynModel):
         # having the same lockdown we should have
         # (1-theta) * v_NLg  as well in the
         # column corresponding to R^q_g
-        M[LWorkg_idx, Sg_idx] = (1- theta) * v_NLg
-        M[LWorkg_idx, Eg_idx] = (1- theta) * v_NLg
-        M[LWorkg_idx, Rg_idx] = (1- theta) * v_NLg
-        M[LWorkg_idx, Rqg_idx] = 0
+        work_value_g = (vg_leisure * nu_leisure
+                        + vg_other * nu_other
+                        + vg_transport * nu_transport)
+        M[LWorkg_idx, Sg_idx] = work_value_g
+        M[LWorkg_idx, Eg_idx] = work_value_g
+        M[LWorkg_idx, Ig_idx] = work_value_g
+        M[LWorkg_idx, Rg_idx] = work_value_g
+
+        M[LSchoolingg_idx, Sg_idx] = school_value_g
+        M[LSchoolingg_idx, Eg_idx] = school_value_g
+        M[LSchoolingg_idx, Ig_idx] = school_value_g
+        M[LSchoolingg_idx, Rg_idx] = school_value_g
+
+        for ah in range(0,num_age_groups):
+            LOtherh_idx = ah*num_controls + controls.index('other')
+            LTransporth_idx = ah*num_controls + controls.index('transport')
+            LLeisureh_idx = ah*num_controls + controls.index('leisure')
+
+            other_value_g = vg_other * small_eta_other * (1/num_age_groups)
+            M[LOtherh_idx, Sg_idx] = other_value_g
+            M[LOtherh_idx, Eg_idx] = other_value_g
+            M[LOtherh_idx, Ig_idx] = other_value_g
+            M[LOtherh_idx, Rg_idx] = other_value_g
+
+            leisure_value_g = vg_leisure * small_eta_leisure * (1/num_age_groups)
+            M[LLeisureh_idx, Sg_idx] = leisure_value_g
+            M[LLeisureh_idx, Eg_idx] = leisure_value_g
+            M[LLeisureh_idx, Ig_idx] = leisure_value_g
+            M[LLeisureh_idx, Rg_idx] = leisure_value_g
+
+            transport_value_g = vg_transport * small_eta_transport * (1/num_age_groups)
+            M[LTransporth_idx, Sg_idx] = transport_value_g
+            M[LTransporth_idx, Eg_idx] = transport_value_g
+            M[LTransporth_idx, Ig_idx] = transport_value_g
+            M[LTransporth_idx, Rg_idx] = transport_value_g
+
+
+
 
         # Vector gamma should have only nonzero elements in the
         # columns corresponding to states S_g E_g R_g and R^q
@@ -709,15 +780,22 @@ def calculate_M_gamma_and_eta(dynModel):
         # lockdown. If we want to implement the obj with R^q being
         # in lockdown, we should have v_NLg * theta in the
         # column corresponding to R^q_g
-        gamma[Sg_idx] = v_NLg * theta
-        gamma[Eg_idx] = v_NLg * theta
-        gamma[Rg_idx] = v_NLg * theta
-        gamma[Rqg_idx] = v_NLg
+        baseline_economic_values = (
+                        vg_leisure * small_gamma_leisure
+                        + vg_other * small_gamma_other
+                        + vg_transport * small_gamma_transport
+                        )
+        gamma[Sg_idx] = baseline_economic_values
+        gamma[Eg_idx] = baseline_economic_values
+        gamma[Ig_idx] = baseline_economic_values
+        gamma[Rg_idx] = baseline_economic_values
+
+        gamma[Rqg_idx] = v_g_ones
 
         # Vector eta should have only nonzero elements in the
         # columns corresponding to D_g. We assume here that D(0)=0
         # but this should not change the decisions of the heur.
-        eta[Dg_idx] = -v_Dg
+        eta[Dg_idx] = -(vg_life_employment + xi)
 
     return M, gamma, eta
 
@@ -729,7 +807,7 @@ def calculate_M_gamma_and_eta(dynModel):
 # K is stored as a dictionary with a key for every time t
 # The boolean flag 'bounce_existing' determines whether to apply the more relaxed
 # version of the capacity constraints, where existing patients can also be bounced
-def calculate_all_constraints(dynModel, bounce_existing):
+def calculate_all_constraints(dynModel, bounce_existing, h_cap_flag=False):
     """Calculate the matrices Gamma_x, Gamma_u and vectors K(t) that yield all the constraints"""
 
     # shorthand for a few useful parameters
@@ -745,7 +823,7 @@ def calculate_all_constraints(dynModel, bounce_existing):
     # M-tests : 1
     # A-tests: 1
     # lockdown: (number of age groups) x (number of activities)
-    num_constraints = 4 + 2*num_age_groups + num_age_groups*num_activities
+    num_constraints = 3 + 2*num_age_groups
 
     # initialize Gamma_x and Gamma_u matrices with zeros
     Gamma_x = np.zeros((num_constraints, Xt_dim))
@@ -760,39 +838,40 @@ def calculate_all_constraints(dynModel, bounce_existing):
     # also store a string label for each constraint
     all_labels = []
 
-    ######## Constraint for H capacity
-    for ag in range(0,num_age_groups):
+    if h_cap_flag:
+        ######## Constraint for H capacity
+        for ag in range(0,num_age_groups):
 
-        curr_group = dynModel.groups[age_groups[ag]]
+            curr_group = dynModel.groups[age_groups[ag]]
 
-        # Useful indices for elements of Gamma_x
-        Hg_idx = ag*num_compartments + SEIR_groups.index('H_g')
-        Ig_idx = ag*num_compartments + SEIR_groups.index('I_g')
-        Issg_idx = ag*num_compartments + SEIR_groups.index('Iss_g')
-        ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
+            # Useful indices for elements of Gamma_x
+            Hg_idx = ag*num_compartments + SEIR_groups.index('H_g')
+            Ig_idx = ag*num_compartments + SEIR_groups.index('I_g')
+            Issg_idx = ag*num_compartments + SEIR_groups.index('Iss_g')
+            ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
 
-        # Useful indices for elements of Gamma_u
-        BHg_idx = ag*num_controls + controls.index('BounceH_g')
-        BICUg_idx = ag*num_controls + controls.index('BounceICU_g')
+            # Useful indices for elements of Gamma_u
+            BHg_idx = ag*num_controls + controls.index('BounceH_g')
+            BICUg_idx = ag*num_controls + controls.index('BounceICU_g')
 
-        # parameters
-        mu_g = curr_group.parameters['mu']
-        pICU_g = curr_group.parameters['p_ICU']
-        pH_g = curr_group.parameters['p_H']
-        lambda_H_R_g = curr_group.parameters['lambda_H_R']
-        lambda_H_D_g = curr_group.parameters['lambda_H_D']
+            # parameters
+            mu_g = curr_group.parameters['mu']
+            pICU_g = curr_group.parameters['p_ICU']
+            pH_g = curr_group.parameters['p_H']
+            lambda_H_R_g = curr_group.parameters['lambda_H_R']
+            lambda_H_D_g = curr_group.parameters['lambda_H_D']
 
-        Gamma_x[curr_constr,Ig_idx] = mu_g * pH_g
-        Gamma_x[curr_constr,Issg_idx] = mu_g * (pH_g / (pH_g + pICU_g))
-        Gamma_x[curr_constr,Hg_idx] = (1 - lambda_H_R_g - lambda_H_D_g)
+            Gamma_x[curr_constr,Ig_idx] = mu_g * pH_g
+            Gamma_x[curr_constr,Issg_idx] = mu_g * (pH_g / (pH_g + pICU_g))
+            Gamma_x[curr_constr,Hg_idx] = (1 - lambda_H_R_g - lambda_H_D_g)
 
-        Gamma_u[curr_constr,BHg_idx] = -1
+            Gamma_u[curr_constr,BHg_idx] = -1
 
-    # store right-hand-sides K(t) for every time t
-    K[curr_constr,:] = dynModel.parameters['global-parameters']['C_H'] * dynModel.dt
+        # store right-hand-sides K(t) for every time t
+        K[curr_constr,:] = dynModel.parameters['global-parameters']['C_H'] * dynModel.dt
 
-    all_labels += ["H_capacity"]
-    curr_constr += 1
+        all_labels += ["H_capacity"]
+        curr_constr += 1
 
     ################ Constraints for BH, for each age group
     for ag in range(num_age_groups):
@@ -909,16 +988,18 @@ def calculate_all_constraints(dynModel, bounce_existing):
     curr_constr += 1
 
     ################ Constraints for lockdown decisions, for each group and each activity
-    for ag in range(num_age_groups):
+    # for ag in range(num_age_groups):
+    #
+    #     # loop over all activities
+    #     for act in activities:
+    #         Gamma_u[curr_constr,ag * num_controls + controls.index(act)] = 1
+    #
+    #         K[curr_constr,:] = 1  # right-hand-sides
+    #
+    #         all_labels += ["lockdown_%s_%s" %(age_groups[ag],act)]
+    #         curr_constr += 1
 
-        # loop over all activities
-        for act in activities:
-            Gamma_u[curr_constr,ag * num_controls + controls.index(act)] = 1
 
-            K[curr_constr,:] = 1  # right-hand-sides
-
-            all_labels += ["lockdown_%s_%s" %(age_groups[ag],act)]
-            curr_constr += 1
 
     return Gamma_x, Gamma_u, K, all_labels
 
@@ -1094,7 +1175,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
                 u_constr_coeffs[t][constr_index][:,tau-k] = all_constraint_coefs_matrix[constr_index, :]
 
             # coefs for u[t-1], u[t-2], ..., u[k] in the objective
-            u_obj_coeffs[:,tau-k] += d_matrix[:,tau-k] @ At_bar_times_Bt
+            u_obj_coeffs[:,tau-k] += d_matrix[:,t-k] @ At_bar_times_Bt
 
             # Update At_bar for next round
             At_bar[tau-1] = At_bar[tau] @ At[tau]
@@ -1104,7 +1185,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
     At_bar[T-1] = np.eye(Xt_dim,Xt_dim)
     # Add up the contribution of eta * X_T in the coefficients of decision u_t, t = k, ..., T-1
     for tau in range(T-1,k-1,-1):
-        u_obj_coeffs[:,tau-k] += d_matrix[:,tau-k] @ At_bar[tau] @ Bt[tau]
+        u_obj_coeffs[:,tau-k] += d_matrix[:,T-1-k] @ At_bar[tau] @ Bt[tau]
         At_bar[tau-1] = At_bar[tau] @ At[tau]
 
     return u_constr_coeffs, constr_constants, u_obj_coeffs
@@ -1124,7 +1205,7 @@ def run_heuristic_linearization(dynModel):
     T = dynModel.time_steps
     Xt_dim = num_compartments * num_age_groups
     ut_dim = num_controls * num_age_groups
-    num_constraints = 4 + 2*num_age_groups + num_age_groups*num_activities
+    num_constraints = 3 + 2*num_age_groups
 
     # some boolean flags for running the heuristic
     use_bounce_var = True   # whether to use the optimal bounce variables when forecasting the new X_hat
@@ -1168,11 +1249,19 @@ def run_heuristic_linearization(dynModel):
 
     lock_work_idx_all_times = [controls.index('work') + i*num_controls for i in range(T*num_age_groups)]
 
+    lock_other_idx_all_times = [controls.index('other') + i*num_controls for i in range(T*num_age_groups)]
+
+    lock_school_idx_all_times = [controls.index('school') + i*num_controls for i in range(T*num_age_groups)]
+
+    lock_leisure_idx_all_times = [controls.index('leisure') + i*num_controls for i in range(T*num_age_groups)]
+
     lock_transport_idx_all_times = [controls.index('transport') + i*num_controls for i in range(T*num_age_groups)]
+
+    dynModel.shadowPrices = {}
 
     for k in range(T):
 
-        print("\n\n HEURISTIC RUNNING FOR TIME k= {}.".format(k))
+        # print("\n\n HEURISTIC RUNNING FOR TIME k= {}.".format(k))
 
 
         # calculate state trajectory X_hat and corresponging controls new_uhat
@@ -1225,7 +1314,20 @@ def run_heuristic_linearization(dynModel):
                 upper_bounds[i] = 1
                 lower_bounds[i] = 1
             if i in lock_work_idx_all_times:
-                lower_bounds[i] = 0.24
+                # lower_bounds[i] = 0
+                upper_bounds[i] = 1
+            if i in lock_other_idx_all_times:
+                # lower_bounds[i] = 0
+                upper_bounds[i] = 1
+            if i in lock_school_idx_all_times:
+                # lower_bounds[i] = 0
+                upper_bounds[i] = 1
+            if i in lock_leisure_idx_all_times:
+                # lower_bounds[i] = 0
+                upper_bounds[i] = 1
+            if i in lock_transport_idx_all_times:
+                # lower_bounds[i] = 0
+                upper_bounds[i] = 1
 
 
         u_vars_vec = mod.addMVar( np.shape(obj_vec), lb=lower_bounds, ub=upper_bounds, obj=obj_vec, name="u")
@@ -1251,6 +1353,8 @@ def run_heuristic_linearization(dynModel):
 
         mod.addMConstrs(TransportConstMatrix, u_vars_vec, ">", TransportConstRHSVector)
 
+        # weekly_u = []
+
         # mod.addConstrs((u_vars_vec[lock_transport_idx_all_times[i]] >= dynModel.transport_lb_work_fraction * u_vars_vec[lock_work_idx_all_times[i]] for i in range((T-k)*num_age_groups)), name=("transport_lock_lb"))
         #
 
@@ -1264,15 +1368,24 @@ def run_heuristic_linearization(dynModel):
             for con in range(num_constraints):
                 cons_vec = np.reshape(constr_coefs[t][con], (ut_dim * (T-k),), 'F').transpose()
                 ConstMatrix[(t-k) * num_constraints + con, :] = cons_vec
-                ConstRHS[(t-k) * num_constraints + con] = K[con,t] -constr_consts[t][con]
+                ConstRHS[(t-k) * num_constraints + con] = K[con,t] - constr_consts[t][con]
                 # cname = ("%s[t=%d]" %(all_labels[con],t))
                 # expr = (u_vars_vec @ cons_vec) + (constr_consts[t][con])
                 # mod.addConstr((u_vars_vec @ cons_vec) + (constr_consts[t][con]) <= K[con,t], name=cname)
-        mod.addMConstrs(ConstMatrix, u_vars_vec, "<", ConstRHS)
+        all_const = mod.addMConstrs(ConstMatrix, u_vars_vec, "<", ConstRHS)
         # optimize the model
 
-        print(f"Optimizing model at time k = {k}")
+        # print(f"Optimizing model at time k = {k}")
         mod.optimize()
+
+
+
+        step_shadow_prices = {}
+
+        for con in range(num_constraints):
+            step_shadow_prices[all_labels[con]] = all_const[con].Pi
+
+        dynModel.shadowPrices[k] = step_shadow_prices
 
         if( mod.Status ==  gb.GRB.INFEASIBLE ):
             # model was infeasible
