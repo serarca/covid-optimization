@@ -102,8 +102,6 @@ sys.path.insert(0, parentdir+"/heuristics/LP-Models")
 sys.path.insert(0, parentdir+"/fast_gradient")
 
 
-from group import SEIR_group, DynamicalModel
-from heuristics import *
 from fast_group import FastDynamicalModel
 from aux import *
 
