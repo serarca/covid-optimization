@@ -213,7 +213,7 @@ windows['alpha_mixing'] = (0.1,3.0)
 windows['gamma_mixing'] = (0.7,1.3)
 
 
-# In[97]:
+# In[137]:
 
 
 import copy
@@ -456,7 +456,7 @@ def error(v):
     error = error_beds_total
     error = mult_icus*error_icus_total
     error = mult_deaths*error_deaths_total
-    error = (error_beds_total + mult_icus*error_icus_total*3 + mult_deaths*error_deaths_total)/3
+    error = (error_beds_total*1.5 + mult_icus*error_icus_total*3 + 0.5*mult_deaths*error_deaths_total)/3
     
     global best_error
     global best_v
@@ -484,295 +484,53 @@ result = differential_evolution(error, [(30,120),
                                             list(upper_params['mu'])+list(upper_params['sigma'])+list(upper_params['p_H'])+
                                             list(upper_params['p_ICU'])+list(upper_params['lambda_H_R'])+list(upper_params['lambda_H_D'])+
                                             list(upper_params['lambda_ICU_R'])+list(upper_params['lambda_ICU_D'])
-                                        ))+
-                                        [(0,1)]*18+[(0,2)]*9)
+                                        ))+[(0,1),(0.2,1),(0.5,1)]
+                                        [(0,1)]*15+[(0,2)]*9)
 
 
 
-# In[76]:
+# In[139]:
 
 
-best_v_grad = 0
-best_error = float('inf')
-def error_grad(v):
-    days_ahead = v[0]
-    alpha_mixing = v[1]
-    beta_mixing = v[2]
-    gamma_mixing = v[3]
-    
-    dynModel.mu = np.array(v[4:13])
-    dynModel.sigma = np.array(v[13:22])
-    dynModel.p_H = np.array(v[22:31])
-    dynModel.p_ICU = np.array(v[31:40])
-    dynModel.lambda_H_R = np.array(v[40:49])
-    dynModel.lambda_H_D = np.array(v[49:58])
-    dynModel.lambda_ICU_R = np.array(v[58:67])
-    dynModel.lambda_ICU_D = np.array(v[67:76])
-
-    
-    upper_bound = v[76]
-    
-    delta_transport = v[77]
-    delta_school = v[78]
-
-    leisure_1 = v[79]
-    leisure_2 = v[80]
-    leisure_3 = v[81]
-    leisure_4 = v[82]
-    leisure_5 = v[83]
-    leisure_denom = leisure_1+leisure_2+leisure_3+leisure_4+leisure_5
-
-    other_1 = v[84]
-    other_2 = v[85]
-    other_3 = v[86]
-    other_4 = v[87]
-    other_5 = v[88]
-    other_denom = other_1+other_2+other_3+other_4+other_5
-    
-    work_1 = v[89]
-    work_2 = v[90]
-    work_3 = v[91]
-    work_4 = v[92]
-    work_5 = v[93]
-    work_denom = work_1+work_2+work_3+work_4+work_5
-
-    initial = v[94:103]
-    
-    # Construct initialization
-    initialization = copy.deepcopy(original_initialization)
-    for i,group in enumerate(age_groups):
-        initialization[group]["I"] = initialization[group]["I"] + (v[94+i])
-        initialization[group]["S"] = initialization[group]["S"] - (v[94+i])
-        initialization[group]["N"] = initialization[group]["S"] + initialization[group]["E"] + initialization[group]["I"] + initialization[group]["R"]
+best_v = [9.32915475e+01, 2.47889905e+00, 1.72638776e+00, 1.21209098e+00,
+ 2.52038749e-01, 2.28742980e-01, 2.55762338e-01, 2.74196728e-01,
+ 2.66074068e-01, 2.34371556e-01, 2.67455066e-01, 2.32386885e-01,
+ 2.31643580e-01, 2.55157221e-01, 2.77382918e-01, 2.66546280e-01,
+ 2.75442885e-01, 2.25718193e-01, 2.48677183e-01, 2.41216111e-01,
+ 2.57847907e-01, 2.60384219e-01, 2.09547106e-03, 2.58157498e-03,
+ 5.36948734e-03, 1.83902399e-02, 1.69565089e-02, 4.01546057e-02,
+ 9.66701223e-02, 1.08263424e-01, 3.65181159e-01, 6.01016450e-04,
+ 5.61141288e-04, 6.92478133e-04, 1.37465108e-03, 5.00653728e-03,
+ 6.83032033e-03, 1.44777084e-02, 1.84760172e-02, 1.52006898e-02,
+ 6.61797870e-02, 6.66195762e-02, 6.45600532e-02, 6.53432296e-02,
+ 6.32488151e-02, 6.13231011e-02, 5.83942818e-02, 5.16860322e-02,
+ 4.50742829e-02, 7.46840505e-04, 5.99479708e-04, 6.95910412e-04,
+ 1.34896336e-03, 1.92633179e-03, 4.31326378e-03, 9.06102872e-03,
+ 1.33753198e-02, 2.08580591e-02, 4.62373701e-02, 4.53501941e-02,
+ 4.45142163e-02, 4.54335695e-02, 4.35536902e-02, 4.37188336e-02,
+ 4.08030138e-02, 3.71518267e-02, 3.11675091e-02, 2.07503132e-04,
+ 3.77879674e-04, 4.15372914e-04, 8.94836389e-04, 1.44506797e-03,
+ 2.95974994e-03, 5.48698618e-03, 9.98120325e-03, 1.44116964e-02,
+ 9.40273931e-01, 9.84830229e-01, 8.60325626e-02, 1.61996996e-01,
+ 6.48309630e-01, 9.71184657e-01, 2.54243030e-01, 9.34245225e-01,
+ 3.02863364e-01, 4.17699478e-01, 3.28649729e-01, 5.91692767e-01,
+ 4.22041720e-01, 7.73642912e-01, 2.31197432e-02, 5.70373872e-01,
+ 4.72060409e-01, 7.25673458e-01, 5.39721156e-01, 1.36001816e+00,
+ 1.01466719e+00, 1.55896692e-01, 1.47807266e+00, 9.12914439e-01,
+ 1.88124522e+00, 9.89433482e-01, 7.65216986e-01]
 
 
-    
-    # Alphas
-    a_before_date_1 = {
-        'home':upper_bound,
-        'leisure':upper_bound,
-        'other':upper_bound,
-        'school':upper_bound,
-        'transport':delta_transport*upper_bound,
-        'work':upper_bound
-    }
-    a_between_date_1_2 = {
-        'home':upper_bound,
-        'leisure':leisure_1/leisure_denom*upper_bound,
-        'other':other_1/other_denom*upper_bound,
-        'school':0,
-        'transport':delta_transport*0.24*work_1/work_denom*upper_bound*upper_bound,
-        'work':work_1/work_denom*upper_bound
-    }
-    a_between_date_2_3 = {
-        'home':upper_bound,
-        'leisure':(leisure_1+leisure_2)/leisure_denom*upper_bound,
-        'other':(other_1+other_2)/other_denom*upper_bound,
-        'school':0.33*delta_school*upper_bound,
-        'transport':delta_transport*(work_1+work_2)/work_denom*upper_bound,
-        'work':(work_1+work_2)/work_denom*upper_bound
-    }
-    a_between_date_3_4 = {
-        'home':upper_bound,
-        'leisure':(leisure_1+leisure_2+leisure_3)/leisure_denom*upper_bound,
-        'other':(other_1+other_2+other_3)/other_denom*upper_bound,
-        'school':0.67*delta_school*upper_bound,
-        'transport':delta_transport*(work_1+work_2+work_3)/work_denom*upper_bound,
-        'work':(work_1+work_2+work_3)/work_denom*upper_bound
-    }
-    a_between_date_4_5 = {
-        'home':upper_bound,
-        'leisure':(leisure_1+leisure_2+leisure_3+leisure_4)/leisure_denom*upper_bound,
-        'other':(other_1+other_2+other_3+other_4)/other_denom*upper_bound,
-        'school':0.67*delta_school*upper_bound,
-        'transport':delta_transport*(work_1+work_2+work_3+work_4)/work_denom*upper_bound,
-        'work':(work_1+work_2+work_3+work_4)/work_denom*upper_bound
-    }
-    a_after_date_5 = {
-        'home':upper_bound,
-        'leisure':(leisure_1+leisure_2+leisure_3+leisure_4)/leisure_denom*upper_bound,
-        'other':(other_1+other_2+other_3+other_4)/other_denom*upper_bound,
-        'school':1.0*delta_school*upper_bound,
-        'transport':delta_transport*(work_1+work_2+work_3+work_4)/work_denom*upper_bound,
-        'work':(work_1+work_2+work_3+work_4)/work_denom*upper_bound
-    }
+# In[140]:
 
 
-
-    # Determine mixing method
-    mixing_method = {
-        "name":"mult",
-        "param_alpha":alpha_mixing,
-        "param_beta":beta_mixing,
-        "param_gamma":gamma_mixing,
-    }
-    dynModel.mixing_method = mixing_method
-
-    # Number of days
-    days_before_date_1 = int(days_ahead)
-    days_between_dates_1_2 = (date_2-date_1).days
-    days_between_dates_2_3 = (date_3-date_2).days
-    days_between_dates_3_4 = (date_4-date_3).days
-    days_between_dates_4_5 = (date_5-date_4).days
-    days_after_date_5 = (final_date-date_5).days
-    total_days = days_before_date_1 + days_between_dates_1_2 + days_between_dates_2_3 + days_between_dates_3_4 + days_between_dates_4_5 + days_after_date_5
+# v0 = (list(best_v[0:4]) + list(best_v[4]*initial_params["mu"]) + list(best_v[5]*initial_params['sigma']) + list(best_v[6]*initial_params['p_H'])+
+#       list(best_v[7]*initial_params['p_ICU'])+list(best_v[8]*initial_params['lambda_H_R'])+list(best_v[9]*initial_params['lambda_H_D'])+
+#     list(best_v[10]*initial_params['lambda_ICU_R'])+list(best_v[11]*initial_params['lambda_ICU_D']) + list(best_v[12:]))
+v0 = best_v
+error(v0)
 
 
-
-    # Calculate alphas
-    alphas_vec = []
-    for t in range(days_before_date_1):
-        alphas = {}
-        for age_group in age_groups:
-            alphas[age_group] = a_before_date_1
-        alphas_vec.append(alphas)
-    for t in range(days_between_dates_1_2):
-        alphas = {}
-        for age_group in age_groups:
-            alphas[age_group] = a_between_date_1_2
-        alphas_vec.append(alphas)
-    for t in range(days_between_dates_2_3):
-        alphas = {}
-        for age_group in age_groups:
-            alphas[age_group] = a_between_date_2_3
-        alphas_vec.append(alphas)
-    for t in range(days_between_dates_3_4):
-        alphas = {}
-        for age_group in age_groups:
-            alphas[age_group] = a_between_date_3_4
-        alphas_vec.append(alphas)
-    for t in range(days_between_dates_4_5):
-        alphas = {}
-        for age_group in age_groups:
-            alphas[age_group] = a_between_date_4_5
-        alphas_vec.append(alphas)
-    for t in range(days_after_date_5):
-        alphas = {}
-        for age_group in age_groups:
-            alphas[age_group] = a_after_date_5
-        alphas_vec.append(alphas)
-
-    # Calculate tests
-    tests = np.zeros(len(age_groups))
-    
-    
-    # Run model
-    model_data_beds = {ag:[] for ag in age_groups+["total"]}
-    model_data_icus = {ag:[] for ag in age_groups+["total"]}
-    model_data_deaths = {ag:[] for ag in age_groups+["total"]}
-
-    state = state_to_matrix(initialization)
-    t_beds = 0
-    t_icus = 0
-    t_deaths = 0
-    for i,ag in enumerate(age_groups):
-        state_H = state[i,cont.index("H")]
-        state_ICU = state[i,cont.index("ICU")]
-        state_D = state[i,cont.index("D")]
-        model_data_beds[ag].append(state_H)
-        model_data_icus[ag].append(state_ICU)
-        model_data_deaths[ag].append(state_D)
-        t_beds+= state_H
-        t_icus+= state_ICU
-        t_deaths+= state_D
-    model_data_beds["total"].append(t_beds)
-    model_data_icus["total"].append(t_icus)
-    model_data_deaths["total"].append(t_deaths)
-    
-    for t in range(total_days):
-        state,_ = dynModel.take_time_step(state, tests, tests, alphas_to_matrix(alphas_vec[t]))
-        t_beds = 0
-        t_icus = 0
-        t_deaths = 0
-        for i,ag in enumerate(age_groups):
-            state_H = state[i,cont.index("H")]
-            state_ICU = state[i,cont.index("ICU")]
-            state_D = state[i,cont.index("D")]
-            model_data_beds[ag].append(state_H)
-            model_data_icus[ag].append(state_ICU)
-            model_data_deaths[ag].append(state_D)
-            t_beds+= state_H
-            t_icus+= state_ICU
-            t_deaths+= state_D
-        model_data_beds["total"].append(t_beds)
-        model_data_icus["total"].append(t_icus)
-        model_data_deaths["total"].append(t_deaths)
-            
-    
-    initial_date = date_1-timedelta(days=days_before_date_1)
-
-    # Calculate the days of the model
-    days_model = [initial_date+timedelta(days = t) for t in range(total_days + 1)]
-
-    # Indices where to put the real data
-    indices = [(datetime.strptime(d, '%Y-%m-%d') - initial_date).days for d in days]
-
-    # Real data
-    real_data_beds = {ag:[float('nan')]*len(days_model) for ag in age_groups+["total"]}
-    real_data_icus = {ag:[float('nan')]*len(days_model) for ag in age_groups+["total"]}
-    real_data_deaths = {ag:[float('nan')]*len(days_model) for ag in age_groups+["total"]}
-    
-    for k,ind in enumerate(indices):
-        for ag in age_groups+["total"]:
-            real_data_beds[ag][ind] = beds_real[ag][k]
-            real_data_icus[ag][ind] = icus_real[ag][k]
-            real_data_deaths[ag][ind] = deaths_real[ag][k]
-
-    error_beds = 0
-    error_icus = 0
-    error_deaths = 0
-    for ag in age_groups:
-        error_beds += np.nanmean(np.abs(np.array(model_data_beds[ag])-np.array(real_data_beds[ag])))
-        error_icus += np.nanmean(np.abs(np.array(model_data_icus[ag])-np.array(real_data_icus[ag])))
-        error_deaths += np.nanmean(np.abs(np.array(model_data_deaths[ag])-np.array(real_data_deaths[ag])))
-    error_beds_total = np.nanmean(np.abs(np.array(model_data_beds["total"])-np.array(real_data_beds["total"])))
-    error_icus_total = np.nanmean(np.abs(np.array(model_data_icus["total"])-np.array(real_data_icus["total"])))
-    error_deaths_total = np.nanmean(np.abs(np.array(model_data_deaths["total"])-np.array(real_data_deaths["total"])))
-    
-    
-    
-    error = error_beds_total
-    error = mult_icus*error_icus_total
-    error = mult_deaths*error_deaths_total
-    error = (error_beds_total + mult_icus*error_icus_total + mult_deaths*error_deaths_total)/3
-    
-    global best_error
-    global best_v_grad
-    if error<best_error:
-        best_error = error
-        print(best_error)
-        best_v_grad = v
-        print(v)
-    return error
-
-
-
-
-# In[84]:
-
-
-best_v = [5.15096166e+01, 1.77964781e+00, 1.43917742e+00, 1.28394332e+00,
- 1.09829204e+00, 1.11440823e+00, 1.51229954e+00, 6.21574802e-01,
- 9.76971066e-01, 9.57635029e-01, 1.02555720e+00, 9.68958707e-01,
- 9.93369883e-01, 7.29547284e-01, 7.65882787e-01, 1.64308950e-02,
- 7.40438932e-01, 8.16835480e-01, 9.15655600e-01, 6.64824377e-01,
- 1.66077079e-01, 4.92378452e-01, 7.78097356e-01, 3.93167073e-01,
- 5.38851209e-01, 5.92582542e-04, 4.49415795e-01, 6.41830395e-01,
- 3.11477417e-01, 2.75094617e-01, 1.23721133e+00, 1.84373432e+00,
- 2.88405513e-01, 1.40810587e+00, 1.27573252e+00, 9.34587622e-01,
- 4.91067414e-01, 7.59348380e-01, 1.13745465e+00]
-
-
-# In[85]:
-
-
-v0 = (list(best_v[0:4]) + list(best_v[4]*initial_params["mu"]) + list(best_v[5]*initial_params['sigma']) + list(best_v[6]*initial_params['p_H'])+
-      list(best_v[7]*initial_params['p_ICU'])+list(best_v[8]*initial_params['lambda_H_R'])+list(best_v[9]*initial_params['lambda_H_D'])+
-    list(best_v[10]*initial_params['lambda_ICU_R'])+list(best_v[11]*initial_params['lambda_ICU_D']) + list(best_v[12:]))
-error_grad(v0)
-
-
-# In[86]:
+# In[141]:
 
 
 lb= ([30,windows['alpha_mixing'][0],windows['beta_mixing'][0],windows['gamma_mixing'][0]]+
@@ -788,26 +546,20 @@ for i in range(len(v0)):
     assert(ub[i]>=v0[i])
 
 
-# In[87]:
+# In[142]:
 
 
 from scipy.optimize import minimize, Bounds, shgo, differential_evolution
 
 bounds = Bounds(lb,ub)
 
-result = minimize(error_grad, v0, bounds = bounds)
+result = minimize(error, v0, bounds = bounds)
 
 
-# In[ ]:
+# In[143]:
 
 
-
-
-
-# In[88]:
-
-
-v = best_v_grad
+v = best_v
 
 days_ahead = v[0]
 alpha_mixing = v[1]
@@ -855,10 +607,9 @@ initial = v[94:103]
 # Construct initialization
 initialization = copy.deepcopy(original_initialization)
 for i,group in enumerate(age_groups):
-    initialization[group]["I"] = initialization[group]["I"] + (v[94+i])
-    initialization[group]["S"] = initialization[group]["S"] - (v[94+i])
+    initialization[group]["I"] = initialization[group]["I"] + (v[30+i])
+    initialization[group]["S"] = initialization[group]["S"] - (v[30+i])
     initialization[group]["N"] = initialization[group]["S"] + initialization[group]["E"] + initialization[group]["I"] + initialization[group]["R"]
-
 
 
 # Alphas
@@ -910,7 +661,6 @@ a_after_date_5 = {
     'transport':delta_transport*(work_1+work_2+work_3+work_4)/work_denom*upper_bound,
     'work':(work_1+work_2+work_3+work_4)/work_denom*upper_bound
 }
-
 
 
 # Determine mixing method
@@ -1044,15 +794,15 @@ error_icus_total = np.nanmean(np.abs(np.array(model_data_icus["total"])-np.array
 error_deaths_total = np.nanmean(np.abs(np.array(model_data_deaths["total"])-np.array(real_data_deaths["total"])))
 
 
-
 error = error_beds_total
 error = mult_icus*error_icus_total
 error = mult_deaths*error_deaths_total
-error = (error_beds_total + mult_icus*error_icus_total + mult_deaths*error_deaths_total)/3
+error = (1.5*error_beds_total + mult_icus*error_icus_total*3 + 0.5*mult_deaths*error_deaths_total)/3
+
 print(error)
 
 
-# In[89]:
+# In[144]:
 
 
 get_ipython().run_line_magic('matplotlib', 'inline')
@@ -1062,7 +812,7 @@ plt.plot(days_model, real_data_beds["total"], label="Model L1")
 plt.legend(loc='upper right')
 
 
-# In[90]:
+# In[145]:
 
 
 get_ipython().run_line_magic('matplotlib', 'inline')
@@ -1072,7 +822,7 @@ plt.plot(days_model, real_data_icus["total"], label="Model L1")
 plt.legend(loc='upper right')
 
 
-# In[91]:
+# In[146]:
 
 
 get_ipython().run_line_magic('matplotlib', 'inline')
@@ -1082,7 +832,7 @@ plt.plot(days_model, real_data_deaths["total"], label="Model L1")
 plt.legend(loc='upper right')
 
 
-# In[102]:
+# In[147]:
 
 
 with open("../initialization/initialization.yaml") as file:
@@ -1093,10 +843,9 @@ with open("../parameters/Ile-de-France.yaml") as file:
     universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
 
-# In[103]:
+# In[ ]:
 
 
-ays_ahead = v[0]
 alpha_mixing = v[1]
 beta_mixing = v[2]
 gamma_mixing = v[3]
@@ -1110,25 +859,32 @@ dynModel.lambda_H_D = np.array(v[49:58])
 dynModel.lambda_ICU_R = np.array(v[58:67])
 dynModel.lambda_ICU_D = np.array(v[67:76])
 
+
 upper_bound = v[76]
 
 delta_transport = v[77]
-delta_work = v[78]
-delta_school = v[79]
+delta_school = v[78]
 
-leisure_1 = v[80]
-leisure_2 = v[81]
-leisure_3 = v[82]
-leisure_4 = v[83]
-leisure_5 = v[84]
+leisure_1 = v[79]
+leisure_2 = v[80]
+leisure_3 = v[81]
+leisure_4 = v[82]
+leisure_5 = v[83]
 leisure_denom = leisure_1+leisure_2+leisure_3+leisure_4+leisure_5
 
-other_1 = v[85]
-other_2 = v[86]
-other_3 = v[87]
-other_4 = v[88]
-other_5 = v[89]
+other_1 = v[84]
+other_2 = v[85]
+other_3 = v[86]
+other_4 = v[87]
+other_5 = v[88]
 other_denom = other_1+other_2+other_3+other_4+other_5
+
+work_1 = v[89]
+work_2 = v[90]
+work_3 = v[91]
+work_4 = v[92]
+work_5 = v[93]
+work_denom = work_1+work_2+work_3+work_4+work_5
 
 
 # In[105]:
@@ -1156,7 +912,7 @@ with open('../parameters/fitted.yaml', 'w') as file:
     
 
 
-# In[107]:
+# In[148]:
 
 
 # Add economic value parameters
@@ -1171,7 +927,7 @@ for age_group in age_groups:
         empl_params["v"][age_group][activity] = float(contrib[age_group][activity])/365.0
 
 
-# In[108]:
+# In[149]:
 
 
 # Calculate l-april and l-may
@@ -1181,19 +937,19 @@ for a in a_between_date_1_2.keys():
     l_may[a] = a_between_date_1_2[a]/3.0 + a_between_date_2_3[a]*2.0/3.0
 
 
-# In[109]:
+# In[150]:
 
 
 l_april
 
 
-# In[110]:
+# In[151]:
 
 
 l_may
 
 
-# In[73]:
+# In[152]:
 
 
 from gurobipy import *
@@ -1227,7 +983,7 @@ for activity in econ_activities:
     
 
 
-# In[111]:
+# In[153]:
 
 
 from gurobipy import *
