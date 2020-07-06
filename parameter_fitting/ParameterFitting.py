@@ -211,7 +211,7 @@ windows['alpha_mixing'] = (0.1,3.0)
 windows['gamma_mixing'] = (0.7,1.3)
 
 
-# In[137]:
+# In[154]:
 
 
 import copy
@@ -468,7 +468,7 @@ def error(v):
 
 
 
-# In[98]:
+# In[155]:
 
 
 from scipy.optimize import minimize, Bounds, shgo, differential_evolution
@@ -482,7 +482,7 @@ result = differential_evolution(error, [(30,120),
                                             list(upper_params['mu'])+list(upper_params['sigma'])+list(upper_params['p_H'])+
                                             list(upper_params['p_ICU'])+list(upper_params['lambda_H_R'])+list(upper_params['lambda_H_D'])+
                                             list(upper_params['lambda_ICU_R'])+list(upper_params['lambda_ICU_D'])
-                                        ))+[(0,1),(0.2,1),(0.5,1)]
+                                        ))+[(0,1),(0.2,1),(0.5,1)]+
                                         [(0,1)]*15+[(0,2)]*9)
 
 
