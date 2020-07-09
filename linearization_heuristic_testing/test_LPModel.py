@@ -11,7 +11,7 @@ sys.path.insert(0, parent_dir+"/heuristics")
 
 from linearization import *
 from heuristics import *
-
+import pickle
 
 
 # Global variables
@@ -19,18 +19,18 @@ from heuristics import *
 bounce_existing = False
 use_bounce_var = True
 
-simulation_params = {
-        'dt':1.0,
-        'days': 30,
-        'region': "fitted",
-        'quar_freq': 1,
-}
+# simulation_params = {
+#         'dt':1.0,
+#         'days': 30,
+#         'region': "fitted",
+#         'quar_freq': 1,
+# }
 
 # Define time variables
-simulation_params['time_periods'] = int(math.ceil(simulation_params["days"]/simulation_params["dt"]))
+
 
 # Define mixing method
-simulation_params_linearization = {
+simulation_params = {
     'dt':1.0,
     'region': "fitted",
     'quar_freq': 1,
@@ -41,14 +41,14 @@ simulation_params_linearization = {
         "name":"mult",
         "param_alpha":1.0,
         "param_beta":0.5,},
-    'mtest_cap' : 100,
-    'atest_cap' : 100,
+    'mtest_cap' : 30000,
+    'atest_cap' : 30000,
     'work_full_lockdown_factor' : 0.24,
     'heuristic': 'linearization',
     'transport_lb_work_fraction': 0.25
 }
 
-
+simulation_params['time_periods'] = int(math.ceil(simulation_params["num_days"]/simulation_params["dt"]))
 # Read group parameters
 with open("../parameters/"+simulation_params["region"]+".yaml") as file:
     # The FullLoader parameter handles the conversion from YAML
@@ -91,7 +91,7 @@ experiment_params = {
 num_time_periods = int(math.ceil(simulation_params["num_days"]/simulation_params["dt"]))
 
 # Create environment
-dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], num_time_periods, mixing_method, simulation_params['transport_lb_work_fraction'])
+dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], num_time_periods, simulation_params['mixing_method'], simulation_params['transport_lb_work_fraction'])
 #print(dynModel.time_steps)
 
 # Set up testing decisions: no testing for now
@@ -102,8 +102,8 @@ tests = {
 }
 
 # add parameters for testing capacity
-dynModel.parameters['global-parameters']['C_mtest'] = 10000
-dynModel.parameters['global-parameters']['C_atest'] = 10000
+dynModel.parameters['global-parameters']['C_mtest'] = simulation_params['mtest_cap']
+dynModel.parameters['global-parameters']['C_atest'] = simulation_params['atest_cap']
 
 # ##############################################################################
 # Testing the construction of a typical LP
@@ -113,6 +113,7 @@ T = dynModel.time_steps
 Xt_dim = num_compartments * num_age_groups
 ut_dim = num_controls * num_age_groups
 num_constraints = 4 + 2*num_age_groups + num_age_groups*num_activities
+mixing_method = simulation_params['mixing_method']
 
 # uptimal decisions
 uopt_seq = np.zeros((ut_dim,T))
@@ -137,14 +138,20 @@ for k in range(T):
     u_vars = {}
     x_vars = {}
     # ones_var =
-    lock_home_idx_all = slice(controls.index('home'),ut_dim,num_controls)
+    lock_home_idx_all = [controls.index('home') + num_controls * i for i in range(num_age_groups)]
+
     lb = np.zeros(ut_dim)
     for i in lock_home_idx_all:
         lb[i] = 1
-    ub = np.ones(ut_dim)
+    ub = np.ones(ut_dim) * float('inf')
+
+    for i in range(num_age_groups):
+        for act in range(4,10):
+            ub[act + i * num_controls] = 1
+
 
     for ti in range(k,T):
-        u_vars[ti] = M.addMVar(ut_dim, lb=lb, ub=ub, name="u_vars_time_{}".format(ti))
+        u_vars[ti] = M.addMVar(ut_dim, ub=ub, lb=lb,  name="u_vars_time_{}".format(ti))
         x_vars[ti] = M.addMVar(Xt_dim, name="x_vars_time_{}".format(ti))
     x_vars[T] = M.addMVar(Xt_dim, name="x_vars_time_{}".format(T))
 
@@ -158,8 +165,8 @@ for k in range(T):
 
     Xhat_seq, new_uhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq, use_bounce_var)
 
-    print("Finished getting nominal trajectory for time {}".format(k))
-    print("-----------------------")
+    # print("Finished getting nominal trajectory for time {}".format(k))
+    # print("-----------------------")
 
     assert( np.shape(Xhat_seq) == (Xt_dim,T-k) )
     assert( np.shape(new_uhat_seq) == (ut_dim,T-k) )
@@ -174,6 +181,9 @@ for k in range(T):
 
 
     d, e = calculate_objective_time_dependent_coefs(dynModel, k, Xhat_seq, uhat_seq)
+
+    M.setParam( 'OutputFlag', False )     # make Gurobi silent
+    M.setParam( 'LogFile', "" )
 
     M.setObjective(sum(d[:,t-k] @ x_vars[t] + e[:,t-k] @ u_vars[t] for t in range(k, T-1)) + d[:,T-k-1] @ x_vars[T], gb.GRB.MAXIMIZE)
 
@@ -225,7 +235,7 @@ for k in range(T):
             work_idx = work_index + i*num_controls
             transport_idx = transport_index + i*num_controls
 
-            M.addConstr(uvars[t][work_idx] * dynModel.transport_lb_work_fraction <= uvars[t][transport_idx])
+            M.addConstr(u_vars[t][work_idx] * dynModel.transport_lb_work_fraction <= u_vars[t][transport_idx])
 
 
 
@@ -238,8 +248,7 @@ for k in range(T):
         assert(False)
 
     # extract decisions for current period (testing and alphas)
-    for i in range(num_age_groups):
-        print(u_vars[k].X[i* num_controls + 2])
+
     uopt_seq[:,k] = u_vars[k].X
     uk_opt_dict, alphak_opt_dict = buildAlphaDict(u_vars[k].X)
 
@@ -262,9 +271,9 @@ for k in range(T):
         uhat_seq[:,t-k-1] = u_vars[t].X
 
 
+pickle.dump(dynModel,open(f"../linearization_heuristic_dyn_models/TESTLPdynModel_linHeur_Prop_Bouncing_n_days={simulation_params['num_days']}_deltas={delta}_xi={xi}_icus={icus}_maxTests={simulation_params['mtest_cap']}.p","wb"))
 
-
-
+dynModel.print_stats()
 
 
 

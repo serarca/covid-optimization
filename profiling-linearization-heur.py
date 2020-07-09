@@ -92,6 +92,8 @@ def run_linearization_heuristic(simulation_params, experiment_params):
 
     print("Total running time for {} days is {}".format(simulation_params['num_days'], end_time - start_time))
 
+    dynModel.print_stats()
+
     return dynModel
 
 
@@ -105,15 +107,15 @@ def main():
 
     params_to_try = {
         "delta_schooling":[0.5],
-        "xi":[37199.03, 30 * 37199.03],
-        "icus":[2000, 2500],
-        "tests":[0,30000]
+        "xi":[30 * 37199.03],
+        "icus":[2000],
+        "tests":[30000]
     }
     regions = ['fitted']
     # 'testing_5_groups']
     # 'Testing-group', 'Ile-de-France']
-    n_days = 90
-    final_time_step = 90
+    n_days = 30
+    final_time_step = 30
     region = 'fitted'
     #
     Parallel(n_jobs=1)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region)
@@ -134,18 +136,18 @@ def main():
             "name":"mult",
             "param_alpha":1.0,
             "param_beta":0.5,},
-        'mtest_cap' : 100,
-        'atest_cap' : 100,
+        'mtest_cap' : 30000,
+        'atest_cap' : 30000,
         'work_full_lockdown_factor' : 0.24,
         'heuristic': 'linearization',
         'transport_lb_work_fraction': 0.25
     }
 
-    run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try, simulation_params_linearization)
+    # run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try, simulation_params_linearization)
 
-    unpickle_plot_and_print_results(n_days, params_to_try, simulation_params_linearization)
+    # unpickle_plot_and_print_results(n_days, params_to_try, simulation_params_linearization)
 
-    load_pickles_and_create_csv(n_days, params_to_try, final_time_step)
+    # load_pickles_and_create_csv(n_days, params_to_try, final_time_step)
 
 def run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region):
 
@@ -162,7 +164,6 @@ def run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region):
         'quar_freq': 1,
         'num_days' : n_days,
         'initial_infected_count' : 1,
-        'perc_infected' : 10,
         'mixing_method' : {
             "name":"mult",
             "param_alpha":1.0,
@@ -222,6 +223,7 @@ def run_dyn_model_with_no_bouncing_and_pickle(pickled_dyn_model):
 
     dynModel.reset_time(0)
     dynModel.simulate(m_tests_cont, a_tests_cont, lockdowns)
+
 
 
     pickle.dump(dynModel,open(f"linearization_heuristic_dyn_models/dynModel_linHeur_Prop_Bouncing_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","wb"))

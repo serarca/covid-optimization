@@ -1295,7 +1295,7 @@ def run_heuristic_linearization(dynModel):
         mod = gb.Model("Linearization Heuristic")
 
         mod.setParam( 'OutputFlag', False )     # make Gurobi silent
-        mod.setParam( 'LogFile', "gurobi-log.txt" )
+        mod.setParam( 'LogFile', "" )
 
         # mod.setParam('Threads', 1)
         mod.Params.threads = __gurobi_threads
