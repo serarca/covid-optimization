@@ -46,7 +46,9 @@ def log_execution_time(function):
 ##################################################
 
 
-age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29','age_group_30_39', 'age_group_40_49', 'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
+age_groups = ['age_group_0_9', 'age_group_10_19']
+# , 'age_group_20_29','age_group_30_39', 'age_group_40_49']
+# , 'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
 SEIR_groups = [ 'S_g', 'E_g', 'I_g', 'R_g', 'N_g', 'Ia_g', 'Ips_g', \
        'Ims_g', 'Iss_g', 'Rq_g', 'H_g', 'ICU_g', 'D_g' ]
 activities = ['home','leisure','other','school','transport','work']
@@ -1142,6 +1144,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
 
     # print("Computing constants for all periods.")
 
+
     for t in range(k,T): # loop over times k, k+1, ..., T - 1 to model constraints indexed with t
 
         # Calculate constants for period t
@@ -1338,25 +1341,27 @@ def run_heuristic_linearization(dynModel):
         # mod.addConstrs((u_vars_vec[i]==1 for i in lock_home_idx_all_times if i < len(obj_vec)), name=("home_lock"))
         #
         # mod.addConstrs((u_vars_vec[i]>=0.24 for i in lock_work_idx_all_times if i < len(obj_vec)), name=("work_lock_lb"))
+
+
         work_index = controls.index('work')
         transport_index = controls.index('transport')
-        TransportConstMatrix = np.zeros((T-k, ut_dim * (T-k)))
-        TransportConstRHSVector = np.zeros((T-k,))
-        for t in range(T-k):
-            for i in range((T-k) * num_age_groups):
-                work_idx = work_index + i*num_controls
-                transport_idx = transport_index + i*num_controls
+        TransportConstMatrix = np.zeros(((T-k) * num_age_groups, ut_dim * (T-k)))
+        TransportConstRHSVector = np.zeros(((T-k) *num_age_groups,))
 
-                TransportConstMatrix[t, work_idx] = -dynModel.transport_lb_work_fraction
-                TransportConstMatrix[t, transport_idx] = 1
+        for i in range((T-k) * num_age_groups):
+            work_idx = work_index + i*num_controls
+            transport_idx = transport_index + i*num_controls
+
+            TransportConstMatrix[i, work_idx] = -dynModel.transport_lb_work_fraction
+            TransportConstMatrix[i, transport_idx] = 1
 
 
-        mod.addMConstrs(TransportConstMatrix, u_vars_vec, ">", TransportConstRHSVector)
+        mod.addMConstrs(TransportConstMatrix, u_vars_vec, ">", TransportConstRHSVector, name=("transport_lock_lb"))
 
         # weekly_u = []
 
         # mod.addConstrs((u_vars_vec[lock_transport_idx_all_times[i]] >= dynModel.transport_lb_work_fraction * u_vars_vec[lock_work_idx_all_times[i]] for i in range((T-k)*num_age_groups)), name=("transport_lock_lb"))
-        #
+
 
         # mod.addConstrs((u_vars_vec @ np.reshape(constr_coefs[t][con], (len(obj_vec),), 'F') + constr_consts[t][con] <= K[con,t] for con in range(num_constraints) for t in range(k,T)), name="All Const")
 
@@ -1378,6 +1383,7 @@ def run_heuristic_linearization(dynModel):
         # print(f"Optimizing model at time k = {k}")
         mod.optimize()
 
+        print(f"Objective value for Line heur k = {k}: {mod.objVal}")
 
 
         step_shadow_prices = {}
@@ -1387,10 +1393,12 @@ def run_heuristic_linearization(dynModel):
 
         dynModel.shadowPrices[k] = step_shadow_prices
 
+        mod.write(f"LP_lineariz_k={k}.lp")
+
         if( mod.Status ==  gb.GRB.INFEASIBLE ):
             # model was infeasible
             mod.computeIIS()  # irreducible system of infeasible inequalities
-            mod.write("LP_lineariz_IIS.ilp")
+            mod.write("LP_lineariz_IIS.lp")
             print("ERROR. Problem infeasible at time k={}. Halting...".format(k))
             assert(False)
 
