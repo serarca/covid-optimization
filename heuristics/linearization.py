@@ -47,8 +47,8 @@ def log_execution_time(function):
 
 
 age_groups = ['age_group_0_9', 'age_group_10_19']
-
-# ,'age_group_20_29','age_group_30_39', 'age_group_40_49' ,'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
+# , 'age_group_20_29','age_group_30_39', 'age_group_40_49']
+# , 'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
 SEIR_groups = [ 'S_g', 'E_g', 'I_g', 'R_g', 'N_g', 'Ia_g', 'Ips_g', \
        'Ims_g', 'Iss_g', 'Rq_g', 'H_g', 'ICU_g', 'D_g' ]
 activities = ['home','leisure','other','school','transport','work']
@@ -1012,8 +1012,6 @@ def calculate_all_constraints(dynModel, bounce_existing, h_cap_flag=False):
 def calculate_objective_time_dependent_coefs(dynModel, k, xhat, uhat):
     """Calculates the coefficient vectors d_t, e_t that yield the linearized objective"""
 
-###### TODO: WE SHOULD CHECK THE INDICES IN THIS FUNCTION CAREFULLY. I THINK THEY WERE OFF BY 1...
-
     T = dynModel.time_steps
     M, gamma, eta = calculate_M_gamma_and_eta(dynModel)
 
@@ -1030,7 +1028,7 @@ def calculate_objective_time_dependent_coefs(dynModel, k, xhat, uhat):
 
 
 ########################################
-# Consider a linear dynamical system of the form X(k+1)=Gamma_x(k) X(k) + Gamma_u((k) u(k) + K(k)
+# Consider a linear dynamical system of the form X(k+1)=Gamma_x(k) X(k) + Gamma_u(k) u(k) + K(k)
 # and a linear expression of the form a*X(t)+b*u(t) for some a,b row vectors of suitable dimension.
 # This function returns the coefficients for all the decisions u(k),...,u(T-1)
 # appearing in all constraints and objective
@@ -1081,7 +1079,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
 
 
         gf_vec = get_F(dynModel, Xhat_t, uhat_t)
-        ct[t] = dynModel.dt * (gf_vec - jacob_X @ Xhat_t ) - jacob_u @ uhat_t
+        ct[t] = dynModel.dt * (gf_vec - jacob_X @ Xhat_t ) - jacob_u @ uhat_t #Revisit whether we need to multiply entire expression with dt
 
         tol = 1e-6
         mu_g = dynModel.groups[age_groups[0]].parameters['mu']
@@ -1110,16 +1108,16 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
             #    print("ct[t][ICU] is not zero and equal to", ct[t][ICUg_idx])
 
 
-    # All constraint coefficients are stored in dictionary u_constr_coeffs: u_coeffs has a key for each
-    # period t in {k,k+1,...,T}. The value for key t stores, in turn, another dictionary, which holds the constraint coefficients
+    # All constraint coefficients are stored in dictionary u_constr_coeffs: u_constr_coeffs has a key for each
+    # period t in {k,k+1,...,T-1}. The value for key t stores, in turn, another dictionary, which holds the constraint coefficients
     # of the constraints indexed with t.
     # In that dictionary, the key is the index of a constraint "type", and the value is a 2D numpy array with
-    # T-k+1 rows (one for every time period k, k+1, ..., T), and (ut_dim) columns. These are the coefficients for
-    # all the controls u(k),...,u(T) appearing in the expression a*X(t) + b*u(t).
+    # (ut_dim) rows, and T-k columns (one for every time period k, k+1, ..., T-1). These are the coefficients for
+    # all the controls u(k),...,u(T-1) appearing in the expression a*X(t) + b*u(t).
     u_constr_coeffs = {}
 
-    # The linear expression for a constraint also has constants, which we store in a separate dictionary: constants.
-    # The constr_constants dictionary has a key for each period in {k,k+1,...,T}. The value for key t stores, in turn, another dictionary,
+    # The linear expression for a constraint also has constants, which we store in a separate dictionary: constr_constants.
+    # The constr_constants dictionary has a key for each period in {k,k+1,...,T-1}. The value for key t stores, in turn, another dictionary,
     # which holds the constants of the constraints indexed with t.
     # In that dictionary, the key is the index of a constraint "type", and the value is the constant corresponding to the specific
     # constraint type index and time period.
@@ -1132,10 +1130,9 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
         for constr_index in range(num_constraints):
             u_constr_coeffs[t][constr_index] = np.zeros((ut_dim,T-k))
 
-    # All objective coefficients are stored in dictionary u_constr_coeffs: u_obj_coeffs has a key for each
-    # period t in {k,k+1,...,T-1}. The value for key t stores the coefficient in the objective for decision u_t, which is of
-    # dimension (ut_dim). These are the coefficients for all the controls u(k),...,u(T-1) appearing in the expression
-    # a*X(t) + b*u(t). Note that for the objective we do not keep track of constant terms.
+    # All objective coefficients are stored in a 2D numpy array with (ut_dim) rows, and (T-k) columns
+    # (one for every time period k, k+1, ..., T-1). Column with index t stores the coefficients in the objective for decision u_{k+t}, which 
+    # is of dimension (ut_dim). Note that for the objective we do not keep track of constant terms.
     u_obj_coeffs = np.zeros((ut_dim, T-k))
 
     # We keep track of certain partial products of matrices / vectors that are useful
@@ -1158,7 +1155,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
         Xt_bar = At[t] @ Xt_bar + ct[t]
 
         # Calculate coefficients for all controls appearing in the constraint for period t
-        # NOTE: The coefficients for control u(tau) are stored on row indexed (tau-k) of the 2D array
+        # NOTE: The coefficients for control u(tau) are stored on column indexed (tau-k) of the 2D array
 
         for constr_index in range(num_constraints):
             # coefs for u[t]
@@ -1170,7 +1167,6 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
         u_obj_coeffs[:,t-k] += e_matrix[:,t-k]
 
         # Initialize At_bar for tau=t-1
-        At_bar = {}
         At_bar[t-1] = np.eye(Xt_dim,Xt_dim)
 
         for tau in range(t-1,k-1,-1):
@@ -1185,12 +1181,12 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
 
             # Update At_bar for next round
             At_bar[tau-1] = At_bar[tau] @ At[tau]
-        # print("Computed constraint and obj coeff for time {}".format(t))
 
-    At_bar = {}
+        # print("Computed constraint and obj coeff for time {}".format(t))
+    
+    # Now we handle the case of t=T
     At_bar[T-1] = np.eye(Xt_dim,Xt_dim)
     # Add up the contribution of eta * X_T in the coefficients of decision u_t, t = k, ..., T-1
-    # TODO: Check CAREFULLY the indices here!!
     for tau in range(T-1,k-1,-1):
         u_obj_coeffs[:,tau-k] += d_matrix[:,T-k] @ At_bar[tau] @ Bt[tau]
         At_bar[tau-1] = At_bar[tau] @ At[tau]
