@@ -47,8 +47,8 @@ def log_execution_time(function):
 
 
 age_groups = ['age_group_0_9', 'age_group_10_19']
-# , 'age_group_20_29','age_group_30_39', 'age_group_40_49']
-# , 'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
+
+# ,'age_group_20_29','age_group_30_39', 'age_group_40_49' ,'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
 SEIR_groups = [ 'S_g', 'E_g', 'I_g', 'R_g', 'N_g', 'Ia_g', 'Ips_g', \
        'Ims_g', 'Iss_g', 'Rq_g', 'H_g', 'ICU_g', 'D_g' ]
 activities = ['home','leisure','other','school','transport','work']
@@ -1012,17 +1012,19 @@ def calculate_all_constraints(dynModel, bounce_existing, h_cap_flag=False):
 def calculate_objective_time_dependent_coefs(dynModel, k, xhat, uhat):
     """Calculates the coefficient vectors d_t, e_t that yield the linearized objective"""
 
+###### TODO: WE SHOULD CHECK THE INDICES IN THIS FUNCTION CAREFULLY. I THINK THEY WERE OFF BY 1...
+
     T = dynModel.time_steps
     M, gamma, eta = calculate_M_gamma_and_eta(dynModel)
 
     d = np.zeros((num_compartments * num_age_groups, T - k + 1))
     e = np.zeros((num_controls * num_age_groups, T - k + 1))
 
-    for t in  range(k, T - 1):
+    for t in  range(k, T):
         d[:, t - k] = uhat[:, t - k] @ M + gamma
         e[:, t - k] = xhat[:, t - k] @ np.transpose(M)
 
-    d[:, T - 1 - k] =  eta
+    d[:, T - k] =  eta
 
     return d, e
 
@@ -1168,6 +1170,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
         u_obj_coeffs[:,t-k] += e_matrix[:,t-k]
 
         # Initialize At_bar for tau=t-1
+        At_bar = {}
         At_bar[t-1] = np.eye(Xt_dim,Xt_dim)
 
         for tau in range(t-1,k-1,-1):
@@ -1182,13 +1185,14 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
 
             # Update At_bar for next round
             At_bar[tau-1] = At_bar[tau] @ At[tau]
-
         # print("Computed constraint and obj coeff for time {}".format(t))
 
+    At_bar = {}
     At_bar[T-1] = np.eye(Xt_dim,Xt_dim)
     # Add up the contribution of eta * X_T in the coefficients of decision u_t, t = k, ..., T-1
+    # TODO: Check CAREFULLY the indices here!!
     for tau in range(T-1,k-1,-1):
-        u_obj_coeffs[:,tau-k] += d_matrix[:,T-1-k] @ At_bar[tau] @ Bt[tau]
+        u_obj_coeffs[:,tau-k] += d_matrix[:,T-k] @ At_bar[tau] @ Bt[tau]
         At_bar[tau-1] = At_bar[tau] @ At[tau]
 
     return u_constr_coeffs, constr_constants, u_obj_coeffs

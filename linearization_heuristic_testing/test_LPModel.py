@@ -22,7 +22,7 @@ use_bounce_var = True
 
 
 
-def initializeDynModel():
+def initializeDynModel(T=5, region="Ile-de-France", econ_param="econ", xi=(30 * 37199.03)):
     # simulation_params = {
     #         'dt':1.0,
     #         'days': 30,
@@ -36,9 +36,9 @@ def initializeDynModel():
     # Define mixing method
     simulation_params = {
         'dt':1.0,
-        'region': "testing_2_groups",
+        'region': region,
         'quar_freq': 1,
-        'num_days' : 4,
+        'num_days' : T,
         'initial_infected_count' : 1,
         'perc_infected' : 10,
         'mixing_method' : {
@@ -65,7 +65,7 @@ def initializeDynModel():
         # scalar values to Python the dictionary format
         initialization = yaml.load(file, Loader=yaml.FullLoader)
 
-    with open("../parameters/econ-death-zero.yaml") as file:
+    with open(f"../parameters/{econ_param}.yaml") as file:
         econ_params = yaml.load(file, Loader=yaml.FullLoader)
 
     # Define policy
@@ -84,7 +84,8 @@ def initializeDynModel():
     # 	initialization[group]["I"] = initialization[group]["I"] + change
 
     delta = 0.5
-    xi = 30 * 37199.03
+
+    # 30 * 37199.03
     icus = 2000
 
     experiment_params = {
@@ -196,8 +197,11 @@ def run_LPModel(dynModel):
         M.setParam( 'OutputFlag', False )     # make Gurobi silent
         M.setParam( 'LogFile', "" )
 
-        M.setObjective(sum(d[:,t-k] @ x_vars[t] + e[:,t-k] @ u_vars[t] for t in range(k, T-1)) + d[:,T-k-1] @ x_vars[T], gb.GRB.MAXIMIZE)
+        M.setObjective(sum(d[:,t-k] @ x_vars[t] + e[:,t-k] @ u_vars[t] for t in range(k, T)) + d[:,T-k] @ x_vars[T], gb.GRB.MAXIMIZE)
 
+        # print(d[:, T-k])
+
+        # + d[:,T-k] @ x_vars[T]
         # M.setObjective(0)
 
         At = {}
@@ -252,7 +256,7 @@ def run_LPModel(dynModel):
 
         M.optimize()
         M.write(f"LP_model_IntermVar_k={k}.lp")
-        
+
         print(f"Objective value for LPRef k = {k}: {M.objVal}")
 
         if( M.Status ==  gb.GRB.INFEASIBLE ):
@@ -292,15 +296,32 @@ def run_LPModel(dynModel):
 
 def main():
 
-    print("LP Model")
-    dynModel = initializeDynModel()
-    run_LPModel(dynModel)
-    print("----------------")
-    print("Lin Huer")
-    dynModel = initializeDynModel()
-    run_heuristic_linearization(dynModel)
-    dynModel.print_stats()
-    print("---------------")
+    region = "testing_2_groups"
+    econ_param = "econ"
+    # "econ"
+    # "econ-death-zero"
+    # "econ-zero"
+    xi = 0
+
+    for T in range(22,28,2):
+        print(f"T is {T}")
+        print("----------------")
+        print("LP Model")
+        dynModel = initializeDynModel(T, region, econ_param, xi)
+
+        run_LPModel(dynModel)
+        LPTotalReward = dynModel.get_total_reward()
+
+        print("----------------")
+        print("Lin Huer")
+        dynModel = initializeDynModel(T, region, econ_param, xi)
+
+        run_heuristic_linearization(dynModel)
+        dynModel.print_stats()
+        LinHeurTotalReward = dynModel.get_total_reward()
+        print("---------------")
+        assert abs(LinHeurTotalReward-LPTotalReward)<0.000001, f"Both Total Rewards are not the same: LinTotRew={LinHeurTotalReward}, LPTotalReward={LPTotalReward}"
+
 
 if __name__ == "__main__":
     main()
