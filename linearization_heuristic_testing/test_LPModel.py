@@ -297,13 +297,13 @@ def run_LPModel(dynModel):
 def main():
 
     region = "testing_2_groups"
-    econ_param = "econ"
+    econ_param = "econ-death-zero"
     # "econ"
     # "econ-death-zero"
     # "econ-zero"
-    xi = 0
+    xi = 10000e6
 
-    for T in range(22,28,2):
+    for T in range(8,10,2):
         print(f"T is {T}")
         print("----------------")
         print("LP Model")

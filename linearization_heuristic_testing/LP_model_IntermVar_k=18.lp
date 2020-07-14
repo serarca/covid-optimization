@@ -1,13 +1,13 @@
 \ Model Linearization Heuristic V2
 \ LP format - for model browsing. Use MPS format to capture full model detail.
 Maximize
-  182633.16600429 u_vars_time_18[5] + -0 u_vars_time_18[6]
-   + 1.630110957667044e+07 u_vars_time_18[7]
-   + 217681.0785453889 u_vars_time_18[8]
-   + 182633.16600429 u_vars_time_18[15] + -0 u_vars_time_18[16]
-   + 1.9002337073974572e+07 u_vars_time_18[17]
-   + 217681.0785453889 u_vars_time_18[18]
-   + 5.6803023428904694e+06 u_vars_time_18[19]
+  179962.0930567535 u_vars_time_18[5] + -0 u_vars_time_18[6]
+   + 1.6356963783629525e+07 u_vars_time_18[7]
+   + 214497.4178072319 u_vars_time_18[8]
+   + 179962.0930567535 u_vars_time_18[15] + -0 u_vars_time_18[16]
+   + 1.8724421350293413e+07 u_vars_time_18[17]
+   + 214497.4178072319 u_vars_time_18[18]
+   + 5.5972259649582887e+06 u_vars_time_18[19]
    + 10.32536320952022 x_vars_time_18[0]
    + 10.32536320952022 x_vars_time_18[1]
    + 10.32536320952022 x_vars_time_18[2]
@@ -18,13 +18,13 @@ Maximize
    + 18.29768039680393 x_vars_time_18[15]
    + 18.29768039680393 x_vars_time_18[16]
    + 18.29768039680393 x_vars_time_18[22]
-   + 181093.9317131174 u_vars_time_19[5] + -0 u_vars_time_19[6]
-   + 1.630079121214441e+07 u_vars_time_19[7]
-   + 215846.4600696372 u_vars_time_19[8]
-   + 181093.9317131174 u_vars_time_19[15] + -0 u_vars_time_19[16]
-   + 1.8842185172342446e+07 u_vars_time_19[17]
-   + 215846.4600696372 u_vars_time_19[18]
-   + 5.6324286935326103e+06 u_vars_time_19[19]
+   + 179955.7962279237 u_vars_time_19[5] + -0 u_vars_time_19[6]
+   + 1.6356698601752559e+07 u_vars_time_19[7]
+   + 214489.9125959876 u_vars_time_19[8]
+   + 179955.7962279237 u_vars_time_19[15] + -0 u_vars_time_19[16]
+   + 1.8723766187452294e+07 u_vars_time_19[17]
+   + 214489.9125959876 u_vars_time_19[18]
+   + 5.5970301194153493e+06 u_vars_time_19[19]
    + 10.32536320952022 x_vars_time_19[0]
    + 10.32536320952022 x_vars_time_19[1]
    + 10.32536320952022 x_vars_time_19[2]
@@ -35,13 +35,13 @@ Maximize
    + 18.29768039680393 x_vars_time_19[15]
    + 18.29768039680393 x_vars_time_19[16]
    + 18.29768039680393 x_vars_time_19[22]
-   + 179496.1975821415 u_vars_time_20[5] + -0 u_vars_time_20[6]
-   + 1.6300480070096258e+07 u_vars_time_20[7]
-   + 213942.1154400783 u_vars_time_20[8]
-   + 179496.1975821415 u_vars_time_20[15] + -0 u_vars_time_20[16]
-   + 1.8675946568612143e+07 u_vars_time_20[17]
-   + 213942.1154400783 u_vars_time_20[18]
-   + 5.582735567546472e+06 u_vars_time_20[19]
+   + 179949.6518006269 u_vars_time_20[5] + -0 u_vars_time_20[6]
+   + 1.6292599728436485e+07 u_vars_time_20[7]
+   + 214482.5890326378 u_vars_time_20[8]
+   + 179949.6518006269 u_vars_time_20[15] + -0 u_vars_time_20[16]
+   + 1.8723126881453425e+07 u_vars_time_20[17]
+   + 214482.5890326378 u_vars_time_20[18]
+   + 5.5968390139029548e+06 u_vars_time_20[19]
    + 10.32536320952022 x_vars_time_20[0]
    + 10.32536320952022 x_vars_time_20[1]
    + 10.32536320952022 x_vars_time_20[2]
@@ -52,13 +52,13 @@ Maximize
    + 18.29768039680393 x_vars_time_20[15]
    + 18.29768039680393 x_vars_time_20[16]
    + 18.29768039680393 x_vars_time_20[22]
-   + 177842.4193506236 u_vars_time_21[5] + -0 u_vars_time_21[6]
-   + 1.6300176511132695e+07 u_vars_time_21[7]
-   + 211970.9716605128 u_vars_time_21[8]
-   + 177842.4193506236 u_vars_time_21[15] + -0 u_vars_time_21[16]
-   + 1.8503876773796424e+07 u_vars_time_21[17]
-   + 211970.9716605128 u_vars_time_21[18]
-   + 5.5312993439478986e+06 u_vars_time_21[19]
+   + 178473.5456805858 u_vars_time_21[5] + -0 u_vars_time_21[6]
+   + 1.6292345586299375e+07 u_vars_time_21[7]
+   + 212723.2132342111 u_vars_time_21[8]
+   + 178473.5456805858 u_vars_time_21[15] + -0 u_vars_time_21[16]
+   + 1.8569543243477628e+07 u_vars_time_21[17]
+   + 212723.2132342111 u_vars_time_21[18]
+   + 5.5509287926903022e+06 u_vars_time_21[19]
    + 10.32536320952022 x_vars_time_21[0]
    + 10.32536320952022 x_vars_time_21[1]
    + 10.32536320952022 x_vars_time_21[2]
@@ -68,204 +68,165 @@ Maximize
    + 18.29768039680393 x_vars_time_21[14]
    + 18.29768039680393 x_vars_time_21[15]
    + 18.29768039680393 x_vars_time_21[16]
-   + 18.29768039680393 x_vars_time_21[22]
-   + 176135.2052591187 u_vars_time_22[5] + -0 u_vars_time_22[6]
-   + 1.6299880884836037e+07 u_vars_time_22[7]
-   + 209936.1375015411 u_vars_time_22[8]
-   + 176135.2052591187 u_vars_time_22[15] + -0 u_vars_time_22[16]
-   + 1.8326247166130014e+07 u_vars_time_22[17]
-   + 209936.1375015411 u_vars_time_22[18]
-   + 5.4782011448860504e+06 u_vars_time_22[19]
-   + 10.32536320952022 x_vars_time_22[0]
-   + 10.32536320952022 x_vars_time_22[1]
-   + 10.32536320952022 x_vars_time_22[2]
-   + 10.32536320952022 x_vars_time_22[3]
-   + 10.32536320952022 x_vars_time_22[9]
-   + 18.29768039680393 x_vars_time_22[13]
-   + 18.29768039680393 x_vars_time_22[14]
-   + 18.29768039680393 x_vars_time_22[15]
-   + 18.29768039680393 x_vars_time_22[16]
-   + 18.29768039680393 x_vars_time_22[22]
-   + 174377.2872253181 u_vars_time_23[5] + -0 u_vars_time_23[6]
-   + 1.6299593521142129e+07 u_vars_time_23[7]
-   + 207840.8691449541 u_vars_time_23[8]
-   + 174377.2872253181 u_vars_time_23[15] + -0 u_vars_time_23[16]
-   + 1.8143341992017705e+07 u_vars_time_23[17]
-   + 207840.8691449541 u_vars_time_23[18]
-   + 5.4235259391472852e+06 u_vars_time_23[19]
-   + 10.32536320952022 x_vars_time_23[0]
-   + 10.32536320952022 x_vars_time_23[1]
-   + 10.32536320952022 x_vars_time_23[2]
-   + 10.32536320952022 x_vars_time_23[3]
-   + 10.32536320952022 x_vars_time_23[9]
-   + 18.29768039680393 x_vars_time_23[13]
-   + 18.29768039680393 x_vars_time_23[14]
-   + 18.29768039680393 x_vars_time_23[15]
-   + 18.29768039680393 x_vars_time_23[16]
-   + 18.29768039680393 x_vars_time_23[22]
-   - 333786.1720555538 x_vars_time_24[12]
-   - 438746.5274871168 x_vars_time_24[25]
+   + 18.29768039680393 x_vars_time_21[22] - 1e+07 x_vars_time_22[12]
+   - 1e+07 x_vars_time_22[25]
 Subject To
- Initial_Conditions: x_vars_time_18[0] = 1.1260586584886899e+06
- Initial_Conditions: x_vars_time_18[1] = 56070.59212567836
- Initial_Conditions: x_vars_time_18[2] = 61666.50403794428
- Initial_Conditions: x_vars_time_18[3] = 334948.6677850939
- Initial_Conditions: x_vars_time_18[4] = 1.5787444224374066e+06
+ Initial_Conditions: x_vars_time_18[0] = 1.1720029282680536e+06
+ Initial_Conditions: x_vars_time_18[1] = 47125.63845338182
+ Initial_Conditions: x_vars_time_18[2] = 51365.14262682132
+ Initial_Conditions: x_vars_time_18[3] = 313660.1312205708
+ Initial_Conditions: x_vars_time_18[4] = 1.5841538405688275e+06
  Initial_Conditions: x_vars_time_18[5] = -0
  Initial_Conditions: x_vars_time_18[6] = -0
  Initial_Conditions: x_vars_time_18[7] = -0
  Initial_Conditions: x_vars_time_18[8] = -0
- Initial_Conditions: x_vars_time_18[9] = 15745.63127323069
- Initial_Conditions: x_vars_time_18[10] = 268.4717941120839
- Initial_Conditions: x_vars_time_18[11] = 95.71433317488368
- Initial_Conditions: x_vars_time_18[12] = 1.760157656185148
- Initial_Conditions: x_vars_time_18[13] = 638106.9096002927
- Initial_Conditions: x_vars_time_18[14] = 108079.4217506801
- Initial_Conditions: x_vars_time_18[15] = 126408.751468246
- Initial_Conditions: x_vars_time_18[16] = 637214.3901754688
- Initial_Conditions: x_vars_time_18[17] = 1.509809472994688e+06
- Initial_Conditions: x_vars_time_18[18] = 6.441153305400878
- Initial_Conditions: x_vars_time_18[19] = 3.220576652700439
- Initial_Conditions: x_vars_time_18[20] = 3.220576652700439
- Initial_Conditions: x_vars_time_18[21] = 0.0258162457130296
- Initial_Conditions: x_vars_time_18[22] = 35559.44520027743
- Initial_Conditions: x_vars_time_18[23] = 535.6098575789043
- Initial_Conditions: x_vars_time_18[24] = 188.2892591005187
- Initial_Conditions: x_vars_time_18[25] = 3.274557700226002
- Dynamics_const_time_18[0]: 5492.205207407396 u_vars_time_18[4]
-   + 4481.573742942526 u_vars_time_18[5]
-   + 5623.8400588379 u_vars_time_18[7]
-   + 344.1512624162557 u_vars_time_18[8]
-   + 1241.52104429132 u_vars_time_18[14]
-   + 791.6292526057834 u_vars_time_18[15]
-   + 437.8257977128541 u_vars_time_18[17]
-   + 96.16637393594395 u_vars_time_18[18]
-   - 0.989042067154245 x_vars_time_18[0]
-   + 0.1168379874197968 x_vars_time_18[2] - 0.00451868 x_vars_time_18[4]
-   - 0.00451868 x_vars_time_18[9] + 0.0406165307184569 x_vars_time_18[15]
-   - 0.0033223684497866 x_vars_time_18[17]
-   - 0.0033223684497866 x_vars_time_18[22] + x_vars_time_19[0]
-   = 18508.91274014988
- Dynamics_const_time_18[1]: - 5492.205207407396 u_vars_time_18[4]
-   - 4481.573742942526 u_vars_time_18[5]
-   - 5623.8400588379 u_vars_time_18[7]
-   - 344.1512624162557 u_vars_time_18[8]
-   - 1241.52104429132 u_vars_time_18[14]
-   - 791.6292526057834 u_vars_time_18[15]
-   - 437.8257977128541 u_vars_time_18[17]
-   - 96.16637393594395 u_vars_time_18[18]
-   - 0.010957932845755 x_vars_time_18[0] - 0.75 x_vars_time_18[1]
-   - 0.1168379874197968 x_vars_time_18[2] + 0.00451868 x_vars_time_18[4]
-   + 0.00451868 x_vars_time_18[9] - 0.0406165307184569 x_vars_time_18[15]
-   + 0.0033223684497866 x_vars_time_18[17]
-   + 0.0033223684497866 x_vars_time_18[22] + x_vars_time_19[1]
-   = -18508.91274014998
- Dynamics_const_time_18[2]: 0.0390604730959163 u_vars_time_18[0]
+ Initial_Conditions: x_vars_time_18[9] = 10374.54917125219
+ Initial_Conditions: x_vars_time_18[10] = 239.4450811795599
+ Initial_Conditions: x_vars_time_18[11] = 86.49592142605663
+ Initial_Conditions: x_vars_time_18[12] = 1.669252948242301
+ Initial_Conditions: x_vars_time_18[13] = 738253.6085390233
+ Initial_Conditions: x_vars_time_18[14] = 94031.36233718901
+ Initial_Conditions: x_vars_time_18[15] = 104110.463888895
+ Initial_Conditions: x_vars_time_18[16] = 551332.5547428636
+ Initial_Conditions: x_vars_time_18[17] = 1.4877279895079702e+06
+ Initial_Conditions: x_vars_time_18[18] = 16.86470174238864
+ Initial_Conditions: x_vars_time_18[19] = 8.43235087119432
+ Initial_Conditions: x_vars_time_18[20] = 8.43235087119432
+ Initial_Conditions: x_vars_time_18[21] = 0.0675939949594735
+ Initial_Conditions: x_vars_time_18[22] = 57711.28648259287
+ Initial_Conditions: x_vars_time_18[23] = 466.5488690026678
+ Initial_Conditions: x_vars_time_18[24] = 166.3232706092782
+ Initial_Conditions: x_vars_time_18[25] = 3.054864673550583
+ Dynamics_const_time_18[0]: 4737.068308099714 u_vars_time_18[4]
+   + 3869.708366018993 u_vars_time_18[5]
+   + 4866.853936884972 u_vars_time_18[7]
+   + 296.4748885901386 u_vars_time_18[8]
+   + 1064.190151492722 u_vars_time_18[14]
+   + 678.5580140830398 u_vars_time_18[15]
+   + 375.2895725270808 u_vars_time_18[17]
+   + 82.43058667266889 u_vars_time_18[18]
+   - 0.9909155097146557 x_vars_time_18[0]
+   + 0.1216021653453691 x_vars_time_18[2]
+   - 0.00391721627967587 x_vars_time_18[4]
+   - 0.00391721627967587 x_vars_time_18[9]
+   + 0.0422717994441715 x_vars_time_18[15]
+   - 0.0028476930267805 x_vars_time_18[17]
+   - 0.0028476930267805 x_vars_time_18[22] + x_vars_time_19[0]
+   = 15970.57382436931
+ Dynamics_const_time_18[1]: - 4737.068308099714 u_vars_time_18[4]
+   - 3869.708366018993 u_vars_time_18[5]
+   - 4866.853936884972 u_vars_time_18[7]
+   - 296.4748885901386 u_vars_time_18[8]
+   - 1064.190151492722 u_vars_time_18[14]
+   - 678.5580140830398 u_vars_time_18[15]
+   - 375.2895725270808 u_vars_time_18[17]
+   - 82.43058667266889 u_vars_time_18[18]
+   - 0.00908449028534431 x_vars_time_18[0] - 0.75 x_vars_time_18[1]
+   - 0.1216021653453691 x_vars_time_18[2]
+   + 0.00391721627967587 x_vars_time_18[4]
+   + 0.00391721627967587 x_vars_time_18[9]
+   - 0.0422717994441715 x_vars_time_18[15]
+   + 0.0028476930267805 x_vars_time_18[17]
+   + 0.0028476930267805 x_vars_time_18[22] + x_vars_time_19[1]
+   = -15970.57382436933
+ Dynamics_const_time_18[2]: 0.0324243399292442 u_vars_time_18[0]
    - 0.25 x_vars_time_18[1] - 0.75 x_vars_time_18[2] + x_vars_time_19[2]
-   = -3.63798e-12
- Dynamics_const_time_18[3]: 0.2121614258930969 u_vars_time_18[1]
+   = 1.81899e-12
+ Dynamics_const_time_18[3]: 0.1979985296806425 u_vars_time_18[1]
    - 0.2495 x_vars_time_18[2] - x_vars_time_18[3] + x_vars_time_19[3]
-   = -2.18279e-11
- Dynamics_const_time_18[4]: 0.0390604730959163 u_vars_time_18[0]
-   + 0.2121614258930969 u_vars_time_18[1] + 0.0005 x_vars_time_18[2]
-   - x_vars_time_18[4] + x_vars_time_19[4] = -4.39329e-11
- Dynamics_const_time_18[5]: - 0.0194911760748622 u_vars_time_18[0]
+   = 3.63798e-12
+ Dynamics_const_time_18[4]: 0.0324243399292442 u_vars_time_18[0]
+   + 0.1979985296806425 u_vars_time_18[1] + 0.0005 x_vars_time_18[2]
+   - x_vars_time_18[4] + x_vars_time_19[4] = 6.67164e-11
+ Dynamics_const_time_18[5]: - 0.0161797456246928 u_vars_time_18[0]
    - 0.75 x_vars_time_18[5] + x_vars_time_19[5] = -0
- Dynamics_const_time_18[6]: - 0.00974558803743112 u_vars_time_18[0]
+ Dynamics_const_time_18[6]: - 0.00808987281234642 u_vars_time_18[0]
    - 0.75 x_vars_time_18[6] + x_vars_time_19[6] = -0
- Dynamics_const_time_18[7]: - 0.00974558803743112 u_vars_time_18[0]
+ Dynamics_const_time_18[7]: - 0.00808987281234642 u_vars_time_18[0]
    - 0.75 x_vars_time_18[7] + x_vars_time_19[7] = -0
- Dynamics_const_time_18[8]: - 7.81209e-05 u_vars_time_18[0]
+ Dynamics_const_time_18[8]: - 6.48487e-05 u_vars_time_18[0]
    - 0.75 x_vars_time_18[8] + x_vars_time_19[8] = -0
- Dynamics_const_time_18[9]: - 0.2121614258930969 u_vars_time_18[1]
+ Dynamics_const_time_18[9]: - 0.1979985296806425 u_vars_time_18[1]
    - 0.25 x_vars_time_18[5] - 0.25 x_vars_time_18[6]
    - 0.25 x_vars_time_18[7] - x_vars_time_18[9]
    - 0.0758199847444699 x_vars_time_18[10]
    - 0.0521237545883587 x_vars_time_18[11] + x_vars_time_19[9]
-   = 8.88178e-14
+   = 8.91731e-13
  Dynamics_const_time_18[10]: u_vars_time_18[2] - 0.000389 x_vars_time_18[2]
    - 0.1945 x_vars_time_18[8] - 0.92372234935164 x_vars_time_18[10]
-   + x_vars_time_19[10] = -2.39883e-08
+   + x_vars_time_19[10] = -1.9981e-08
  Dynamics_const_time_18[11]: u_vars_time_18[3] - 0.000111 x_vars_time_18[2]
    - 0.0555 x_vars_time_18[8] - 0.9475616151022549 x_vars_time_18[11]
-   + x_vars_time_19[11] = -6.84499e-09
+   + x_vars_time_19[11] = -5.70153e-09
  Dynamics_const_time_18[12]: - u_vars_time_18[2] - u_vars_time_18[3]
    - 0.000457666 x_vars_time_18[10]
    - 3.1463030938647091e-04 x_vars_time_18[11] - x_vars_time_18[12]
-   + x_vars_time_19[12] = -0
- Dynamics_const_time_18[13]: 308.7936493554591 u_vars_time_18[4]
-   + 196.8956461812764 u_vars_time_18[5]
-   + 108.8969260711661 u_vars_time_18[7]
-   + 23.91869679445276 u_vars_time_18[8]
-   + 5474.676751315705 u_vars_time_18[14]
-   + 10083.01413632568 u_vars_time_18[15]
-   + 13977.44313282574 u_vars_time_18[17]
-   + 1776.153723063481 u_vars_time_18[18]
-   + 24.48540238903941 u_vars_time_18[19]
-   + 0.020708322236314 x_vars_time_18[2]
-   - 8.0088918324256668e-04 x_vars_time_18[4]
-   - 8.0088918324256668e-04 x_vars_time_18[9]
-   - 0.9665946488660231 x_vars_time_18[13]
-   + 0.1585268053568571 x_vars_time_18[15]
-   - 0.0129672438105047 x_vars_time_18[17]
-   - 0.0129672438105047 x_vars_time_18[22] + x_vars_time_19[13]
-   = 31974.27806432199
- Dynamics_const_time_18[14]: - 308.7936493554591 u_vars_time_18[4]
-   - 196.8956461812764 u_vars_time_18[5]
-   - 108.8969260711661 u_vars_time_18[7]
-   - 23.91869679445276 u_vars_time_18[8]
-   - 5474.676751315705 u_vars_time_18[14]
-   - 10083.01413632568 u_vars_time_18[15]
-   - 13977.44313282574 u_vars_time_18[17]
-   - 1776.153723063481 u_vars_time_18[18]
-   - 24.48540238903941 u_vars_time_18[19]
-   - 0.020708322236314 x_vars_time_18[2]
-   + 8.0088918324256668e-04 x_vars_time_18[4]
-   + 8.0088918324256668e-04 x_vars_time_18[9]
-   - 0.033405351133977 x_vars_time_18[13] - 0.75 x_vars_time_18[14]
-   - 0.1585268053568571 x_vars_time_18[15]
-   + 0.0129672438105047 x_vars_time_18[17]
-   + 0.0129672438105047 x_vars_time_18[22] + x_vars_time_19[14]
-   = -31974.27806432201
- Dynamics_const_time_18[15]: 0.0837249690966078 u_vars_time_18[10]
+   + x_vars_time_19[12] = -5.55112e-17
+ Dynamics_const_time_18[13]: 297.5700511828758 u_vars_time_18[4]
+   + 189.7391595783866 u_vars_time_18[5]
+   + 104.938893439979 u_vars_time_18[7]
+   + 23.04933357343726 u_vars_time_18[8]
+   + 5223.058585397428 u_vars_time_18[14]
+   + 9611.536720251728 u_vars_time_18[15]
+   + 13320.30860094668 u_vars_time_18[17]
+   + 1692.868232284567 u_vars_time_18[18]
+   + 23.33011310300936 u_vars_time_18[19]
+   + 0.0239577817293313 x_vars_time_18[2] - 0.000771761 x_vars_time_18[4]
+   - 0.000771761 x_vars_time_18[9] - 0.9724698041096478 x_vars_time_18[13]
+   + 0.1833981990961622 x_vars_time_18[15]
+   - 0.012354850741095 x_vars_time_18[17]
+   - 0.012354850741095 x_vars_time_18[22] + x_vars_time_19[13]
+   = 30486.3996897581
+ Dynamics_const_time_18[14]: - 297.5700511828758 u_vars_time_18[4]
+   - 189.7391595783866 u_vars_time_18[5]
+   - 104.938893439979 u_vars_time_18[7]
+   - 23.04933357343726 u_vars_time_18[8]
+   - 5223.058585397428 u_vars_time_18[14]
+   - 9611.536720251728 u_vars_time_18[15]
+   - 13320.30860094668 u_vars_time_18[17]
+   - 1692.868232284567 u_vars_time_18[18]
+   - 23.33011310300936 u_vars_time_18[19]
+   - 0.0239577817293313 x_vars_time_18[2] + 0.000771761 x_vars_time_18[4]
+   + 0.000771761 x_vars_time_18[9] - 0.0275301958903522 x_vars_time_18[13]
+   - 0.75 x_vars_time_18[14] - 0.1833981990961622 x_vars_time_18[15]
+   + 0.012354850741095 x_vars_time_18[17]
+   + 0.012354850741095 x_vars_time_18[22] + x_vars_time_19[14]
+   = -30486.39968975809
+ Dynamics_const_time_18[15]: 0.0699795020481714 u_vars_time_18[10]
    - 0.25 x_vars_time_18[14] - 0.75 x_vars_time_18[15] + x_vars_time_19[15]
-   = 3.63798e-12
- Dynamics_const_time_18[16]: 0.4220495377549606 u_vars_time_18[11]
-   - 0.2495 x_vars_time_18[15] - 0.9801299431904508 x_vars_time_18[16]
-   - 0.00838614829163505 x_vars_time_18[17] + x_vars_time_19[16]
-   = 5.27507e-11
- Dynamics_const_time_18[17]: 0.0837249690966078 u_vars_time_18[10]
-   + 0.4220495377549606 u_vars_time_18[11] + 0.0005 x_vars_time_18[15]
-   + 0.0198700568095492 x_vars_time_18[16]
-   - 1.008386148291635 x_vars_time_18[17] + x_vars_time_19[17]
-   = 8.36735e-11
- Dynamics_const_time_18[18]: - 0.0417787595792073 u_vars_time_18[10]
+   = -3.63798e-12
+ Dynamics_const_time_18[16]: 0.3705869343260816 u_vars_time_18[11]
+   - 0.2495 x_vars_time_18[15] - x_vars_time_18[16] + x_vars_time_19[16]
+   = -2.91038e-11
+ Dynamics_const_time_18[17]: 0.0699795020481714 u_vars_time_18[10]
+   + 0.3705869343260816 u_vars_time_18[11] + 0.0005 x_vars_time_18[15]
+   - x_vars_time_18[17] + x_vars_time_19[17] = 2.24532e-11
+ Dynamics_const_time_18[18]: - 0.0349197715220375 u_vars_time_18[10]
    - 0.75 x_vars_time_18[18] + x_vars_time_19[18] = -0
- Dynamics_const_time_18[19]: - 0.0208893797896036 u_vars_time_18[10]
+ Dynamics_const_time_18[19]: - 0.0174598857610188 u_vars_time_18[10]
    - 0.75 x_vars_time_18[19] + x_vars_time_19[19] = -0
- Dynamics_const_time_18[20]: - 0.0208893797896036 u_vars_time_18[10]
+ Dynamics_const_time_18[20]: - 0.0174598857610188 u_vars_time_18[10]
    - 0.75 x_vars_time_18[20] + x_vars_time_19[20] = -0
- Dynamics_const_time_18[21]: - 0.00016745 u_vars_time_18[10]
-   - 0.75 x_vars_time_18[21] + x_vars_time_19[21] = -8.67362e-19
- Dynamics_const_time_18[22]: - 0.4220495377549606 u_vars_time_18[11]
-   - 0.0198700568095492 x_vars_time_18[16]
-   + 0.00838614829163505 x_vars_time_18[17] - 0.25 x_vars_time_18[18]
-   - 0.25 x_vars_time_18[19] - 0.25 x_vars_time_18[20] - x_vars_time_18[22]
+ Dynamics_const_time_18[21]: - 0.000139959 u_vars_time_18[10]
+   - 0.75 x_vars_time_18[21] + x_vars_time_19[21] = -3.46945e-18
+ Dynamics_const_time_18[22]: - 0.3705869343260816 u_vars_time_18[11]
+   - 0.25 x_vars_time_18[18] - 0.25 x_vars_time_18[19]
+   - 0.25 x_vars_time_18[20] - x_vars_time_18[22]
    - 0.0758199847444699 x_vars_time_18[23]
    - 0.0521237545883587 x_vars_time_18[24] + x_vars_time_19[22]
-   = -9.09495e-12
+   = -2.29505e-12
  Dynamics_const_time_18[23]: u_vars_time_18[12]
    - 0.000389 x_vars_time_18[15] - 0.1945 x_vars_time_18[21]
    - 0.92372234935164 x_vars_time_18[23] + x_vars_time_19[23]
-   = -4.9178e-08
+   = -4.05122e-08
  Dynamics_const_time_18[24]: u_vars_time_18[13]
    - 0.000111 x_vars_time_18[15] - 0.0555 x_vars_time_18[21]
    - 0.9475616151022549 x_vars_time_18[24] + x_vars_time_19[24]
-   = -1.40328e-08
+   = -1.156e-08
  Dynamics_const_time_18[25]: - u_vars_time_18[12] - u_vars_time_18[13]
    - 0.000457666 x_vars_time_18[23]
    - 3.1463030938647091e-04 x_vars_time_18[24] - x_vars_time_18[25]
-   + x_vars_time_19[25] = 1.11022e-16
+   + x_vars_time_19[25] = -5.55112e-17
  All_const_time_18[0]: u_vars_time_18[2] - 0.000389 x_vars_time_18[2]
    - 0.1945 x_vars_time_18[8] <= -0
  All_const_time_18[1]: u_vars_time_18[12] - 0.000389 x_vars_time_18[15]
@@ -283,144 +244,144 @@ Subject To
  All_const_time_18[6]: u_vars_time_18[1] + u_vars_time_18[11] <= 30000
  R59: - u_vars_time_18[8] + 0.25 u_vars_time_18[9] <= -0
  R60: - u_vars_time_18[18] + 0.25 u_vars_time_18[19] <= -0
- Dynamics_const_time_19[0]: 5275.50401615079 u_vars_time_19[4]
-   + 4310.688314249634 u_vars_time_19[5]
-   + 5424.302783717316 u_vars_time_19[7]
-   + 330.0795872260477 u_vars_time_19[8]
-   + 1183.411738431059 u_vars_time_19[14]
-   + 754.5771006675481 u_vars_time_19[15]
-   + 417.3333917969067 u_vars_time_19[17]
-   + 91.6653135131577 u_vars_time_19[18]
-   - 0.989352457173673 x_vars_time_19[0]
-   + 0.1155580823869381 x_vars_time_19[2]
-   - 0.0043678063084841 x_vars_time_19[4]
-   - 0.0043678063084841 x_vars_time_19[9]
-   + 0.0401717060012779 x_vars_time_19[15]
-   - 0.00316688481637599 x_vars_time_19[17]
-   - 0.00316688481637599 x_vars_time_19[22] + x_vars_time_20[0]
-   = 17787.56224575248
- Dynamics_const_time_19[1]: - 5275.50401615079 u_vars_time_19[4]
-   - 4310.688314249634 u_vars_time_19[5]
-   - 5424.302783717316 u_vars_time_19[7]
-   - 330.0795872260477 u_vars_time_19[8]
-   - 1183.411738431059 u_vars_time_19[14]
-   - 754.5771006675481 u_vars_time_19[15]
-   - 417.3333917969067 u_vars_time_19[17]
-   - 91.6653135131577 u_vars_time_19[18]
-   - 0.010647542826327 x_vars_time_19[0] - 0.75 x_vars_time_19[1]
-   - 0.1155580823869381 x_vars_time_19[2]
-   + 0.0043678063084841 x_vars_time_19[4]
-   + 0.0043678063084841 x_vars_time_19[9]
-   - 0.0401717060012779 x_vars_time_19[15]
-   + 0.00316688481637599 x_vars_time_19[17]
-   + 0.00316688481637599 x_vars_time_19[22] + x_vars_time_20[1]
-   = -17787.56224575246
- Dynamics_const_time_19[2]: 0.0381750853813678 u_vars_time_19[0]
+ Dynamics_const_time_19[0]: 4589.65462153872 u_vars_time_19[4]
+   + 3750.636323041218 u_vars_time_19[5]
+   + 4720.483021789301 u_vars_time_19[7]
+   + 287.1368271618901 u_vars_time_19[8]
+   + 1028.999740891069 u_vars_time_19[14]
+   + 656.1196038993611 u_vars_time_19[15]
+   + 362.8795778158703 u_vars_time_19[17]
+   + 79.7047897959758 u_vars_time_19[18]
+   - 0.9911163524261725 x_vars_time_19[0]
+   + 0.1204976998268655 x_vars_time_19[2]
+   - 0.00380155062131565 x_vars_time_19[4]
+   - 0.00380155062131565 x_vars_time_19[9]
+   + 0.0418877703025311 x_vars_time_19[15]
+   - 0.00275352537868847 x_vars_time_19[17]
+   - 0.00275352537868847 x_vars_time_19[22] + x_vars_time_20[0]
+   = 15475.61450593351
+ Dynamics_const_time_19[1]: - 4589.65462153872 u_vars_time_19[4]
+   - 3750.636323041218 u_vars_time_19[5]
+   - 4720.483021789301 u_vars_time_19[7]
+   - 287.1368271618901 u_vars_time_19[8]
+   - 1028.999740891069 u_vars_time_19[14]
+   - 656.1196038993611 u_vars_time_19[15]
+   - 362.8795778158703 u_vars_time_19[17]
+   - 79.7047897959758 u_vars_time_19[18]
+   - 0.00888364757382754 x_vars_time_19[0] - 0.75 x_vars_time_19[1]
+   - 0.1204976998268655 x_vars_time_19[2]
+   + 0.00380155062131565 x_vars_time_19[4]
+   + 0.00380155062131565 x_vars_time_19[9]
+   - 0.0418877703025311 x_vars_time_19[15]
+   + 0.00275352537868847 x_vars_time_19[17]
+   + 0.00275352537868847 x_vars_time_19[22] + x_vars_time_20[1]
+   = -15475.61450593341
+ Dynamics_const_time_19[2]: 0.0317558060750918 u_vars_time_19[0]
    - 0.25 x_vars_time_19[1] - 0.75 x_vars_time_19[2] + x_vars_time_20[2]
-   = -0
- Dynamics_const_time_19[3]: 0.2219113479116454 u_vars_time_19[1]
-   - 0.2495 x_vars_time_19[2] - x_vars_time_19[3] + x_vars_time_20[3]
-   = 7.27596e-12
- Dynamics_const_time_19[4]: 0.0381750853813678 u_vars_time_19[0]
-   + 0.2219113479116454 u_vars_time_19[1] + 0.0005 x_vars_time_19[2]
-   - x_vars_time_19[4] + x_vars_time_20[4] = 3.33955e-13
- Dynamics_const_time_19[5]: - 0.0190493676053025 u_vars_time_19[0]
+   = -3.63798e-12
+ Dynamics_const_time_19[3]: 0.2060917436873659 u_vars_time_19[1]
+   - 0.2495 x_vars_time_19[2] - 0.9810621382818403 x_vars_time_19[3]
+   - 0.00390293694320575 x_vars_time_19[4] + x_vars_time_20[3]
+   = -2.18279e-11
+ Dynamics_const_time_19[4]: 0.0317558060750918 u_vars_time_19[0]
+   + 0.2060917436873659 u_vars_time_19[1] + 0.0005 x_vars_time_19[2]
+   + 0.0189378617181597 x_vars_time_19[3]
+   - 1.003902936943206 x_vars_time_19[4] + x_vars_time_20[4]
+   = -4.72937e-11
+ Dynamics_const_time_19[5]: - 0.0158461472314708 u_vars_time_19[0]
    - 0.75 x_vars_time_19[5] + x_vars_time_20[5] = -0
- Dynamics_const_time_19[6]: - 0.00952468380265127 u_vars_time_19[0]
+ Dynamics_const_time_19[6]: - 0.0079230736157354 u_vars_time_19[0]
    - 0.75 x_vars_time_19[6] + x_vars_time_20[6] = -0
- Dynamics_const_time_19[7]: - 0.00952468380265127 u_vars_time_19[0]
+ Dynamics_const_time_19[7]: - 0.0079230736157354 u_vars_time_19[0]
    - 0.75 x_vars_time_19[7] + x_vars_time_20[7] = -0
- Dynamics_const_time_19[8]: - 7.63502e-05 u_vars_time_19[0]
+ Dynamics_const_time_19[8]: - 6.35116e-05 u_vars_time_19[0]
    - 0.75 x_vars_time_19[8] + x_vars_time_20[8] = -0
- Dynamics_const_time_19[9]: - 0.2219113479116454 u_vars_time_19[1]
-   - 0.25 x_vars_time_19[5] - 0.25 x_vars_time_19[6]
-   - 0.25 x_vars_time_19[7] - x_vars_time_19[9]
+ Dynamics_const_time_19[9]: - 0.2060917436873659 u_vars_time_19[1]
+   - 0.0189378617181597 x_vars_time_19[3]
+   + 0.00390293694320575 x_vars_time_19[4] - 0.25 x_vars_time_19[5]
+   - 0.25 x_vars_time_19[6] - 0.25 x_vars_time_19[7] - x_vars_time_19[9]
    - 0.0758199847444699 x_vars_time_19[10]
    - 0.0521237545883587 x_vars_time_19[11] + x_vars_time_20[9]
-   = -4.54747e-13
+   = -9.09495e-13
  Dynamics_const_time_19[10]: u_vars_time_19[2] - 0.000389 x_vars_time_19[2]
    - 0.1945 x_vars_time_19[8] - 0.92372234935164 x_vars_time_19[10]
-   + x_vars_time_20[10] = -2.34441e-08
+   + x_vars_time_20[10] = -1.95687e-08
  Dynamics_const_time_19[11]: u_vars_time_19[3] - 0.000111 x_vars_time_19[2]
    - 0.0555 x_vars_time_19[8] - 0.9475616151022549 x_vars_time_19[11]
-   + x_vars_time_20[11] = -6.68969e-09
+   + x_vars_time_20[11] = -5.58388e-09
  Dynamics_const_time_19[12]: - u_vars_time_19[2] - u_vars_time_19[3]
    - 0.000457666 x_vars_time_19[10]
    - 3.1463030938647091e-04 x_vars_time_19[11] - x_vars_time_19[12]
-   + x_vars_time_20[12] = -5.55112e-17
- Dynamics_const_time_19[13]: 291.7079582822514 u_vars_time_19[4]
-   + 186.0013217956073 u_vars_time_19[5]
-   + 102.8716103253357 u_vars_time_19[7]
-   + 22.5952645763461 u_vars_time_19[8]
-   + 5108.09218625052 u_vars_time_19[14]
-   + 9398.107083621357 u_vars_time_19[15]
-   + 13023.69915640608 u_vars_time_19[17]
-   + 1655.223030878734 u_vars_time_19[18]
-   + 22.80965179341832 u_vars_time_19[19]
-   + 0.0200166223640992 x_vars_time_19[2]
-   - 7.5657823001689739e-04 x_vars_time_19[4]
-   - 7.5657823001689739e-04 x_vars_time_19[9]
-   - 0.9677782581210378 x_vars_time_19[13]
-   + 0.1532321096409604 x_vars_time_19[15]
-   - 0.0120798564389519 x_vars_time_19[17]
-   - 0.0120798564389519 x_vars_time_19[22] + x_vars_time_20[13]
-   = 29811.10726392967
- Dynamics_const_time_19[14]: - 291.7079582822514 u_vars_time_19[4]
-   - 186.0013217956073 u_vars_time_19[5]
-   - 102.8716103253357 u_vars_time_19[7]
-   - 22.5952645763461 u_vars_time_19[8]
-   - 5108.09218625052 u_vars_time_19[14]
-   - 9398.107083621357 u_vars_time_19[15]
-   - 13023.69915640608 u_vars_time_19[17]
-   - 1655.223030878734 u_vars_time_19[18]
-   - 22.80965179341832 u_vars_time_19[19]
-   - 0.0200166223640992 x_vars_time_19[2]
-   + 7.5657823001689739e-04 x_vars_time_19[4]
-   + 7.5657823001689739e-04 x_vars_time_19[9]
-   - 0.0322217418789623 x_vars_time_19[13] - 0.75 x_vars_time_19[14]
-   - 0.1532321096409604 x_vars_time_19[15]
-   + 0.0120798564389519 x_vars_time_19[17]
-   + 0.0120798564389519 x_vars_time_19[22] + x_vars_time_20[14]
-   = -29811.10726392965
- Dynamics_const_time_19[15]: 0.0813757647289217 u_vars_time_19[10]
+   + x_vars_time_20[12] = -0
+ Dynamics_const_time_19[13]: 283.4073593401486 u_vars_time_19[4]
+   + 180.7086229470128 u_vars_time_19[5]
+   + 99.94438137735935 u_vars_time_19[7]
+   + 21.95231252819706 u_vars_time_19[8]
+   + 4958.399077485595 u_vars_time_19[14]
+   + 9122.021699597872 u_vars_time_19[15]
+   + 12640.80860854629 u_vars_time_19[17]
+   + 1606.578533711278 u_vars_time_19[18]
+   + 22.1387131532224 u_vars_time_19[19]
+   + 0.0232982634221991 x_vars_time_19[2]
+   - 7.3503085880888914e-04 x_vars_time_19[4]
+   - 7.3503085880888914e-04 x_vars_time_19[9]
+   - 0.9731301697695524 x_vars_time_19[13]
+   + 0.1783491622518779 x_vars_time_19[15]
+   - 0.0117239218268608 x_vars_time_19[17]
+   - 0.0117239218268608 x_vars_time_19[22] + x_vars_time_20[13]
+   = 28935.95930868695
+ Dynamics_const_time_19[14]: - 283.4073593401486 u_vars_time_19[4]
+   - 180.7086229470128 u_vars_time_19[5]
+   - 99.94438137735935 u_vars_time_19[7]
+   - 21.95231252819706 u_vars_time_19[8]
+   - 4958.399077485595 u_vars_time_19[14]
+   - 9122.021699597872 u_vars_time_19[15]
+   - 12640.80860854629 u_vars_time_19[17]
+   - 1606.578533711278 u_vars_time_19[18]
+   - 22.1387131532224 u_vars_time_19[19]
+   - 0.0232982634221991 x_vars_time_19[2]
+   + 7.3503085880888914e-04 x_vars_time_19[4]
+   + 7.3503085880888914e-04 x_vars_time_19[9]
+   - 0.0268698302304476 x_vars_time_19[13] - 0.75 x_vars_time_19[14]
+   - 0.1783491622518779 x_vars_time_19[15]
+   + 0.0117239218268608 x_vars_time_19[17]
+   + 0.0117239218268608 x_vars_time_19[22] + x_vars_time_20[14]
+   = -28935.95930868698
+ Dynamics_const_time_19[15]: 0.0682881843823113 u_vars_time_19[10]
    - 0.25 x_vars_time_19[14] - 0.75 x_vars_time_19[15] + x_vars_time_20[15]
    = 7.27596e-12
- Dynamics_const_time_19[16]: 0.4382463139091784 u_vars_time_19[11]
-   - 0.2495 x_vars_time_19[15] - 0.9799610547438889 x_vars_time_19[16]
-   - 0.00878199389311849 x_vars_time_19[17] + x_vars_time_20[16]
-   = -5.45697e-12
- Dynamics_const_time_19[17]: 0.0813757647289217 u_vars_time_19[10]
-   + 0.4382463139091784 u_vars_time_19[11] + 0.0005 x_vars_time_19[15]
-   + 0.0200389452561111 x_vars_time_19[16]
-   - 1.008781993893118 x_vars_time_19[17] + x_vars_time_20[17]
-   = 1.0732e-10
- Dynamics_const_time_19[18]: - 0.0406065065997319 u_vars_time_19[10]
-   - 0.75 x_vars_time_19[18] + x_vars_time_20[18] = -2.22045e-16
- Dynamics_const_time_19[19]: - 0.020303253299866 u_vars_time_19[10]
-   - 0.75 x_vars_time_19[19] + x_vars_time_20[19] = -1.11022e-16
- Dynamics_const_time_19[20]: - 0.020303253299866 u_vars_time_19[10]
-   - 0.75 x_vars_time_19[20] + x_vars_time_20[20] = -1.11022e-16
- Dynamics_const_time_19[21]: - 1.6275152945784347e-04 u_vars_time_19[10]
+ Dynamics_const_time_19[16]: 0.3880603982238165 u_vars_time_19[11]
+   - 0.2495 x_vars_time_19[15] - x_vars_time_19[16] + x_vars_time_20[16]
+   = 4.00178e-11
+ Dynamics_const_time_19[17]: 0.0682881843823113 u_vars_time_19[10]
+   + 0.3880603982238165 u_vars_time_19[11] + 0.0005 x_vars_time_19[15]
+   - x_vars_time_19[17] + x_vars_time_20[17] = -2.5274e-11
+ Dynamics_const_time_19[18]: - 0.0340758040067733 u_vars_time_19[10]
+   - 0.75 x_vars_time_19[18] + x_vars_time_20[18] = -4.44089e-16
+ Dynamics_const_time_19[19]: - 0.0170379020033867 u_vars_time_19[10]
+   - 0.75 x_vars_time_19[19] + x_vars_time_20[19] = -2.22045e-16
+ Dynamics_const_time_19[20]: - 0.0170379020033867 u_vars_time_19[10]
+   - 0.75 x_vars_time_19[20] + x_vars_time_20[20] = -2.22045e-16
+ Dynamics_const_time_19[21]: - 1.3657636876462261e-04 u_vars_time_19[10]
    - 0.75 x_vars_time_19[21] + x_vars_time_20[21] = -0
- Dynamics_const_time_19[22]: - 0.4382463139091784 u_vars_time_19[11]
-   - 0.0200389452561111 x_vars_time_19[16]
-   + 0.00878199389311849 x_vars_time_19[17] - 0.25 x_vars_time_19[18]
-   - 0.25 x_vars_time_19[19] - 0.25 x_vars_time_19[20] - x_vars_time_19[22]
+ Dynamics_const_time_19[22]: - 0.3880603982238165 u_vars_time_19[11]
+   - 0.25 x_vars_time_19[18] - 0.25 x_vars_time_19[19]
+   - 0.25 x_vars_time_19[20] - x_vars_time_19[22]
    - 0.0758199847444699 x_vars_time_19[23]
    - 0.0521237545883587 x_vars_time_19[24] + x_vars_time_20[22]
-   = 3.63798e-12
+   = 1.71951e-12
  Dynamics_const_time_19[23]: u_vars_time_19[12]
    - 0.000389 x_vars_time_19[15] - 0.1945 x_vars_time_19[21]
    - 0.92372234935164 x_vars_time_19[23] + x_vars_time_20[23]
-   = -4.73942e-08
+   = -3.95286e-08
  Dynamics_const_time_19[24]: u_vars_time_19[13]
    - 0.000111 x_vars_time_19[15] - 0.0555 x_vars_time_19[21]
    - 0.9475616151022549 x_vars_time_19[24] + x_vars_time_20[24]
-   = -1.35238e-08
+   = -1.12794e-08
  Dynamics_const_time_19[25]: - u_vars_time_19[12] - u_vars_time_19[13]
    - 0.000457666 x_vars_time_19[23]
    - 3.1463030938647091e-04 x_vars_time_19[24] - x_vars_time_19[25]
-   + x_vars_time_20[25] = -1.66533e-16
+   + x_vars_time_20[25] = -1.11022e-16
  All_const_time_19[0]: u_vars_time_19[2] - 0.000389 x_vars_time_19[2]
    - 0.1945 x_vars_time_19[8] <= -0
  All_const_time_19[1]: u_vars_time_19[12] - 0.000389 x_vars_time_19[15]
@@ -438,140 +399,144 @@ Subject To
  All_const_time_19[6]: u_vars_time_19[1] + u_vars_time_19[11] <= 30000
  R94: - u_vars_time_19[8] + 0.25 u_vars_time_19[9] <= -0
  R95: - u_vars_time_19[18] + 0.25 u_vars_time_19[19] <= -0
- Dynamics_const_time_20[0]: 5055.751057352288 u_vars_time_20[4]
-   + 4137.656840932616 u_vars_time_20[5]
-   + 5222.935961792445 u_vars_time_20[7]
-   + 315.7881312003164 u_vars_time_20[8]
-   + 1124.083966950796 u_vars_time_20[14]
-   + 716.7480202732672 u_vars_time_20[15]
-   + 396.4112906417874 u_vars_time_20[17]
-   + 87.06987255531718 u_vars_time_20[18]
-   - 0.9896802197916971 x_vars_time_20[0]
-   + 0.1143279902497592 x_vars_time_20[2]
-   - 0.00421600556248754 x_vars_time_20[4]
-   - 0.00421600556248754 x_vars_time_20[9]
-   + 0.0397441618736375 x_vars_time_20[15]
-   - 0.00300813400489616 x_vars_time_20[17]
-   - 0.00300813400489616 x_vars_time_20[22] + x_vars_time_21[0]
-   = 17056.44514169876
- Dynamics_const_time_20[1]: - 5055.751057352288 u_vars_time_20[4]
-   - 4137.656840932616 u_vars_time_20[5]
-   - 5222.935961792445 u_vars_time_20[7]
-   - 315.7881312003164 u_vars_time_20[8]
-   - 1124.083966950796 u_vars_time_20[14]
-   - 716.7480202732672 u_vars_time_20[15]
-   - 396.4112906417874 u_vars_time_20[17]
-   - 87.06987255531718 u_vars_time_20[18]
-   - 0.0103197802083029 x_vars_time_20[0] - 0.75 x_vars_time_20[1]
-   - 0.1143279902497592 x_vars_time_20[2]
-   + 0.00421600556248754 x_vars_time_20[4]
-   + 0.00421600556248754 x_vars_time_20[9]
-   - 0.0397441618736375 x_vars_time_20[15]
-   + 0.00300813400489616 x_vars_time_20[17]
-   + 0.00300813400489616 x_vars_time_20[22] + x_vars_time_21[1]
-   = -17056.44514169883
- Dynamics_const_time_20[2]: 0.0372454016392838 u_vars_time_20[0]
+ Dynamics_const_time_20[0]: 4441.167621347546 u_vars_time_20[4]
+   + 3631.124694570786 u_vars_time_20[5]
+   + 4574.654947341445 u_vars_time_20[7]
+   + 277.6953206216118 u_vars_time_20[8]
+   + 992.8966921607195 u_vars_time_20[14]
+   + 633.0992695968437 u_vars_time_20[15]
+   + 350.147738768185 u_vars_time_20[17]
+   + 76.90830132693642 u_vars_time_20[18]
+   - 0.9913251145832143 x_vars_time_20[0]
+   + 0.1194274128813117 x_vars_time_20[2]
+   - 0.00368701201239608 x_vars_time_20[4]
+   - 0.00368701201239608 x_vars_time_20[9]
+   + 0.0415156516048536 x_vars_time_20[15]
+   - 0.00265691619388375 x_vars_time_20[17]
+   - 0.00265691619388375 x_vars_time_20[22] + x_vars_time_21[0]
+   = 14977.69458573409
+ Dynamics_const_time_20[1]: - 4441.167621347546 u_vars_time_20[4]
+   - 3631.124694570786 u_vars_time_20[5]
+   - 4574.654947341445 u_vars_time_20[7]
+   - 277.6953206216118 u_vars_time_20[8]
+   - 992.8966921607195 u_vars_time_20[14]
+   - 633.0992695968437 u_vars_time_20[15]
+   - 350.147738768185 u_vars_time_20[17]
+   - 76.90830132693642 u_vars_time_20[18]
+   - 0.00867488541678576 x_vars_time_20[0] - 0.75 x_vars_time_20[1]
+   - 0.1194274128813117 x_vars_time_20[2]
+   + 0.00368701201239608 x_vars_time_20[4]
+   + 0.00368701201239608 x_vars_time_20[9]
+   - 0.0415156516048536 x_vars_time_20[15]
+   + 0.00265691619388375 x_vars_time_20[17]
+   + 0.00265691619388375 x_vars_time_20[22] + x_vars_time_21[1]
+   = -14977.69458573407
+ Dynamics_const_time_20[2]: 0.0311972479955199 u_vars_time_20[0]
    - 0.25 x_vars_time_20[1] - 0.75 x_vars_time_20[2] + x_vars_time_21[2]
-   = -0
- Dynamics_const_time_20[3]: 0.2314404493437539 u_vars_time_20[1]
+   = 1.81899e-12
+ Dynamics_const_time_20[3]: 0.2109385093218705 u_vars_time_20[1]
    - 0.2495 x_vars_time_20[2] - x_vars_time_20[3] + x_vars_time_21[3]
-   = -5.45697e-12
- Dynamics_const_time_20[4]: 0.0372454016392838 u_vars_time_20[0]
-   + 0.2314404493437539 u_vars_time_20[1] + 0.0005 x_vars_time_20[2]
-   - x_vars_time_20[4] + x_vars_time_21[4] = 9.92628e-12
- Dynamics_const_time_20[5]: - 0.0185854554180026 u_vars_time_20[0]
+   = -9.09495e-12
+ Dynamics_const_time_20[4]: 0.0311972479955199 u_vars_time_20[0]
+   + 0.2109385093218705 u_vars_time_20[1] + 0.0005 x_vars_time_20[2]
+   - x_vars_time_20[4] + x_vars_time_21[4] = 7.45572e-11
+ Dynamics_const_time_20[5]: - 0.0155674267497644 u_vars_time_20[0]
    - 0.75 x_vars_time_20[5] + x_vars_time_21[5] = -0
- Dynamics_const_time_20[6]: - 0.0092927277090013 u_vars_time_20[0]
+ Dynamics_const_time_20[6]: - 0.00778371337488222 u_vars_time_20[0]
    - 0.75 x_vars_time_20[6] + x_vars_time_21[6] = -0
- Dynamics_const_time_20[7]: - 0.0092927277090013 u_vars_time_20[0]
+ Dynamics_const_time_20[7]: - 0.00778371337488222 u_vars_time_20[0]
    - 0.75 x_vars_time_20[7] + x_vars_time_21[7] = -0
- Dynamics_const_time_20[8]: - 7.44908e-05 u_vars_time_20[0]
+ Dynamics_const_time_20[8]: - 6.23945e-05 u_vars_time_20[0]
    - 0.75 x_vars_time_20[8] + x_vars_time_21[8] = -0
- Dynamics_const_time_20[9]: - 0.2314404493437539 u_vars_time_20[1]
+ Dynamics_const_time_20[9]: - 0.2109385093218705 u_vars_time_20[1]
    - 0.25 x_vars_time_20[5] - 0.25 x_vars_time_20[6]
    - 0.25 x_vars_time_20[7] - x_vars_time_20[9]
    - 0.0758199847444699 x_vars_time_20[10]
    - 0.0521237545883587 x_vars_time_20[11] + x_vars_time_21[9]
-   = -8.88178e-13
+   = -4.15668e-13
  Dynamics_const_time_20[10]: u_vars_time_20[2] - 0.000389 x_vars_time_20[2]
    - 0.1945 x_vars_time_20[8] - 0.92372234935164 x_vars_time_20[10]
-   + x_vars_time_21[10] = -2.28727e-08
+   + x_vars_time_21[10] = -1.91492e-08
  Dynamics_const_time_20[11]: u_vars_time_20[3] - 0.000111 x_vars_time_20[2]
    - 0.0555 x_vars_time_20[8] - 0.9475616151022549 x_vars_time_20[11]
-   + x_vars_time_21[11] = -6.52665e-09
+   + x_vars_time_21[11] = -5.46418e-09
  Dynamics_const_time_20[12]: - u_vars_time_20[2] - u_vars_time_20[3]
    - 0.000457666 x_vars_time_20[10]
    - 3.1463030938647091e-04 x_vars_time_20[11] - x_vars_time_20[12]
-   + x_vars_time_21[12] = -1.94289e-16
- Dynamics_const_time_20[13]: 275.4290219187429 u_vars_time_20[4]
-   + 175.6214072438439 u_vars_time_20[5]
-   + 97.13079883716429 u_vars_time_20[7]
-   + 21.33432237812513 u_vars_time_20[8]
-   + 4754.979138752865 u_vars_time_20[14]
-   + 8737.883939615816 u_vars_time_20[15]
-   + 12104.11674117713 u_vars_time_20[17]
-   + 1538.636798180747 u_vars_time_20[18]
-   + 21.19367940527573 u_vars_time_20[19]
-   + 0.0193717057210914 x_vars_time_20[2] - 0.000714359 x_vars_time_20[4]
-   - 0.000714359 x_vars_time_20[9] - 0.9690338388992726 x_vars_time_20[13]
-   + 0.1482953975437084 x_vars_time_20[15]
-   - 0.011224099517789 x_vars_time_20[17]
-   - 0.011224099517789 x_vars_time_20[22] + x_vars_time_21[13]
-   = 27726.32584750966
- Dynamics_const_time_20[14]: - 275.4290219187429 u_vars_time_20[4]
-   - 175.6214072438439 u_vars_time_20[5]
-   - 97.13079883716429 u_vars_time_20[7]
-   - 21.33432237812513 u_vars_time_20[8]
-   - 4754.979138752865 u_vars_time_20[14]
-   - 8737.883939615816 u_vars_time_20[15]
-   - 12104.11674117713 u_vars_time_20[17]
-   - 1538.636798180747 u_vars_time_20[18]
-   - 21.19367940527573 u_vars_time_20[19]
-   - 0.0193717057210914 x_vars_time_20[2] + 0.000714359 x_vars_time_20[4]
-   + 0.000714359 x_vars_time_20[9] - 0.0309661611007273 x_vars_time_20[13]
-   - 0.75 x_vars_time_20[14] - 0.1482953975437084 x_vars_time_20[15]
-   + 0.011224099517789 x_vars_time_20[17]
-   + 0.011224099517789 x_vars_time_20[22] + x_vars_time_21[14]
-   = -27726.32584750972
- Dynamics_const_time_20[15]: 0.078823105419476 u_vars_time_20[10]
+   + x_vars_time_21[12] = 5.55112e-17
+ Dynamics_const_time_20[13]: 269.8799168289907 u_vars_time_20[4]
+   + 172.0831394243627 u_vars_time_20[5]
+   + 95.17389173113673 u_vars_time_20[7]
+   + 20.90449695134132 u_vars_time_20[8]
+   + 4700.363271144091 u_vars_time_20[14]
+   + 8643.995685849386 u_vars_time_20[15]
+   + 11976.92175012315 u_vars_time_20[17]
+   + 1522.292096312699 u_vars_time_20[18]
+   + 20.97429959693957 u_vars_time_20[19]
+   + 0.0226722757211904 x_vars_time_20[2]
+   - 6.9994778347464359e-04 x_vars_time_20[4]
+   - 6.9994778347464359e-04 x_vars_time_20[9]
+   - 0.9738323605145635 x_vars_time_20[13]
+   + 0.1735569400529436 x_vars_time_20[15]
+   - 0.0111072866921753 x_vars_time_20[17]
+   - 0.0111072866921753 x_vars_time_20[22] + x_vars_time_21[13]
+   = 27422.5885479621
+ Dynamics_const_time_20[14]: - 269.8799168289907 u_vars_time_20[4]
+   - 172.0831394243627 u_vars_time_20[5]
+   - 95.17389173113673 u_vars_time_20[7]
+   - 20.90449695134132 u_vars_time_20[8]
+   - 4700.363271144091 u_vars_time_20[14]
+   - 8643.995685849386 u_vars_time_20[15]
+   - 11976.92175012315 u_vars_time_20[17]
+   - 1522.292096312699 u_vars_time_20[18]
+   - 20.97429959693957 u_vars_time_20[19]
+   - 0.0226722757211904 x_vars_time_20[2]
+   + 6.9994778347464359e-04 x_vars_time_20[4]
+   + 6.9994778347464359e-04 x_vars_time_20[9]
+   - 0.0261676394854365 x_vars_time_20[13] - 0.75 x_vars_time_20[14]
+   - 0.1735569400529436 x_vars_time_20[15]
+   + 0.0111072866921753 x_vars_time_20[17]
+   + 0.0111072866921753 x_vars_time_20[22] + x_vars_time_21[14]
+   = -27422.58854796209
+ Dynamics_const_time_20[15]: 0.0664851385208037 u_vars_time_20[10]
    - 0.25 x_vars_time_20[14] - 0.75 x_vars_time_20[15] + x_vars_time_21[15]
-   = -7.27596e-12
- Dynamics_const_time_20[16]: 0.4537710508969158 u_vars_time_20[11]
-   - 0.2495 x_vars_time_20[15] - 0.9797826837966727 x_vars_time_20[16]
-   - 0.00917403281989909 x_vars_time_20[17] + x_vars_time_21[16]
-   = 4.18368e-11
- Dynamics_const_time_20[17]: 0.078823105419476 u_vars_time_20[10]
-   + 0.4537710508969158 u_vars_time_20[11] + 0.0005 x_vars_time_20[15]
-   + 0.0202173162033273 x_vars_time_20[16]
-   - 1.009174032819899 x_vars_time_20[17] + x_vars_time_21[17]
-   = 1.10958e-10
- Dynamics_const_time_20[18]: - 0.0393327296043185 u_vars_time_20[10]
-   - 0.75 x_vars_time_20[18] + x_vars_time_21[18] = -2.22045e-16
- Dynamics_const_time_20[19]: - 0.0196663648021593 u_vars_time_20[10]
-   - 0.75 x_vars_time_20[19] + x_vars_time_21[19] = -1.11022e-16
- Dynamics_const_time_20[20]: - 0.0196663648021593 u_vars_time_20[10]
-   - 0.75 x_vars_time_20[20] + x_vars_time_21[20] = -1.11022e-16
- Dynamics_const_time_20[21]: - 1.5764621083895193e-04 u_vars_time_20[10]
-   - 0.75 x_vars_time_20[21] + x_vars_time_21[21] = -0
- Dynamics_const_time_20[22]: - 0.4537710508969158 u_vars_time_20[11]
-   - 0.0202173162033273 x_vars_time_20[16]
-   + 0.00917403281989909 x_vars_time_20[17] - 0.25 x_vars_time_20[18]
+   = -3.63798e-12
+ Dynamics_const_time_20[16]: 0.4051121324132002 u_vars_time_20[11]
+   - 0.2495 x_vars_time_20[15] - 0.9798336293096376 x_vars_time_20[16]
+   - 0.00816964143340776 x_vars_time_20[17] + x_vars_time_21[16]
+   = 2.18279e-11
+ Dynamics_const_time_20[17]: 0.0664851385208037 u_vars_time_20[10]
+   + 0.4051121324132002 u_vars_time_20[11] + 0.0005 x_vars_time_20[15]
+   + 0.0201663706903624 x_vars_time_20[16]
+   - 1.008169641433408 x_vars_time_20[17] + x_vars_time_21[17]
+   = 2.54659e-11
+ Dynamics_const_time_20[18]: - 0.0331760841218811 u_vars_time_20[10]
+   - 0.75 x_vars_time_20[18] + x_vars_time_21[18] = 4.44089e-16
+ Dynamics_const_time_20[19]: - 0.0165880420609405 u_vars_time_20[10]
+   - 0.75 x_vars_time_20[19] + x_vars_time_21[19] = 2.22045e-16
+ Dynamics_const_time_20[20]: - 0.0165880420609405 u_vars_time_20[10]
+   - 0.75 x_vars_time_20[20] + x_vars_time_21[20] = 2.22045e-16
+ Dynamics_const_time_20[21]: - 1.3297027704160748e-04 u_vars_time_20[10]
+   - 0.75 x_vars_time_20[21] + x_vars_time_21[21] = -1.73472e-18
+ Dynamics_const_time_20[22]: - 0.4051121324132002 u_vars_time_20[11]
+   - 0.0201663706903624 x_vars_time_20[16]
+   + 0.00816964143340776 x_vars_time_20[17] - 0.25 x_vars_time_20[18]
    - 0.25 x_vars_time_20[19] - 0.25 x_vars_time_20[20] - x_vars_time_20[22]
    - 0.0758199847444699 x_vars_time_20[23]
    - 0.0521237545883587 x_vars_time_20[24] + x_vars_time_21[22]
-   = -1.81899e-12
+   = -5.45697e-12
  Dynamics_const_time_20[23]: u_vars_time_20[12]
    - 0.000389 x_vars_time_20[15] - 0.1945 x_vars_time_20[21]
    - 0.92372234935164 x_vars_time_20[23] + x_vars_time_21[23]
-   = -4.55018e-08
+   = -3.84814e-08
  Dynamics_const_time_20[24]: u_vars_time_20[13]
    - 0.000111 x_vars_time_20[15] - 0.0555 x_vars_time_20[21]
    - 0.9475616151022549 x_vars_time_20[24] + x_vars_time_21[24]
-   = -1.29838e-08
+   = -1.09806e-08
  Dynamics_const_time_20[25]: - u_vars_time_20[12] - u_vars_time_20[13]
    - 0.000457666 x_vars_time_20[23]
    - 3.1463030938647091e-04 x_vars_time_20[24] - x_vars_time_20[25]
-   + x_vars_time_21[25] = -2.77556e-16
+   + x_vars_time_21[25] = 1.11022e-16
  All_const_time_20[0]: u_vars_time_20[2] - 0.000389 x_vars_time_20[2]
    - 0.1945 x_vars_time_20[8] <= -0
  All_const_time_20[1]: u_vars_time_20[12] - 0.000389 x_vars_time_20[15]
@@ -589,144 +554,140 @@ Subject To
  All_const_time_20[6]: u_vars_time_20[1] + u_vars_time_20[11] <= 30000
  R129: - u_vars_time_20[8] + 0.25 u_vars_time_20[9] <= -0
  R130: - u_vars_time_20[18] + 0.25 u_vars_time_20[19] <= -0
- Dynamics_const_time_21[0]: 4834.400305000227 u_vars_time_21[4]
-   + 3963.449774249925 u_vars_time_21[5]
-   + 5020.415525384959 u_vars_time_21[7]
-   + 301.3859201817355 u_vars_time_21[8]
-   + 1064.198124945394 u_vars_time_21[14]
-   + 678.5630981840369 u_vars_time_21[15]
-   + 375.2923843870107 u_vars_time_21[17]
-   + 82.43120428445623 u_vars_time_21[18]
-   - 0.9900227508354951 x_vars_time_21[0]
-   + 0.113148392280854 x_vars_time_21[2]
-   - 0.00406347809602226 x_vars_time_21[4]
-   - 0.00406347809602226 x_vars_time_21[9]
-   + 0.0393341323115986 x_vars_time_21[15]
-   - 0.00284788374030181 x_vars_time_21[17]
-   - 0.00284788374030181 x_vars_time_21[22] + x_vars_time_22[0]
-   = 16320.13633661766
- Dynamics_const_time_21[1]: - 4834.400305000227 u_vars_time_21[4]
-   - 3963.449774249925 u_vars_time_21[5]
-   - 5020.415525384959 u_vars_time_21[7]
-   - 301.3859201817355 u_vars_time_21[8]
-   - 1064.198124945394 u_vars_time_21[14]
-   - 678.5630981840369 u_vars_time_21[15]
-   - 375.2923843870107 u_vars_time_21[17]
-   - 82.43120428445623 u_vars_time_21[18]
-   - 0.00997724916450494 x_vars_time_21[0] - 0.75 x_vars_time_21[1]
-   - 0.113148392280854 x_vars_time_21[2]
-   + 0.00406347809602226 x_vars_time_21[4]
-   + 0.00406347809602226 x_vars_time_21[9]
-   - 0.0393341323115986 x_vars_time_21[15]
-   + 0.00284788374030181 x_vars_time_21[17]
-   + 0.00284788374030181 x_vars_time_21[22] + x_vars_time_22[1]
-   = -16320.13633661775
- Dynamics_const_time_21[2]: 0.0362727724395464 u_vars_time_21[0]
+ Dynamics_const_time_21[0]: 4290.935817858957 u_vars_time_21[4]
+   + 3510.628067961324 u_vars_time_21[5]
+   + 4428.691595507595 u_vars_time_21[7]
+   + 268.1080836069373 u_vars_time_21[8]
+   + 955.7253513725697 u_vars_time_21[14]
+   + 609.3977617877072 u_vars_time_21[15]
+   + 337.039163599475 u_vars_time_21[17]
+   + 74.02906454366138 u_vars_time_21[18]
+   - 0.9915431644459514 x_vars_time_21[0]
+   + 0.1183915139543116 x_vars_time_21[2]
+   - 0.003573059852676 x_vars_time_21[4]
+   - 0.003573059852676 x_vars_time_21[9]
+   + 0.0411555013975003 x_vars_time_21[15]
+   - 0.0025574480914778 x_vars_time_21[17]
+   - 0.0025574480914778 x_vars_time_21[22] + x_vars_time_22[0]
+   = 14474.55490623815
+ Dynamics_const_time_21[1]: - 4290.935817858957 u_vars_time_21[4]
+   - 3510.628067961324 u_vars_time_21[5]
+   - 4428.691595507595 u_vars_time_21[7]
+   - 268.1080836069373 u_vars_time_21[8]
+   - 955.7253513725697 u_vars_time_21[14]
+   - 609.3977617877072 u_vars_time_21[15]
+   - 337.039163599475 u_vars_time_21[17]
+   - 74.02906454366138 u_vars_time_21[18]
+   - 0.00845683555404862 x_vars_time_21[0] - 0.75 x_vars_time_21[1]
+   - 0.1183915139543116 x_vars_time_21[2]
+   + 0.003573059852676 x_vars_time_21[4]
+   + 0.003573059852676 x_vars_time_21[9]
+   - 0.0411555013975003 x_vars_time_21[15]
+   + 0.0025574480914778 x_vars_time_21[17]
+   + 0.0025574480914778 x_vars_time_21[22] + x_vars_time_22[1]
+   = -14474.55490623823
+ Dynamics_const_time_21[2]: 0.0304980314279365 u_vars_time_21[0]
    - 0.25 x_vars_time_21[1] - 0.75 x_vars_time_21[2] + x_vars_time_22[2]
-   = 1.81899e-12
- Dynamics_const_time_21[3]: 0.2407376602381778 u_vars_time_21[1]
+   = -0
+ Dynamics_const_time_21[3]: 0.2187256345156842 u_vars_time_21[1]
    - 0.2495 x_vars_time_21[2] - x_vars_time_21[3] + x_vars_time_22[3]
-   = 5.45697e-12
- Dynamics_const_time_21[4]: 0.0362727724395464 u_vars_time_21[0]
-   + 0.2407376602381778 u_vars_time_21[1] + 0.0005 x_vars_time_21[2]
-   - x_vars_time_21[4] + x_vars_time_22[4] = -6.63825e-11
- Dynamics_const_time_21[5]: - 0.0181001134473337 u_vars_time_21[0]
+   = -2.36469e-11
+ Dynamics_const_time_21[4]: 0.0304980314279365 u_vars_time_21[0]
+   + 0.2187256345156842 u_vars_time_21[1] + 0.0005 x_vars_time_21[2]
+   - x_vars_time_21[4] + x_vars_time_22[4] = -1.03348e-11
+ Dynamics_const_time_21[5]: - 0.0152185176825403 u_vars_time_21[0]
    - 0.75 x_vars_time_21[5] + x_vars_time_22[5] = -0
- Dynamics_const_time_21[6]: - 0.00905005672366683 u_vars_time_21[0]
+ Dynamics_const_time_21[6]: - 0.00760925884127015 u_vars_time_21[0]
    - 0.75 x_vars_time_21[6] + x_vars_time_22[6] = -0
- Dynamics_const_time_21[7]: - 0.00905005672366683 u_vars_time_21[0]
+ Dynamics_const_time_21[7]: - 0.00760925884127015 u_vars_time_21[0]
    - 0.75 x_vars_time_21[7] + x_vars_time_22[7] = -0
- Dynamics_const_time_21[8]: - 7.25455e-05 u_vars_time_21[0]
+ Dynamics_const_time_21[8]: - 6.09961e-05 u_vars_time_21[0]
    - 0.75 x_vars_time_21[8] + x_vars_time_22[8] = -0
- Dynamics_const_time_21[9]: - 0.2407376602381778 u_vars_time_21[1]
+ Dynamics_const_time_21[9]: - 0.2187256345156842 u_vars_time_21[1]
    - 0.25 x_vars_time_21[5] - 0.25 x_vars_time_21[6]
    - 0.25 x_vars_time_21[7] - x_vars_time_21[9]
    - 0.0758199847444699 x_vars_time_21[10]
    - 0.0521237545883587 x_vars_time_21[11] + x_vars_time_22[9]
-   = -9.23706e-14
+   = 7.67386e-13
  Dynamics_const_time_21[10]: u_vars_time_21[2] - 0.000389 x_vars_time_21[2]
    - 0.1945 x_vars_time_21[8] - 0.92372234935164 x_vars_time_21[10]
-   + x_vars_time_22[10] = -2.2275e-08
+   + x_vars_time_22[10] = -1.87197e-08
  Dynamics_const_time_21[11]: u_vars_time_21[3] - 0.000111 x_vars_time_21[2]
    - 0.0555 x_vars_time_21[8] - 0.9475616151022549 x_vars_time_21[11]
-   + x_vars_time_22[11] = -6.3561e-09
+   + x_vars_time_22[11] = -5.34162e-09
  Dynamics_const_time_21[12]: - u_vars_time_21[2] - u_vars_time_21[3]
    - 0.000457666 x_vars_time_21[10]
    - 3.1463030938647091e-04 x_vars_time_21[11] - x_vars_time_21[12]
-   + x_vars_time_22[12] = -5.55112e-17
- Dynamics_const_time_21[13]: 259.9259095913275 u_vars_time_21[4]
-   + 165.7361802454946 u_vars_time_21[5]
-   + 91.66358381990153 u_vars_time_21[7]
-   + 20.13347435581707 u_vars_time_21[8]
-   + 4416.964880223184 u_vars_time_21[14]
-   + 8105.674846362613 u_vars_time_21[15]
-   + 11223.45921592462 u_vars_time_21[17]
-   + 1426.991283712892 u_vars_time_21[18]
-   + 19.64600042603392 u_vars_time_21[19]
-   + 0.0187718784704704 x_vars_time_21[2]
-   - 6.7415113417264045e-04 x_vars_time_21[4]
-   - 6.7415113417264045e-04 x_vars_time_21[9]
-   - 0.9703449140628135 x_vars_time_21[13]
-   + 0.1437037020906667 x_vars_time_21[15]
-   - 0.0104044861944116 x_vars_time_21[17]
-   - 0.0104044861944116 x_vars_time_21[22] + x_vars_time_22[13]
-   = 25730.19537466188
- Dynamics_const_time_21[14]: - 259.9259095913275 u_vars_time_21[4]
-   - 165.7361802454946 u_vars_time_21[5]
-   - 91.66358381990153 u_vars_time_21[7]
-   - 20.13347435581707 u_vars_time_21[8]
-   - 4416.964880223184 u_vars_time_21[14]
-   - 8105.674846362613 u_vars_time_21[15]
-   - 11223.45921592462 u_vars_time_21[17]
-   - 1426.991283712892 u_vars_time_21[18]
-   - 19.64600042603392 u_vars_time_21[19]
-   - 0.0187718784704704 x_vars_time_21[2]
-   + 6.7415113417264045e-04 x_vars_time_21[4]
-   + 6.7415113417264045e-04 x_vars_time_21[9]
-   - 0.0296550859371864 x_vars_time_21[13] - 0.75 x_vars_time_21[14]
-   - 0.1437037020906667 x_vars_time_21[15]
-   + 0.0104044861944116 x_vars_time_21[17]
-   + 0.0104044861944116 x_vars_time_21[22] + x_vars_time_22[14]
-   = -25730.19537466189
- Dynamics_const_time_21[15]: 0.0761028534341658 u_vars_time_21[10]
+   + x_vars_time_22[12] = 1.94289e-16
+ Dynamics_const_time_21[13]: 256.9235762483429 u_vars_time_21[4]
+   + 163.8218067962594 u_vars_time_21[5]
+   + 90.60480274466106 u_vars_time_21[7]
+   + 19.90091808059373 u_vars_time_21[8]
+   + 4448.020202742886 u_vars_time_21[14]
+   + 8175.775661089992 u_vars_time_21[15]
+   + 11326.32890154707 u_vars_time_21[17]
+   + 1439.713365909284 u_vars_time_21[18]
+   + 19.83282604600426 u_vars_time_21[19]
+   + 0.0220790181992257 x_vars_time_21[2]
+   - 6.6634550804545471e-04 x_vars_time_21[4]
+   - 6.6634550804545471e-04 x_vars_time_21[9]
+   - 0.9745810675432607 x_vars_time_21[13]
+   + 0.169015337154931 x_vars_time_21[15]
+   - 0.0105027988181334 x_vars_time_21[17]
+   - 0.0105027988181334 x_vars_time_21[22] + x_vars_time_22[13]
+   = 25940.92206120506
+ Dynamics_const_time_21[14]: - 256.9235762483429 u_vars_time_21[4]
+   - 163.8218067962594 u_vars_time_21[5]
+   - 90.60480274466106 u_vars_time_21[7]
+   - 19.90091808059373 u_vars_time_21[8]
+   - 4448.020202742886 u_vars_time_21[14]
+   - 8175.775661089992 u_vars_time_21[15]
+   - 11326.32890154707 u_vars_time_21[17]
+   - 1439.713365909284 u_vars_time_21[18]
+   - 19.83282604600426 u_vars_time_21[19]
+   - 0.0220790181992257 x_vars_time_21[2]
+   + 6.6634550804545471e-04 x_vars_time_21[4]
+   + 6.6634550804545471e-04 x_vars_time_21[9]
+   - 0.0254189324567393 x_vars_time_21[13] - 0.75 x_vars_time_21[14]
+   - 0.169015337154931 x_vars_time_21[15]
+   + 0.0105027988181334 x_vars_time_21[17]
+   + 0.0105027988181334 x_vars_time_21[22] + x_vars_time_22[14]
+   = -25940.92206120508
+ Dynamics_const_time_21[15]: 0.0650900703366603 u_vars_time_21[10]
    - 0.25 x_vars_time_21[14] - 0.75 x_vars_time_21[15] + x_vars_time_22[15]
    = -3.63798e-12
- Dynamics_const_time_21[16]: 0.4685806243961321 u_vars_time_21[11]
-   - 0.2495 x_vars_time_21[15] - 0.9795946805207453 x_vars_time_21[16]
-   - 0.00956153734259175 x_vars_time_21[17] + x_vars_time_22[16]
-   = 4.36557e-11
- Dynamics_const_time_21[17]: 0.0761028534341658 u_vars_time_21[10]
-   + 0.4685806243961321 u_vars_time_21[11] + 0.0005 x_vars_time_21[15]
-   + 0.0204053194792548 x_vars_time_21[16]
-   - 1.009561537342592 x_vars_time_21[17] + x_vars_time_22[17]
-   = -4.54747e-11
- Dynamics_const_time_21[18]: - 0.0379753238636488 u_vars_time_21[10]
-   - 0.75 x_vars_time_21[18] + x_vars_time_22[18] = -2.22045e-16
- Dynamics_const_time_21[19]: - 0.0189876619318244 u_vars_time_21[10]
-   - 0.75 x_vars_time_21[19] + x_vars_time_22[19] = -1.11022e-16
- Dynamics_const_time_21[20]: - 0.0189876619318244 u_vars_time_21[10]
-   - 0.75 x_vars_time_21[20] + x_vars_time_22[20] = -1.11022e-16
- Dynamics_const_time_21[21]: - 1.5220570686833167e-04 u_vars_time_21[10]
-   - 0.75 x_vars_time_21[21] + x_vars_time_22[21] = -4.33681e-19
- Dynamics_const_time_21[22]: - 0.4685806243961321 u_vars_time_21[11]
-   - 0.0204053194792548 x_vars_time_21[16]
-   + 0.00956153734259175 x_vars_time_21[17] - 0.25 x_vars_time_21[18]
-   - 0.25 x_vars_time_21[19] - 0.25 x_vars_time_21[20] - x_vars_time_21[22]
+ Dynamics_const_time_21[16]: 0.4169507315262705 u_vars_time_21[11]
+   - 0.2495 x_vars_time_21[15] - x_vars_time_21[16] + x_vars_time_22[16]
+   = -3.63798e-12
+ Dynamics_const_time_21[17]: 0.0650900703366603 u_vars_time_21[10]
+   + 0.4169507315262705 u_vars_time_21[11] + 0.0005 x_vars_time_21[15]
+   - x_vars_time_21[17] + x_vars_time_22[17] = -3.21876e-11
+ Dynamics_const_time_21[18]: - 0.0324799450979935 u_vars_time_21[10]
+   - 0.75 x_vars_time_21[18] + x_vars_time_22[18] = -4.44089e-16
+ Dynamics_const_time_21[19]: - 0.0162399725489967 u_vars_time_21[10]
+   - 0.75 x_vars_time_21[19] + x_vars_time_22[19] = -2.22045e-16
+ Dynamics_const_time_21[20]: - 0.0162399725489967 u_vars_time_21[10]
+   - 0.75 x_vars_time_21[20] + x_vars_time_22[20] = -2.22045e-16
+ Dynamics_const_time_21[21]: - 1.3018014067332057e-04 u_vars_time_21[10]
+   - 0.75 x_vars_time_21[21] + x_vars_time_22[21] = -0
+ Dynamics_const_time_21[22]: - 0.4169507315262705 u_vars_time_21[11]
+   - 0.25 x_vars_time_21[18] - 0.25 x_vars_time_21[19]
+   - 0.25 x_vars_time_21[20] - x_vars_time_21[22]
    - 0.0758199847444699 x_vars_time_21[23]
    - 0.0521237545883587 x_vars_time_21[24] + x_vars_time_22[22]
-   = 3.63798e-12
+   = -1.93978e-12
  Dynamics_const_time_21[23]: u_vars_time_21[12]
    - 0.000389 x_vars_time_21[15] - 0.1945 x_vars_time_21[21]
    - 0.92372234935164 x_vars_time_21[23] + x_vars_time_22[23]
-   = -4.35261e-08
+   = -3.73633e-08
  Dynamics_const_time_21[24]: u_vars_time_21[13]
    - 0.000111 x_vars_time_21[15] - 0.0555 x_vars_time_21[21]
    - 0.9475616151022549 x_vars_time_21[24] + x_vars_time_22[24]
-   = -1.242e-08
+   = -1.06615e-08
  Dynamics_const_time_21[25]: - u_vars_time_21[12] - u_vars_time_21[13]
    - 0.000457666 x_vars_time_21[23]
    - 3.1463030938647091e-04 x_vars_time_21[24] - x_vars_time_21[25]
-   + x_vars_time_22[25] = 2.22045e-16
+   + x_vars_time_22[25] = 5.55112e-17
  All_const_time_21[0]: u_vars_time_21[2] - 0.000389 x_vars_time_21[2]
    - 0.1945 x_vars_time_21[8] <= -0
  All_const_time_21[1]: u_vars_time_21[12] - 0.000389 x_vars_time_21[15]
@@ -744,310 +705,6 @@ Subject To
  All_const_time_21[6]: u_vars_time_21[1] + u_vars_time_21[11] <= 30000
  R164: - u_vars_time_21[8] + 0.25 u_vars_time_21[9] <= -0
  R165: - u_vars_time_21[18] + 0.25 u_vars_time_21[19] <= -0
- Dynamics_const_time_22[0]: 4612.843935263533 u_vars_time_22[4]
-   + 3789.016454031198 u_vars_time_22[5]
-   + 4817.464463977558 u_vars_time_22[7]
-   + 286.9756756849195 u_vars_time_22[8]
-   + 1004.355612323539 u_vars_time_22[14]
-   + 640.4058041464374 u_vars_time_22[15]
-   + 354.1887583580528 u_vars_time_22[17]
-   + 77.79589224321352 u_vars_time_22[18]
-   - 0.9903773601841381 x_vars_time_22[0]
-   + 0.1120196528557437 x_vars_time_22[2]
-   - 0.00391050866825419 x_vars_time_22[4]
-   - 0.00391050866825419 x_vars_time_22[9]
-   + 0.0389417431923365 x_vars_time_22[15]
-   - 0.00268774409662756 x_vars_time_22[17]
-   - 0.00268774409662756 x_vars_time_22[22] + x_vars_time_23[0]
-   = 15583.0465960285
- Dynamics_const_time_22[1]: - 4612.843935263533 u_vars_time_22[4]
-   - 3789.016454031198 u_vars_time_22[5]
-   - 4817.464463977558 u_vars_time_22[7]
-   - 286.9756756849195 u_vars_time_22[8]
-   - 1004.355612323539 u_vars_time_22[14]
-   - 640.4058041464374 u_vars_time_22[15]
-   - 354.1887583580528 u_vars_time_22[17]
-   - 77.79589224321352 u_vars_time_22[18]
-   - 0.00962263981586183 x_vars_time_22[0] - 0.75 x_vars_time_22[1]
-   - 0.1120196528557437 x_vars_time_22[2]
-   + 0.00391050866825419 x_vars_time_22[4]
-   + 0.00391050866825419 x_vars_time_22[9]
-   - 0.0389417431923365 x_vars_time_22[15]
-   + 0.00268774409662756 x_vars_time_22[17]
-   + 0.00268774409662756 x_vars_time_22[22] + x_vars_time_23[1]
-   = -15583.04659602845
- Dynamics_const_time_22[2]: 0.0352596066119218 u_vars_time_22[0]
-   - 0.25 x_vars_time_22[1] - 0.75 x_vars_time_22[2] + x_vars_time_23[2]
-   = -1.81899e-12
- Dynamics_const_time_22[3]: 0.2497922472905162 u_vars_time_22[1]
-   - 0.2495 x_vars_time_22[2] - x_vars_time_22[3] + x_vars_time_23[3]
-   = 1.45519e-11
- Dynamics_const_time_22[4]: 0.0352596066119218 u_vars_time_22[0]
-   + 0.2497922472905162 u_vars_time_22[1] + 0.0005 x_vars_time_22[2]
-   - x_vars_time_22[4] + x_vars_time_23[4] = -9.32303e-11
- Dynamics_const_time_22[5]: - 0.017594543699349 u_vars_time_22[0]
-   - 0.75 x_vars_time_22[5] + x_vars_time_23[5] = -0
- Dynamics_const_time_22[6]: - 0.0087972718496745 u_vars_time_22[0]
-   - 0.75 x_vars_time_22[6] + x_vars_time_23[6] = -0
- Dynamics_const_time_22[7]: - 0.0087972718496745 u_vars_time_22[0]
-   - 0.75 x_vars_time_22[7] + x_vars_time_23[7] = -0
- Dynamics_const_time_22[8]: - 7.05192e-05 u_vars_time_22[0]
-   - 0.75 x_vars_time_22[8] + x_vars_time_23[8] = -0
- Dynamics_const_time_22[9]: - 0.2497922472905162 u_vars_time_22[1]
-   - 0.25 x_vars_time_22[5] - 0.25 x_vars_time_22[6]
-   - 0.25 x_vars_time_22[7] - x_vars_time_22[9]
-   - 0.0758199847444699 x_vars_time_22[10]
-   - 0.0521237545883587 x_vars_time_22[11] + x_vars_time_23[9]
-   = -4.26326e-13
- Dynamics_const_time_22[10]: u_vars_time_22[2] - 0.000389 x_vars_time_22[2]
-   - 0.1945 x_vars_time_22[8] - 0.92372234935164 x_vars_time_22[10]
-   + x_vars_time_23[10] = -2.16524e-08
- Dynamics_const_time_22[11]: u_vars_time_22[3] - 0.000111 x_vars_time_22[2]
-   - 0.0555 x_vars_time_22[8] - 0.9475616151022549 x_vars_time_22[11]
-   + x_vars_time_23[11] = -6.17845e-09
- Dynamics_const_time_22[12]: - u_vars_time_22[2] - u_vars_time_22[3]
-   - 0.000457666 x_vars_time_22[10]
-   - 3.1463030938647091e-04 x_vars_time_22[11] - x_vars_time_22[12]
-   + x_vars_time_23[12] = 1.94289e-16
- Dynamics_const_time_22[13]: 245.1687998940191 u_vars_time_22[4]
-   + 156.32662582077 u_vars_time_22[5] + 86.459448673061 u_vars_time_22[7]
-   + 18.99041058766914 u_vars_time_22[8]
-   + 4095.202438900795 u_vars_time_22[14]
-   + 7503.860885217083 u_vars_time_22[15]
-   + 10385.14092341115 u_vars_time_22[17]
-   + 1320.713376913234 u_vars_time_22[18]
-   + 18.17272813380853 u_vars_time_22[19]
-   + 0.0182152244895653 x_vars_time_22[2]
-   - 6.3587764686586314e-04 x_vars_time_22[4]
-   - 6.3587764686586314e-04 x_vars_time_22[9]
-   - 0.9716955538682384 x_vars_time_22[13]
-   + 0.1394423617049295 x_vars_time_22[15]
-   - 0.00962425802669215 x_vars_time_22[17]
-   - 0.00962425802669215 x_vars_time_22[22] + x_vars_time_23[13]
-   = 23830.03563755161
- Dynamics_const_time_22[14]: - 245.1687998940191 u_vars_time_22[4]
-   - 156.32662582077 u_vars_time_22[5] - 86.459448673061 u_vars_time_22[7]
-   - 18.99041058766914 u_vars_time_22[8]
-   - 4095.202438900795 u_vars_time_22[14]
-   - 7503.860885217083 u_vars_time_22[15]
-   - 10385.14092341115 u_vars_time_22[17]
-   - 1320.713376913234 u_vars_time_22[18]
-   - 18.17272813380853 u_vars_time_22[19]
-   - 0.0182152244895653 x_vars_time_22[2]
-   + 6.3587764686586314e-04 x_vars_time_22[4]
-   + 6.3587764686586314e-04 x_vars_time_22[9]
-   - 0.0283044461317616 x_vars_time_22[13] - 0.75 x_vars_time_22[14]
-   - 0.1394423617049295 x_vars_time_22[15]
-   + 0.00962425802669215 x_vars_time_22[17]
-   + 0.00962425802669215 x_vars_time_22[22] + x_vars_time_23[14]
-   = -23830.0356375516
- Dynamics_const_time_22[15]: 0.0732502878991447 u_vars_time_22[10]
-   - 0.25 x_vars_time_22[14] - 0.75 x_vars_time_22[15] + x_vars_time_23[15]
-   = -7.27596e-12
- Dynamics_const_time_22[16]: 0.4826398934864981 u_vars_time_22[11]
-   - 0.2495 x_vars_time_22[15] - 0.9793968992259416 x_vars_time_22[16]
-   - 0.00994387836308311 x_vars_time_22[17] + x_vars_time_23[16]
-   = -1.45519e-11
- Dynamics_const_time_22[17]: 0.0732502878991447 u_vars_time_22[10]
-   + 0.4826398934864981 u_vars_time_22[11] + 0.0005 x_vars_time_22[15]
-   + 0.0206031007740583 x_vars_time_22[16]
-   - 1.009943878363083 x_vars_time_22[17] + x_vars_time_23[17]
-   = -3.45608e-11
- Dynamics_const_time_22[18]: - 0.0365518936616732 u_vars_time_22[10]
-   - 0.75 x_vars_time_22[18] + x_vars_time_23[18] = -0
- Dynamics_const_time_22[19]: - 0.0182759468308366 u_vars_time_22[10]
-   - 0.75 x_vars_time_22[19] + x_vars_time_23[19] = -0
- Dynamics_const_time_22[20]: - 0.0182759468308366 u_vars_time_22[10]
-   - 0.75 x_vars_time_22[20] + x_vars_time_23[20] = -0
- Dynamics_const_time_22[21]: - 1.4650057579828938e-04 u_vars_time_22[10]
-   - 0.75 x_vars_time_22[21] + x_vars_time_23[21] = -4.33681e-19
- Dynamics_const_time_22[22]: - 0.4826398934864981 u_vars_time_22[11]
-   - 0.0206031007740583 x_vars_time_22[16]
-   + 0.00994387836308311 x_vars_time_22[17] - 0.25 x_vars_time_22[18]
-   - 0.25 x_vars_time_22[19] - 0.25 x_vars_time_22[20] - x_vars_time_22[22]
-   - 0.0758199847444699 x_vars_time_22[23]
-   - 0.0521237545883587 x_vars_time_22[24] + x_vars_time_23[22]
-   = 3.63798e-12
- Dynamics_const_time_22[23]: u_vars_time_22[12]
-   - 0.000389 x_vars_time_22[15] - 0.1945 x_vars_time_22[21]
-   - 0.92372234935164 x_vars_time_22[23] + x_vars_time_23[23]
-   = -4.14921e-08
- Dynamics_const_time_22[24]: u_vars_time_22[13]
-   - 0.000111 x_vars_time_22[15] - 0.0555 x_vars_time_22[21]
-   - 0.9475616151022549 x_vars_time_22[24] + x_vars_time_23[24]
-   = -1.18396e-08
- Dynamics_const_time_22[25]: - u_vars_time_22[12] - u_vars_time_22[13]
-   - 0.000457666 x_vars_time_22[23]
-   - 3.1463030938647091e-04 x_vars_time_22[24] - x_vars_time_22[25]
-   + x_vars_time_23[25] = 3.88578e-16
- All_const_time_22[0]: u_vars_time_22[2] - 0.000389 x_vars_time_22[2]
-   - 0.1945 x_vars_time_22[8] <= -0
- All_const_time_22[1]: u_vars_time_22[12] - 0.000389 x_vars_time_22[15]
-   - 0.1945 x_vars_time_22[21] <= -0
- All_const_time_22[2]: - u_vars_time_22[3] - u_vars_time_22[13]
-   + 0.000111 x_vars_time_22[2] + 0.0555 x_vars_time_22[8]
-   + 0.9475616151022548 x_vars_time_22[11] + 0.000111 x_vars_time_22[15]
-   + 0.0555 x_vars_time_22[21] + 0.9475616151022548 x_vars_time_22[24]
-   <= 2500
- All_const_time_22[3]: u_vars_time_22[3] - 0.000111 x_vars_time_22[2]
-   - 0.0555 x_vars_time_22[8] <= -0
- All_const_time_22[4]: u_vars_time_22[13] - 0.000111 x_vars_time_22[15]
-   - 0.0555 x_vars_time_22[21] <= -0
- All_const_time_22[5]: u_vars_time_22[0] + u_vars_time_22[10] <= 30000
- All_const_time_22[6]: u_vars_time_22[1] + u_vars_time_22[11] <= 30000
- R199: - u_vars_time_22[8] + 0.25 u_vars_time_22[9] <= -0
- R200: - u_vars_time_22[18] + 0.25 u_vars_time_22[19] <= -0
- Dynamics_const_time_23[0]: 4392.387426800735 u_vars_time_23[4]
-   + 3615.265429410076 u_vars_time_23[5]
-   + 4614.829731254808 u_vars_time_23[7]
-   + 272.6522016608907 u_vars_time_23[8]
-   + 945.0922243746264 u_vars_time_23[14]
-   + 602.6177765293429 u_vars_time_23[15]
-   + 333.2893622316585 u_vars_time_23[17]
-   + 73.20543833797245 u_vars_time_23[18]
-   - 0.9907413365873883 x_vars_time_23[0]
-   + 0.1109418308881851 x_vars_time_23[2]
-   - 0.00375744886682524 x_vars_time_23[4]
-   - 0.00375744886682524 x_vars_time_23[9]
-   + 0.0385670157394256 x_vars_time_23[15]
-   - 0.0025291497162839 x_vars_time_23[17]
-   - 0.0025291497162839 x_vars_time_23[22] + x_vars_time_24[0]
-   = 14849.33959060019
- Dynamics_const_time_23[1]: - 4392.387426800735 u_vars_time_23[4]
-   - 3615.265429410076 u_vars_time_23[5]
-   - 4614.829731254808 u_vars_time_23[7]
-   - 272.6522016608907 u_vars_time_23[8]
-   - 945.0922243746264 u_vars_time_23[14]
-   - 602.6177765293429 u_vars_time_23[15]
-   - 333.2893622316585 u_vars_time_23[17]
-   - 73.20543833797245 u_vars_time_23[18]
-   - 0.00925866341261177 x_vars_time_23[0] - 0.75 x_vars_time_23[1]
-   - 0.1109418308881851 x_vars_time_23[2]
-   + 0.00375744886682524 x_vars_time_23[4]
-   + 0.00375744886682524 x_vars_time_23[9]
-   - 0.0385670157394256 x_vars_time_23[15]
-   + 0.0025291497162839 x_vars_time_23[17]
-   + 0.0025291497162839 x_vars_time_23[22] + x_vars_time_24[1]
-   = -14849.33959060011
- Dynamics_const_time_23[2]: 0.0342092408513021 u_vars_time_23[0]
-   - 0.25 x_vars_time_23[1] - 0.75 x_vars_time_23[2] + x_vars_time_24[2]
-   = -0
- Dynamics_const_time_23[3]: 0.2585940781029238 u_vars_time_23[1]
-   - 0.2495 x_vars_time_23[2] - x_vars_time_23[3] + x_vars_time_24[3]
-   = 2.72848e-11
- Dynamics_const_time_23[4]: 0.0342092408513021 u_vars_time_23[0]
-   + 0.2585940781029238 u_vars_time_23[1] + 0.0005 x_vars_time_23[2]
-   - x_vars_time_23[4] + x_vars_time_24[4] = -3.87814e-11
- Dynamics_const_time_23[5]: - 0.0170704111847997 u_vars_time_23[0]
-   - 0.75 x_vars_time_23[5] + x_vars_time_24[5] = -0
- Dynamics_const_time_23[6]: - 0.00853520559239987 u_vars_time_23[0]
-   - 0.75 x_vars_time_23[6] + x_vars_time_24[6] = -0
- Dynamics_const_time_23[7]: - 0.00853520559239987 u_vars_time_23[0]
-   - 0.75 x_vars_time_23[7] + x_vars_time_24[7] = -0
- Dynamics_const_time_23[8]: - 6.84185e-05 u_vars_time_23[0]
-   - 0.75 x_vars_time_23[8] + x_vars_time_24[8] = -0
- Dynamics_const_time_23[9]: - 0.2585940781029238 u_vars_time_23[1]
-   - 0.25 x_vars_time_23[5] - 0.25 x_vars_time_23[6]
-   - 0.25 x_vars_time_23[7] - x_vars_time_23[9]
-   - 0.0758199847444699 x_vars_time_23[10]
-   - 0.0521237545883587 x_vars_time_23[11] + x_vars_time_24[9]
-   = -7.24754e-13
- Dynamics_const_time_23[10]: u_vars_time_23[2] - 0.000389 x_vars_time_23[2]
-   - 0.1945 x_vars_time_23[8] - 0.92372234935164 x_vars_time_23[10]
-   + x_vars_time_24[10] = -2.1007e-08
- Dynamics_const_time_23[11]: u_vars_time_23[3] - 0.000111 x_vars_time_23[2]
-   - 0.0555 x_vars_time_23[8] - 0.9475616151022549 x_vars_time_23[11]
-   + x_vars_time_24[11] = -5.99429e-09
- Dynamics_const_time_23[12]: - u_vars_time_23[2] - u_vars_time_23[3]
-   - 0.000457666 x_vars_time_23[10]
-   - 3.1463030938647091e-04 x_vars_time_23[11] - x_vars_time_23[12]
-   + x_vars_time_24[12] = -1.11022e-16
- Dynamics_const_time_23[13]: 231.1288384301203 u_vars_time_23[4]
-   + 147.3743455826088 u_vars_time_23[5]
-   + 81.50821781463024 u_vars_time_23[7]
-   + 17.90289605502981 u_vars_time_23[8]
-   + 3790.425188794839 u_vars_time_23[14]
-   + 6933.983360372073 u_vars_time_23[15]
-   + 9591.382571036942 u_vars_time_23[17]
-   + 1220.080101700664 u_vars_time_23[18]
-   + 16.77785050965946 u_vars_time_23[19]
-   + 0.0176996690506084 x_vars_time_23[2]
-   - 5.9946370890903602e-04 x_vars_time_23[4]
-   - 5.9946370890903602e-04 x_vars_time_23[9]
-   - 0.9730706818821413 x_vars_time_23[13]
-   + 0.1354955050269147 x_vars_time_23[15]
-   - 0.00888553110803042 x_vars_time_23[17]
-   - 0.00888553110803042 x_vars_time_23[22] + x_vars_time_24[13]
-   = 22030.56337029653
- Dynamics_const_time_23[14]: - 231.1288384301203 u_vars_time_23[4]
-   - 147.3743455826088 u_vars_time_23[5]
-   - 81.50821781463024 u_vars_time_23[7]
-   - 17.90289605502981 u_vars_time_23[8]
-   - 3790.425188794839 u_vars_time_23[14]
-   - 6933.983360372073 u_vars_time_23[15]
-   - 9591.382571036942 u_vars_time_23[17]
-   - 1220.080101700664 u_vars_time_23[18]
-   - 16.77785050965946 u_vars_time_23[19]
-   - 0.0176996690506084 x_vars_time_23[2]
-   + 5.9946370890903602e-04 x_vars_time_23[4]
-   + 5.9946370890903602e-04 x_vars_time_23[9]
-   - 0.0269293181178587 x_vars_time_23[13] - 0.75 x_vars_time_23[14]
-   - 0.1354955050269147 x_vars_time_23[15]
-   + 0.00888553110803042 x_vars_time_23[17]
-   + 0.00888553110803042 x_vars_time_23[22] + x_vars_time_24[14]
-   = -22030.56337029656
- Dynamics_const_time_23[15]: 0.0702994004875916 u_vars_time_23[10]
-   - 0.25 x_vars_time_23[14] - 0.75 x_vars_time_23[15] + x_vars_time_24[15]
-   = -0
- Dynamics_const_time_23[16]: 0.4959215083071238 u_vars_time_23[11]
-   - 0.2495 x_vars_time_23[15] - x_vars_time_23[16] + x_vars_time_24[16]
-   = -3.63798e-12
- Dynamics_const_time_23[17]: 0.0702994004875916 u_vars_time_23[10]
-   + 0.4959215083071238 u_vars_time_23[11] + 0.0005 x_vars_time_23[15]
-   - x_vars_time_23[17] + x_vars_time_24[17] = 9.63638e-11
- Dynamics_const_time_23[18]: - 0.0350794008433082 u_vars_time_23[10]
-   - 0.75 x_vars_time_23[18] + x_vars_time_24[18] = -1.11022e-16
- Dynamics_const_time_23[19]: - 0.0175397004216541 u_vars_time_23[10]
-   - 0.75 x_vars_time_23[19] + x_vars_time_24[19] = -5.55112e-17
- Dynamics_const_time_23[20]: - 0.0175397004216541 u_vars_time_23[10]
-   - 0.75 x_vars_time_23[20] + x_vars_time_24[20] = -5.55112e-17
- Dynamics_const_time_23[21]: - 1.405988009751832e-04 u_vars_time_23[10]
-   - 0.75 x_vars_time_23[21] + x_vars_time_24[21] = -0
- Dynamics_const_time_23[22]: - 0.4959215083071238 u_vars_time_23[11]
-   - 0.25 x_vars_time_23[18] - 0.25 x_vars_time_23[19]
-   - 0.25 x_vars_time_23[20] - x_vars_time_23[22]
-   - 0.0758199847444699 x_vars_time_23[23]
-   - 0.0521237545883587 x_vars_time_23[24] + x_vars_time_24[22]
-   = 5.08749e-12
- Dynamics_const_time_23[23]: u_vars_time_23[12]
-   - 0.000389 x_vars_time_23[15] - 0.1945 x_vars_time_23[21]
-   - 0.92372234935164 x_vars_time_23[23] + x_vars_time_24[23]
-   = -3.94228e-08
- Dynamics_const_time_23[24]: u_vars_time_23[13]
-   - 0.000111 x_vars_time_23[15] - 0.0555 x_vars_time_23[21]
-   - 0.9475616151022549 x_vars_time_23[24] + x_vars_time_24[24]
-   = -1.12492e-08
- Dynamics_const_time_23[25]: - u_vars_time_23[12] - u_vars_time_23[13]
-   - 0.000457666 x_vars_time_23[23]
-   - 3.1463030938647091e-04 x_vars_time_23[24] - x_vars_time_23[25]
-   + x_vars_time_24[25] = 3.88578e-16
- All_const_time_23[0]: u_vars_time_23[2] - 0.000389 x_vars_time_23[2]
-   - 0.1945 x_vars_time_23[8] <= -0
- All_const_time_23[1]: u_vars_time_23[12] - 0.000389 x_vars_time_23[15]
-   - 0.1945 x_vars_time_23[21] <= -0
- All_const_time_23[2]: - u_vars_time_23[3] - u_vars_time_23[13]
-   + 0.000111 x_vars_time_23[2] + 0.0555 x_vars_time_23[8]
-   + 0.9475616151022548 x_vars_time_23[11] + 0.000111 x_vars_time_23[15]
-   + 0.0555 x_vars_time_23[21] + 0.9475616151022548 x_vars_time_23[24]
-   <= 2500
- All_const_time_23[3]: u_vars_time_23[3] - 0.000111 x_vars_time_23[2]
-   - 0.0555 x_vars_time_23[8] <= -0
- All_const_time_23[4]: u_vars_time_23[13] - 0.000111 x_vars_time_23[15]
-   - 0.0555 x_vars_time_23[21] <= -0
- All_const_time_23[5]: u_vars_time_23[0] + u_vars_time_23[10] <= 30000
- All_const_time_23[6]: u_vars_time_23[1] + u_vars_time_23[11] <= 30000
- R234: - u_vars_time_23[8] + 0.25 u_vars_time_23[9] <= -0
- R235: - u_vars_time_23[18] + 0.25 u_vars_time_23[19] <= -0
 Bounds
  u_vars_time_18[4] = 1
  u_vars_time_18[5] <= 1
@@ -1097,28 +754,4 @@ Bounds
  u_vars_time_21[17] <= 1
  u_vars_time_21[18] <= 1
  u_vars_time_21[19] <= 1
- u_vars_time_22[4] = 1
- u_vars_time_22[5] <= 1
- u_vars_time_22[6] <= 1
- u_vars_time_22[7] <= 1
- u_vars_time_22[8] <= 1
- u_vars_time_22[9] <= 1
- u_vars_time_22[14] = 1
- u_vars_time_22[15] <= 1
- u_vars_time_22[16] <= 1
- u_vars_time_22[17] <= 1
- u_vars_time_22[18] <= 1
- u_vars_time_22[19] <= 1
- u_vars_time_23[4] = 1
- u_vars_time_23[5] <= 1
- u_vars_time_23[6] <= 1
- u_vars_time_23[7] <= 1
- u_vars_time_23[8] <= 1
- u_vars_time_23[9] <= 1
- u_vars_time_23[14] = 1
- u_vars_time_23[15] <= 1
- u_vars_time_23[16] <= 1
- u_vars_time_23[17] <= 1
- u_vars_time_23[18] <= 1
- u_vars_time_23[19] <= 1
 End
