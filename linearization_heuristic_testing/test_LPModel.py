@@ -116,7 +116,7 @@ def initializeDynModel(T=5, region="Ile-de-France", econ_param="econ", xi=(30 * 
 
 
 
-def run_LPModel(dynModel):
+def run_LPModel_no_intermVar(dynModel):
     # ##############################################################################
     # Testing the construction of a typical LP
 
@@ -124,7 +124,242 @@ def run_LPModel(dynModel):
     T = dynModel.time_steps
     Xt_dim = num_compartments * num_age_groups
     ut_dim = num_controls * num_age_groups
-    num_constraints = 4 + 2*num_age_groups + num_age_groups*num_activities
+    num_constraints = 3 + 2*num_age_groups
+    mixing_method = dynModel.mixing_method
+
+    # uptimal decisions
+    uopt_seq = np.zeros((ut_dim,T))
+
+    # pick a starting u_hat sequence
+    uhat_seq = np.zeros((ut_dim,T))
+    # for now, homogenous testing
+    Nmtestg_idx_all = slice(controls.index('Nmtest_g'),ut_dim,num_controls)
+    uhat_seq[Nmtestg_idx_all,:] = dynModel.parameters['global-parameters']['C_mtest']/num_age_groups
+
+    Natestg_idx_all = slice(controls.index('Natest_g'),ut_dim,num_controls)
+    uhat_seq[Natestg_idx_all,:] = dynModel.parameters['global-parameters']['C_atest']/num_age_groups
+
+    # and home lockdown variables all 1
+    lock_home_idx_all = slice(controls.index('home'),ut_dim,num_controls)
+    uhat_seq[lock_home_idx_all,:] = 1.0
+
+    for k in range(T):
+        M = gb.Model("Linearization Heuristic V2")
+        M.Params.DualReductions = 0  # change this to get explicit infeasible or unbounded
+
+        u_vars = {}
+        x_vars = {}
+        # ones_var =
+        lock_home_idx_all = [controls.index('home') + num_controls * i for i in range(num_age_groups)]
+
+        lb = np.zeros(ut_dim)
+        for i in lock_home_idx_all:
+            lb[i] = 1
+        ub = np.ones(ut_dim) * float('inf')
+
+        for i in range(num_age_groups):
+            for act in range(4,10):
+                ub[act + i * num_controls] = 1
+
+
+        for ti in range(k,T):
+            u_vars[ti] = M.addVars(ut_dim, ub=ub, lb=lb,  name="u_vars_time_{}".format(ti))
+
+            x_vars[ti] = [0 for s in range(Xt_dim)]
+        x_vars[T] =   [0 for s in range(Xt_dim)]
+
+        M.update()
+
+
+        Gamma_x, Gamma_u, K, all_labels = calculate_all_constraints(dynModel, bounce_existing)
+
+
+        assert( np.shape(Gamma_x) == (num_constraints,Xt_dim) )
+        assert( np.shape(Gamma_u) == (num_constraints,ut_dim) )
+        assert( np.shape(K) == (num_constraints,T) )
+
+
+        # Xhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq)
+
+
+        Xhat_seq, new_uhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq, use_bounce_var)
+
+        # print("Finished getting nominal trajectory for time {}".format(k))
+        # print("-----------------------")
+
+        assert( np.shape(Xhat_seq) == (Xt_dim,T-k) )
+        assert( np.shape(new_uhat_seq) == (ut_dim,T-k) )
+
+        # overwrite uhat with the updated one (with new bounce variables)
+        #print("\nOld uhat at 1:")
+        #print(uhat_seq[:,1])
+        #print("\nNew uhat at 1")
+        #print(new_uhat_seq[:,1])
+
+        uhat_seq = new_uhat_seq
+
+
+        At = {}
+        Bt = {}
+        ct = {}
+
+        dynamicConst = {}
+        problemConst = {}
+        #for t in range(k,T):
+        for t in range(k,T):
+            # get Xhat(t) and uhat(t)
+            Xhat_t = Xhat_seq[:,t-k]
+            uhat_t = uhat_seq[:,t-k]
+
+            #Initial conditions
+            if t == k:
+                for i in range(Xt_dim):
+                    x_vars[t][i] = Xhat_t[i]
+
+            jacob_X = get_Jacobian_X(dynModel, Xhat_t, uhat_t, mixing_method)
+            jacob_u = get_Jacobian_u(dynModel, Xhat_t, uhat_t, mixing_method)
+
+            # Calculate linearization coefficients for X(t+1)
+            At[t] = np.eye(Xt_dim) + dynModel.dt * jacob_X
+            Bt[t] = dynModel.dt * jacob_u
+            ct[t] = dynModel.dt * (get_F(dynModel, Xhat_t, uhat_t) - jacob_X @ Xhat_t - jacob_u @ uhat_t)
+
+            # print(get_F(dynModel, Xhat_t, uhat_t)[116])
+            # print((jacob_X @ Xhat_t)[116])
+            #
+            # print("BH_hat for group 8 at time {}: {}".format(t, uhat_t[8*num_controls+2]))
+            # print((jacob_u @ uhat_t)[116])
+            # print(ct[t][116])
+
+            #Dynamic constraints binding x(t+1) with x(t) and u(t)
+
+            for s in range(Xt_dim):
+                # print(f"state {s} at time {t}")
+                state_values = gb.quicksum(At[t][s,i] * x_vars[t][i] for i in range(Xt_dim))
+                control_values = gb.quicksum(Bt[t][s,i] * u_vars[t][i] for i in range(ut_dim))
+                # print(f"t+1 is {t+1}")
+                x_vars[t+1][s] = state_values + control_values + ct[t][s]
+                # for i in range(ut_dim):
+                #     print(f"i = {i}, {u_vars[t][i]}")
+                #     print(f"i = {i}, {Bt[t][s,i]}")
+
+                # print(state_values)
+                # print(control_values)
+                # print(x_vars[t+1])
+
+            problemConst[t] = {}
+            for c in range(num_constraints):
+                # print(f"Adding constraint {c} at time {k}")
+                # All constraints of the problem in matrix form
+                # print(f"c is {c}")
+                # print(num_constraints)
+                # print(Gamma_x.shape)
+                # assert( np.shape(Gamma_x) == (num_constraints,Xt_dim) )
+                # print(f"AAAx-vars is : {x_vars[t]}")
+
+                # print(f"AAAAu-vars is : {u_vars[t]}")
+                #
+                # print(f"gamm x is worth:{Gamma_x[c,:]}")
+                # print(f"gamm x is worth:{Gamma_u[c,:]}")
+                #
+                # print(f"The constants is worth {K[c,t]}")
+                # print(Gamma_x[c,t])
+                # print(t)
+                # print(Gamma_x)
+                # print(num_constraints)
+                # print(x_vars[t])
+                # for i in range(ut_dim):
+                #     print(f"Gamma_u[c,i] = {Gamma_u[c,i]}")
+                problemConst[t][c] = M.addConstr(gb.quicksum(Gamma_x[c,s] *
+                x_vars[t][s] for s in range(Xt_dim)) + gb.quicksum(Gamma_u[c,i] * u_vars[t][i] for i in range(ut_dim)) <= K[c,t], name="Const{}_time_{}".format(c,t))
+
+            work_index = controls.index('work')
+            transport_index = controls.index('transport')
+
+            for i in range(num_age_groups):
+                # print(f"Adding transport constraint for group {i} at time {k}")
+                work_idx = work_index + i*num_controls
+                transport_idx = transport_index + i*num_controls
+
+                M.addConstr(u_vars[t][work_idx] * dynModel.transport_lb_work_fraction <= u_vars[t][transport_idx])
+
+
+
+        d, e = calculate_objective_time_dependent_coefs(dynModel, k, Xhat_seq, uhat_seq)
+
+
+
+        M.setParam( 'OutputFlag', False )     # make Gurobi silent
+        M.setParam( 'LogFile', "" )
+
+        # print(f"Calculating objective at time {k}")
+        terminalValue = gb.quicksum(d[s,T-k] * x_vars[T][s] for s in range(Xt_dim))
+
+        # print(f"Calculating interm values of objective at time {k}")
+
+        intermValues = gb.quicksum(gb.quicksum(d[s,t-k] * x_vars[t][s] for s in range(Xt_dim)) + gb.quicksum(e[i,t-k] * u_vars[t][i] for i in range(ut_dim)) for t in range(k, T))
+
+        M.setObjective(intermValues + terminalValue, gb.GRB.MAXIMIZE)
+
+
+        # print(d[:, T-k])
+
+        # + d[:,T-k] @ x_vars[T]
+        # M.setObjective(0)
+
+
+        # print(f"Optimizing model for time {k}")
+        M.optimize()
+        M.write(f"LP_model_NoIntermVar_k={k}.lp")
+
+        print(f"Objective value for LPRef k = {k}: {M.objVal}")
+
+        if( M.Status ==  gb.GRB.INFEASIBLE ):
+            # model was infeasible
+            M.computeIIS()  # irreducible system of infeasible inequalities
+            M.write("LP_lineariz_IIS-V2.ilp")
+            assert(False)
+
+        # extract decisions for current period (testing and alphas)
+
+        uopt_seq[:,k] = [u_vars[k][i].X for i in range(ut_dim)]
+        uk_opt_dict, alphak_opt_dict = buildAlphaDict([u_vars[k][i].X for i in range(ut_dim)])
+
+        m_tests = {}
+        a_tests = {}
+        BH = {}
+        BICU = {}
+        for ag in age_groups:
+            BH[ag] = uk_opt_dict[ag]['BounceH_g']
+            BICU[ag] = uk_opt_dict[ag]['BounceICU_g']
+            m_tests[ag] = uk_opt_dict[ag]['Nmtest_g']
+            a_tests[ag] = uk_opt_dict[ag]['Natest_g']
+
+        # take one time step in dynamical system
+        dynModel.take_time_step(m_tests, a_tests, alphak_opt_dict, BH, BICU)
+
+        # update uhat_sequence
+        uhat_seq = np.zeros((ut_dim, T-k-1))
+        for t in range(k+1,T):
+            uhat_seq[:,t-k-1] = [u_vars[t][i].X for i in range(ut_dim)]
+        print(f"States at stage {k}")
+        print(dynModel.get_state(0))
+
+    pickle.dump(dynModel,open(f"../linearization_heuristic_dyn_models/TESTLPdynModel_NoIntermVar_linHeur_Prop_Bouncing_n_days={T}_deltas={dynModel.experiment_params['delta_schooling']}_xi={dynModel.experiment_params['xi']}_icus={dynModel.icus}_maxTests={dynModel.parameters['global-parameters']['C_atest']}.p","wb"))
+
+    dynModel.print_stats()
+    print("uopt matrix is")
+    print(uopt_seq)
+
+def run_LPModel_interm_X(dynModel):
+    # ##############################################################################
+    # Testing the construction of a typical LP
+
+    # shorthand for a few useful parameters
+    T = dynModel.time_steps
+    Xt_dim = num_compartments * num_age_groups
+    ut_dim = num_controls * num_age_groups
+    num_constraints = 3 + 2*num_age_groups
     mixing_method = dynModel.mixing_method
 
     # uptimal decisions
@@ -268,6 +503,7 @@ def run_LPModel(dynModel):
         # extract decisions for current period (testing and alphas)
 
         uopt_seq[:,k] = u_vars[k].X
+        print("uopt_k for k=",k,"is ",uopt_seq[:,k])
         uk_opt_dict, alphak_opt_dict = buildAlphaDict(u_vars[k].X)
 
         m_tests = {}
@@ -288,29 +524,45 @@ def run_LPModel(dynModel):
         for t in range(k+1,T):
             uhat_seq[:,t-k-1] = u_vars[t].X
 
+        print(f"States at stage {k}")
+        print(dynModel.get_state(0))
 
-    pickle.dump(dynModel,open(f"../linearization_heuristic_dyn_models/TESTLPdynModel_linHeur_Prop_Bouncing_n_days={T}_deltas={dynModel.experiment_params['delta_schooling']}_xi={dynModel.experiment_params['xi']}_icus={dynModel.icus}_maxTests={dynModel.parameters['global-parameters']['C_atest']}.p","wb"))
+
+    pickle.dump(dynModel,open(f"../linearization_heuristic_dyn_models/TESTLP_IntermVar_dynModel_linHeur_Prop_Bouncing_n_days={T}_deltas={dynModel.experiment_params['delta_schooling']}_xi={dynModel.experiment_params['xi']}_icus={dynModel.icus}_maxTests={dynModel.parameters['global-parameters']['C_atest']}.p","wb"))
 
     dynModel.print_stats()
+    print("uopt matrix is")
+    print(uopt_seq)
+
 
 
 def main():
 
     region = "testing_2_groups"
-    econ_param = "econ-death-zero"
+    econ_param = "econ"
     # "econ"
     # "econ-death-zero"
     # "econ-zero"
-    xi = 10000e6
+    xi = 0
 
-    for T in range(8,10,2):
+    for T in range(4,5,1):
         print(f"T is {T}")
         print("----------------")
-        print("LP Model")
+        print("LP Model with interm var")
         dynModel = initializeDynModel(T, region, econ_param, xi)
 
-        run_LPModel(dynModel)
+        run_LPModel_interm_X(dynModel)
         LPTotalReward = dynModel.get_total_reward()
+
+        print("----------------")
+        print("LP Model no interm var")
+        dynModel = initializeDynModel(T, region, econ_param, xi)
+
+        run_LPModel_no_intermVar(dynModel)
+        LP_no_intermVar_TotalReward = dynModel.get_total_reward()
+
+        assert abs(LP_no_intermVar_TotalReward-LPTotalReward)<0.000001, f"Both Total Rewards are not the same: LP_noIntermVar={LP_no_intermVar_TotalReward}, LPTotalReward={LPTotalReward}"
+
 
         print("----------------")
         print("Lin Huer")

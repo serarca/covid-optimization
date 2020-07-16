@@ -70,13 +70,6 @@ def run_linearization_heuristic(simulation_params, experiment_params):
     with open("parameters/econ.yaml") as file:
         econ_params = yaml.load(file, Loader=yaml.FullLoader)
 
-    # Percentage infected at time 0
-    # perc_infected = simulation_params['perc_infected']
-    # # Move population to infected (without this there is no epidem.)
-    # for group in initialization:
-    #     change = initialization[group]["S"]*perc_infected/100
-    #     initialization[group]["S"] = initialization[group]["S"] - change
-    #     initialization[group]["I"] = initialization[group]["I"] + change
 
     dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], num_time_periods, mixing_method, simulation_params['transport_lb_work_fraction'])
 

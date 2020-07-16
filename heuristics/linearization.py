@@ -678,7 +678,7 @@ def calculate_M_gamma_and_eta(dynModel):
     # Vector eta should have len equal to the size of X(t)
     eta = np.zeros(num_age_groups*num_compartments)
 
-    for ag in range(0,num_age_groups):
+    for ag in range(num_age_groups):
         # Get all the useful indices for the columns
         Sg_idx = ag*num_compartments + SEIR_groups.index('S_g')
         Eg_idx = ag*num_compartments + SEIR_groups.index('E_g')
@@ -750,7 +750,7 @@ def calculate_M_gamma_and_eta(dynModel):
         M[LSchoolingg_idx, Ig_idx] = school_value_g
         M[LSchoolingg_idx, Rg_idx] = school_value_g
 
-        for ah in range(0,num_age_groups):
+        for ah in range(num_age_groups):
             LOtherh_idx = ah*num_controls + controls.index('other')
             LTransporth_idx = ah*num_controls + controls.index('transport')
             LLeisureh_idx = ah*num_controls + controls.index('leisure')
@@ -1131,7 +1131,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
             u_constr_coeffs[t][constr_index] = np.zeros((ut_dim,T-k))
 
     # All objective coefficients are stored in a 2D numpy array with (ut_dim) rows, and (T-k) columns
-    # (one for every time period k, k+1, ..., T-1). Column with index t stores the coefficients in the objective for decision u_{k+t}, which 
+    # (one for every time period k, k+1, ..., T-1). Column with index t stores the coefficients in the objective for decision u_{k+t}, which
     # is of dimension (ut_dim). Note that for the objective we do not keep track of constant terms.
     u_obj_coeffs = np.zeros((ut_dim, T-k))
 
@@ -1183,7 +1183,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
             At_bar[tau-1] = At_bar[tau] @ At[tau]
 
         # print("Computed constraint and obj coeff for time {}".format(t))
-    
+
     # Now we handle the case of t=T
     At_bar[T-1] = np.eye(Xt_dim,Xt_dim)
     # Add up the contribution of eta * X_T in the coefficients of decision u_t, t = k, ..., T-1
@@ -1425,7 +1425,12 @@ def run_heuristic_linearization(dynModel):
 
         # update uhat_sequence
         uhat_seq = uvars_opt[:,1:]
+        print(f"States at stage {k}")
+        print(dynModel.get_state(0))
 
+    print("uopt matrix is")
+    print(uopt_seq)
+    
     return dynModel
 
 ####################################
