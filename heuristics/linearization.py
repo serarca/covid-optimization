@@ -46,9 +46,8 @@ def log_execution_time(function):
 ##################################################
 
 
-age_groups = ['age_group_0_9', 'age_group_10_19']
-# , 'age_group_20_29','age_group_30_39', 'age_group_40_49']
-# , 'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
+age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29','age_group_30_39', 'age_group_80_plus']
+# 'age_group_40_49', 'age_group_50_59', 'age_group_60_69', 'age_group_70_79',
 SEIR_groups = [ 'S_g', 'E_g', 'I_g', 'R_g', 'N_g', 'Ia_g', 'Ips_g', \
        'Ims_g', 'Iss_g', 'Rq_g', 'H_g', 'ICU_g', 'D_g' ]
 activities = ['home','leisure','other','school','transport','work']
@@ -62,6 +61,9 @@ num_activities = len(activities)
 
 Xt_dim = num_compartments * num_age_groups
 ut_dim = num_controls * num_age_groups
+
+
+numpyArrayDatatype = np.float64
 
 
 #def get_index_X(ag_name, SEIRg_name, age_groups, SEIR_groups):
@@ -83,7 +85,7 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method):
     # The order of the controls is as follows:
     # u_hat = [ Nmtest_g, Natest_g, BounceH_g, BounceICU_g, alpha_{g,activity1}, alpha_{g,activity2}, ... ]
 
-    jacob = np.zeros((num_age_groups*num_compartments, num_age_groups*num_compartments))
+    jacob = np.zeros((num_age_groups*num_compartments, num_age_groups*num_compartments), dtype=numpyArrayDatatype)
 
     u_hat_dict, alphas = buildAlphaDict(u_hat)
 
@@ -265,7 +267,7 @@ def get_Jacobian_u(dynModel, X_hat, u_hat, mixing_method):
     alpha = mixing_method['param_alpha']
     beta = mixing_method['param_beta']
 
-    jacob = np.zeros((num_age_groups*num_compartments,num_age_groups*num_controls))
+    jacob = np.zeros((num_age_groups*num_compartments,num_age_groups*num_controls), dtype=numpyArrayDatatype)
 
     I_h_slice = X_hat[SEIR_groups.index('I_g'): len(X_hat): num_compartments]
     Rq_h_slice = X_hat[SEIR_groups.index('Rq_g'): len(X_hat): num_compartments]
@@ -327,7 +329,7 @@ def get_Jacobian_u(dynModel, X_hat, u_hat, mixing_method):
 
         # Lockdown alpha's
         for act in range(num_controls-num_activities,num_controls):
-            partial_contacts_g_array = np.zeros(num_age_groups)
+            partial_contacts_g_array = np.zeros(num_age_groups, dtype=numpyArrayDatatype)
 
             lga_idx = ag * num_controls + act
             lga = u_hat[lga_idx]
@@ -397,7 +399,7 @@ def get_X_hat_sequence(dynModel, k, u_hat_sequence, use_bounce):
     # The total time horizon for the dynamical model
     T = dynModel.time_steps
 
-    X_hat_sequence = np.zeros((num_compartments * num_age_groups, T-k))
+    X_hat_sequence = np.zeros((num_compartments * num_age_groups, T-k), dtype=numpyArrayDatatype)
     new_uhat_sequence = u_hat_sequence  # initialized with the old one
 
     Hidx_all = slice(SEIR_groups.index('H_g'),np.shape(X_hat_sequence)[0],num_compartments)
@@ -470,7 +472,7 @@ def buildAlphaDict(u_hat_array):
 # Takes a dictionary of testing and bouncing variables, and a dictionary of alphas, and builds an array of u
 def dict_to_u(u_hat_dict, alphas):
 
-    u_hat_array = np.zeros(num_controls * num_age_groups)
+    u_hat_array = np.zeros(num_controls * num_age_groups, dtype=numpyArrayDatatype)
 
     for ag in range(0, num_age_groups):
         u_hat_array[ag * num_controls + controls.index('Nmtest_g')] = u_hat_dict[age_groups[ag]]['Nmtest_g']
@@ -525,7 +527,7 @@ def X_to_dict(X):
 
 # Converts a dictionary into an X array
 def dict_to_X(X_dict):
-    X = np.zeros(num_compartments * num_age_groups)
+    X = np.zeros(num_compartments * num_age_groups, dtype=numpyArrayDatatype)
 
     for ag in range(num_age_groups):
         Sg_idx = ag*num_compartments + SEIR_groups.index('S_g')
@@ -657,7 +659,7 @@ def get_F(dynModel, X, u):
 ####################################
 # our internal function here to calculate the contacts of a given age group with all other age groups
 def calcContacts(dynModel, alphas, mixing_method, ag):
-    contacts_ag = np.zeros(num_age_groups)
+    contacts_ag = np.zeros(num_age_groups, dtype=numpyArrayDatatype)
     for h in range(0, num_age_groups):
         contacts_ag[h] = n_contacts(dynModel.groups[age_groups[ag]], dynModel.groups[age_groups[h]], alphas, mixing_method)
 
@@ -670,13 +672,13 @@ def calculate_M_gamma_and_eta(dynModel):
 
     # M should have number of rows equal to the len(mu(t))
     # and number of columns equal to the len of X(t)
-    M = np.zeros((num_age_groups*num_controls, num_age_groups*num_compartments))
+    M = np.zeros((num_age_groups*num_controls, num_age_groups*num_compartments), dtype=numpyArrayDatatype)
 
     # Vector gamma should have len equal to the size of X(t)
-    gamma = np.zeros(num_age_groups*num_compartments)
+    gamma = np.zeros(num_age_groups*num_compartments, dtype=numpyArrayDatatype)
 
     # Vector eta should have len equal to the size of X(t)
-    eta = np.zeros(num_age_groups*num_compartments)
+    eta = np.zeros(num_age_groups*num_compartments, dtype=numpyArrayDatatype)
 
     for ag in range(num_age_groups):
         # Get all the useful indices for the columns
@@ -825,14 +827,14 @@ def calculate_all_constraints(dynModel, bounce_existing, h_cap_flag=False):
     # M-tests : 1
     # A-tests: 1
     # lockdown: (number of age groups) x (number of activities)
-    num_constraints = 3 + 2*num_age_groups
+    num_constraints = 5 + 2*num_age_groups
 
     # initialize Gamma_x and Gamma_u matrices with zeros
-    Gamma_x = np.zeros((num_constraints, Xt_dim))
-    Gamma_u = np.zeros((num_constraints, ut_dim))
+    Gamma_x = np.zeros((num_constraints, Xt_dim), dtype=numpyArrayDatatype)
+    Gamma_u = np.zeros((num_constraints, ut_dim), dtype=numpyArrayDatatype)
 
     # right-hand-sides are time-varying; we store them in a matrix with one column for each time t
-    K = np.zeros((num_constraints,T))
+    K = np.zeros((num_constraints,T), dtype=numpyArrayDatatype)
 
     # index for current constraint
     curr_constr = 0
@@ -981,10 +983,24 @@ def calculate_all_constraints(dynModel, bounce_existing, h_cap_flag=False):
     all_labels += ["Mtest_cap"]
     curr_constr += 1
 
+    Nmtestg_idx_all = slice(controls.index('Nmtest_g'),ut_dim,num_controls)
+    Gamma_u[curr_constr,Nmtestg_idx_all] = -1
+    K[curr_constr,:] = -dynModel.parameters['global-parameters']['C_mtest'] * dynModel.dt
+
+    all_labels += ["Mtest_cap"]
+    curr_constr += 1
+
     ################ Constraint for A-test capacity
     Natestg_idx_all = slice(controls.index('Natest_g'),ut_dim,num_controls)
     Gamma_u[curr_constr,Natestg_idx_all] = 1
     K[curr_constr,:] = dynModel.parameters['global-parameters']['C_atest'] * dynModel.dt
+
+    all_labels += ["Atest_cap"]
+    curr_constr += 1
+
+    Natestg_idx_all = slice(controls.index('Natest_g'),ut_dim,num_controls)
+    Gamma_u[curr_constr,Natestg_idx_all] = -1
+    K[curr_constr,:] = - dynModel.parameters['global-parameters']['C_atest'] * dynModel.dt
 
     all_labels += ["Atest_cap"]
     curr_constr += 1
@@ -1015,8 +1031,8 @@ def calculate_objective_time_dependent_coefs(dynModel, k, xhat, uhat):
     T = dynModel.time_steps
     M, gamma, eta = calculate_M_gamma_and_eta(dynModel)
 
-    d = np.zeros((num_compartments * num_age_groups, T - k + 1))
-    e = np.zeros((num_controls * num_age_groups, T - k + 1))
+    d = np.zeros((num_compartments * num_age_groups, T - k + 1), dtype=numpyArrayDatatype)
+    e = np.zeros((num_controls * num_age_groups, T - k + 1), dtype=numpyArrayDatatype)
 
     for t in  range(k, T):
         d[:, t - k] = uhat[:, t - k] @ M + gamma
@@ -1128,12 +1144,12 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
         u_constr_coeffs[t] = {}
         constr_constants[t] = {}
         for constr_index in range(num_constraints):
-            u_constr_coeffs[t][constr_index] = np.zeros((ut_dim,T-k))
+            u_constr_coeffs[t][constr_index] = np.zeros((ut_dim,T-k), dtype=numpyArrayDatatype)
 
     # All objective coefficients are stored in a 2D numpy array with (ut_dim) rows, and (T-k) columns
     # (one for every time period k, k+1, ..., T-1). Column with index t stores the coefficients in the objective for decision u_{k+t}, which
     # is of dimension (ut_dim). Note that for the objective we do not keep track of constant terms.
-    u_obj_coeffs = np.zeros((ut_dim, T-k))
+    u_obj_coeffs = np.zeros((ut_dim, T-k), dtype=numpyArrayDatatype)
 
     # We keep track of certain partial products of matrices / vectors that are useful
     # NOTE. When comparing this with Overleaf, note that we are only keeping track of
@@ -1208,13 +1224,20 @@ def run_heuristic_linearization(dynModel):
     T = dynModel.time_steps
     Xt_dim = num_compartments * num_age_groups
     ut_dim = num_controls * num_age_groups
-    num_constraints = 3 + 2*num_age_groups
+    num_constraints = 5 + 2*num_age_groups
 
     # some boolean flags for running the heuristic
     use_bounce_var = True   # whether to use the optimal bounce variables when forecasting the new X_hat
     bounce_existing = False   # whether to allow bouncing existing patients
 
+    test_freq = 1
+    lockdown_freq = 1
 
+    if 'test_freq' in dynModel.experiment_params:
+        test_freq = dynModel.experiment_params['test_freq']
+
+    if 'lockdown_freq' in dynModel.experiment_params:
+        lockdown_freq = dynModel.experiment_params['lockdown_freq']
 
     # calculate M, gamma, eta
     M, gamma, eta = calculate_M_gamma_and_eta(dynModel)
@@ -1232,10 +1255,10 @@ def run_heuristic_linearization(dynModel):
 
 
     # uptimal decisions
-    uopt_seq = np.zeros((ut_dim,T))
+    uopt_seq = np.zeros((ut_dim,T), dtype=numpyArrayDatatype)
 
     # pick a starting u_hat sequence
-    uhat_seq = np.zeros((ut_dim,T))
+    uhat_seq = np.zeros((ut_dim,T), dtype=numpyArrayDatatype)
     # for now, homogenous testing
     Nmtestg_idx_all = slice(controls.index('Nmtest_g'),ut_dim,num_controls)
     uhat_seq[Nmtestg_idx_all,:] = dynModel.parameters['global-parameters']['C_mtest']/num_age_groups
@@ -1308,8 +1331,8 @@ def run_heuristic_linearization(dynModel):
         # add all decisions using matrix format, and also specify objective coefficients
         obj_vec = np.reshape(obj_coefs, (ut_dim*(T-k),), 'F')  # reshape by reading along rows first
 
-        upper_bounds = np.ones(np.shape(obj_vec)) * np.inf
-        lower_bounds = np.zeros(np.shape(obj_vec))
+        upper_bounds = np.ones(np.shape(obj_vec), dtype=numpyArrayDatatype) * np.inf
+        lower_bounds = np.zeros(np.shape(obj_vec), dtype=numpyArrayDatatype)
 
         for i in range(len(obj_vec)):
 
@@ -1345,8 +1368,8 @@ def run_heuristic_linearization(dynModel):
 
         work_index = controls.index('work')
         transport_index = controls.index('transport')
-        TransportConstMatrix = np.zeros(((T-k) * num_age_groups, ut_dim * (T-k)))
-        TransportConstRHSVector = np.zeros(((T-k) *num_age_groups,))
+        TransportConstMatrix = np.zeros(((T-k) * num_age_groups, ut_dim * (T-k)), dtype=numpyArrayDatatype)
+        TransportConstRHSVector = np.zeros(((T-k) *num_age_groups,), dtype=numpyArrayDatatype)
 
         for i in range((T-k) * num_age_groups):
             work_idx = work_index + i*num_controls
@@ -1358,16 +1381,55 @@ def run_heuristic_linearization(dynModel):
 
         mod.addMConstrs(TransportConstMatrix, u_vars_vec, ">", TransportConstRHSVector, name=("transport_lock_lb"))
 
-        # weekly_u = []
+        # Weekly testing constraints
+        if test_freq > 1:
+            #Obeserve that we will have one constraint for each window of size test_freq, of which we have (T-k+test_freq-1)//test_freq)
+            #
+            # weeklyTestingConstMatrix = np.zeros(2 * num_age_groups * ((T-k+test_freq-1)//test_freq), ut_dim * (T-k))
+            #
 
-        # mod.addConstrs((u_vars_vec[lock_transport_idx_all_times[i]] >= dynModel.transport_lb_work_fraction * u_vars_vec[lock_work_idx_all_times[i]] for i in range((T-k)*num_age_groups)), name=("transport_lock_lb"))
+            m_test_id = controls.index('Nmtest_g')
+            a_test_id = controls.index('Natest_g')
+
+            row_index = 0
+            time_index = T-k
+            while time_index > 0:
+                for ag in range(num_age_groups):
+                    m_test_idx = m_test_id + ag * num_controls
+                    a_test_idx = a_test_id + ag * num_controls
+                    for window in range(1, min(time_index, test_freq)):
+                        print(time_index-window)
+                        print(time_index-window-1)
+                        mod.addConstr(u_vars_vec[(time_index-window) * ut_dim + m_test_idx] == u_vars_vec[(time_index-window-1) * ut_dim + m_test_idx])
+                        mod.addConstr(u_vars_vec[(time_index-window) * ut_dim + a_test_idx] == u_vars_vec[(time_index-window-1) * ut_dim + a_test_idx])
+
+                time_index = max(time_index - test_freq, 0)
+
+        # if lockdown_freq > 1:
+        #     #Obeserve that we will have one constraint for each window of size test_freq, of which we have (T-k+test_freq-1)//test_freq)
+        #     #
+        #     # weeklyTestingConstMatrix = np.zeros(2 * num_age_groups * ((T-k+test_freq-1)//test_freq), ut_dim * (T-k))
+        #     #
+        #
+        #     m_test_id = controls.index('Nmtest_g')
+        #     a_test_id = controls.index('Natest_g')
+        #
+        #     row_index = 0
+        #     time_index = T-k
+        #     while time_index > 0:
+        #         for ag in range(num_age_groups):
+        #             m_test_idx = m_test_id + ag * num_controls
+        #             a_test_idx = a_test_id + ag * num_controls
+        #             for window in range(1, min(time_index, test_freq)):
+        #                 mod.addConstr(u_vars_vec[time_index-window, m_test_idx] == u_vars_vec[time_index-window-1, m_test_idx])
+        #                 mod.addConstr(u_vars_vec[time_index-window, a_test_idx] == u_vars_vec[time_index-window-1, a_test_idx])
+        #
+        #         time_index = max(time_index - test_freq, 0)
 
 
-        # mod.addConstrs((u_vars_vec @ np.reshape(constr_coefs[t][con], (len(obj_vec),), 'F') + constr_consts[t][con] <= K[con,t] for con in range(num_constraints) for t in range(k,T)), name="All Const")
+        ConstMatrix = np.zeros(((T-k) * num_constraints, ut_dim * (T-k)), dtype=numpyArrayDatatype)
 
-        ConstMatrix = np.zeros(((T-k) * num_constraints, ut_dim * (T-k)))
-
-        ConstRHS = np.zeros(((T-k) * num_constraints,))
+        ConstRHS = np.zeros(((T-k) * num_constraints,), dtype=numpyArrayDatatype)
         for t in range(k,T):
             #print("Time %d number of constraints %d" %(t,len(constr_coefs[t])))
             for con in range(num_constraints):
@@ -1425,12 +1487,14 @@ def run_heuristic_linearization(dynModel):
 
         # update uhat_sequence
         uhat_seq = uvars_opt[:,1:]
-        print(f"States at stage {k}")
-        print(dynModel.get_state(0))
+        # print(f"u_optSeq at time {k} is {uopt_seq[:,k]}")
+        # print(f"uhat_seq is {uhat_seq}")
+        # print(f"States at stage {k}")
+        # print(dynModel.get_state(k))
 
-    print("uopt matrix is")
-    print(uopt_seq)
-    
+    # print("uopt matrix is")
+    # print(uopt_seq)
+
     return dynModel
 
 ####################################

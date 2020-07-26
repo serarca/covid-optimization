@@ -14,6 +14,7 @@ from heuristics import *
 import pickle
 import math
 import yaml
+import time
 
 # Global variables
 
@@ -87,11 +88,15 @@ def initializeDynModel(T=5, region="Ile-de-France", econ_param="econ", xi=(30 * 
 
     # 30 * 37199.03
     icus = 2000
+    tests_freq = 7
+    lockdown_freq = 14
 
     experiment_params = {
         'delta_schooling':delta,
         'xi':xi,
         'icus':icus,
+        'test_freq': tests_freq,
+        'lockdown_freq': lockdown_freq
     }
     num_time_periods = int(math.ceil(simulation_params["num_days"]/simulation_params["dt"]))
 
@@ -115,7 +120,7 @@ def initializeDynModel(T=5, region="Ile-de-France", econ_param="econ", xi=(30 * 
 
 
 
-
+# @profile
 def run_LPModel_no_intermVar(dynModel):
     # ##############################################################################
     # Testing the construction of a typical LP
@@ -124,7 +129,7 @@ def run_LPModel_no_intermVar(dynModel):
     T = dynModel.time_steps
     Xt_dim = num_compartments * num_age_groups
     ut_dim = num_controls * num_age_groups
-    num_constraints = 3 + 2*num_age_groups
+    num_constraints = 5 + 2*num_age_groups
     mixing_method = dynModel.mixing_method
 
     # uptimal decisions
@@ -191,10 +196,7 @@ def run_LPModel_no_intermVar(dynModel):
         assert( np.shape(new_uhat_seq) == (ut_dim,T-k) )
 
         # overwrite uhat with the updated one (with new bounce variables)
-        #print("\nOld uhat at 1:")
-        #print(uhat_seq[:,1])
-        #print("\nNew uhat at 1")
-        #print(new_uhat_seq[:,1])
+
 
         uhat_seq = new_uhat_seq
 
@@ -224,52 +226,20 @@ def run_LPModel_no_intermVar(dynModel):
             Bt[t] = dynModel.dt * jacob_u
             ct[t] = dynModel.dt * (get_F(dynModel, Xhat_t, uhat_t) - jacob_X @ Xhat_t - jacob_u @ uhat_t)
 
-            # print(get_F(dynModel, Xhat_t, uhat_t)[116])
-            # print((jacob_X @ Xhat_t)[116])
-            #
-            # print("BH_hat for group 8 at time {}: {}".format(t, uhat_t[8*num_controls+2]))
-            # print((jacob_u @ uhat_t)[116])
-            # print(ct[t][116])
-
-            #Dynamic constraints binding x(t+1) with x(t) and u(t)
 
             for s in range(Xt_dim):
-                # print(f"state {s} at time {t}")
+
                 state_values = gb.quicksum(At[t][s,i] * x_vars[t][i] for i in range(Xt_dim))
                 control_values = gb.quicksum(Bt[t][s,i] * u_vars[t][i] for i in range(ut_dim))
-                # print(f"t+1 is {t+1}")
-                x_vars[t+1][s] = state_values + control_values + ct[t][s]
-                # for i in range(ut_dim):
-                #     print(f"i = {i}, {u_vars[t][i]}")
-                #     print(f"i = {i}, {Bt[t][s,i]}")
 
-                # print(state_values)
-                # print(control_values)
-                # print(x_vars[t+1])
+                x_vars[t+1][s] = state_values + control_values + ct[t][s]
+
+            for s in range(Xt_dim):
+                M.addConstr(x_vars[t+1][s] >= 0)
 
             problemConst[t] = {}
-            for c in range(num_constraints):
-                # print(f"Adding constraint {c} at time {k}")
-                # All constraints of the problem in matrix form
-                # print(f"c is {c}")
-                # print(num_constraints)
-                # print(Gamma_x.shape)
-                # assert( np.shape(Gamma_x) == (num_constraints,Xt_dim) )
-                # print(f"AAAx-vars is : {x_vars[t]}")
+            for c in range(len(Gamma_x)):
 
-                # print(f"AAAAu-vars is : {u_vars[t]}")
-                #
-                # print(f"gamm x is worth:{Gamma_x[c,:]}")
-                # print(f"gamm x is worth:{Gamma_u[c,:]}")
-                #
-                # print(f"The constants is worth {K[c,t]}")
-                # print(Gamma_x[c,t])
-                # print(t)
-                # print(Gamma_x)
-                # print(num_constraints)
-                # print(x_vars[t])
-                # for i in range(ut_dim):
-                #     print(f"Gamma_u[c,i] = {Gamma_u[c,i]}")
                 problemConst[t][c] = M.addConstr(gb.quicksum(Gamma_x[c,s] *
                 x_vars[t][s] for s in range(Xt_dim)) + gb.quicksum(Gamma_u[c,i] * u_vars[t][i] for i in range(ut_dim)) <= K[c,t], name="Const{}_time_{}".format(c,t))
 
@@ -285,6 +255,11 @@ def run_LPModel_no_intermVar(dynModel):
 
 
 
+        # if k == 1:
+        #     print(f"k is {k}")
+        #     print(f"Xhat_seq is {Xhat_seq}")
+        #     print(f"uhat_seq is {uhat_seq}")
+
         d, e = calculate_objective_time_dependent_coefs(dynModel, k, Xhat_seq, uhat_seq)
 
 
@@ -293,14 +268,30 @@ def run_LPModel_no_intermVar(dynModel):
         M.setParam( 'LogFile', "" )
 
         # print(f"Calculating objective at time {k}")
-        terminalValue = gb.quicksum(d[s,T-k] * x_vars[T][s] for s in range(Xt_dim))
+        terminalValue = gb.quicksum(d[s,T-k] * x_vars[T][s] for s in range(len(x_vars[T])))
 
         # print(f"Calculating interm values of objective at time {k}")
+        # if k == 0:
+        #     print(f"coeff of u{2}[0]: {e[0,2]}")
+        #     print(f"coeff of u{2}[1]: {e[1,2]}")
+        #     print(f"coeff of u{2}[2]: {e[2,2]}")
+        #     print(f"coeff of u{2}[3]: {e[3,2]}")
+        #     print(f"coeff of u{t}[5]: {e[5,t-k]}")
+        #     print(f"coeff of u{t}[8]: {e[8,t-k]}")
+        #     print(f"coeff of u{t}[15]: {e[15,t-k]}")
+        #     print(f"coeff of u{t}[17]: {e[17,t-k]}")
+        #     print(f"coeff of u{t}[18]: {e[18,t-k]}")
+        #     print(f"coeff of u{t}[19]: {e[19,t-k]}")
 
-        intermValues = gb.quicksum(gb.quicksum(d[s,t-k] * x_vars[t][s] for s in range(Xt_dim)) + gb.quicksum(e[i,t-k] * u_vars[t][i] for i in range(ut_dim)) for t in range(k, T))
+            # M.addConstr(u_vars[2][0] == 30000)
 
-        M.setObjective(intermValues + terminalValue, gb.GRB.MAXIMIZE)
+        intermValues = gb.quicksum((gb.quicksum(e[i,ti-k] * u_vars[ti][i] for i in range(len(u_vars[ti]))) +  gb.quicksum(d[s,ti-k] * x_vars[ti][s] for s in range(len(x_vars[ti])))) for ti in range(k, T))
 
+        # gb.quicksum(d[s,t-k] * x_vars[t][s] for s in range(len(x_vars[t]))) +
+# gb.quicksum(e[i,t-k] * u_vars[t][i] for i in range(len(u_vars[t])))
+
+        M.setObjective(intermValues + terminalValue , gb.GRB.MAXIMIZE)
+# + terminalValue
 
         # print(d[:, T-k])
 
@@ -340,16 +331,26 @@ def run_LPModel_no_intermVar(dynModel):
 
         # update uhat_sequence
         uhat_seq = np.zeros((ut_dim, T-k-1))
-        for t in range(k+1,T):
-            uhat_seq[:,t-k-1] = [u_vars[t][i].X for i in range(ut_dim)]
-        print(f"States at stage {k}")
-        print(dynModel.get_state(0))
+        for ti in range(k+1,T):
+            uhat_seq[:,ti-k-1] = [u_vars[ti][i].X for i in range(ut_dim)]
+        # print(f"u_optSeq at time {k} is {uopt_seq[:,k]}")
+        # print(f"uhat_seq is {uhat_seq}")
+        # print(f"States at stage {k}")
+        # print(dynModel.get_state(k))
+
+        # if k == 1:
+        #     assert False
+            # print(x_vars)
+            # print([u_vars[t][i].X for i in range(ut_dim) for t in range(k,T)])
+
 
     pickle.dump(dynModel,open(f"../linearization_heuristic_dyn_models/TESTLPdynModel_NoIntermVar_linHeur_Prop_Bouncing_n_days={T}_deltas={dynModel.experiment_params['delta_schooling']}_xi={dynModel.experiment_params['xi']}_icus={dynModel.icus}_maxTests={dynModel.parameters['global-parameters']['C_atest']}.p","wb"))
 
     dynModel.print_stats()
-    print("uopt matrix is")
-    print(uopt_seq)
+    # print("uopt matrix is")
+    # print(uopt_seq)
+
+
 
 def run_LPModel_interm_X(dynModel):
     # ##############################################################################
@@ -359,7 +360,7 @@ def run_LPModel_interm_X(dynModel):
     T = dynModel.time_steps
     Xt_dim = num_compartments * num_age_groups
     ut_dim = num_controls * num_age_groups
-    num_constraints = 3 + 2*num_age_groups
+    num_constraints = 5 + 2*num_age_groups
     mixing_method = dynModel.mixing_method
 
     # uptimal decisions
@@ -426,19 +427,6 @@ def run_LPModel_interm_X(dynModel):
 
         uhat_seq = new_uhat_seq
 
-
-        d, e = calculate_objective_time_dependent_coefs(dynModel, k, Xhat_seq, uhat_seq)
-
-        M.setParam( 'OutputFlag', False )     # make Gurobi silent
-        M.setParam( 'LogFile', "" )
-
-        M.setObjective(sum(d[:,t-k] @ x_vars[t] + e[:,t-k] @ u_vars[t] for t in range(k, T)) + d[:,T-k] @ x_vars[T], gb.GRB.MAXIMIZE)
-
-        # print(d[:, T-k])
-
-        # + d[:,T-k] @ x_vars[T]
-        # M.setObjective(0)
-
         At = {}
         Bt = {}
         ct = {}
@@ -474,9 +462,22 @@ def run_LPModel_interm_X(dynModel):
             #Dynamic constraints binding x(t+1) with x(t) and u(t)
             dynamicConst[t] = M.addConstr(x_vars[t+1] == At[t] @ x_vars[t] + Bt[t] @ u_vars[t] + ct[t], name="Dynamics_const_time_{}".format(t))
 
+            # for s in range(Xt_dim):
+            #     state_values = sum(At[t][s,i] * x_vars[t][i] for i in range(Xt_dim))
+            #     control_values = sum(Bt[t][s,i] * u_vars[t][i] for i in range(ut_dim))
+            #
+            #     M.addConstr(x_vars[t+1][s] == state_values + control_values + ct[t][s])
+
+            # for c in range(len(Gamma_x)):
+            #
+            #     M.addConstr(sum(Gamma_x[c,s] *
+            #     x_vars[t][s] for s in range(Xt_dim)) + sum(Gamma_u[c,i] * u_vars[t][i] for i in range(ut_dim)) <= K[c,t], name="Const{}_time_{}".format(c,t))
+
+
+
+
             # All constraints of the problem in matrix form
-            problemConst[t] = M.addConstr(Gamma_x @
-            x_vars[t] + Gamma_u @ u_vars[t] <= K[:,t], name="All_const_time_{}".format(t))
+            problemConst[t] = M.addConstr(Gamma_x @ x_vars[t] + Gamma_u @ u_vars[t] <= K[:,t], name="All_const_time_{}".format(t))
 
             work_index = controls.index('work')
             transport_index = controls.index('transport')
@@ -486,6 +487,30 @@ def run_LPModel_interm_X(dynModel):
                 transport_idx = transport_index + i*num_controls
 
                 M.addConstr(u_vars[t][work_idx] * dynModel.transport_lb_work_fraction <= u_vars[t][transport_idx])
+
+
+        # if k == 1:
+        #     print(f"k is {k}")
+        #     print(f"Xhat_seq is {Xhat_seq}")
+        #     print(f"uhat_seq is {uhat_seq}")
+
+        d, e = calculate_objective_time_dependent_coefs(dynModel, k, Xhat_seq, uhat_seq)
+
+        M.setParam( 'OutputFlag', False )     # make Gurobi silent
+        M.setParam( 'LogFile', "" )
+
+
+        M.setObjective(sum(e[:,ti-k] @ u_vars[ti] + d[:,ti-k] @ x_vars[ti] for ti in range(k, T)) + d[:,T-k] @ x_vars[T], gb.GRB.MAXIMIZE)
+
+        # e[:,t-k] @ u_vars[t]
+        # d[:,t-k] @ x_vars[t]
+        # + d[:,T-k] @ x_vars[T]
+
+        # print(d[:, T-k])
+
+        # + d[:,T-k] @ x_vars[T]
+        # M.setObjective(0)
+
 
 
 
@@ -503,7 +528,7 @@ def run_LPModel_interm_X(dynModel):
         # extract decisions for current period (testing and alphas)
 
         uopt_seq[:,k] = u_vars[k].X
-        print("uopt_k for k=",k,"is ",uopt_seq[:,k])
+        # print("uopt_k for k=",k,"is ",uopt_seq[:,k])
         uk_opt_dict, alphak_opt_dict = buildAlphaDict(u_vars[k].X)
 
         m_tests = {}
@@ -521,47 +546,51 @@ def run_LPModel_interm_X(dynModel):
 
         # update uhat_sequence
         uhat_seq = np.zeros((ut_dim, T-k-1))
-        for t in range(k+1,T):
-            uhat_seq[:,t-k-1] = u_vars[t].X
+        for ti in range(k+1,T):
+            uhat_seq[:,ti-k-1] = u_vars[ti].X
 
-        print(f"States at stage {k}")
-        print(dynModel.get_state(0))
+        # print(f"uhat_seq is {uhat_seq}")
+        #
+        # print(f"States at stage {k}")
+        # print(dynModel.get_state(k))
 
 
     pickle.dump(dynModel,open(f"../linearization_heuristic_dyn_models/TESTLP_IntermVar_dynModel_linHeur_Prop_Bouncing_n_days={T}_deltas={dynModel.experiment_params['delta_schooling']}_xi={dynModel.experiment_params['xi']}_icus={dynModel.icus}_maxTests={dynModel.parameters['global-parameters']['C_atest']}.p","wb"))
 
     dynModel.print_stats()
-    print("uopt matrix is")
-    print(uopt_seq)
+    # print("uopt matrix is")
+    # print(uopt_seq)
 
 
 
 def main():
 
-    region = "testing_2_groups"
-    econ_param = "econ"
+    region = "test-5-groups"
+    econ_param = "econ-test"
     # "econ"
     # "econ-death-zero"
     # "econ-zero"
-    xi = 0
+    xi = 1
 
-    for T in range(4,5,1):
-        print(f"T is {T}")
-        print("----------------")
-        print("LP Model with interm var")
-        dynModel = initializeDynModel(T, region, econ_param, xi)
-
-        run_LPModel_interm_X(dynModel)
-        LPTotalReward = dynModel.get_total_reward()
-
-        print("----------------")
-        print("LP Model no interm var")
-        dynModel = initializeDynModel(T, region, econ_param, xi)
-
-        run_LPModel_no_intermVar(dynModel)
-        LP_no_intermVar_TotalReward = dynModel.get_total_reward()
-
-        assert abs(LP_no_intermVar_TotalReward-LPTotalReward)<0.000001, f"Both Total Rewards are not the same: LP_noIntermVar={LP_no_intermVar_TotalReward}, LPTotalReward={LPTotalReward}"
+    start_time = time.time()
+    for T in range(35,36,1):
+        # print(f"T is {T}")
+        # print("----------------")
+        # print("LP Model with interm var")
+        # dynModel = initializeDynModel(T, region, econ_param, xi)
+        #
+        # run_LPModel_interm_X(dynModel)
+        # LPTotalReward = dynModel.get_total_reward()
+        #
+        # end_time_LPModel = time.time()
+        # print("----------------")
+        # print("LP Model no interm var")
+        # dynModel = initializeDynModel(T, region, econ_param, xi)
+        #
+        # run_LPModel_no_intermVar(dynModel)
+        # LP_no_intermVar_TotalReward = dynModel.get_total_reward()
+        #
+        # assert abs(LP_no_intermVar_TotalReward-LPTotalReward)<0.000001, f"Both Total Rewards are not the same: LP_noIntermVar={LP_no_intermVar_TotalReward}, LPTotalReward={LPTotalReward}"
 
 
         print("----------------")
@@ -572,8 +601,16 @@ def main():
         dynModel.print_stats()
         LinHeurTotalReward = dynModel.get_total_reward()
         print("---------------")
-        assert abs(LinHeurTotalReward-LPTotalReward)<0.000001, f"Both Total Rewards are not the same: LinTotRew={LinHeurTotalReward}, LPTotalReward={LPTotalReward}"
 
+        pickle.dump(dynModel,open(f"../linearization_heuristic_dyn_models/TESTLP_linHeur_Prop_Bouncing_n_days={T}_deltas={dynModel.experiment_params['delta_schooling']}_xi={dynModel.experiment_params['xi']}_icus={dynModel.icus}_maxTests={dynModel.parameters['global-parameters']['C_atest']}.p","wb"))
+
+
+        # if abs(LinHeurTotalReward-LPTotalReward)>0.000001:
+        #     print(f"Both Total Rewards are not the same: LinTotRew={LinHeurTotalReward}, LPTotalReward={LPTotalReward}")
+        end_time_lin = time.time()
+
+    # print(f"Total time LP Model: {end_time_LPModel-start_time}")
+    print(f"Total time Lin Model: {end_time_lin-end_time_LPModel}")
 
 if __name__ == "__main__":
     main()
