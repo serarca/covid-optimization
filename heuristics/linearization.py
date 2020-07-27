@@ -7,7 +7,7 @@ import sys
 from threadpoolctl import threadpool_limits
 import numpy as np
 
-threadpool_limits(limits=6, user_api='blas')
+threadpool_limits(limits=2, user_api='blas')
 
 import pandas as pd
 import math
@@ -46,8 +46,7 @@ def log_execution_time(function):
 ##################################################
 
 
-age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29','age_group_30_39', 'age_group_80_plus']
-# 'age_group_40_49', 'age_group_50_59', 'age_group_60_69', 'age_group_70_79',
+age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29','age_group_30_39', 'age_group_40_49', 'age_group_50_59', 'age_group_60_69', 'age_group_70_79','age_group_80_plus']
 SEIR_groups = [ 'S_g', 'E_g', 'I_g', 'R_g', 'N_g', 'Ia_g', 'Ips_g', \
        'Ims_g', 'Iss_g', 'Rq_g', 'H_g', 'ICU_g', 'D_g' ]
 activities = ['home','leisure','other','school','transport','work']
@@ -1383,13 +1382,23 @@ def run_heuristic_linearization(dynModel):
 
         # Weekly testing constraints
         if test_freq > 1:
+            m_test_id = controls.index('Nmtest_g')
+            a_test_id = controls.index('Natest_g')
+
+            if k % test_freq != 0:
+                #Fix the first control to be equal to the control at time k-1
+                for ag in range(num_age_groups):
+                    m_test_idx = m_test_id + ag * num_controls
+                    a_test_idx = a_test_id + ag * num_controls
+
+                    mod.addConstr(u_vars_vec[m_test_idx] == dynModel.m_tests_controls[k-1][age_groups[ag]])
+                    mod.addConstr(u_vars_vec[a_test_idx] == dynModel.a_tests_controls[k-1][age_groups[ag]])
+
+
             #Obeserve that we will have one constraint for each window of size test_freq, of which we have (T-k+test_freq-1)//test_freq)
             #
             # weeklyTestingConstMatrix = np.zeros(2 * num_age_groups * ((T-k+test_freq-1)//test_freq), ut_dim * (T-k))
             #
-
-            m_test_id = controls.index('Nmtest_g')
-            a_test_id = controls.index('Natest_g')
 
             row_index = 0
             time_index = T-k
@@ -1398,8 +1407,8 @@ def run_heuristic_linearization(dynModel):
                     m_test_idx = m_test_id + ag * num_controls
                     a_test_idx = a_test_id + ag * num_controls
                     for window in range(1, min(time_index, test_freq)):
-                        print(time_index-window)
-                        print(time_index-window-1)
+                        # print(time_index-window)
+                        # print(time_index-window-1)
                         mod.addConstr(u_vars_vec[(time_index-window) * ut_dim + m_test_idx] == u_vars_vec[(time_index-window-1) * ut_dim + m_test_idx])
                         mod.addConstr(u_vars_vec[(time_index-window) * ut_dim + a_test_idx] == u_vars_vec[(time_index-window-1) * ut_dim + a_test_idx])
 
@@ -1455,7 +1464,7 @@ def run_heuristic_linearization(dynModel):
 
         dynModel.shadowPrices[k] = step_shadow_prices
 
-        mod.write(f"LP_lineariz_k={k}.lp")
+        # mod.write(f"LP_lineariz_k={k}.lp")
 
         if( mod.Status ==  gb.GRB.INFEASIBLE ):
             # model was infeasible

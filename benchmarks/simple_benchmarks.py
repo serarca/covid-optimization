@@ -177,7 +177,7 @@ simulation_params = {
 	'dt':1.0,
 	'days': 90.0,
 	'region': "fitted",
-	'heuristic': 'benckmark',
+	'heuristic': 'benchmark',
 	'mixing_method': {'name': 'multi'}
 }
 age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29', 'age_group_30_39', 'age_group_40_49',
@@ -208,8 +208,8 @@ mixing_method = universe_params["mixing"]
 # Parameters to try
 params_to_try = {
 	"delta_schooling":[0.5],
-	"xi":[37199.03, 30 * 37199.03],
-	"icus":[2000, 2500],
+	"xi":[0, 30 * 37199.03],
+	"icus":[2000],
 	"tests":[0,30000],
 	"testing":["homogeneous"]+age_groups
 }
@@ -359,7 +359,7 @@ for delta in params_to_try["delta_schooling"]:
 						"deaths":dynModel.get_total_deaths(),
 						"reward":dynModel.get_total_reward(),
 					})
-					pickle.dump(dynModel,open(f"/dynModel_zero_full_lock_benchmark_days_{simulation_params['time_periods']}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","wb"))
+					pickle.dump(dynModel,open(f"dynModel_zero_full_lock_benchmark_days_{simulation_params['time_periods']}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","wb"))
 
 					plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params, "zero_full_lockdown")
 
@@ -410,4 +410,4 @@ for delta in params_to_try["delta_schooling"]:
 					pickle.dump(dynModel,open(f"dynModel_open_benchmark_days_{simulation_params['time_periods']}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","wb"))
 					plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params, "open")
 
-pd.DataFrame(results).to_excel("simulations.xlsx")
+pd.DataFrame(results).to_excel(f"simulations-{simulation_params['days']}-days.xlsx")

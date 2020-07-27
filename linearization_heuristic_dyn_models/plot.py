@@ -13,6 +13,8 @@ parent_dir = current_dir[:current_dir.rfind(os.path.sep)]
 sys.path.insert(0, parent_dir)
 sys.path.insert(0, parent_dir+"/heuristics")
 
+import numpy as np
+
 from linearization import *
 from heuristics import *
 

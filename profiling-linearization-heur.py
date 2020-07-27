@@ -100,18 +100,18 @@ def main():
 
     params_to_try = {
         "delta_schooling":[0.5],
-        "xi":[30 * 37199.03],
+        "xi":[0, 30 * 37199.03],
         "icus":[2000],
-        "tests":[30000]
+        "tests":[0, 30000]
     }
     regions = ['fitted']
     # 'testing_5_groups']
     # 'Testing-group', 'Ile-de-France']
-    n_days = 50
-    final_time_step = 50
+    n_days = 180
+    final_time_step = 180
     region = 'fitted'
     #
-    Parallel(n_jobs=1)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region)
+    Parallel(n_jobs=4)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region)
     for delta in params_to_try["delta_schooling"]
     for xi in params_to_try["xi"]
     for icus in params_to_try["icus"]
@@ -136,11 +136,11 @@ def main():
         'transport_lb_work_fraction': 0.25
     }
 
-    # run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try, simulation_params_linearization)
+    run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try, simulation_params_linearization)
 
     # unpickle_plot_and_print_results(n_days, params_to_try, simulation_params_linearization)
 
-    # load_pickles_and_create_csv(n_days, params_to_try, final_time_step)
+    load_pickles_and_create_csv(n_days, params_to_try, final_time_step)
 
 def run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region):
 
@@ -246,7 +246,7 @@ def load_pickles_and_create_csv(n_days, params_to_try, final_time_step):
                             "reward":dynModel.get_total_reward(final_time_step),
                         })
 
-    pd.DataFrame(results).to_excel("linearization_heuristic_dyn_models/linearization_heuristic_results.xlsx")
+    pd.DataFrame(results).to_excel(f"linearization_heuristic_dyn_models/linearization_heuristic_results_{n_days}_days.xlsx")
 
 def run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try, simulation_params):
     for delta in params_to_try["delta_schooling"]:

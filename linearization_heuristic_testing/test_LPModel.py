@@ -23,7 +23,7 @@ use_bounce_var = True
 
 
 
-def initializeDynModel(T=5, region="Ile-de-France", econ_param="econ", xi=(30 * 37199.03)):
+def initializeDynModel(T=5, region="Ile-de-France", econ_param="econ", xi=0):
     # simulation_params = {
     #         'dt':1.0,
     #         'days': 30,
@@ -301,7 +301,7 @@ def run_LPModel_no_intermVar(dynModel):
 
         # print(f"Optimizing model for time {k}")
         M.optimize()
-        M.write(f"LP_model_NoIntermVar_k={k}.lp")
+        # M.write(f"LP_model_NoIntermVar_k={k}.lp")
 
         print(f"Objective value for LPRef k = {k}: {M.objVal}")
 
@@ -515,7 +515,7 @@ def run_LPModel_interm_X(dynModel):
 
 
         M.optimize()
-        M.write(f"LP_model_IntermVar_k={k}.lp")
+        # M.write(f"LP_model_IntermVar_k={k}.lp")
 
         print(f"Objective value for LPRef k = {k}: {M.objVal}")
 
@@ -565,22 +565,25 @@ def run_LPModel_interm_X(dynModel):
 
 def main():
 
-    region = "test-5-groups"
-    econ_param = "econ-test"
+    region = "fitted"
+    econ_param = "econ"
     # "econ"
     # "econ-death-zero"
     # "econ-zero"
-    xi = 1
+    xi = 1e6
 
     start_time = time.time()
-    for T in range(35,36,1):
-        # print(f"T is {T}")
-        # print("----------------")
+    for T in range(28,29,1):
+        print(f"T is {T}")
+        print("----------------")
         # print("LP Model with interm var")
         # dynModel = initializeDynModel(T, region, econ_param, xi)
         #
         # run_LPModel_interm_X(dynModel)
         # LPTotalReward = dynModel.get_total_reward()
+        # dynModel.print_stats()
+        # print(f"Total reward: {LPTotalReward}")
+
         #
         # end_time_LPModel = time.time()
         # print("----------------")
@@ -607,10 +610,10 @@ def main():
 
         # if abs(LinHeurTotalReward-LPTotalReward)>0.000001:
         #     print(f"Both Total Rewards are not the same: LinTotRew={LinHeurTotalReward}, LPTotalReward={LPTotalReward}")
-        end_time_lin = time.time()
+        # end_time_lin = time.time()
 
     # print(f"Total time LP Model: {end_time_LPModel-start_time}")
-    print(f"Total time Lin Model: {end_time_lin-end_time_LPModel}")
+    # print(f"Total time Lin Model: {end_time_lin-end_time_LPModel}")
 
 if __name__ == "__main__":
     main()
