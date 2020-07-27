@@ -1385,7 +1385,7 @@ def run_heuristic_linearization(dynModel):
             m_test_id = controls.index('Nmtest_g')
             a_test_id = controls.index('Natest_g')
 
-            if k % test_freq != 0:
+            if (T-k) % test_freq != 0 and k != 0:
                 #Fix the first control to be equal to the control at time k-1
                 for ag in range(num_age_groups):
                     m_test_idx = m_test_id + ag * num_controls
@@ -1414,26 +1414,40 @@ def run_heuristic_linearization(dynModel):
 
                 time_index = max(time_index - test_freq, 0)
 
-        # if lockdown_freq > 1:
-        #     #Obeserve that we will have one constraint for each window of size test_freq, of which we have (T-k+test_freq-1)//test_freq)
-        #     #
-        #     # weeklyTestingConstMatrix = np.zeros(2 * num_age_groups * ((T-k+test_freq-1)//test_freq), ut_dim * (T-k))
-        #     #
+        if lockdown_freq > 1:
+
+            if (T-k) % lockdown_freq != 0 and k != 0:
+                #Fix the first control to be equal to the control at time k-1
+                for ag in range(num_age_groups):
+                    for act in activities:
+                        act_lock_id = controls.index(act)
+                        act_lock_idx = act_lock_id + ag * num_controls
+
+                        mod.addConstr(u_vars_vec[act_lock_idx] == dynModel.lockdown_controls[k-1][age_groups[ag]][act])
+
+
+
+        #Obeserve that we will have one constraint for each window of size test_freq, of which we have (T-k+test_freq-1)//test_freq)
         #
-        #     m_test_id = controls.index('Nmtest_g')
-        #     a_test_id = controls.index('Natest_g')
+        # weeklyTestingConstMatrix = np.zeros(2 * num_age_groups * ((T-k+test_freq-1)//test_freq), ut_dim * (T-k))
         #
-        #     row_index = 0
-        #     time_index = T-k
-        #     while time_index > 0:
-        #         for ag in range(num_age_groups):
-        #             m_test_idx = m_test_id + ag * num_controls
-        #             a_test_idx = a_test_id + ag * num_controls
-        #             for window in range(1, min(time_index, test_freq)):
-        #                 mod.addConstr(u_vars_vec[time_index-window, m_test_idx] == u_vars_vec[time_index-window-1, m_test_idx])
-        #                 mod.addConstr(u_vars_vec[time_index-window, a_test_idx] == u_vars_vec[time_index-window-1, a_test_idx])
-        #
-        #         time_index = max(time_index - test_freq, 0)
+
+            row_index = 0
+            time_index = T-k
+            while time_index > 0:
+                for ag in range(num_age_groups):
+                    for act in activities:
+                        act_lock_id = controls.index(act)
+                        act_lock_idx = act_lock_id + ag * num_controls
+
+                        for window in range(1, min(time_index, lockdown_freq)):
+                        # print(time_index-window)
+                        # print(time_index-window-1)
+
+                            mod.addConstr(u_vars_vec[(time_index-window) * ut_dim + act_lock_idx] == u_vars_vec[(time_index-window-1) * ut_dim + act_lock_idx])
+
+                time_index = max(time_index - lockdown_freq, 0)
+
 
 
         ConstMatrix = np.zeros(((T-k) * num_constraints, ut_dim * (T-k)), dtype=numpyArrayDatatype)

@@ -107,8 +107,8 @@ def main():
     regions = ['fitted']
     # 'testing_5_groups']
     # 'Testing-group', 'Ile-de-France']
-    n_days = 180
-    final_time_step = 180
+    n_days = 90
+    final_time_step = 90
     region = 'fitted'
     #
     Parallel(n_jobs=4)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region)
@@ -144,10 +144,15 @@ def main():
 
 def run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region):
 
+    tests_freq = 7
+    lockdown_freq = 14
+
     experiment_params = {
         'delta_schooling':delta,
         'xi':xi,
         'icus':icus,
+        'test_freq': tests_freq,
+        'lockdown_freq': lockdown_freq
     }
     # logging.critical(f'{region}, {n_days}')
 
@@ -184,11 +189,15 @@ def run_dyn_model_with_no_bouncing_and_pickle(pickled_dyn_model):
     xi = dynModel.experiment_params['xi']
     icus = dynModel.icus
     tests = dynModel.parameters['global-parameters']['C_mtest']
+    tests_freq = 7
+    lockdown_freq = 14
 
     experiment_params = {
         'delta_schooling':delta,
         'xi':xi,
         'icus':icus,
+        'test_freq': tests_freq,
+        'lockdown_freq': lockdown_freq
     }
     # logging.critical(f'{region}, {n_days}')
 
