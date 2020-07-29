@@ -16,6 +16,7 @@ __gurobi_threads = 1
 
 from time import time
 import logging
+import random
 
 
 current_path = os.path.abspath(getsourcefile(lambda:0))
@@ -1258,12 +1259,27 @@ def run_heuristic_linearization(dynModel):
 
     # pick a starting u_hat sequence
     uhat_seq = np.zeros((ut_dim,T), dtype=numpyArrayDatatype)
+
+
+
+
+
     # for now, homogenous testing
     Nmtestg_idx_all = slice(controls.index('Nmtest_g'),ut_dim,num_controls)
     uhat_seq[Nmtestg_idx_all,:] = dynModel.parameters['global-parameters']['C_mtest']/num_age_groups
 
     Natestg_idx_all = slice(controls.index('Natest_g'),ut_dim,num_controls)
     uhat_seq[Natestg_idx_all,:] = dynModel.parameters['global-parameters']['C_atest']/num_age_groups
+
+    # Starting the uhat_seq with all lockdowns set to 1 (fully open)
+
+    for act in activities:
+        act_indices = slice(controls.index(act), ut_dim, num_controls)
+        # uhat_seq[act_indices,:] = 1.0
+
+    # # Random lockdowns
+        uhat_seq[act_indices,:] = random.uniform(0,1)
+
 
     # and home lockdown variables all 1
     lock_home_idx_all = slice(controls.index('home'),ut_dim,num_controls)
