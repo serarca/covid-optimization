@@ -386,9 +386,9 @@ def get_X_hat_sequence(dynModel, k, u_hat_sequence, use_bounce):
     """Given a dynamical model, a starting point k, and the controls for time periods k to T-1 for tests and lockdowns, we start the dynamical model at time k, and then run it until time T-1 with the controls in u_hat.
     This produces the nominal trajectory X_hat_sequence. X_hat_sequence is a np.array of shape (num_compartments * num_age_groups, T-k), where each column represents the X_hat at time k, k+1,...
     This assumes that the dynamical model has already been run up to point k (it takes the states at time k as the starting points for the new nominal trajectory).
-    We assume as well that u_hat_sequence is a 2-d numpy array with shape (num_controls * num_age_groups, T-k) with each column corresponding to a u_hat at time k, k+1,..., T-1. Hence, u_hat_sequence[:,k] gives the u_hat at time k.
+    We assume as well that u_hat_sequence is a 2-d numpy array with shape (num_controls * num_age_groups, T-k) with each column corresponding to a u_hat at time k, k+1,..., T. Hence, u_hat_sequence[:,k] gives the u_hat at time k.
     Note we are not using the bouncing variables in forecasting X_hat_sequence.
-    Note: we return x_hat[k], x_hat[k+1], ..., x_hat[T-1].
+    Note: we return x_hat[k], x_hat[k+1], ..., x_hat[T].
     """
     #NOTE. There are a few extra arguments, as follows:
     # Argument 'use_bounce' determines whether to use bounce variables or not
@@ -399,13 +399,13 @@ def get_X_hat_sequence(dynModel, k, u_hat_sequence, use_bounce):
     # The total time horizon for the dynamical model
     T = dynModel.time_steps
 
-    X_hat_sequence = np.zeros((num_compartments * num_age_groups, T-k), dtype=numpyArrayDatatype)
-    new_uhat_sequence = u_hat_sequence  # initialized with the old one
+    X_hat_sequence = np.zeros((num_compartments * num_age_groups, T-k+1), dtype=numpyArrayDatatype)
+    new_uhat_sequence = np.copy(u_hat_sequence)  # initialized with the old one
 
     Hidx_all = slice(SEIR_groups.index('H_g'),np.shape(X_hat_sequence)[0],num_compartments)
     ICUidx_all = slice(SEIR_groups.index('ICU_g'),np.shape(X_hat_sequence)[0],num_compartments)
 
-    for t in range(T-k):
+    for t in range(T-k+1):
 
         # get the state from the dynamic model
         state = dynModel.get_state(t + k)
@@ -413,32 +413,33 @@ def get_X_hat_sequence(dynModel, k, u_hat_sequence, use_bounce):
         # write it into X_hat
         X_hat_sequence[:,t] = dict_to_X(state)
 
-        # build a dictionary of decisions/controls
-        u_hat_dict, alphas = buildAlphaDict(u_hat_sequence[:,t])
+        if t < T-k:
+            # build a dictionary of decisions/controls
+            u_hat_dict, alphas = buildAlphaDict(u_hat_sequence[:,t])
 
-        #Create m and a tests in the format taken by dynModel
-        m_tests = {}
-        a_tests = {}
-        BH = {}
-        BICU = {}
-        for ag in age_groups:
-            BH[ag] = u_hat_dict[ag]['BounceH_g']
-            BICU[ag] = u_hat_dict[ag]['BounceICU_g']
-            m_tests[ag] = u_hat_dict[ag]['Nmtest_g']
-            a_tests[ag] = u_hat_dict[ag]['Natest_g']
+            #Create m and a tests in the format taken by dynModel
+            m_tests = {}
+            a_tests = {}
+            BH = {}
+            BICU = {}
+            for ag in age_groups:
+                BH[ag] = u_hat_dict[ag]['BounceH_g']
+                BICU[ag] = u_hat_dict[ag]['BounceICU_g']
+                m_tests[ag] = u_hat_dict[ag]['Nmtest_g']
+                a_tests[ag] = u_hat_dict[ag]['Natest_g']
 
-        # take one time step in dynamical system.
-        if(use_bounce):
-            dynModel.take_time_step(m_tests, a_tests, alphas, BH, BICU)
-        else:
-            dynModel.take_time_step(m_tests, a_tests, alphas)
+            # take one time step in dynamical system.
+            if(use_bounce):
+                dynModel.take_time_step(m_tests, a_tests, alphas, BH, BICU)
+            else:
+                dynModel.take_time_step(m_tests, a_tests, alphas)
 
-        # get the updated bounce variables and write them in new control
-        new_bounce = dynModel.get_bounce(t + k)
-        for ag in range(num_age_groups):
-            #print("ICU: Age group {}: bouncing {}".format(age_groups[ag],new_bounce[age_groups[ag]]['B_ICU']))
-            new_uhat_sequence[ag * num_controls + controls.index('BounceH_g'),t] = new_bounce[age_groups[ag]]['B_H']
-            new_uhat_sequence[ag * num_controls + controls.index('BounceICU_g'),t] = new_bounce[age_groups[ag]]['B_ICU']
+            # get the updated bounce variables and write them in new control
+            new_bounce = dynModel.get_bounce(t + k)
+            for ag in range(num_age_groups):
+                #print("ICU: Age group {}: bouncing {}".format(age_groups[ag],new_bounce[age_groups[ag]]['B_ICU']))
+                new_uhat_sequence[ag * num_controls + controls.index('BounceH_g'),t] = new_bounce[age_groups[ag]]['B_H']
+                new_uhat_sequence[ag * num_controls + controls.index('BounceICU_g'),t] = new_bounce[age_groups[ag]]['B_ICU']
 
     # Erase the states after k so as to reset the dyn model
     dynModel.reset_time(k)
@@ -1062,7 +1063,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
     ut_dim = num_controls * num_age_groups
     num_constraints = Gamma_x.shape[0]
 
-    assert( Xhat_seq.shape==(Xt_dim, T-k) )
+    assert( Xhat_seq.shape==(Xt_dim, T-k+1) )
     assert( uhat_seq.shape==(ut_dim, T-k) )
     assert(Gamma_x.shape ==(num_constraints,Xt_dim))
     assert(Gamma_u.shape ==(num_constraints,ut_dim))
@@ -1275,10 +1276,10 @@ def run_heuristic_linearization(dynModel):
 
     for act in activities:
         act_indices = slice(controls.index(act), ut_dim, num_controls)
-        # uhat_seq[act_indices,:] = 1.0
+        uhat_seq[act_indices,:] = 1.0
 
     # # Random lockdowns
-        uhat_seq[act_indices,:] = random.uniform(0,1)
+        # uhat_seq[act_indices,:] = random.uniform(0,1)
 
 
     # and home lockdown variables all 1
@@ -1308,7 +1309,7 @@ def run_heuristic_linearization(dynModel):
         # calculate state trajectory X_hat and corresponging controls new_uhat
         Xhat_seq, new_uhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq, use_bounce_var)
 
-        assert( np.shape(Xhat_seq) == (Xt_dim,T-k) )
+        assert( np.shape(Xhat_seq) == (Xt_dim,T-k+1) )
         assert( np.shape(new_uhat_seq) == (ut_dim,T-k) )
 
         uhat_seq = new_uhat_seq
