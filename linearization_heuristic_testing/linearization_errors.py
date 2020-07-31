@@ -46,8 +46,8 @@ def initializeDynModel(T=5, region="Ile-de-France", econ_param="econ", xi=0):
             "name":"mult",
             "param_alpha":1.0,
             "param_beta":0.5,},
-        'mtest_cap' : 30000,
-        'atest_cap' : 30000,
+        'mtest_cap' : 0,
+        'atest_cap' : 0,
         'work_full_lockdown_factor' : 0.24,
         'heuristic': 'linearization',
         'transport_lb_work_fraction': 0.25
@@ -131,6 +131,7 @@ def linearization_errors(dynModel, k, u_hat_seq, u_seq):
 
     x_vars = np.zeros((Xt_dim,T-k+1))
 
+    X_seq, new_u_seq = get_X_hat_sequence(dynModel, k, u_seq, use_bounce_var)
 
     Xhat_seq, new_uhat_seq = get_X_hat_sequence(dynModel, k, u_hat_seq, use_bounce_var)
 
@@ -180,6 +181,55 @@ def linearization_errors(dynModel, k, u_hat_seq, u_seq):
         #Dynamic constraints binding x(t+1) with x(t) and u(t)
         x_vars[:, t+1-k] = At[t] @ x_vars[:, t-k] + Bt[t] @ u_seq[:, t-k] + ct[t]
 
+        # infected_idx =
+
+        print(f"t = {t}")
+        print("real dynamics Exposed for time t+1:")
+        print(X_seq[slice(SEIR_groups.index('E_g'), Xt_dim, num_compartments) , t+1-k])
+        print("linearized dynamics for exposed:")
+        print(x_vars[slice(SEIR_groups.index('E_g'), Xt_dim, num_compartments) , t+1-k])
+
+        print("At[t] @ x[t] in the exposed indices:")
+        print((At[t] @ x_vars[:, t-k])[slice(SEIR_groups.index('E_g'), Xt_dim, num_compartments)])
+        print("Bt[t] @ u_seq[t] in the exposed indices:")
+        print((Bt[t] @ u_seq[:, t-k])[slice(SEIR_groups.index('E_g'), Xt_dim, num_compartments)])
+
+
+        print("C[t] in the exposed indices is:")
+        print(ct[t][slice(SEIR_groups.index('E_g'), Xt_dim, num_compartments)])
+        print("get_F in the exposed indices is:")
+        print(get_F(dynModel, Xhat_t, uhat_t)[slice(SEIR_groups.index('E_g'), Xt_dim, num_compartments)])
+        print("- jacob_X @ Xhat in the exposed indices is:")
+        print((- jacob_X @ Xhat_t)[slice(SEIR_groups.index('E_g'), Xt_dim, num_compartments)])
+        print("- jacob_u @ uhat in the exposed indices is:")
+        print((- jacob_u @ uhat_t)[slice(SEIR_groups.index('E_g'), Xt_dim, num_compartments)])
+        print("jacob u in row E:")
+        print(jacob_u[slice(SEIR_groups.index('E_g'), Xt_dim, num_compartments),:])
+
+        print(f"u hat at t is: {uhat_t}")
+
+
+
+        assert (x_vars[slice(SEIR_groups.index('E_g'), Xt_dim, num_compartments) , t+1-k] >= 0).all()
+
+
+
+        # print("real dynamics Infected for tine t+1:")
+        # print(X_seq[slice(SEIR_groups.index('I_g'), Xt_dim, num_compartments) , t+1-k])
+        # print("linearized dynamics for infected:")
+        # print(x_vars[slice(SEIR_groups.index('I_g'), Xt_dim, num_compartments) , t+1-k])
+        # print("C[t] in the infected indices is:")
+        # print(ct[t][slice(SEIR_groups.index('I_g'), Xt_dim, num_compartments)])
+        # print("At[t] @ x[t] in the infected indices:")
+        # print((At[t] @ x_vars[:, t-k])[slice(SEIR_groups.index('I_g'), Xt_dim, num_compartments)])
+        # print("Bt[t] @ u_seq[t] in the infected indices:")
+        # print((Bt[t] @ u_seq[:, t-k])[slice(SEIR_groups.index('I_g'), Xt_dim, num_compartments)])
+
+
+        if not (x_vars[slice(SEIR_groups.index('I_g'), Xt_dim, num_compartments) , t+1-k] >= 0).all():
+            print(x_vars[slice(SEIR_groups.index('I_g'), Xt_dim, num_compartments) , t+1-k])
+            assert(False)
+
         D_g_idxs = [ag * num_compartments + SEIR_groups.index('D_g') for ag in range(num_age_groups)]
 
         # print(f"Total cumulative deaths for linearized dynamics at time {t+1}: {sum(x_vars[i, t+1-k] for i in D_g_idxs)}")
@@ -188,9 +238,9 @@ def linearization_errors(dynModel, k, u_hat_seq, u_seq):
 
     total_deaths_linearized = sum(x_vars[i, T-k] for i in D_g_idxs)
 
-    X_seq, new_u_seq = get_X_hat_sequence(dynModel, k, u_seq, use_bounce_var)
 
-    assert((new_u_seq==u_seq).all())
+
+    # assert((new_u_seq==u_seq).all())
 
     total_deaths_real_dynamics = sum(X_seq[i, T-k] for i in D_g_idxs)
 
@@ -216,31 +266,31 @@ def main():
     ## OBS: We could run the errors for other ks, but we'd need to run the dynamical model up to k
     k = 0
 
-    print(f"Error with nominal trajectory of full lockdown and no tests and evaluated point of full opening and homogenous testing.")
-    # Nominal Trajectory: No tests and everything closed down
-    u_hat_seq = np.zeros((ut_dim, T))
-
-    # Sequence to be tested: Full openning up for the lockdowns, and homogenous testing
-    u_seq = np.zeros((ut_dim,T))
-
-    # for now, homogenous testing
-    Nmtestg_idx_all = slice(controls.index('Nmtest_g'),ut_dim,num_controls)
-    u_seq[Nmtestg_idx_all,:] = dynModel.parameters['global-parameters']['C_mtest']/num_age_groups
-
-    Natestg_idx_all = slice(controls.index('Natest_g'),ut_dim,num_controls)
-    u_seq[Natestg_idx_all,:] = dynModel.parameters['global-parameters']['C_atest']/num_age_groups
-
-    # Starting the uhat_seq with all lockdowns set to 1 (fully open)
-
-    for act in activities:
-        act_indices = slice(controls.index(act), ut_dim, num_controls)
-        u_seq[act_indices,:] = 1.0
-
-    X, adjusted_u_seq = get_X_hat_sequence(dynModel, k, u_seq, use_bounce_var)
-
-    X, adjusted_u_hat_seq = get_X_hat_sequence(dynModel, k, u_hat_seq, use_bounce_var)
-
-    linearization_errors(dynModel, k, adjusted_u_hat_seq, adjusted_u_seq)
+    # print(f"Error with nominal trajectory of full lockdown and no tests and evaluated point of full opening and homogenous testing.")
+    # # Nominal Trajectory: No tests and everything closed down
+    # u_hat_seq = np.zeros((ut_dim, T))
+    #
+    # # Sequence to be tested: Full openning up for the lockdowns, and homogenous testing
+    # u_seq = np.zeros((ut_dim,T))
+    #
+    # # for now, homogenous testing
+    # Nmtestg_idx_all = slice(controls.index('Nmtest_g'),ut_dim,num_controls)
+    # u_seq[Nmtestg_idx_all,:] = dynModel.parameters['global-parameters']['C_mtest']/num_age_groups
+    #
+    # Natestg_idx_all = slice(controls.index('Natest_g'),ut_dim,num_controls)
+    # u_seq[Natestg_idx_all,:] = dynModel.parameters['global-parameters']['C_atest']/num_age_groups
+    #
+    # # Starting the uhat_seq with all lockdowns set to 1 (fully open)
+    #
+    # for act in activities:
+    #     act_indices = slice(controls.index(act), ut_dim, num_controls)
+    #     u_seq[act_indices,:] = 1.0
+    #
+    # X, adjusted_u_seq = get_X_hat_sequence(dynModel, k, u_seq, use_bounce_var)
+    #
+    # X, adjusted_u_hat_seq = get_X_hat_sequence(dynModel, k, u_hat_seq, use_bounce_var)
+    #
+    # linearization_errors(dynModel, k, adjusted_u_hat_seq, adjusted_u_seq)
 
 # ##############################################
 
@@ -252,17 +302,20 @@ def main():
     u_hat_seq = np.zeros((ut_dim,T))
 
     # for now, homogenous testing
-    Nmtestg_idx_all = slice(controls.index('Nmtest_g'),ut_dim,num_controls)
-    u_hat_seq[Nmtestg_idx_all,:] = dynModel.parameters['global-parameters']['C_mtest']/num_age_groups
-
-    Natestg_idx_all = slice(controls.index('Natest_g'),ut_dim,num_controls)
-    u_hat_seq[Natestg_idx_all,:] = dynModel.parameters['global-parameters']['C_atest']/num_age_groups
+    # Nmtestg_idx_all = slice(controls.index('Nmtest_g'),ut_dim,num_controls)
+    # u_hat_seq[Nmtestg_idx_all,:] = dynModel.parameters['global-parameters']['C_mtest']/num_age_groups
+    #
+    # Natestg_idx_all = slice(controls.index('Natest_g'),ut_dim,num_controls)
+    # u_hat_seq[Natestg_idx_all,:] = dynModel.parameters['global-parameters']['C_atest']/num_age_groups
 
     # Starting the uhat_seq with all lockdowns set to 1 (fully open)
 
     for act in activities:
         act_indices = slice(controls.index(act), ut_dim, num_controls)
         u_hat_seq[act_indices,:] = 1.0
+
+    act_indices = slice(controls.index('home'), ut_dim, num_controls)
+    u_hat_seq[act_indices,:] = 1.0
 
     # Sequence to be tested: Full openning up for the lockdowns, and homogenous testing
     u_seq = np.zeros((ut_dim,T))
@@ -278,15 +331,18 @@ def main():
 
     for act in activities:
         act_indices = slice(controls.index(act), ut_dim, num_controls)
-        u_seq[act_indices,:] = 1.0
+        u_seq[act_indices,:] = 0.0
 
-    assert((u_hat_seq == u_seq).all())
+    act_indices = slice(controls.index('home'), ut_dim, num_controls)
+    u_seq[act_indices,:] = 1.0
+
+    # assert((u_hat_seq == u_seq).all())
     # u_hat_seq = u_seq
     # for t in range(T-k):
     #     for i in range(ut_dim):
     #         u_hat_seq[i,t] = u_seq[i,t]
     #
-    u_hat_seq = np.copy(u_seq)
+    # u_hat_seq = np.copy(u_seq)
 
     X, adjusted_u_seq = get_X_hat_sequence(dynModel, k, u_seq, use_bounce_var)
 
