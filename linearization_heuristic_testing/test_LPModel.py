@@ -46,8 +46,8 @@ def initializeDynModel(T=5, region="Ile-de-France", econ_param="econ", xi=0):
             "name":"mult",
             "param_alpha":1.0,
             "param_beta":0.5,},
-        'mtest_cap' : 30000,
-        'atest_cap' : 30000,
+        'mtest_cap' : 0,
+        'atest_cap' : 0,
         'work_full_lockdown_factor' : 0.24,
         'heuristic': 'linearization',
         'transport_lb_work_fraction': 0.25
@@ -88,8 +88,8 @@ def initializeDynModel(T=5, region="Ile-de-France", econ_param="econ", xi=0):
 
     # 30 * 37199.03
     icus = 2000
-    tests_freq = 7
-    lockdown_freq = 14
+    tests_freq = 1
+    lockdown_freq = 1
 
     experiment_params = {
         'delta_schooling':delta,
@@ -566,14 +566,14 @@ def run_LPModel_interm_X(dynModel):
 def main():
 
     region = "fitted"
-    econ_param = "econ"
+    econ_param = "econ-zero"
     # "econ"
     # "econ-death-zero"
     # "econ-zero"
     xi = 1e6
 
     start_time = time.time()
-    for T in range(28,29,1):
+    for T in range(13,14,1):
         print(f"T is {T}")
         print("----------------")
         # print("LP Model with interm var")

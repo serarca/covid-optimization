@@ -138,15 +138,15 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method):
         jacob[Eg_idx,Sg_idx] = - jacob[Sg_idx,Sg_idx]
 
         # df^Eg/dNh all h
-        for ah in range(0, num_age_groups):
+        for ah in range(num_age_groups):
             jacob[Eg_idx,ah * num_compartments + SEIR_groups.index('N_g')] = - jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('N_g')]
 
         # df^Eg/dIh all h
-        for ah in range(0, num_age_groups):
+        for ah in range(num_age_groups):
             jacob[Eg_idx,ah * num_compartments + SEIR_groups.index('I_g')] = - jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('I_g')]
 
         # df^Eg/dRqh all h
-        for ah in range(0, num_age_groups):
+        for ah in range(num_age_groups):
             jacob[Eg_idx,ah * num_compartments + SEIR_groups.index('Rq_g')] = - jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('Rq_g')]
 
         # # df^Eg/dEg
@@ -592,6 +592,9 @@ def get_F(dynModel, X, u):
 
     # Determine the testing at time t given by u
     u_hat_dict, alphas = buildAlphaDict(u)
+    # print("==========")
+    # print(u)
+    # print(alphas)
 
     m_tests = {}
     a_tests = {}
@@ -985,8 +988,8 @@ def calculate_all_constraints(dynModel, bounce_existing, h_cap_flag=False):
     curr_constr += 1
 
     Nmtestg_idx_all = slice(controls.index('Nmtest_g'),ut_dim,num_controls)
-    Gamma_u[curr_constr,Nmtestg_idx_all] = -1
-    K[curr_constr,:] = -dynModel.parameters['global-parameters']['C_mtest'] * dynModel.dt
+    Gamma_u[curr_constr,Nmtestg_idx_all] = 1
+    K[curr_constr,:] = dynModel.parameters['global-parameters']['C_mtest'] * dynModel.dt
 
     all_labels += ["Mtest_cap"]
     curr_constr += 1
@@ -1000,8 +1003,8 @@ def calculate_all_constraints(dynModel, bounce_existing, h_cap_flag=False):
     curr_constr += 1
 
     Natestg_idx_all = slice(controls.index('Natest_g'),ut_dim,num_controls)
-    Gamma_u[curr_constr,Natestg_idx_all] = -1
-    K[curr_constr,:] = - dynModel.parameters['global-parameters']['C_atest'] * dynModel.dt
+    Gamma_u[curr_constr,Natestg_idx_all] = 1
+    K[curr_constr,:] =  dynModel.parameters['global-parameters']['C_atest'] * dynModel.dt
 
     all_labels += ["Atest_cap"]
     curr_constr += 1
@@ -1273,10 +1276,10 @@ def run_heuristic_linearization(dynModel):
     uhat_seq[Natestg_idx_all,:] = dynModel.parameters['global-parameters']['C_atest']/num_age_groups
 
     # Starting the uhat_seq with all lockdowns set to 1 (fully open)
-
-    for act in activities:
-        act_indices = slice(controls.index(act), ut_dim, num_controls)
-        uhat_seq[act_indices,:] = 1.0
+    for t in range(T):
+        for act in activities:
+            act_indices = slice(controls.index(act), ut_dim, num_controls)
+            uhat_seq[act_indices,t] = 1.0
 
     # # Random lockdowns
         # uhat_seq[act_indices,:] = random.uniform(0,1)
@@ -1313,6 +1316,8 @@ def run_heuristic_linearization(dynModel):
         assert( np.shape(new_uhat_seq) == (ut_dim,T-k) )
 
         uhat_seq = new_uhat_seq
+
+
 
         ICUidx_all = slice(SEIR_groups.index('ICU_g'),Xt_dim,num_compartments)
 
@@ -1356,19 +1361,19 @@ def run_heuristic_linearization(dynModel):
                 upper_bounds[i] = 1
                 lower_bounds[i] = 1
             if i in lock_work_idx_all_times:
-                # lower_bounds[i] = 0
-                upper_bounds[i] = 1
+                lower_bounds[i] = 0
+                upper_bounds[i] = 0
             if i in lock_other_idx_all_times:
-                # lower_bounds[i] = 0
-                upper_bounds[i] = 1
+                lower_bounds[i] = 0
+                upper_bounds[i] = 0
             if i in lock_school_idx_all_times:
-                # lower_bounds[i] = 0
-                upper_bounds[i] = 1
+                lower_bounds[i] = 0
+                upper_bounds[i] = 0
             if i in lock_leisure_idx_all_times:
-                # lower_bounds[i] = 0
-                upper_bounds[i] = 1
+                lower_bounds[i] = 0
+                upper_bounds[i] = 0
             if i in lock_transport_idx_all_times:
-                # lower_bounds[i] = 0
+                lower_bounds[i] = 0
                 upper_bounds[i] = 1
 
 
@@ -1485,6 +1490,13 @@ def run_heuristic_linearization(dynModel):
         # print(f"Optimizing model at time k = {k}")
         mod.optimize()
 
+        if( mod.Status ==  gb.GRB.INFEASIBLE ):
+            # model was infeasible
+            mod.computeIIS()  # irreducible system of infeasible inequalities
+            mod.write(f"LP_lineariz_IIS_k={k}.ilp")
+            print("ERROR. Problem infeasible at time k={}. Halting...".format(k))
+            assert(False)
+
         print(f"Objective value for Line heur k = {k}: {mod.objVal}")
 
 
@@ -1495,14 +1507,9 @@ def run_heuristic_linearization(dynModel):
 
         dynModel.shadowPrices[k] = step_shadow_prices
 
-        # mod.write(f"LP_lineariz_k={k}.lp")
+        mod.write(f"LP_lineariz_k={k}.lp")
 
-        if( mod.Status ==  gb.GRB.INFEASIBLE ):
-            # model was infeasible
-            mod.computeIIS()  # irreducible system of infeasible inequalities
-            mod.write("LP_lineariz_IIS.lp")
-            print("ERROR. Problem infeasible at time k={}. Halting...".format(k))
-            assert(False)
+
 
         # extract decisions for current period (testing and alphas)
         uvars_opt = np.reshape(u_vars_vec.X, np.shape(obj_coefs), 'F')
@@ -1529,6 +1536,13 @@ def run_heuristic_linearization(dynModel):
         uhat_seq = uvars_opt[:,1:]
         # print(f"u_optSeq at time {k} is {uopt_seq[:,k]}")
         # print(f"uhat_seq is {uhat_seq}")
+        #
+        for ti in range(T-k):
+            for act in activities:
+                act_indices = slice(controls.index(act), ut_dim, num_controls)
+                if (uvars_opt[act_indices, ti] >0).any():
+                    print(f"A time {ti+k} for subproblem {k} the activity {act} has non-zero lockdown.")
+
         # print(f"States at stage {k}")
         # print(dynModel.get_state(k))
 
