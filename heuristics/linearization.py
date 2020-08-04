@@ -1060,6 +1060,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
     Gamma_x: rows = number of "types" of constraints, columns = num_compartments * num_age_groups
     Gamma_u: rows = number of "types" of constraints, columns = num_controls * num_age_groups"""
 
+
     # shorthand for a few useful parameters
     T = dynModel.time_steps
     Xt_dim = num_compartments * num_age_groups
@@ -1224,6 +1225,10 @@ def run_heuristic_linearization(dynModel):
 
     dynModel.reset_time(0)
 
+    max_step_size = 0.1
+    threshold = 0.01
+    max_inner_iterations = 2/max_step_size
+
     # shorthand for a few useful parameters
     T = dynModel.time_steps
     Xt_dim = num_compartments * num_age_groups
@@ -1281,8 +1286,8 @@ def run_heuristic_linearization(dynModel):
             act_indices = slice(controls.index(act), ut_dim, num_controls)
             uhat_seq[act_indices,t] = 1.0
 
-    # # Random lockdowns
-        # uhat_seq[act_indices,:] = random.uniform(0,1)
+    # Random lockdowns
+            # uhat_seq[act_indices,:] = random.uniform(0,1)
 
 
     # and home lockdown variables all 1
@@ -1290,131 +1295,175 @@ def run_heuristic_linearization(dynModel):
     uhat_seq[lock_home_idx_all,:] = 1.0
 
     # a python list with the indices for all home lockdown decisions for all groups and periods
-    lock_home_idx_all_times = [controls.index('home') + i*num_controls for i in range(T*num_age_groups)]
 
-    lock_work_idx_all_times = [controls.index('work') + i*num_controls for i in range(T*num_age_groups)]
-
-    lock_other_idx_all_times = [controls.index('other') + i*num_controls for i in range(T*num_age_groups)]
-
-    lock_school_idx_all_times = [controls.index('school') + i*num_controls for i in range(T*num_age_groups)]
-
-    lock_leisure_idx_all_times = [controls.index('leisure') + i*num_controls for i in range(T*num_age_groups)]
-
-    lock_transport_idx_all_times = [controls.index('transport') + i*num_controls for i in range(T*num_age_groups)]
 
     dynModel.shadowPrices = {}
 
     for k in range(T):
 
-        # print("\n\n HEURISTIC RUNNING FOR TIME k= {}.".format(k))
+        lock_home_idx_all_times = [controls.index('home') + i*num_controls for i in range((T-k)*num_age_groups)]
+
+        lock_work_idx_all_times = [controls.index('work') + i*num_controls for i in range((T-k)*num_age_groups)]
+
+        lock_other_idx_all_times = [controls.index('other') + i*num_controls for i in range((T-k)*num_age_groups)]
+
+        lock_school_idx_all_times = [controls.index('school') + i*num_controls for i in range((T-k)*num_age_groups)]
+
+        lock_leisure_idx_all_times = [controls.index('leisure') + i*num_controls for i in range((T-k)*num_age_groups)]
+
+        lock_transport_idx_all_times = [controls.index('transport') + i*num_controls for i in range((T-k)*num_age_groups)]
+
+        all_lockdowns_idx_all_times =  lock_work_idx_all_times + lock_other_idx_all_times + lock_school_idx_all_times + lock_leisure_idx_all_times + lock_transport_idx_all_times
 
 
-        # calculate state trajectory X_hat and corresponging controls new_uhat
-        Xhat_seq, new_uhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq, use_bounce_var)
+        inner_iterations = 0
+        u_hat_difference = threshold + 1
 
-        assert( np.shape(Xhat_seq) == (Xt_dim,T-k+1) )
-        assert( np.shape(new_uhat_seq) == (ut_dim,T-k) )
-
-        uhat_seq = new_uhat_seq
+        while inner_iterations < max_inner_iterations and u_hat_difference > threshold:
 
 
-
-        ICUidx_all = slice(SEIR_groups.index('ICU_g'),Xt_dim,num_compartments)
-
-        # calculate objective parameters d, e
-        D,E = calculate_objective_time_dependent_coefs(dynModel, k, Xhat_seq, uhat_seq)
-
-        # get coefficients for decisions in all constraints and objective
-        constr_coefs, constr_consts, obj_coefs = calculate_all_coefs(dynModel,k,Xhat_seq,uhat_seq,Gamma_x,Gamma_u,D,E)
-
-        assert( np.shape(obj_coefs) == (ut_dim,T-k) )
-        assert( len(constr_coefs) == T-k )
-        assert( len(constr_consts) == T-k )
-        for t in range(k,T):
-            assert( len(constr_coefs[t]) == num_constraints )
-            assert( len(constr_consts[t]) == num_constraints )
-
-            for i in range(num_constraints):
-                assert( np.shape(constr_coefs[t][i])==np.shape(uhat_seq) )
-                assert( np.shape(constr_consts[t][i])==() )
-
-        # create empty model
-        mod = gb.Model("Linearization Heuristic")
-
-        mod.setParam( 'OutputFlag', False )     # make Gurobi silent
-        mod.setParam( 'LogFile', "" )
-
-        # mod.setParam('Threads', 1)
-        mod.Params.threads = __gurobi_threads
-
-        mod.Params.DualReductions = 0  # change this to get explicit infeasible or unbounded
-
-        # add all decisions using matrix format, and also specify objective coefficients
-        obj_vec = np.reshape(obj_coefs, (ut_dim*(T-k),), 'F')  # reshape by reading along rows first
-
-        upper_bounds = np.ones(np.shape(obj_vec), dtype=numpyArrayDatatype) * np.inf
-        lower_bounds = np.zeros(np.shape(obj_vec), dtype=numpyArrayDatatype)
-
-        for i in range(len(obj_vec)):
-
-            if i in lock_home_idx_all_times:
-                upper_bounds[i] = 1
-                lower_bounds[i] = 1
-            if i in lock_work_idx_all_times:
-                lower_bounds[i] = 0
-                upper_bounds[i] = 0
-            if i in lock_other_idx_all_times:
-                lower_bounds[i] = 0
-                upper_bounds[i] = 0
-            if i in lock_school_idx_all_times:
-                lower_bounds[i] = 0
-                upper_bounds[i] = 0
-            if i in lock_leisure_idx_all_times:
-                lower_bounds[i] = 0
-                upper_bounds[i] = 0
-            if i in lock_transport_idx_all_times:
-                lower_bounds[i] = 0
-                upper_bounds[i] = 1
+            # print("\n\n HEURISTIC RUNNING FOR TIME k= {}.".format(k))
 
 
-        u_vars_vec = mod.addMVar( np.shape(obj_vec), lb=lower_bounds, ub=upper_bounds, obj=obj_vec, name="u")
+            # calculate state trajectory X_hat and corresponging controls new_uhat
+            Xhat_seq, uhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq, use_bounce_var)
 
-        # Sense -1 indicates a maximization problem
-        mod.ModelSense = -1
-
-        # mod.addConstrs((u_vars_vec[i]==1 for i in lock_home_idx_all_times if i < len(obj_vec)), name=("home_lock"))
-        #
-        # mod.addConstrs((u_vars_vec[i]>=0.24 for i in lock_work_idx_all_times if i < len(obj_vec)), name=("work_lock_lb"))
+            assert( np.shape(Xhat_seq) == (Xt_dim,T-k+1) )
+            assert( np.shape(uhat_seq) == (ut_dim,T-k) )
 
 
-        work_index = controls.index('work')
-        transport_index = controls.index('transport')
-        TransportConstMatrix = np.zeros(((T-k) * num_age_groups, ut_dim * (T-k)), dtype=numpyArrayDatatype)
-        TransportConstRHSVector = np.zeros(((T-k) *num_age_groups,), dtype=numpyArrayDatatype)
+            ICUidx_all = slice(SEIR_groups.index('ICU_g'), Xt_dim, num_compartments)
 
-        for i in range((T-k) * num_age_groups):
-            work_idx = work_index + i*num_controls
-            transport_idx = transport_index + i*num_controls
+            # calculate objective parameters d, e
+            D,E = calculate_objective_time_dependent_coefs(dynModel, k, Xhat_seq, uhat_seq)
 
-            TransportConstMatrix[i, work_idx] = -dynModel.transport_lb_work_fraction
-            TransportConstMatrix[i, transport_idx] = 1
+            # get coefficients for decisions in all constraints and objective
+            constr_coefs, constr_consts, obj_coefs = calculate_all_coefs(dynModel,k,Xhat_seq,uhat_seq,Gamma_x,Gamma_u,D,E)
+
+            assert( np.shape(obj_coefs) == (ut_dim,T-k) )
+            assert( len(constr_coefs) == T-k )
+            assert( len(constr_consts) == T-k )
+            for t in range(k,T):
+                assert( len(constr_coefs[t]) == num_constraints )
+                assert( len(constr_consts[t]) == num_constraints )
+
+                for i in range(num_constraints):
+                    assert( np.shape(constr_coefs[t][i])==np.shape(uhat_seq) )
+                    assert( np.shape(constr_consts[t][i])==() )
+
+            # create empty model
+            mod = gb.Model("Linearization Heuristic")
+
+            mod.setParam( 'OutputFlag', False )     # make Gurobi silent
+            mod.setParam( 'LogFile', "" )
+
+            # mod.setParam('Threads', 1)
+            mod.Params.threads = __gurobi_threads
+
+            mod.Params.DualReductions = 0  # change this to get explicit infeasible or unbounded
+
+            # add all decisions using matrix format, and also specify objective coefficients
+            obj_vec = np.reshape(obj_coefs, (ut_dim*(T-k),), 'F')  # reshape by reading along rows first
+
+            upper_bounds = np.ones(np.shape(obj_vec), dtype=numpyArrayDatatype) * np.inf
+            lower_bounds = np.zeros(np.shape(obj_vec), dtype=numpyArrayDatatype)
+
+            for i in range(len(obj_vec)):
+                if i in all_lockdowns_idx_all_times:
+                    lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - max_step_size, 0)
+                    upper_bounds[i] = min(uhat_seq[i%ut_dim, i//ut_dim] + max_step_size, 1)
+
+                if i in lock_home_idx_all_times:
+                    upper_bounds[i] = 1
+                    lower_bounds[i] = 1
+
+                # if i in lock_work_idx_all_times:
+                #     lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - max_step_size, 0)
+                #     upper_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim]  max_step_size, 1)
+                # if i in lock_other_idx_all_times:
+                #     lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - max_step_size, 0)
+                #     upper_bounds[i] = 0
+                # if i in lock_school_idx_all_times:
+                #     lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - max_step_size, 0)
+                #     upper_bounds[i] = 0
+                # if i in lock_leisure_idx_all_times:
+                #     lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - max_step_size, 0)
+                #     upper_bounds[i] = 0
+                # if i in lock_transport_idx_all_times:
+                #     lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - max_step_size, 0)
+                #     upper_bounds[i] = 0
 
 
-        mod.addMConstrs(TransportConstMatrix, u_vars_vec, ">", TransportConstRHSVector, name=("transport_lock_lb"))
+            u_vars_vec = mod.addMVar( np.shape(obj_vec), lb=lower_bounds, ub=upper_bounds, obj=obj_vec, name="u")
 
-        # Weekly testing constraints
-        if test_freq > 1:
-            m_test_id = controls.index('Nmtest_g')
-            a_test_id = controls.index('Natest_g')
+            # Sense -1 indicates a maximization problem
+            mod.ModelSense = -1
 
-            if (T-k) % test_freq != 0 and k != 0:
-                #Fix the first control to be equal to the control at time k-1
-                for ag in range(num_age_groups):
-                    m_test_idx = m_test_id + ag * num_controls
-                    a_test_idx = a_test_id + ag * num_controls
+            # mod.addConstrs((u_vars_vec[i]==1 for i in lock_home_idx_all_times if i < len(obj_vec)), name=("home_lock"))
+            #
+            # mod.addConstrs((u_vars_vec[i]>=0.24 for i in lock_work_idx_all_times if i < len(obj_vec)), name=("work_lock_lb"))
 
-                    mod.addConstr(u_vars_vec[m_test_idx] == dynModel.m_tests_controls[k-1][age_groups[ag]])
-                    mod.addConstr(u_vars_vec[a_test_idx] == dynModel.a_tests_controls[k-1][age_groups[ag]])
+
+            work_index = controls.index('work')
+            transport_index = controls.index('transport')
+            TransportConstMatrix = np.zeros(((T-k) * num_age_groups, ut_dim * (T-k)), dtype=numpyArrayDatatype)
+            TransportConstRHSVector = np.zeros(((T-k) *num_age_groups,), dtype=numpyArrayDatatype)
+
+            for i in range((T-k) * num_age_groups):
+                work_idx = work_index + i*num_controls
+                transport_idx = transport_index + i*num_controls
+
+                TransportConstMatrix[i, work_idx] = -dynModel.transport_lb_work_fraction
+                TransportConstMatrix[i, transport_idx] = 1
+
+
+            mod.addMConstrs(TransportConstMatrix, u_vars_vec, ">", TransportConstRHSVector, name=("transport_lock_lb"))
+
+            # Weekly testing constraints
+            if test_freq > 1:
+                m_test_id = controls.index('Nmtest_g')
+                a_test_id = controls.index('Natest_g')
+
+                if (T-k) % test_freq != 0 and k != 0:
+                    #Fix the first control to be equal to the control at time k-1
+                    for ag in range(num_age_groups):
+                        m_test_idx = m_test_id + ag * num_controls
+                        a_test_idx = a_test_id + ag * num_controls
+
+                        mod.addConstr(u_vars_vec[m_test_idx] == dynModel.m_tests_controls[k-1][age_groups[ag]])
+                        mod.addConstr(u_vars_vec[a_test_idx] == dynModel.a_tests_controls[k-1][age_groups[ag]])
+
+
+                #Obeserve that we will have one constraint for each window of size test_freq, of which we have (T-k+test_freq-1)//test_freq)
+                #
+                # weeklyTestingConstMatrix = np.zeros(2 * num_age_groups * ((T-k+test_freq-1)//test_freq), ut_dim * (T-k))
+                #
+
+                row_index = 0
+                time_index = T-k
+                while time_index > 0:
+                    for ag in range(num_age_groups):
+                        m_test_idx = m_test_id + ag * num_controls
+                        a_test_idx = a_test_id + ag * num_controls
+                        for window in range(1, min(time_index, test_freq)):
+                            # print(time_index-window)
+                            # print(time_index-window-1)
+                            mod.addConstr(u_vars_vec[(time_index-window) * ut_dim + m_test_idx] == u_vars_vec[(time_index-window-1) * ut_dim + m_test_idx])
+                            mod.addConstr(u_vars_vec[(time_index-window) * ut_dim + a_test_idx] == u_vars_vec[(time_index-window-1) * ut_dim + a_test_idx])
+
+                    time_index = max(time_index - test_freq, 0)
+
+            if lockdown_freq > 1:
+
+                if (T-k) % lockdown_freq != 0 and k != 0:
+                    #Fix the first control to be equal to the control at time k-1
+                    for ag in range(num_age_groups):
+                        for act in activities:
+                            act_lock_id = controls.index(act)
+                            act_lock_idx = act_lock_id + ag * num_controls
+
+                            mod.addConstr(u_vars_vec[act_lock_idx] == dynModel.lockdown_controls[k-1][age_groups[ag]][act])
+
 
 
             #Obeserve that we will have one constraint for each window of size test_freq, of which we have (T-k+test_freq-1)//test_freq)
@@ -1422,97 +1471,74 @@ def run_heuristic_linearization(dynModel):
             # weeklyTestingConstMatrix = np.zeros(2 * num_age_groups * ((T-k+test_freq-1)//test_freq), ut_dim * (T-k))
             #
 
-            row_index = 0
-            time_index = T-k
-            while time_index > 0:
-                for ag in range(num_age_groups):
-                    m_test_idx = m_test_id + ag * num_controls
-                    a_test_idx = a_test_id + ag * num_controls
-                    for window in range(1, min(time_index, test_freq)):
-                        # print(time_index-window)
-                        # print(time_index-window-1)
-                        mod.addConstr(u_vars_vec[(time_index-window) * ut_dim + m_test_idx] == u_vars_vec[(time_index-window-1) * ut_dim + m_test_idx])
-                        mod.addConstr(u_vars_vec[(time_index-window) * ut_dim + a_test_idx] == u_vars_vec[(time_index-window-1) * ut_dim + a_test_idx])
+                row_index = 0
+                time_index = T-k
+                while time_index > 0:
+                    for ag in range(num_age_groups):
+                        for act in activities:
+                            act_lock_id = controls.index(act)
+                            act_lock_idx = act_lock_id + ag * num_controls
 
-                time_index = max(time_index - test_freq, 0)
+                            for window in range(1, min(time_index, lockdown_freq)):
+                            # print(time_index-window)
+                            # print(time_index-window-1)
 
-        if lockdown_freq > 1:
+                                mod.addConstr(u_vars_vec[(time_index-window) * ut_dim + act_lock_idx] == u_vars_vec[(time_index-window-1) * ut_dim + act_lock_idx])
 
-            if (T-k) % lockdown_freq != 0 and k != 0:
-                #Fix the first control to be equal to the control at time k-1
-                for ag in range(num_age_groups):
-                    for act in activities:
-                        act_lock_id = controls.index(act)
-                        act_lock_idx = act_lock_id + ag * num_controls
-
-                        mod.addConstr(u_vars_vec[act_lock_idx] == dynModel.lockdown_controls[k-1][age_groups[ag]][act])
+                    time_index = max(time_index - lockdown_freq, 0)
 
 
 
-        #Obeserve that we will have one constraint for each window of size test_freq, of which we have (T-k+test_freq-1)//test_freq)
-        #
-        # weeklyTestingConstMatrix = np.zeros(2 * num_age_groups * ((T-k+test_freq-1)//test_freq), ut_dim * (T-k))
-        #
+            ConstMatrix = np.zeros(((T-k) * num_constraints, ut_dim * (T-k)), dtype=numpyArrayDatatype)
 
-            row_index = 0
-            time_index = T-k
-            while time_index > 0:
-                for ag in range(num_age_groups):
-                    for act in activities:
-                        act_lock_id = controls.index(act)
-                        act_lock_idx = act_lock_id + ag * num_controls
+            ConstRHS = np.zeros(((T-k) * num_constraints,), dtype=numpyArrayDatatype)
+            for t in range(k,T):
+                #print("Time %d number of constraints %d" %(t,len(constr_coefs[t])))
+                for con in range(num_constraints):
+                    cons_vec = np.reshape(constr_coefs[t][con], (ut_dim * (T-k),), 'F').transpose()
+                    ConstMatrix[(t-k) * num_constraints + con, :] = cons_vec
+                    ConstRHS[(t-k) * num_constraints + con] = K[con,t] - constr_consts[t][con]
+                    # cname = ("%s[t=%d]" %(all_labels[con],t))
+                    # expr = (u_vars_vec @ cons_vec) + (constr_consts[t][con])
+                    # mod.addConstr((u_vars_vec @ cons_vec) + (constr_consts[t][con]) <= K[con,t], name=cname)
+            all_const = mod.addMConstrs(ConstMatrix, u_vars_vec, "<", ConstRHS)
+            # optimize the model
 
-                        for window in range(1, min(time_index, lockdown_freq)):
-                        # print(time_index-window)
-                        # print(time_index-window-1)
+            # print(f"Optimizing model at time k = {k}")
+            mod.optimize()
 
-                            mod.addConstr(u_vars_vec[(time_index-window) * ut_dim + act_lock_idx] == u_vars_vec[(time_index-window-1) * ut_dim + act_lock_idx])
+            if( mod.Status ==  gb.GRB.INFEASIBLE ):
+                # model was infeasible
+                mod.computeIIS()  # irreducible system of infeasible inequalities
+                mod.write(f"LP_lineariz_IIS_k={k}.ilp")
+                print("ERROR. Problem infeasible at time k={}. Halting...".format(k))
+                assert(False)
 
-                time_index = max(time_index - lockdown_freq, 0)
+            print(f"Objective value for Line heur k = {k}: {mod.objVal}")
 
 
+            step_shadow_prices = {}
 
-        ConstMatrix = np.zeros(((T-k) * num_constraints, ut_dim * (T-k)), dtype=numpyArrayDatatype)
-
-        ConstRHS = np.zeros(((T-k) * num_constraints,), dtype=numpyArrayDatatype)
-        for t in range(k,T):
-            #print("Time %d number of constraints %d" %(t,len(constr_coefs[t])))
             for con in range(num_constraints):
-                cons_vec = np.reshape(constr_coefs[t][con], (ut_dim * (T-k),), 'F').transpose()
-                ConstMatrix[(t-k) * num_constraints + con, :] = cons_vec
-                ConstRHS[(t-k) * num_constraints + con] = K[con,t] - constr_consts[t][con]
-                # cname = ("%s[t=%d]" %(all_labels[con],t))
-                # expr = (u_vars_vec @ cons_vec) + (constr_consts[t][con])
-                # mod.addConstr((u_vars_vec @ cons_vec) + (constr_consts[t][con]) <= K[con,t], name=cname)
-        all_const = mod.addMConstrs(ConstMatrix, u_vars_vec, "<", ConstRHS)
-        # optimize the model
+                step_shadow_prices[all_labels[con]] = all_const[con].Pi
 
-        # print(f"Optimizing model at time k = {k}")
-        mod.optimize()
+            dynModel.shadowPrices[k] = step_shadow_prices
 
-        if( mod.Status ==  gb.GRB.INFEASIBLE ):
-            # model was infeasible
-            mod.computeIIS()  # irreducible system of infeasible inequalities
-            mod.write(f"LP_lineariz_IIS_k={k}.ilp")
-            print("ERROR. Problem infeasible at time k={}. Halting...".format(k))
-            assert(False)
-
-        print(f"Objective value for Line heur k = {k}: {mod.objVal}")
-
-
-        step_shadow_prices = {}
-
-        for con in range(num_constraints):
-            step_shadow_prices[all_labels[con]] = all_const[con].Pi
-
-        dynModel.shadowPrices[k] = step_shadow_prices
-
-        mod.write(f"LP_lineariz_k={k}.lp")
+            # mod.write(f"LP_lineariz_k={k}.lp")
 
 
 
-        # extract decisions for current period (testing and alphas)
-        uvars_opt = np.reshape(u_vars_vec.X, np.shape(obj_coefs), 'F')
+            # extract decisions for current period (testing and alphas)
+            uvars_opt = np.reshape(u_vars_vec.X, np.shape(obj_coefs), 'F')
+
+            # Norm Infinity
+            u_hat_difference = max([abs(uvars_opt[i%ut_dim, i//ut_dim] - uhat_seq[i%ut_dim, i//ut_dim]) for i in all_lockdowns_idx_all_times])
+
+            inner_iterations += 1
+
+            uhat_seq = uvars_opt
+
+
         uopt_seq[:,k] = uvars_opt[:,0]
         uk_opt_dict, alphak_opt_dict = buildAlphaDict(uvars_opt[:,0])
 
@@ -1537,11 +1563,11 @@ def run_heuristic_linearization(dynModel):
         # print(f"u_optSeq at time {k} is {uopt_seq[:,k]}")
         # print(f"uhat_seq is {uhat_seq}")
         #
-        for ti in range(T-k):
-            for act in activities:
-                act_indices = slice(controls.index(act), ut_dim, num_controls)
-                if (uvars_opt[act_indices, ti] >0).any():
-                    print(f"A time {ti+k} for subproblem {k} the activity {act} has non-zero lockdown.")
+        # for ti in range(T-k):
+        #     for act in activities:
+        #         act_indices = slice(controls.index(act), ut_dim, num_controls)
+        #         if (uvars_opt[act_indices, ti] >0).any():
+        #             print(f"A time {ti+k} for subproblem {k} the activity {act} has non-zero lockdown.")
 
         # print(f"States at stage {k}")
         # print(dynModel.get_state(k))

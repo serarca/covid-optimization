@@ -61,7 +61,7 @@ def run_linearization_heuristic(simulation_params, experiment_params):
         universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
         # Read initialization
-    with open("initialization/fitted.yaml") as file:
+    with open("initialization/61days.yaml") as file:
         # The FullLoader parameter handles the conversion from YAML
         # scalar values to Python the dictionary format
         initialization = yaml.load(file, Loader=yaml.FullLoader)
@@ -111,11 +111,11 @@ def main():
     final_time_step = 90
     region = 'fitted'
     #
-    # Parallel(n_jobs=4)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region)
-    # for delta in params_to_try["delta_schooling"]
-    # for xi in params_to_try["xi"]
-    # for icus in params_to_try["icus"]
-    # for tests in params_to_try["tests"])
+    Parallel(n_jobs=4)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region)
+    for delta in params_to_try["delta_schooling"]
+    for xi in params_to_try["xi"]
+    for icus in params_to_try["icus"]
+    for tests in params_to_try["tests"])
 
 
     simulation_params_linearization = {
@@ -131,7 +131,6 @@ def main():
             "param_beta":0.5,},
         'mtest_cap' : 30000,
         'atest_cap' : 30000,
-        'work_full_lockdown_factor' : 0.24,
         'heuristic': 'linearization',
         'transport_lb_work_fraction': 0.25
     }
@@ -168,7 +167,6 @@ def run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region):
             "param_beta":0.5,},
         'mtest_cap' : tests,
         'atest_cap' : tests,
-        'work_full_lockdown_factor' : 0.24,
         'heuristic': 'linearization',
         'transport_lb_work_fraction': 0.25
     }
@@ -214,7 +212,6 @@ def run_dyn_model_with_no_bouncing_and_pickle(pickled_dyn_model):
             "param_beta":0.5,},
         'mtest_cap' : tests,
         'atest_cap' : tests,
-        'work_full_lockdown_factor' : 0.24,
         'heuristic': 'linearization',
         'transport_lb_work_fraction': 0.25
     }

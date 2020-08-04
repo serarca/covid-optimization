@@ -194,7 +194,7 @@ with open("../parameters/fitted.yaml") as file:
     universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
 # Read initialization
-with open("../initialization/fitted.yaml") as file:
+with open("../initialization/61days.yaml") as file:
 	initialization = yaml.load(file, Loader=yaml.FullLoader)
 
 # Read econ parameters

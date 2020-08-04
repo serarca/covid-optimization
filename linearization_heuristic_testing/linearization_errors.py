@@ -181,7 +181,37 @@ def linearization_errors(dynModel, k, u_hat_seq, u_seq):
         #Dynamic constraints binding x(t+1) with x(t) and u(t)
         x_vars[:, t+1-k] = At[t] @ x_vars[:, t-k] + Bt[t] @ u_seq[:, t-k] + ct[t]
 
-        # infected_idx =
+
+        # print(f"t = {t}")
+        # print("real dynamics Susceptible for time t+1:")
+        # print(X_seq[slice(SEIR_groups.index('S_g'), Xt_dim, num_compartments) , t+1-k])
+        # print("linearized dynamics for Susceptible:")
+        # print(x_vars[slice(SEIR_groups.index('S_g'), Xt_dim, num_compartments) , t+1-k])
+        #
+        # print("At[t] @ x[t] in the Susceptible indices:")
+        # print((At[t] @ x_vars[:, t-k])[slice(SEIR_groups.index('S_g'), Xt_dim, num_compartments)])
+        # print("Bt[t] @ u_seq[t] in the Susceptible indices:")
+        # print((Bt[t] @ u_seq[:, t-k])[slice(SEIR_groups.index('S_g'), Xt_dim, num_compartments)])
+        #
+        #
+        # print("C[t] in the Susceptible indices is:")
+        # print(ct[t][slice(SEIR_groups.index('S_g'), Xt_dim, num_compartments)])
+        # print("get_F in the Susceptible indices is:")
+        # print(get_F(dynModel, Xhat_t, uhat_t)[slice(SEIR_groups.index('S_g'), Xt_dim, num_compartments)])
+        # print("- jacob_X @ Xhat in the Susceptible indices is:")
+        # print((- jacob_X @ Xhat_t)[slice(SEIR_groups.index('S_g'), Xt_dim, num_compartments)])
+        # print("- jacob_u @ uhat in the Susceptible indices is:")
+        # print((- jacob_u @ uhat_t)[slice(SEIR_groups.index('S_g'), Xt_dim, num_compartments)])
+        # print("jacob u in row S:")
+        # print(jacob_u[slice(SEIR_groups.index('S_g'), Xt_dim, num_compartments),:])
+        #
+        # print(f"u hat at t is: {uhat_t}")
+        #
+        #
+        #
+        # assert (x_vars[slice(SEIR_groups.index('S_g'), Xt_dim, num_compartments) , t+1-k] >= 0).all()
+
+
 
         print(f"t = {t}")
         print("real dynamics Exposed for time t+1:")
