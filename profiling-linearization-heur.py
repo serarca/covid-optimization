@@ -100,9 +100,9 @@ def main():
 
     params_to_try = {
         "delta_schooling":[0.5],
-        "xi":[0, 30 * 37199.03],
+        "xi":[30 * 37199.03],
         "icus":[2000],
-        "tests":[0, 30000]
+        "tests":[30000]
     }
     regions = ['fitted']
     # 'testing_5_groups']
@@ -143,8 +143,8 @@ def main():
 
 def run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region):
 
-    tests_freq = 7
-    lockdown_freq = 14
+    tests_freq = 1
+    lockdown_freq = 1
 
     experiment_params = {
         'delta_schooling':delta,
@@ -187,8 +187,8 @@ def run_dyn_model_with_no_bouncing_and_pickle(pickled_dyn_model):
     xi = dynModel.experiment_params['xi']
     icus = dynModel.icus
     tests = dynModel.parameters['global-parameters']['C_mtest']
-    tests_freq = 7
-    lockdown_freq = 14
+    tests_freq = 1
+    lockdown_freq = 1
 
     experiment_params = {
         'delta_schooling':delta,
