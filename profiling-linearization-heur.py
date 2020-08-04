@@ -100,22 +100,22 @@ def main():
 
     params_to_try = {
         "delta_schooling":[0.5],
-        "xi":[30 * 37199.03],
+        "xi":[0, 30 * 37199.03],
         "icus":[2000],
-        "tests":[30000]
+        "tests":[0, 3000]
     }
     regions = ['fitted']
     # 'testing_5_groups']
     # 'Testing-group', 'Ile-de-France']
-    n_days = 30
-    final_time_step = 30
+    n_days = 50
+    final_time_step = 50
     region = 'fitted'
     #
-    # Parallel(n_jobs=4)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region)
-    # for delta in params_to_try["delta_schooling"]
-    # for xi in params_to_try["xi"]
-    # for icus in params_to_try["icus"]
-    # for tests in params_to_try["tests"])
+    Parallel(n_jobs=4)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region)
+    for delta in params_to_try["delta_schooling"]
+    for xi in params_to_try["xi"]
+    for icus in params_to_try["icus"]
+    for tests in params_to_try["tests"])
 
 
     simulation_params_linearization = {
@@ -135,7 +135,7 @@ def main():
         'transport_lb_work_fraction': 0.25
     }
 
-    # run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try, simulation_params_linearization)
+    run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try, simulation_params_linearization)
 
     # unpickle_plot_and_print_results(n_days, params_to_try, simulation_params_linearization)
 
@@ -143,8 +143,8 @@ def main():
 
 def run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region):
 
-    tests_freq = 1
-    lockdown_freq = 1
+    tests_freq = 7
+    lockdown_freq = 14
 
     experiment_params = {
         'delta_schooling':delta,
@@ -187,8 +187,8 @@ def run_dyn_model_with_no_bouncing_and_pickle(pickled_dyn_model):
     xi = dynModel.experiment_params['xi']
     icus = dynModel.icus
     tests = dynModel.parameters['global-parameters']['C_mtest']
-    tests_freq = 1
-    lockdown_freq = 1
+    tests_freq = 7
+    lockdown_freq = 14
 
     experiment_params = {
         'delta_schooling':delta,
