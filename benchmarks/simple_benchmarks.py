@@ -169,13 +169,15 @@ def plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params,
     figure.suptitle('Region: %s, %s Heuristic with Total Days: %s, M-test daily capacity: %s, A-test daily capacity: %s, '%(simulation_params['region'],simulation_params['heuristic'],T,K_mtest,K_atest), fontsize=22)
     plt.savefig("../results_runs/linearization_heuristic_dyn_models/"+simulation_params['region']+"_"+simulation_params['heuristic']+"_heuristic"+"_n_days_"+str(T)+"_tests_"+str(tests)+ "_icu_cap_"+str(dynModel.icus)+"_deltaS_"+str(delta)+"_xi_"+str(xi)+"_mixing_" + simulation_params['mixing_method']["name"]+"_benckmark_"+benchmark+"_testing"+testing+".pdf")
 
+    plt.close('all')
+
 
 
 
 # Global variables
 simulation_params = {
 	'dt':1.0,
-	'days': 90.0,
+	'days': 30.0,
 	'region': "fitted",
 	'heuristic': 'benchmark',
 	'mixing_method': {'name': 'multi'}
@@ -194,7 +196,7 @@ with open("../parameters/fitted.yaml") as file:
     universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
 # Read initialization
-with open("../initialization/fitted.yaml") as file:
+with open("../initialization/61days.yaml") as file:
 	initialization = yaml.load(file, Loader=yaml.FullLoader)
 
 # Read econ parameters

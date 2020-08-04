@@ -61,7 +61,7 @@ def initializeDynModel(T=5, region="Ile-de-France", econ_param="econ", xi=0):
         universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
     # Read initialization
-    with open("../initialization/fitted.yaml") as file:
+    with open("../initialization/61days.yaml") as file:
         # The FullLoader parameter handles the conversion from YAML
         # scalar values to Python the dictionary format
         initialization = yaml.load(file, Loader=yaml.FullLoader)
@@ -88,8 +88,8 @@ def initializeDynModel(T=5, region="Ile-de-France", econ_param="econ", xi=0):
 
     # 30 * 37199.03
     icus = 2000
-    tests_freq = 1
-    lockdown_freq = 1
+    tests_freq = 7
+    lockdown_freq = 14
 
     experiment_params = {
         'delta_schooling':delta,
@@ -192,7 +192,7 @@ def run_LPModel_no_intermVar(dynModel):
         # print("Finished getting nominal trajectory for time {}".format(k))
         # print("-----------------------")
 
-        assert( np.shape(Xhat_seq) == (Xt_dim,T-k) )
+        assert( np.shape(Xhat_seq) == (Xt_dim,T-k+1) )
         assert( np.shape(new_uhat_seq) == (ut_dim,T-k) )
 
         # overwrite uhat with the updated one (with new bounce variables)
@@ -400,8 +400,8 @@ def run_LPModel_interm_X(dynModel):
 
         for ti in range(k,T):
             u_vars[ti] = M.addMVar(ut_dim, ub=ub, lb=lb,  name="u_vars_time_{}".format(ti))
-            x_vars[ti] = M.addMVar(Xt_dim, name="x_vars_time_{}".format(ti))
-        x_vars[T] = M.addMVar(Xt_dim, name="x_vars_time_{}".format(T))
+            x_vars[ti] = M.addMVar(Xt_dim,lb=-gb.GRB.INFINITY, name="x_vars_time_{}".format(ti))
+        x_vars[T] = M.addMVar(Xt_dim, lb=-gb.GRB.INFINITY, name="x_vars_time_{}".format(T))
 
 
 
@@ -416,7 +416,7 @@ def run_LPModel_interm_X(dynModel):
         # print("Finished getting nominal trajectory for time {}".format(k))
         # print("-----------------------")
 
-        assert( np.shape(Xhat_seq) == (Xt_dim,T-k) )
+        assert( np.shape(Xhat_seq) == (Xt_dim,T-k+1) )
         assert( np.shape(new_uhat_seq) == (ut_dim,T-k) )
 
         # overwrite uhat with the updated one (with new bounce variables)
@@ -566,14 +566,14 @@ def run_LPModel_interm_X(dynModel):
 def main():
 
     region = "fitted"
-    econ_param = "econ-zero"
+    econ_param = "econ"
     # "econ"
     # "econ-death-zero"
     # "econ-zero"
-    xi = 1e6
+    xi = 30 * 37199.03
 
     start_time = time.time()
-    for T in range(13,14,1):
+    for T in range(90,91,1):
         print(f"T is {T}")
         print("----------------")
         # print("LP Model with interm var")
