@@ -1,10 +1,43 @@
+days_before_full_lockdown: 64
+days_of_full_lockdown: 55
 global-parameters:
   C_H: 20000000.0
   C_ICU: 2500.0
 mixing:
   name: mult
-  param_alpha: 1.86299295
-  param_beta: 0.83142249
+  param_alpha: !!python/object/apply:numpy.core.multiarray.scalar
+  - &id001 !!python/object/apply:numpy.dtype
+    args:
+    - f8
+    - 0
+    - 1
+    state: !!python/tuple
+    - 3
+    - <
+    - null
+    - null
+    - null
+    - -1
+    - -1
+    - 0
+  - !!binary |
+    llKc2jn/AkA=
+  param_beta: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    mTn8l8zE8D8=
+  param_gamma_after_lockdown: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    2DsZyC7w8j8=
+  param_gamma_before_lockdown: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    35npXF0l/D8=
+  param_gamma_during_lockdown: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    Tk23UAWW8z8=
 seir-groups:
   age_group_0_9:
     contacts:
@@ -74,19 +107,19 @@ seir-groups:
       work_value: 0.0
     name: age_group_0_9
     parameters:
-      beta: 0.041894738302861105
-      lambda_H_D: 0.0003732809972889646
-      lambda_H_R: 0.06345737191808558
+      beta: 0.060606045273519614
+      lambda_H_D: 0.0004576659038901602
+      lambda_H_R: 0.07581998474446987
       lambda_ICU_D: 0.0003146303093864709
       lambda_ICU_R: 0.052123754588358676
-      mu: 0.12748028225931612
-      p_H: 0.00014628350829138488
+      mu: 0.25
+      p_H: 0.001556
       p_ICU: 0.000444
       p_Ia: 0.499
       p_Ims: 0.2495
       p_Ips: 0.2495
       p_Iss: 0.002
-      sigma: 0.15657849791400008
+      sigma: 0.25
   age_group_10_19:
     contacts:
       home:
@@ -155,19 +188,19 @@ seir-groups:
       work_value: 0.0
     name: age_group_10_19
     parameters:
-      beta: 0.041894738302861105
-      lambda_H_D: 0.0003732809972889646
-      lambda_H_R: 0.06345737191808558
+      beta: 0.060606045273519614
+      lambda_H_D: 0.0004576659038901602
+      lambda_H_R: 0.07581998474446987
       lambda_ICU_D: 0.0003146303093864709
       lambda_ICU_R: 0.052123754588358676
-      mu: 0.12748028225931612
-      p_H: 0.00014628350829138488
+      mu: 0.25
+      p_H: 0.001556
       p_ICU: 0.000444
       p_Ia: 0.499
       p_Ims: 0.2495
       p_Ips: 0.2495
       p_Iss: 0.002
-      sigma: 0.15657849791400008
+      sigma: 0.25
   age_group_20_29:
     contacts:
       home:
@@ -236,19 +269,19 @@ seir-groups:
       work_value: 38.961495895150684
     name: age_group_20_29
     parameters:
-      beta: 0.041894738302861105
-      lambda_H_D: 0.0006843484950297684
-      lambda_H_R: 0.06313816984606302
+      beta: 0.060606045273519614
+      lambda_H_D: 0.0008390541571319603
+      lambda_H_R: 0.07543859649122807
       lambda_ICU_D: 0.0005768222338751966
       lambda_ICU_R: 0.05186156266386995
-      mu: 0.12748028225931612
-      p_H: 0.0004992065739249702
+      mu: 0.25
+      p_H: 0.0053100000000000005
       p_ICU: 0.0006900000000000001
       p_Ia: 0.497
       p_Ims: 0.2485
       p_Ips: 0.2485
       p_Iss: 0.006
-      sigma: 0.15657849791400008
+      sigma: 0.25
   age_group_30_39:
     contacts:
       home:
@@ -317,19 +350,19 @@ seir-groups:
       work_value: 85.28878053728769
     name: age_group_30_39
     parameters:
-      beta: 0.041894738302861105
-      lambda_H_D: 0.0011820564914150544
-      lambda_H_R: 0.06262744653082691
+      beta: 0.060606045273519614
+      lambda_H_D: 0.0014492753623188406
+      lambda_H_R: 0.0748283752860412
       lambda_ICU_D: 0.0009963293130571577
       lambda_ICU_R: 0.051442055584687986
-      mu: 0.12748028225931612
-      p_H: 0.0010278390720756497
+      mu: 0.25
+      p_H: 0.010933000000000002
       p_ICU: 0.0020670000000000003
       p_Ia: 0.4935
       p_Ims: 0.24675
       p_Ips: 0.24675
       p_Iss: 0.013000000000000001
-      sigma: 0.15657849791400008
+      sigma: 0.25
   age_group_40_49:
     contacts:
       home:
@@ -398,19 +431,19 @@ seir-groups:
       work_value: 109.06185238356166
     name: age_group_40_49
     parameters:
-      beta: 0.041894738302861105
-      lambda_H_D: 0.002053045485089306
-      lambda_H_R: 0.06173368072916374
+      beta: 0.060606045273519614
+      lambda_H_D: 0.0025171624713958814
+      lambda_H_R: 0.07376048817696415
       lambda_ICU_D: 0.0017304667016255898
       lambda_ICU_R: 0.050707918196119556
-      mu: 0.12748028225931612
-      p_H: 0.0012434098204767714
+      mu: 0.25
+      p_H: 0.013226000000000002
       p_ICU: 0.0037740000000000004
       p_Ia: 0.4915
       p_Ims: 0.24575
       p_Ips: 0.24575
       p_Iss: 0.017
-      sigma: 0.15657849791400008
+      sigma: 0.25
   age_group_50_59:
     contacts:
       home:
@@ -479,19 +512,19 @@ seir-groups:
       work_value: 90.93383013698627
     name: age_group_50_59
     parameters:
-      beta: 0.041894738302861105
-      lambda_H_D: 0.00404387747063045
-      lambda_H_R: 0.05969078746821934
+      beta: 0.060606045273519614
+      lambda_H_D: 0.0049580472921434025
+      lambda_H_R: 0.07131960335621663
       lambda_ICU_D: 0.0034084950183534348
       lambda_ICU_R: 0.04902988987939171
-      mu: 0.12748028225931612
-      p_H: 0.0023822776992954322
+      mu: 0.25
+      p_H: 0.02534
       p_ICU: 0.009660000000000002
       p_Ia: 0.4825
       p_Ims: 0.24125
       p_Ips: 0.24125
       p_Iss: 0.035
-      sigma: 0.15657849791400008
+      sigma: 0.25
   age_group_60_69:
     contacts:
       home:
@@ -560,19 +593,19 @@ seir-groups:
       work_value: 22.733457534246575
     name: age_group_60_69
     parameters:
-      beta: 0.041894738302861105
-      lambda_H_D: 0.007838900943068257
-      lambda_H_R: 0.055796522189544055
+      beta: 0.060606045273519614
+      lambda_H_D: 0.009610983981693364
+      lambda_H_R: 0.06666666666666667
       lambda_ICU_D: 0.006607236497115888
       lambda_ICU_R: 0.04583114840062926
-      mu: 0.12748028225931612
-      p_H: 0.004619023990599177
+      mu: 0.25
+      p_H: 0.049131999999999995
       p_ICU: 0.021868
       p_Ia: 0.4645
       p_Ims: 0.23225
       p_Ips: 0.23225
       p_Iss: 0.071
-      sigma: 0.15657849791400008
+      sigma: 0.25
   age_group_70_79:
     contacts:
       home:
@@ -641,19 +674,19 @@ seir-groups:
       work_value: 0.0
     name: age_group_70_79
     parameters:
-      beta: 0.041894738302861105
-      lambda_H_D: 0.01306483490511376
-      lambda_H_R: 0.050433927379565
+      beta: 0.060606045273519614
+      lambda_H_D: 0.016018306636155607
+      lambda_H_R: 0.06025934401220443
       lambda_ICU_D: 0.01101206082852648
       lambda_ICU_R: 0.041426324069218666
-      mu: 0.12748028225931612
-      p_H: 0.007978185966665677
+      mu: 0.25
+      p_H: 0.084863
       p_ICU: 0.028137000000000002
       p_Ia: 0.4435
       p_Ims: 0.22175
       p_Ips: 0.22175
       p_Iss: 0.113
-      sigma: 0.15657849791400008
+      sigma: 0.25
   age_group_80_plus:
     contacts:
       home:
@@ -722,16 +755,41 @@ seir-groups:
       work_value: 0.0
     name: age_group_80_plus
     parameters:
-      beta: 0.041894738302861105
-      lambda_H_D: 0.0196594658572188
-      lambda_H_R: 0.043666843452686656
+      beta: 0.060606045273519614
+      lambda_H_D: 0.02410373760488177
+      lambda_H_R: 0.05217391304347826
       lambda_ICU_D: 0.016570529627687465
       lambda_ICU_R: 0.035867855270057675
-      mu: 0.12748028225931612
-      p_H: 0.028399307316620527
+      mu: 0.25
+      p_H: 0.30208
       p_ICU: 0.017920000000000002
       p_Ia: 0.33999999999999997
       p_Ims: 0.16999999999999998
       p_Ips: 0.16999999999999998
       p_Iss: 0.32
-      sigma: 0.15657849791400008
+      sigma: 0.25
+upper_bounds:
+  home: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    3DGvAgAA8D8=
+  leisure: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    6YcsINTZ6z8=
+  other: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    mpmZmZmZ6T8=
+  school: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    ZyoHdVbg7T8=
+  transport: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    ZXEKxI837D8=
+  work: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    /sFXWaCZ6T8=
