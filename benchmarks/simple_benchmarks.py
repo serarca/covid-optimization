@@ -272,7 +272,7 @@ for delta in params_to_try["delta_schooling"]:
 					})
 					pickle.dump(dynModel,open(f"dynModel_real_benchmark_days_{simulation_params['time_periods']}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","wb"))
 
-					plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params, "real")
+					# plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params, "real")
 
 
 # Now we benchmark government full lockdown
@@ -314,7 +314,7 @@ for delta in params_to_try["delta_schooling"]:
 					})
 					pickle.dump(dynModel,open(f"dynModel_gov_full_lockd_benchmark_days_{simulation_params['time_periods']}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","wb"))
 
-					plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params, "govm_full_lockdown")
+					# plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params, "govm_full_lockdown")
 
 
 # Now we benchmark zero full lockdown
@@ -363,7 +363,7 @@ for delta in params_to_try["delta_schooling"]:
 					})
 					pickle.dump(dynModel,open(f"dynModel_zero_full_lock_benchmark_days_{simulation_params['time_periods']}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","wb"))
 
-					plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params, "zero_full_lockdown")
+					# plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params, "zero_full_lockdown")
 
 # Now we benchmark open
 alphas={ag:{
@@ -410,6 +410,6 @@ for delta in params_to_try["delta_schooling"]:
 						"reward":dynModel.get_total_reward(),
 					})
 					pickle.dump(dynModel,open(f"dynModel_open_benchmark_days_{simulation_params['time_periods']}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","wb"))
-					plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params, "open")
+					# plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params, "open")
 
 pd.DataFrame(results).to_excel(f"simulations-{simulation_params['days']}-days.xlsx")
