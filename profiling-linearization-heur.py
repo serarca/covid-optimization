@@ -111,11 +111,11 @@ def main():
     final_time_step = 90
     region = 'fitted'
     #
-    Parallel(n_jobs=4)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region)
-    for delta in params_to_try["delta_schooling"]
-    for xi in params_to_try["xi"]
-    for icus in params_to_try["icus"]
-    for tests in params_to_try["tests"])
+    # Parallel(n_jobs=4)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region)
+    # for delta in params_to_try["delta_schooling"]
+    # for xi in params_to_try["xi"]
+    # for icus in params_to_try["icus"]
+    # for tests in params_to_try["tests"])
 
 
     simulation_params_linearization = {
@@ -135,7 +135,7 @@ def main():
         'transport_lb_work_fraction': 0.25
     }
 
-    run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try, simulation_params_linearization)
+    # run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try, simulation_params_linearization)
 
     # unpickle_plot_and_print_results(n_days, params_to_try, simulation_params_linearization)
 
