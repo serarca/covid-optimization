@@ -5,39 +5,11 @@ global-parameters:
   C_ICU: 2500.0
 mixing:
   name: mult
-  param_alpha: !!python/object/apply:numpy.core.multiarray.scalar
-  - &id001 !!python/object/apply:numpy.dtype
-    args:
-    - f8
-    - 0
-    - 1
-    state: !!python/tuple
-    - 3
-    - <
-    - null
-    - null
-    - null
-    - -1
-    - -1
-    - 0
-  - !!binary |
-    llKc2jn/AkA=
-  param_beta: !!python/object/apply:numpy.core.multiarray.scalar
-  - *id001
-  - !!binary |
-    mTn8l8zE8D8=
-  param_gamma_after_lockdown: !!python/object/apply:numpy.core.multiarray.scalar
-  - *id001
-  - !!binary |
-    2DsZyC7w8j8=
-  param_gamma_before_lockdown: !!python/object/apply:numpy.core.multiarray.scalar
-  - *id001
-  - !!binary |
-    35npXF0l/D8=
-  param_gamma_during_lockdown: !!python/object/apply:numpy.core.multiarray.scalar
-  - *id001
-  - !!binary |
-    Tk23UAWW8z8=
+  param_alpha: 2.37462207
+  param_beta: 1.04804668
+  param_gamma_after_lockdown: 1.1836383630353475
+  param_gamma_before_lockdown: 1.75912224
+  param_gamma_during_lockdown: 1.224126161310625
 seir-groups:
   age_group_0_9:
     contacts:
@@ -769,27 +741,9 @@ seir-groups:
       p_Iss: 0.32
       sigma: 0.25
 upper_bounds:
-  home: !!python/object/apply:numpy.core.multiarray.scalar
-  - *id001
-  - !!binary |
-    3DGvAgAA8D8=
-  leisure: !!python/object/apply:numpy.core.multiarray.scalar
-  - *id001
-  - !!binary |
-    6YcsINTZ6z8=
-  other: !!python/object/apply:numpy.core.multiarray.scalar
-  - *id001
-  - !!binary |
-    mpmZmZmZ6T8=
-  school: !!python/object/apply:numpy.core.multiarray.scalar
-  - *id001
-  - !!binary |
-    ZyoHdVbg7T8=
-  transport: !!python/object/apply:numpy.core.multiarray.scalar
-  - *id001
-  - !!binary |
-    ZXEKxI837D8=
-  work: !!python/object/apply:numpy.core.multiarray.scalar
-  - *id001
-  - !!binary |
-    /sFXWaCZ6T8=
+  home: 1.00000001
+  leisure: 0.870340407
+  other: 0.8
+  school: 0.933634976
+  transport: 0.88178242
+  work: 0.800003218
