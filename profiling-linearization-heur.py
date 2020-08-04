@@ -107,8 +107,8 @@ def main():
     regions = ['fitted']
     # 'testing_5_groups']
     # 'Testing-group', 'Ile-de-France']
-    n_days = 90
-    final_time_step = 90
+    n_days = 30
+    final_time_step = 30
     region = 'fitted'
     #
     Parallel(n_jobs=4)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region)

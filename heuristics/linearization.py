@@ -1317,9 +1317,9 @@ def run_heuristic_linearization(dynModel):
 
 
         inner_iterations = 0
-        u_hat_difference = threshold + 1
+        u_hat_lockdown_difference = threshold + 1
 
-        while inner_iterations < max_inner_iterations and u_hat_difference > threshold:
+        while inner_iterations < max_inner_iterations and u_hat_lockdown_difference > threshold:
 
 
             # print("\n\n HEURISTIC RUNNING FOR TIME k= {}.".format(k))
@@ -1532,7 +1532,12 @@ def run_heuristic_linearization(dynModel):
             uvars_opt = np.reshape(u_vars_vec.X, np.shape(obj_coefs), 'F')
 
             # Norm Infinity
-            u_hat_difference = max([abs(uvars_opt[i%ut_dim, i//ut_dim] - uhat_seq[i%ut_dim, i//ut_dim]) for i in all_lockdowns_idx_all_times])
+            u_hat_lockdown_difference = max([abs(uvars_opt[i%ut_dim, i//ut_dim] - uhat_seq[i%ut_dim, i//ut_dim]) for i in all_lockdowns_idx_all_times])
+
+            u_hat_difference = max([abs(uvars_opt[i, j] - uhat_seq[i, j]) for i in range(ut_dim) for j in range(T-k)])
+
+            if u_hat_difference < 1e-6:
+                print(f"New solution equals old solution at k={k}")
 
             inner_iterations += 1
 

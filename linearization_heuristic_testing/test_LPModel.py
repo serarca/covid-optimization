@@ -566,7 +566,7 @@ def run_LPModel_interm_X(dynModel):
 def main():
 
     region = "fitted"
-    econ_param = "econ-zero"
+    econ_param = "econ"
     # "econ"
     # "econ-death-zero"
     # "econ-zero"
