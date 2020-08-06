@@ -78,7 +78,7 @@ def plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params,
 
     groups = dynModel.groups.keys()
     groups = sorted(groups)
-    fig = plt.figure()
+    
     for i,group in enumerate(groups):
         plt.subplot(13,len(groups),i+1)
         plt.plot(time_axis, dynModel.groups[group].S, label="Susceptible")
@@ -177,7 +177,7 @@ def plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params,
 # Global variables
 simulation_params = {
 	'dt':1.0,
-	'days': 30.0,
+	'days': 90.0,
 	'region': "fitted",
 	'heuristic': 'benchmark',
 	'mixing_method': {'name': 'multi'}
@@ -210,7 +210,7 @@ mixing_method = universe_params["mixing"]
 # Parameters to try
 params_to_try = {
 	"delta_schooling":[0.5],
-	"xi":[0, 30 * 37199.03],
+	"xi":[0, 30 * 37199.03, 60 * 37199.03],
 	"icus":[2000],
 	"tests":[0,30000],
 	"testing":["homogeneous"]+age_groups
