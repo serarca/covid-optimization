@@ -1,1 +1,0 @@
-```upper_group_dynamics.py``` shows the dynamics when testing is applied exactly and when the population is kept at N0, its initial value

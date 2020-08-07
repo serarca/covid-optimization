@@ -1,5 +1,4 @@
 from collections import defaultdict
-from bound import Bounds
 import numpy as np
 import pandas as pd
 import math
@@ -233,9 +232,9 @@ class DynamicalModel:
 			v_employment += sum(
 				[
 					self.econ_params["employment_params"]["v"][age_group][activity]*(
-						self.econ_params["employment_params"]["nu"][activity]*alphas[age_group]["work"]+
-						self.econ_params["employment_params"]["eta"][activity]*np.mean([alphas[ag][activity] for ag in alphas])+
-						self.econ_params["employment_params"]["gamma"][activity]
+						self.econ_params["employment_params"]["nu"]*alphas[age_group]["work"]+
+						self.econ_params["employment_params"]["eta"]*np.mean([alphas[ag][activity] for ag in alphas if (ag not in ['home','work'])])+
+						self.econ_params["employment_params"]["gamma"]
 					)
 					for activity in econ_activities
 				]

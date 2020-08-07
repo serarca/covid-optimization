@@ -73,6 +73,7 @@ class FastDynamicalModel:
 		self.alphas = alphas
 		self.B_H = B_H
 		self.B_ICU = B_ICU
+		self.overflow_icu = 0
 
 		# Create new state
 		self.new_state = np.zeros((len(age_groups),len(cont)), order = "C")
@@ -92,6 +93,7 @@ class FastDynamicalModel:
 		# Construct flow variables
 		self.flow_H = self.get_flow_H()
 		self.flow_ICU = self.get_flow_ICU()
+
 
 		# # Construct prorrated bouncing
 		if ((B_H is False) and (B_H_perc is False)):
@@ -120,6 +122,7 @@ class FastDynamicalModel:
 			summ_entering_icu = summ_entering_icu if summ_entering_icu!=0 else 1e-6
 			
 			self.B_ICU = self.flow_ICU*overflow_icu/summ_entering_icu
+			self.overflow_icu = overflow_icu
 
 		elif B_ICU_perc is not False:
 			summ_entering_icu = np.sum(self.flow_ICU)
@@ -127,6 +130,7 @@ class FastDynamicalModel:
 			overflow_icu = summ_entering_icu - self.icus + summ_staying_icu if summ_entering_icu - self.icus + summ_staying_icu>0 else 0
 
 			self.B_ICU = overflow_icu*B_ICU_perc
+			self.overflow_icu = overflow_icu
 
 
 
@@ -187,7 +191,9 @@ class FastDynamicalModel:
 	def get_flow_H(self):
 		denom = self.p_ICU + self.p_H
 		denom[denom == 0] = 1e-6
+
 		return self.mu*self.p_H*(self.state[:,cont.index("I")] + self.state[:,cont.index("Iss")]/denom)
+
 
 	def get_flow_ICU(self):
 		denom = self.p_ICU + self.p_H
