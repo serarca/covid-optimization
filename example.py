@@ -97,7 +97,7 @@ experiment_params = {
 # Create dynamical method
 dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method)
 
-
+# Homogenous testing
 m_tests = {ag:tests/len(age_groups) for ag in age_groups}
 a_tests = {ag:tests/len(age_groups) for ag in age_groups}
 

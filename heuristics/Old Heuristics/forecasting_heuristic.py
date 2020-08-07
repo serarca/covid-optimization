@@ -45,14 +45,6 @@ def forecasting_heuristic(dynModel, max_a_tests, max_m_tests, alphas, h_cap_vec,
 
         initialize_with_forecast(dynModelC, forecasting)
 
-        # Run the model with no testing and fix the results as the old forecasting
-        # Fix the new forecast as all all zeros
-        # no_m_tests = {}
-        # no_a_tests = {}
-        # for g in dynModelC.groups:
-        #     no_m_tests[g] = [0 for i in remaining_time_steps]
-        #     no_a_tests[g] = [0 for i in remaining_time_steps]
-
         groups = []
         for group in dynModelC.parameters['seir-groups']:
         	population = sum([dynModelC.initialization[group][sg] for sg in ["S","E","I","R","Ia","Ips","Ims","Iss","Rq","H","ICU","D"]])
