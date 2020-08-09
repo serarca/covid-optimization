@@ -463,7 +463,7 @@ class SEIR_group:
 		else:
 			lock_state = "post_lockdown"
 			prob_multiplier = self.mixing_method["param_gamma_after_lockdown"]
-		print(lock_state,prob_multiplier)
+		#print(lock_state,prob_multiplier)
 
 
 		if (len(self.total_contacts) == t):
