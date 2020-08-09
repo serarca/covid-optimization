@@ -23,7 +23,7 @@ import numpy as np
 # Global variables
 simulation_params = {
 	'dt':1.0,
-	'days': 30.0,
+	'days': 180,
 	'region': "fitted",
 	'heuristic': 'benchmark',
 	'mixing_method': {'name': 'multi'}

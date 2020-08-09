@@ -4,7 +4,7 @@ import pandas as pd
 import math
 import gurobipy as gb
 
-def n_contacts(group_g, group_h, alphas, mixing_method):
+def n_contacts(group_g, group_h, alphas, mixing_method, prob_multiplier):
 
 	n = 0
 	if mixing_method['name'] == "maxmin":
@@ -226,25 +226,24 @@ class DynamicalModel:
 	# Given a state and set of alphas, returns the economic value
 	def get_economic_value(self, state, alphas):
 		econ_activities = ["transport","leisure","other"]
+		eta_activities = ["transport","leisure","other","school"]
 		v_employment = 0
 		v_schooling = 0
 		for age_group in state:
-			v_employment += sum(
-				[
-					self.econ_params["employment_params"]["v"][age_group][activity]*(
+			v_g = sum([self.econ_params["employment_params"]["v"][age_group][activity] for activity in econ_activities])
+			l_mean = np.mean([np.sum([alphas[ag][act] for act in eta_activities]) for ag in alphas])
+			l_mean_upper_bound = np.sum([self.econ_params["upper_bounds"][act] for act in eta_activities])
+
+			v_employment += v_g*(
 						self.econ_params["employment_params"]["nu"]*alphas[age_group]["work"]+
-						self.econ_params["employment_params"]["eta"]*np.mean([alphas[ag][activity] for ag in alphas if (ag not in ['home','work'])])+
+						self.econ_params["employment_params"]["eta"]*l_mean+
 						self.econ_params["employment_params"]["gamma"]
-					)
-					for activity in econ_activities
-				]
-			)*(state[age_group]["S"] + state[age_group]["E"] + state[age_group]["I"] + state[age_group]["R"])* self.dt
+					)*(state[age_group]["S"] + state[age_group]["E"] + state[age_group]["I"] + state[age_group]["R"])* self.dt
 			# Add contribution of people fully recovered
-			v_employment += sum(
-				[
-					self.econ_params["employment_params"]["v"][age_group][activity]
-					for activity in econ_activities
-				]
+			v_employment += v_g*(
+						self.econ_params["employment_params"]["nu"]*self.econ_params["upper_bounds"]["work"]+
+						self.econ_params["employment_params"]["eta"]*l_mean_upper_bound+
+						self.econ_params["employment_params"]["gamma"]
 			)*state[age_group]["Rq"]* self.dt
 			# Add schooling contributions
 			v_schooling += self.experiment_params['delta_schooling']*self.econ_params['schooling_params'][age_group]*alphas[age_group]["school"]* self.dt
@@ -454,6 +453,19 @@ class SEIR_group:
 
 
 	def update_total_contacts(self, t, alphas):
+		# Calculate the multiplier
+		if t<self.parent.parameters['days_before_full_lockdown']:
+			lock_state = "pre-lockdown"
+			prob_multiplier = self.mixing_method["param_gamma_before_lockdown"]
+		elif t<=self.parent.parameters['days_before_full_lockdown']+self.parent.parameters['days_of_full_lockdown']:
+			lock_state = "lockdown"
+			prob_multiplier = self.mixing_method["param_gamma_during_lockdown"]
+		else:
+			lock_state = "post_lockdown"
+			prob_multiplier = self.mixing_method["param_gamma_after_lockdown"]
+		print(lock_state,prob_multiplier)
+
+
 		if (len(self.total_contacts) == t):
 			summ_contacts = 0
 			for n,g in self.all_groups.items():
@@ -463,7 +475,7 @@ class SEIR_group:
 					pop_g = g.N[0] + g.Rq[0]
 				else:
 					pop_g = g.N[t] + g.Rq[t]
-				new_contacts = n_contacts(self, g, alphas, self.mixing_method)
+				new_contacts = n_contacts(self, g, alphas, self.mixing_method, prob_multiplier)
 				summ_contacts += new_contacts*g.I[t]/(pop_g if pop_g!=0 else 10e-6)
 				if self.parent.extra_data:
 					self.parent.n_contacts[t][self.name][g.name] = new_contacts
