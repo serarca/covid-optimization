@@ -28,13 +28,15 @@ from aux import *
 # Global variables
 simulation_params = {
 	'dt':1.0,
-	'days': 182,
+	'days': 90,
 	'region': "Ile-de-France",
 }
 age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29', 'age_group_30_39', 'age_group_40_49', 
 	'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
 cont = [ 'S', 'E', 'I', 'R', 'N', 'Ia', 'Ips', \
        'Ims', 'Iss', 'Rq', 'H', 'ICU', 'D' ]
+activities = ['home','leisure','other','school','transport','work']
+
 
 # Define time variables
 simulation_params['time_periods'] = int(math.ceil(simulation_params["days"]/simulation_params["dt"]))
@@ -45,52 +47,44 @@ bouncing = False
 parser = argparse.ArgumentParser()
 parser.add_argument("-a_tests", "--a_tests", help="Number of A tests")
 parser.add_argument("-m_tests", "--m_tests", help="Number of M tests")
-parser.add_argument("-perc_infected", "--perc_infected", help="Percentage of population infected")
-parser.add_argument("-policy", "--policy", help="Type of policy")
 args = parser.parse_args()
 
+
+policy = "static"
 # Change policy
-if args.policy == "static":
-	simulation_params['quar_freq'] = 182
-elif args.policy == "dynamic":
+if policy == "static":
+	simulation_params['quar_freq'] = 90
+elif policy == "dynamic":
 	simulation_params['quar_freq'] = 14
 
 
 # Read group parameters
-with open("../parameters/"+simulation_params["region"]+".yaml") as file:
+with open("../parameters/fitted.yaml") as file:
     # The FullLoader parameter handles the conversion from YAML
     # scalar values to Python the dictionary format
     universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
 # Read initialization
-with open("../initialization/initialization.yaml") as file:
+with open("../initialization/61days.yaml") as file:
 	# The FullLoader parameter handles the conversion from YAML
 	# scalar values to Python the dictionary format
 	initialization = yaml.load(file, Loader=yaml.FullLoader)
+	start_day = 61
 
-# Read lockdown
-with open("../alphas_action_space/default.yaml") as file:
-	# The FullLoader parameter handles the conversion from YAML
-	# scalar values to Python the dictionary format
-	actions_dict = yaml.load(file, Loader=yaml.FullLoader)
+# Read econ parameters
+with open("../parameters/econ.yaml") as file:
+	econ_params = yaml.load(file, Loader=yaml.FullLoader)
 
-
-# Move population to infected
-for group in initialization:
-	change = initialization[group]["S"]*float(args.perc_infected)/100
-	initialization[group]["S"] = initialization[group]["S"] - change
-	initialization[group]["I"] = initialization[group]["I"] + change
-	initialization[group]["N"] = initialization[group]["S"] + initialization[group]["E"] + initialization[group]["I"] + initialization[group]["R"]
 
 # Define mixing method
-mixing_method = {
-    "name":"mult",
-    "param_alpha":1.0,
-    "param_beta":0.5,
-    "param":1.0
-}
+mixing_method = universe_params["mixing"]
 
 
+experiment_params = {
+						'delta_schooling':0.5,
+						'xi':60 * 37199.03,
+						'icus':2000,
+					}
 
 ############################################
 ####################    Gradient Descent
@@ -101,6 +95,7 @@ max_a_tests = float(args.a_tests)
 all_activities = ['home','leisure','other','school','transport','work']
 rel_activities = ['leisure','other','school','transport','work']
 intervention_times = [t*simulation_params['quar_freq'] for t in range(int(simulation_params['days']/simulation_params['quar_freq']))]
+
 
 # Initialize parameters
 x0_testing = np.zeros(len(intervention_times)*len(age_groups)*2) + 0.5
@@ -114,8 +109,10 @@ else:
 	x0 = np.append(x0_testing, x0_lockdown)
 
 # Create dynamical model
-fastModel = FastDynamicalModel(universe_params, simulation_params['dt'], mixing_method)
+fastModel = FastDynamicalModel(universe_params, econ_params, experiment_params, simulation_params['dt'], mixing_method)
 initial_state = state_to_matrix(initialization)
+
+
 
 def simulate(x):
 	# Extract vector components
@@ -144,19 +141,36 @@ def simulate(x):
 
 	state = initial_state
 	total_reward = 0
+	total_deaths = 0
+	total_econ = 0
 	for t in range(simulation_params['time_periods']):
 		if t in intervention_times:
 			update_contacts = True
 		else:
 			update_contacts = False
+
+		if start_day + t <= universe_params['days_before_full_lockdown']:
+			lockdown_status = "pre-lockdown"
+		elif start_day + t <= universe_params['days_before_full_lockdown']+universe_params['days_of_full_lockdown']:
+			lockdown_status = "lockdown"
+		else:
+			lockdown_status = "post-lockdown"
 		
 		# Add home activity to lockdown
 		x_lockdown_all = np.concatenate((np.array([[1.0]]*len(age_groups)),x_lockdown[int(t/simulation_params['quar_freq']),:,:]), axis=1)
+
+		# Scale the lockdowns by the upper bounds
+		for act in activities:
+			x_lockdown_all[:,activities.index(act)] = x_lockdown_all[:,activities.index(act)]*econ_params["upper_bounds"][act]
+
+
+
 		state, econs = fastModel.take_time_step(
 			state, 
 			x_m_testing[int(t/simulation_params['quar_freq']),:], 
 			x_a_testing[int(t/simulation_params['quar_freq']),:],
 			x_lockdown_all,
+			lockdown_status,
 			update_contacts = update_contacts, 
 			B_H = False, 
 			B_ICU = False,
@@ -164,8 +178,10 @@ def simulate(x):
 			B_ICU_perc = x_bouncing_perc_icu[int(t/simulation_params['quar_freq']),:] if bouncing else False,
 		)
 		total_reward += econs['reward']
+		total_deaths += econs['deaths']
+		total_econ += econs['economic_value']
 
-	print(total_reward)
+	print(total_reward, total_deaths, total_econ)
 	return -total_reward
 
 
@@ -182,7 +198,6 @@ else:
 		np.zeros(len(intervention_times)*len(age_groups)*2+len(intervention_times)*len(age_groups)*len(rel_activities)),
 		np.zeros(len(intervention_times)*len(age_groups)*2+len(intervention_times)*len(age_groups)*len(rel_activities)) + 1.0
 	)
-
 
 import time
 
@@ -250,7 +265,7 @@ policy = {
 print(result_lockdown)
 
 
-with open('./Results/'+args.policy+"_infected_"+args.perc_infected+"_m_tests_"+args.m_tests+"_a_tests_"+args.a_tests+"_bouncing_"+str(bouncing)+'.yaml', 'w') as file:
+with open('./Results/'+policy+"_days_"+start_day+"_m_tests_"+args.m_tests+"_a_tests_"+args.a_tests+"_bouncing_"+str(bouncing)+'.yaml', 'w') as file:
     yaml.dump(policy, file)
 
 

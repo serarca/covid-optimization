@@ -10,10 +10,13 @@ activities = ['home','leisure','other','school','transport','work']
 
 
 class FastDynamicalModel:
-	def __init__(self, parameters, dt, mixing_method):
+	def __init__(self, parameters, econ_params, experiment_params, dt, mixing_method):
 		self.parameters = parameters
+		self.econ_params = econ_params
+		self.experiment_params = experiment_params
 		self.dt = dt
 		self.mixing_method = mixing_method
+		self.original_lockdown_status = 0
 
 		# Create groups from parameters
 		self.groups = {}
@@ -23,7 +26,8 @@ class FastDynamicalModel:
 
 		# Fix number of beds and icus
 		self.beds = self.parameters['global-parameters']['C_H']
-		self.icus = self.parameters['global-parameters']['C_ICU']
+		self.icus = self.experiment_params['icus']
+
 
 		# Initialize M matrix
 		self.initialize_M()
@@ -45,9 +49,16 @@ class FastDynamicalModel:
 		self.lambda_ICU_R = self.params_vector("lambda_ICU_R")
 		self.lambda_H_D = self.params_vector("lambda_H_D")
 		self.lambda_ICU_D = self.params_vector("lambda_ICU_D")
-		self.work_value = self.params_vector("work_value")
-		self.lockdown_fraction = self.params_vector("lockdown_fraction")
-		self.death_value = self.params_vector("death_value")
+
+
+		# Process econ data
+		econ_activities = ['transport','leisure','other']
+		self.v_g = np.array([sum([self.econ_params["employment_params"]["v"][ag][act] for act in econ_activities]) for ag in age_groups])
+		self.schooling_params = np.array([self.econ_params["schooling_params"][ag] for ag in age_groups])
+		self.econ_cost_death = np.array([self.econ_params["econ_cost_death"][ag] for ag in age_groups])
+		self.schooling_params = np.array([self.econ_params['schooling_params'][ag] for ag in age_groups])
+
+		
 
 	def params_vector(self, param):
 		v = np.zeros(len(age_groups), order = "C")
@@ -64,7 +75,7 @@ class FastDynamicalModel:
 					self.M[g1,g2,act] = self.groups[age_groups[g1]].contacts[activities[act]][age_groups[g2]]
 
 
-	def take_time_step(self, state, m_tests, a_tests, alphas, update_contacts = True, B_H = False, B_ICU = False, B_H_perc = False, B_ICU_perc = False):
+	def take_time_step(self, state, m_tests, a_tests, alphas, lockdown_status, update_contacts = True, B_H = False, B_ICU = False, B_H_perc = False, B_ICU_perc = False):
 
 		# Store variables
 		self.state = state
@@ -74,13 +85,15 @@ class FastDynamicalModel:
 		self.B_H = B_H
 		self.B_ICU = B_ICU
 		self.overflow_icu = 0
+		self.lockdown_status = lockdown_status
 
 		# Create new state
 		self.new_state = np.zeros((len(age_groups),len(cont)), order = "C")
 
 		# Update contact matric
-		if update_contacts:
+		if update_contacts or lockdown_status!=self.original_lockdown_status:
 			self.update_contact_matrix()
+			self.original_lockdown_status = lockdown_status
 
 		# Update total contacts
 		pop = self.state[:,cont.index("N")] + self.state[:,cont.index("Rq")]
@@ -174,6 +187,14 @@ class FastDynamicalModel:
 		# }
 
 	def update_contact_matrix(self):
+		if self.lockdown_status == "pre-lockdown":
+			prob_multiplier = self.mixing_method["param_gamma_before_lockdown"]
+		elif self.lockdown_status == "lockdown":
+			prob_multiplier = self.mixing_method["param_gamma_during_lockdown"]
+		else:
+			prob_multiplier = self.mixing_method["param_gamma_after_lockdown"]
+
+
 		for g1 in range(len(age_groups)):
 			for g2 in range(len(age_groups)):
 				self.contact_matrix[g1,g2] = 0
@@ -184,7 +205,7 @@ class FastDynamicalModel:
 								/(math.exp(self.alphas[g1,act]*self.mixing_method['param'])+math.exp(self.alphas[g2,act]*self.mixing_method['param']))
 							)
 					elif self.mixing_method['name'] == "mult":
-						self.contact_matrix[g1,g2] += self.mixing_method['param_gamma']*self.M[g1,g2,act]*(self.alphas[g1,act]**self.mixing_method['param_alpha'])*(self.alphas[g2,act]**self.mixing_method['param_beta'])
+						self.contact_matrix[g1,g2] += prob_multiplier*self.M[g1,g2,act]*(self.alphas[g1,act]**self.mixing_method['param_alpha'])*(self.alphas[g2,act]**self.mixing_method['param_beta'])
 					else:
 						assert(False)
 
@@ -281,20 +302,40 @@ class FastDynamicalModel:
 		)*self.dt
 
 	def get_economic_value(self):
-		values = self.work_value*(self.alphas[:,activities.index('work')]+
-			self.lockdown_fraction*(1-self.alphas[:,activities.index('work')])
-		)*(
-		self.new_state[:,cont.index("S")]+self.new_state[:,cont.index("E")]+self.new_state[:,cont.index("R")]
-		)*self.dt
+		econ_activities = ["transport","leisure","other"]
+		eta_activities = ["transport","leisure","other","school"]
+		work_alpha = self.alphas[:,activities.index('work')]
+		school_alpha = self.alphas[:,activities.index('school')]
+		l_mean = np.mean(
+			self.alphas[:,activities.index('transport')]+
+			self.alphas[:,activities.index('leisure')]+
+			self.alphas[:,activities.index('other')]+
+			self.alphas[:,activities.index('school')]
+		)
+		l_mean_upper = np.mean([self.econ_params['upper_bounds'][act] for act in eta_activities])
 
-		values += self.new_state[:,cont.index("Rq")]*self.work_value*self.dt
-		return np.sum(values)
+		v_employment = (
+			self.v_g*(self.econ_params["employment_params"]["nu"]*work_alpha+
+				self.econ_params["employment_params"]["eta"]*l_mean
+				+self.econ_params["employment_params"]["gamma"])*(
+				self.new_state[:,cont.index("S")]+self.new_state[:,cont.index("E")]+self.new_state[:,cont.index("R")]
+			)*self.dt + 
+			self.v_g*(self.econ_params["employment_params"]["nu"]*self.econ_params["upper_bounds"]["work"]+
+				self.econ_params["employment_params"]["eta"]*l_mean_upper
+				+self.econ_params["employment_params"]["gamma"])*(
+				self.new_state[:,cont.index("Rq")]
+			)*self.dt
+		)
+
+		v_schooling = self.experiment_params['delta_schooling']*self.schooling_params*school_alpha*self.dt
+
+		return np.sum(v_schooling+v_employment)
 
 	def get_deaths(self):
 		return np.sum(self.new_state[:,cont.index("D")] - self.state[:,cont.index("D")])
 
 	def get_reward(self):
-		return self.economic_value - np.sum(self.death_value*(self.new_state[:,cont.index("D")] - self.state[:,cont.index("D")]))
+		return self.economic_value - np.sum((self.econ_cost_death+self.experiment_params["xi"])*(self.new_state[:,cont.index("D")] - self.state[:,cont.index("D")]))
 
 
 
