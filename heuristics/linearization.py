@@ -701,26 +701,22 @@ def calculate_M_gamma_and_eta(dynModel):
 
         # Rename parameters to make expressions similar to the Latex
 
-        vg_other = dynModel.econ_params["employment_params"]["v"][age_groups[ag]]["other"]
-        vg_leisure = dynModel.econ_params["employment_params"]["v"][age_groups[ag]]["leisure"]
-        vg_transport = dynModel.econ_params["employment_params"]["v"][age_groups[ag]]["transport"]
+        econ_activities = ["transport","leisure","other"]
+		eta_activities = ["transport","leisure","other","school"]
 
-        nu_other = dynModel.econ_params["employment_params"]["nu"]["other"]
-        nu_leisure = dynModel.econ_params["employment_params"]["nu"]["leisure"]
-        nu_transport = dynModel.econ_params["employment_params"]["nu"]["transport"]
+        v_g = sum([self.econ_params["employment_params"]["v"][age_group][activity] for activity in econ_activities])
 
-        small_eta_other = dynModel.econ_params["employment_params"]["eta"]["other"]
-        small_eta_leisure = dynModel.econ_params["employment_params"]["eta"]["leisure"]
-        small_eta_transport = dynModel.econ_params["employment_params"]["eta"]["transport"]
+
+        nu = dynModel.econ_params["employment_params"]["nu"]
+
+        small_eta = dynModel.econ_params["employment_params"]["eta"]
 
         school_value_g = dynModel.experiment_params['delta_schooling']*dynModel.econ_params['schooling_params'][age_groups[ag]]
 
         # number_of_groups = len(dynModel.groups)
         # assert number_of_groups == len(age_groups)
 
-        small_gamma_other = dynModel.econ_params["employment_params"]["gamma"]["other"]
-        small_gamma_leisure = dynModel.econ_params["employment_params"]["gamma"]["leisure"]
-        small_gamma_transport = dynModel.econ_params["employment_params"]["gamma"]["transport"]
+        small_gamma = dynModel.econ_params["employment_params"]["gamma"]
 
         v_g_schooling_ones = school_value_g
         v_g_employment_ones = (
@@ -728,8 +724,18 @@ def calculate_M_gamma_and_eta(dynModel):
                                 + vg_other
                                 + vg_transport
                                 )
+        
+        l_mean_upper_bound = np.sum([dynModel.econ_params["upper_bounds"][act] for act in eta_activities])
+        
+        v_g_employment_UpperBound = v_g*(
+						dynModel.econ_params["employment_params"]["nu"]*dynModel.econ_params["upper_bounds"]["work"]+
+						dynModel.econ_params["employment_params"]["eta"]*l_mean_upper_bound+
+						dynModel.econ_params["employment_params"]["gamma"]
+			)
 
         v_g_ones = v_g_schooling_ones + v_g_employment_ones
+
+        v_g_UpperBounds = v_g_schooling_ones + v_g_employment_UpperBound
 
         vg_life_employment = dynModel.econ_params["econ_cost_death"][age_groups[ag]]
         xi = dynModel.experiment_params["xi"]
@@ -743,9 +749,8 @@ def calculate_M_gamma_and_eta(dynModel):
         # having the same lockdown we should have
         # (1-theta) * v_NLg  as well in the
         # column corresponding to R^q_g
-        work_value_g = (vg_leisure * nu_leisure
-                        + vg_other * nu_other
-                        + vg_transport * nu_transport)
+        work_value_g = (vg * nu)
+
         M[LWorkg_idx, Sg_idx] = work_value_g
         M[LWorkg_idx, Eg_idx] = work_value_g
         M[LWorkg_idx, Ig_idx] = work_value_g
@@ -761,23 +766,21 @@ def calculate_M_gamma_and_eta(dynModel):
             LTransporth_idx = ah*num_controls + controls.index('transport')
             LLeisureh_idx = ah*num_controls + controls.index('leisure')
 
-            other_value_g = vg_other * small_eta_other * (1/num_age_groups)
-            M[LOtherh_idx, Sg_idx] = other_value_g
-            M[LOtherh_idx, Eg_idx] = other_value_g
-            M[LOtherh_idx, Ig_idx] = other_value_g
-            M[LOtherh_idx, Rg_idx] = other_value_g
+            activities_value_g = vg * small_eta * (1/num_age_groups)
+            M[LOtherh_idx, Sg_idx] = activities_value_g
+            M[LOtherh_idx, Eg_idx] = activities_value_g
+            M[LOtherh_idx, Ig_idx] = activities_value_g
+            M[LOtherh_idx, Rg_idx] = activities_value_g
 
-            leisure_value_g = vg_leisure * small_eta_leisure * (1/num_age_groups)
-            M[LLeisureh_idx, Sg_idx] = leisure_value_g
-            M[LLeisureh_idx, Eg_idx] = leisure_value_g
-            M[LLeisureh_idx, Ig_idx] = leisure_value_g
-            M[LLeisureh_idx, Rg_idx] = leisure_value_g
+            M[LLeisureh_idx, Sg_idx] = activities_value_g
+            M[LLeisureh_idx, Eg_idx] = activities_value_g
+            M[LLeisureh_idx, Ig_idx] = activities_value_g
+            M[LLeisureh_idx, Rg_idx] = activities_value_g
 
-            transport_value_g = vg_transport * small_eta_transport * (1/num_age_groups)
-            M[LTransporth_idx, Sg_idx] = transport_value_g
-            M[LTransporth_idx, Eg_idx] = transport_value_g
-            M[LTransporth_idx, Ig_idx] = transport_value_g
-            M[LTransporth_idx, Rg_idx] = transport_value_g
+            M[LTransporth_idx, Sg_idx] = activities_value_g
+            M[LTransporth_idx, Eg_idx] = activities_value_g
+            M[LTransporth_idx, Ig_idx] = activities_value_g
+            M[LTransporth_idx, Rg_idx] = activities_value_g
 
 
 
@@ -789,16 +792,14 @@ def calculate_M_gamma_and_eta(dynModel):
         # in lockdown, we should have v_NLg * theta in the
         # column corresponding to R^q_g
         baseline_economic_values = (
-                        vg_leisure * small_gamma_leisure
-                        + vg_other * small_gamma_other
-                        + vg_transport * small_gamma_transport
+                        vg * small_gamma
                         )
         gamma[Sg_idx] = baseline_economic_values
         gamma[Eg_idx] = baseline_economic_values
         gamma[Ig_idx] = baseline_economic_values
         gamma[Rg_idx] = baseline_economic_values
 
-        gamma[Rqg_idx] = v_g_ones
+        gamma[Rqg_idx] = v_g_UpperBounds
 
         # Vector eta should have only nonzero elements in the
         # columns corresponding to D_g. We assume here that D(0)=0
