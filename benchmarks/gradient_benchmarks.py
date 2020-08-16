@@ -256,31 +256,6 @@ experiment_params = {
 	"testing":"homogeneous",
 }
 
-# Some basic policies
-full_open_policy = {
-	"home": 1.0,
-	"leisure": 1.0,
-	"other": 1.0,
-	"school": 1.0,
-	"transport": 1.0,
-	"work": 1.0
-}
-full_lockdown_policy = gov_policy[start_lockdown]
-
-print(full_lockdown_policy)
-
-thresholds_to_try = {
-	"icus":[500,1000,1500,2000,2500,3000],
-	"beds":[25000,50000,75000,100000,125000,150000],
-	"infection_rate":[0.001,0.005,0.01,0.05,0.1,0.2],
-}
-
-thresholds = {
-	"icus":1000,
-	"beds":50000,
-	"infection_rate":0.01
-}
-
 
 def run_government_policy(experiment_params):
 
@@ -374,7 +349,100 @@ def run_open(experiment_params):
 
 
 
-threshold_policy(experiment_params, thresholds)
+def gradient_descent(experiment_params, quar_freq):
+
+	intervention_times = [t*quar_freq for t in range(int(simulation_params['days']/quar_freq))]
+
+	x0 = np.zeros(len(intervention_times)*len(age_groups)*len(rel_activities)) + 0.5
+
+	# Create dynamical model
+	fastModel = FastDynamicalModel(universe_params, econ_params, experiment_params, simulation_params['dt'], mixing_method)
+	initial_state = state_to_matrix(initialization)
+
+	if experiment_params["testing"] == "homogeneous":
+		m_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
+		a_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
+
+	m_tests_vec = dict_to_vector(m_tests)
+	a_tests_vec = dict_to_vector(a_tests)
+
+
+	def simulate(x):
+		# Extract vector components
+		x_lockdown = np.reshape(
+			x,
+			(len(intervention_times),len(age_groups),len(rel_activities))
+		)
+
+
+		state = initial_state
+		total_reward = 0
+		total_deaths = 0
+		total_econ = 0
+		for t in range(simulation_params['time_periods']):
+			if t in intervention_times:
+				update_contacts = True
+			else:
+				update_contacts = False
+
+			if start_day + t < universe_params['days_before_gamma']:
+				lockdown_status = "pre-gamma"
+			else:
+				lockdown_status = "post-gamma"
+			
+			# Add home activity to lockdown
+			x_lockdown_all = np.concatenate((np.array([[1.0]]*len(age_groups)),x_lockdown[int(t/quar_freq),:,:]), axis=1)
+
+
+			state, econs = fastModel.take_time_step(
+				state, 
+				m_tests_vec, 
+				a_tests_vec,
+				x_lockdown_all,
+				lockdown_status,
+				update_contacts = update_contacts, 
+				B_H = False, 
+				B_ICU = False,
+				B_H_perc = False,
+				B_ICU_perc = False,
+			)
+			total_reward += econs['reward']
+			total_deaths += econs['deaths']
+			total_econ += econs['economic_value']
+
+		print(total_reward, total_deaths, total_econ)
+		return -total_reward
+
+	lower_bounds_matrix = np.zeros((len(intervention_times),len(age_groups),len(rel_activities)))
+	for i,act in enumerate(rel_activities):
+		lower_bounds_matrix[:,:,i] += lower_bounds[act]
+
+
+	
+	full_bounds = Bounds(
+		lower_bounds_matrix.flatten(),
+		np.zeros(len(intervention_times)*len(age_groups)*len(rel_activities)) + 1.0
+	)
+
+	result_lockdown = minimize(simulate, x0, method='L-BFGS-B',bounds=full_bounds,options={'eps':10e-8,'maxfun':700000})
+
+	x_lockdown = np.reshape(
+		result_lockdown.x,
+		(len(intervention_times),len(age_groups),len(rel_activities))
+	)
+
+	alphas = matrix_to_alphas(x_lockdown, quar_freq)[0]
+
+	with open('./gradient_alphas/delta_%f_xi_%d_icus_%d_tests_%d_testing_%s.yaml'%(experiment_params["delta_schooling"],experiment_params["xi"],experiment_params["icus"],experiment_params["tests"], experiment_params["testing"]), 'w') as file:
+		yaml.dump(alphas, file)
+
+	result_policy = run_constant_policy(experiment_params, alphas)
+	result_policy["heuristic"] = "gradient"
+
+	return result_policy
+
+
+
 
 all_results = []
 for delta in params_to_try["delta_schooling"]:
@@ -389,22 +457,12 @@ for delta in params_to_try["delta_schooling"]:
 						'testing':testing,
 						'tests':tests,
 					}
-
-					result_real = run_government_policy(experiment_params)
-					result_closed = run_full_lockdown(experiment_params)
-					result_open = run_open(experiment_params)
-
-					all_results.append(result_real)
-					all_results.append(result_closed)
-					all_results.append(result_open)
-
-					# pickle.dump(dynModel,open(f"dynModel_gov_full_lockd_benchmark_days_{simulation_params['time_periods']}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","wb"))
-
-					# plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params, "govm_full_lockdown")
+					print(experiment_params)
+					result_gradient = gradient_descent(experiment_params, 90)
+					all_results.append(result_gradient)
 
 
 
 
 
-
-pd.DataFrame(all_results).to_excel(f"simulations-{simulation_params['days']}-days.xlsx")
+pd.DataFrame(all_results).to_excel(f"gradient_simulations-{simulation_params['days']}-days.xlsx")
