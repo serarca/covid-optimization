@@ -712,7 +712,7 @@ def calculate_M_gamma_and_eta(dynModel):
         # Rename parameters to make expressions similar to the Latex
 
         econ_activities = ["transport","leisure","other"]
-        eta_activities = ["transport","leisure","other","school"]
+        eta_activities = ["transport","leisure","other"]
 
         v_g = sum([dynModel.econ_params["employment_params"]["v"][age_group][activity] for activity in econ_activities])
 
