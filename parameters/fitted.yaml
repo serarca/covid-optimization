@@ -1,15 +1,13 @@
-days_before_full_lockdown: 64
-days_of_full_lockdown: 55
+days_before_gamma: 65.930313
 global-parameters:
   C_H: 20000000.0
   C_ICU: 2500.0
 mixing:
   name: mult
-  param_alpha: 2.37462207
-  param_beta: 1.04804668
-  param_gamma_after_lockdown: 1.1836383630353475
-  param_gamma_before_lockdown: 1.75912224
-  param_gamma_during_lockdown: 1.224126161310625
+  param_alpha: 1.67438361
+  param_beta: 3.54751353
+  param_gamma_after: 1.2768961906897378
+  param_gamma_before: 1.81829588
 seir-groups:
   age_group_0_9:
     contacts:
@@ -741,9 +739,9 @@ seir-groups:
       p_Iss: 0.32
       sigma: 0.25
 upper_bounds:
-  home: 1.00000001
-  leisure: 0.870340407
-  other: 0.8
-  school: 0.933634976
-  transport: 0.88178242
-  work: 0.800003218
+  home: 0.99615458
+  leisure: 0.89687269
+  other: 0.8787483
+  school: 0.96537944
+  transport: 0.90696783
+  work: 0.96665457

@@ -149,9 +149,9 @@ def simulate(x):
 		else:
 			update_contacts = False
 
-		if start_day + t <= universe_params['days_before_full_lockdown']:
+		if start_day + t < universe_params['days_before_full_lockdown']:
 			lockdown_status = "pre-lockdown"
-		elif start_day + t <= universe_params['days_before_full_lockdown']+universe_params['days_of_full_lockdown']:
+		elif start_day + t < universe_params['days_before_full_lockdown']+universe_params['days_of_full_lockdown']:
 			lockdown_status = "lockdown"
 		else:
 			lockdown_status = "post-lockdown"

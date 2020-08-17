@@ -52,3 +52,10 @@ def matrix_to_state(m):
 		for j,c in enumerate(cont):
 			state[age_group][c] = m[i,j]
 	return state
+
+def dict_to_vector(d):
+	v = []
+	for ag in age_groups:
+		v.append(d[ag])
+	return np.array(v)
+

@@ -432,64 +432,59 @@ def threshold_policy(experiment_params, thresholds, plot=False):
 
 
 
-# partial_results = []
-# all_results = []
-# for delta in params_to_try["delta_schooling"]:
-# 	for xi in params_to_try["xi"]:
-# 		for icus in params_to_try["icus"]:
-# 			for tests in params_to_try["tests"]:
-# 				for testing in params_to_try["testing"]:
-# 					experiment_params = {
-# 						'delta_schooling':delta,
-# 						'xi':xi,
-# 						'icus':icus,
-# 						'testing':testing,
-# 						'tests':tests,
-# 					}
+partial_results = []
+all_results = []
+for delta in params_to_try["delta_schooling"]:
+	for xi in params_to_try["xi"]:
+		for icus in params_to_try["icus"]:
+			for tests in params_to_try["tests"]:
+				for testing in params_to_try["testing"]:
+					experiment_params = {
+						'delta_schooling':delta,
+						'xi':xi,
+						'icus':icus,
+						'testing':testing,
+						'tests':tests,
+					}
 
-# 					best_reward = -float("inf")
-# 					best_result = 0
-# 					for icus_t in thresholds_to_try["icus"]:
-# 						for beds_t in thresholds_to_try["beds"]:
-# 							for inf_t in thresholds_to_try["infection_rate"]:
-# 								thresholds = {
-# 									"icus_t":icus_t,
-# 									"beds_t":beds_t,
-# 									"infection_rate_t":inf_t,
-# 								}
-# 								partial_result = threshold_policy(experiment_params, thresholds)
-# 								partial_result.update(thresholds)
-# 								partial_results.append(partial_result)
-# 								if partial_result["reward"]>best_reward:
-# 									best_reward = partial_result["reward"]
-# 									best_result = partial_result
-# 									print(best_result)
+					best_reward = -float("inf")
+					best_result = 0
+					for icus_t in thresholds_to_try["icus"]:
+						for beds_t in thresholds_to_try["beds"]:
+							for inf_t in thresholds_to_try["infection_rate"]:
+								thresholds = {
+									"icus_t":icus_t,
+									"beds_t":beds_t,
+									"infection_rate_t":inf_t,
+								}
+								partial_result = threshold_policy(experiment_params, thresholds)
+								partial_result.update(thresholds)
+								partial_results.append(partial_result)
+								if partial_result["reward"]>best_reward:
+									best_reward = partial_result["reward"]
+									best_result = partial_result
+									print(best_result)
 
-# 					all_results.append(best_result)
+					all_results.append(best_result)
 
 
-					# pickle.dump(dynModel,open(f"dynModel_gov_full_lockd_benchmark_days_{simulation_params['time_periods']}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","wb"))
+					#pickle.dump(dynModel,open(f"dynModel_gov_full_lockd_benchmark_days_{simulation_params['time_periods']}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","wb"))
 
-# We plot the winning model
-# for r in all_results:
-# 	experiment_params = {
-# 		"delta_schooling":r['delta_schooling'],
-# 		"xi":r['xi'],
-# 		"icus":r['icus'],
-# 		"tests":r['tests'],
-# 		"testing":r['testing'],
-# 	}
-# 	thresholds = {
-# 		"icus_t":r["icus_t"],
-# 		"beds_t":r["beds_t"],
-# 		"infection_rate_t":r["infection_rate_t"],
-# 	}
-
-experiment_params = {'delta_schooling': 0.5, 'xi': 1000000.0, 'icus': 3000, 'tests': 0, 'testing': 'homogeneous'}
-thresholds = {'icus_t': 500, 'beds_t': 5000, 'infection_rate_t': 0.005}
-print(experiment_params)
-print(thresholds)
-threshold_policy(experiment_params, thresholds, plot=True)
+#We plot the winning model
+for r in all_results:
+	experiment_params = {
+		"delta_schooling":r['delta_schooling'],
+		"xi":r['xi'],
+		"icus":r['icus'],
+		"tests":r['tests'],
+		"testing":r['testing'],
+	}
+	thresholds = {
+		"icus_t":r["icus_t"],
+		"beds_t":r["beds_t"],
+		"infection_rate_t":r["infection_rate_t"],
+	}	
+	threshold_policy(experiment_params, thresholds, plot=True)
 
 
 

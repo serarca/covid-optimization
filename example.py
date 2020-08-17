@@ -23,7 +23,7 @@ import numpy as np
 # Global variables
 simulation_params = {
 	'dt':1.0,
-	'days': 180,
+	'days': 30,
 	'region': "fitted",
 	'heuristic': 'benchmark',
 	'mixing_method': {'name': 'multi'}
@@ -42,8 +42,9 @@ with open("./parameters/fitted.yaml") as file:
     universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
 # Read initialization
-with open("./initialization/61days.yaml") as file:
+with open("./initialization/64days.yaml") as file:
 	initialization = yaml.load(file, Loader=yaml.FullLoader)
+	start_day = 61
 
 # Read econ parameters
 with open("./parameters/econ.yaml") as file:
@@ -95,7 +96,7 @@ experiment_params = {
 }
 
 # Create dynamical method
-dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method)
+dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method, start_day)
 
 # Homogenous testing
 m_tests = {ag:tests/len(age_groups) for ag in age_groups}

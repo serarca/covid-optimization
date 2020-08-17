@@ -187,12 +187,15 @@ class FastDynamicalModel:
 		# }
 
 	def update_contact_matrix(self):
-		if self.lockdown_status == "pre-lockdown":
-			prob_multiplier = self.mixing_method["param_gamma_before_lockdown"]
-		elif self.lockdown_status == "lockdown":
-			prob_multiplier = self.mixing_method["param_gamma_during_lockdown"]
+
+		if "fixed_gamma" in self.mixing_method:
+			prob_multiplier = self.mixing_method["fixed_gamma"]
+		elif self.lockdown_status == "pre-gamma":
+			prob_multiplier = self.mixing_method["param_gamma_before"]
+		elif self.lockdown_status == "post-gamma":
+			prob_multiplier = self.mixing_method["param_gamma_after"]
 		else:
-			prob_multiplier = self.mixing_method["param_gamma_after_lockdown"]
+			assert(False)
 
 
 		for g1 in range(len(age_groups)):
@@ -316,18 +319,24 @@ class FastDynamicalModel:
 
 		v_employment = (
 			self.v_g*(self.econ_params["employment_params"]["nu"]*work_alpha+
-				self.econ_params["employment_params"]["eta"]*l_mean
-				+self.econ_params["employment_params"]["gamma"])*(
-				self.new_state[:,cont.index("S")]+self.new_state[:,cont.index("E")]+self.new_state[:,cont.index("R")]
+				self.econ_params["employment_params"]["eta"]*l_mean+
+				self.econ_params["employment_params"]["gamma"])*(
+				self.new_state[:,cont.index("S")]+self.new_state[:,cont.index("I")]+self.new_state[:,cont.index("E")]+self.new_state[:,cont.index("R")]
 			)*self.dt + 
-			self.v_g*(self.econ_params["employment_params"]["nu"]*self.econ_params["upper_bounds"]["work"]+
-				self.econ_params["employment_params"]["eta"]*l_mean_upper
-				+self.econ_params["employment_params"]["gamma"])*(
+			self.v_g*(self.econ_params["employment_params"]["nu"]*1.0+
+				self.econ_params["employment_params"]["eta"]*1.0+
+				self.econ_params["employment_params"]["gamma"])*(
 				self.new_state[:,cont.index("Rq")]
 			)*self.dt
 		)
 
-		v_schooling = self.experiment_params['delta_schooling']*self.schooling_params*school_alpha*self.dt
+		v_schooling = (self.experiment_params['delta_schooling']*self.schooling_params*school_alpha*self.dt*(
+				self.new_state[:,cont.index("S")]+self.new_state[:,cont.index("I")]+self.new_state[:,cont.index("E")]+self.new_state[:,cont.index("R")]
+			)*self.dt +
+			self.experiment_params['delta_schooling']*self.schooling_params*1.0*self.dt*(
+				self.new_state[:,cont.index("Rq")]
+			)*self.dt 
+		)
 
 		return np.sum(v_schooling+v_employment)
 

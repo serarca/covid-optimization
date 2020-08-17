@@ -15,7 +15,7 @@ def n_contacts(group_g, group_h, alphas, mixing_method, prob_multiplier):
 				)
 	elif mixing_method['name'] == "mult":
 		for activity in alphas[group_g.name]:
-			n += group_g.contacts[activity][group_h.name]*(alphas[group_g.name][activity]**mixing_method['param_alpha'])*(alphas[group_h.name][activity]**mixing_method['param_beta'])
+			n += prob_multiplier*group_g.contacts[activity][group_h.name]*(alphas[group_g.name][activity]**mixing_method['param_alpha'])*(alphas[group_h.name][activity]**mixing_method['param_beta'])
 	elif mixing_method['name'] == "min":
 		for activity in alphas[group_g.name]:
 			n += group_g.contacts[activity][group_h.name]*min(alphas[group_g.name][activity],alphas[group_h.name][activity])
@@ -29,7 +29,7 @@ def n_contacts(group_g, group_h, alphas, mixing_method, prob_multiplier):
 
 
 class DynamicalModel:
-	def __init__(self, parameters, econ_params, experiment_params, initialization, dt, time_steps, mixing_method, transport_lb_work_fraction = 0 , extra_data = False):
+	def __init__(self, parameters, econ_params, experiment_params, initialization, dt, time_steps, mixing_method, start_day, transport_lb_work_fraction = 0 , extra_data = False):
 		self.parameters = parameters
 		self.econ_params = econ_params
 		self.experiment_params = experiment_params
@@ -44,6 +44,7 @@ class DynamicalModel:
 		self.m_tests_controls = []
 		self.a_tests_controls = []
 		self.transport_lb_work_fraction = transport_lb_work_fraction
+		self.start_day = start_day
 
 		# Create groups from parameters
 		self.groups = {}
@@ -234,19 +235,28 @@ class DynamicalModel:
 			l_mean = np.mean([np.sum([alphas[ag][act] for act in eta_activities]) for ag in alphas])
 			l_mean_upper_bound = np.sum([self.econ_params["upper_bounds"][act] for act in eta_activities])
 
-			v_employment += v_g*(
+			v_employment_g = 0
+			v_employment_g += v_g*(
 						self.econ_params["employment_params"]["nu"]*alphas[age_group]["work"]+
 						self.econ_params["employment_params"]["eta"]*l_mean+
 						self.econ_params["employment_params"]["gamma"]
 					)*(state[age_group]["S"] + state[age_group]["E"] + state[age_group]["I"] + state[age_group]["R"])* self.dt
 			# Add contribution of people fully recovered
-			v_employment += v_g*(
-						self.econ_params["employment_params"]["nu"]*self.econ_params["upper_bounds"]["work"]+
-						self.econ_params["employment_params"]["eta"]*l_mean_upper_bound+
+			v_employment_g += v_g*(
+						self.econ_params["employment_params"]["nu"]*1.0+
+						self.econ_params["employment_params"]["eta"]*1.0+
 						self.econ_params["employment_params"]["gamma"]
 			)*state[age_group]["Rq"]* self.dt
+			
+			v_employment += v_employment_g
 			# Add schooling contributions
-			v_schooling += self.experiment_params['delta_schooling']*self.econ_params['schooling_params'][age_group]*alphas[age_group]["school"]* self.dt
+			v_schooling += (
+
+				self.experiment_params['delta_schooling']*self.econ_params['schooling_params'][age_group]*alphas[age_group]["school"]* 
+				(state[age_group]["S"] + state[age_group]["E"] + state[age_group]["I"] + state[age_group]["R"])*self.dt+
+				self.experiment_params['delta_schooling']*self.econ_params['schooling_params'][age_group]*1.0* 
+				(state[age_group]["Rq"])*self.dt
+			)
 
 		return v_employment + v_schooling
 
@@ -454,16 +464,12 @@ class SEIR_group:
 
 	def update_total_contacts(self, t, alphas):
 		# Calculate the multiplier
-		if t<self.parent.parameters['days_before_full_lockdown']:
-			lock_state = "pre-lockdown"
-			prob_multiplier = self.mixing_method["param_gamma_before_lockdown"]
-		elif t<=self.parent.parameters['days_before_full_lockdown']+self.parent.parameters['days_of_full_lockdown']:
-			lock_state = "lockdown"
-			prob_multiplier = self.mixing_method["param_gamma_during_lockdown"]
+		if t+self.parent.start_day<self.parent.parameters['days_before_gamma']:
+			lock_state = "pre-gamma"
+			prob_multiplier = self.mixing_method["param_gamma_before"]
 		else:
-			lock_state = "post_lockdown"
-			prob_multiplier = self.mixing_method["param_gamma_after_lockdown"]
-		#print(lock_state,prob_multiplier)
+			lock_state = "post-gamma"
+			prob_multiplier = self.mixing_method["param_gamma_after"]
 
 
 		if (len(self.total_contacts) == t):
