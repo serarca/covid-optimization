@@ -75,7 +75,7 @@ numpyArrayDatatype = np.float64
 ####################################
 # Calculate the Jacobian with respect to X (states)
 # @profile
-def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method):
+def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method, t):
     """ Calculates the Jacobian for a given control trajectory u_hat and corresponding state trajectory X_hat """
     # This assumes that the order of components in X_hat and u_hat is as follows:
     # For X_hat: all the SEIR states for age group 1, then all the SEIR states for age group 2, etc.
@@ -113,7 +113,7 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method):
         N_h_slice = X_hat[SEIR_groups.index('N_g'): len(X_hat): num_compartments]
 
         infection_prob_arr = np.divide(I_h_slice, (N_h_slice + Rq_h_slice))
-        c_gh_arr = calcContacts(dynModel, alphas, mixing_method, ag)
+        c_gh_arr = calcContacts(dynModel, alphas, mixing_method, ag, t)
 
         contacts = np.dot(c_gh_arr, infection_prob_arr)
 
@@ -662,10 +662,20 @@ def get_F(dynModel, X, u):
 
 ####################################
 # our internal function here to calculate the contacts of a given age group with all other age groups
-def calcContacts(dynModel, alphas, mixing_method, ag):
+def calcContacts(dynModel, alphas, mixing_method, ag, t):
+    # Calculate the multiplier
+    
+    if t+dynModel.start_day < dynModel.parameters['days_before_gamma']:
+        lock_state = "pre-gamma"
+        prob_multiplier = dynModel.mixing_method["param_gamma_before"]
+    else:
+        lock_state = "post-gamma"
+        prob_multiplier = dynModel.mixing_method["param_gamma_after"]
+
+
     contacts_ag = np.zeros(num_age_groups, dtype=numpyArrayDatatype)
     for h in range(0, num_age_groups):
-        contacts_ag[h] = n_contacts(dynModel.groups[age_groups[ag]], dynModel.groups[age_groups[h]], alphas, mixing_method)
+        contacts_ag[h] = n_contacts(dynModel.groups[age_groups[ag]], dynModel.groups[age_groups[h]], alphas, mixing_method, prob_multiplier)
 
     return contacts_ag
 
@@ -702,9 +712,9 @@ def calculate_M_gamma_and_eta(dynModel):
         # Rename parameters to make expressions similar to the Latex
 
         econ_activities = ["transport","leisure","other"]
-		eta_activities = ["transport","leisure","other","school"]
+        eta_activities = ["transport","leisure","other","school"]
 
-        v_g = sum([self.econ_params["employment_params"]["v"][age_group][activity] for activity in econ_activities])
+        v_g = sum([dynModel.econ_params["employment_params"]["v"][age_group][activity] for activity in econ_activities])
 
 
         nu = dynModel.econ_params["employment_params"]["nu"]
@@ -719,11 +729,7 @@ def calculate_M_gamma_and_eta(dynModel):
         small_gamma = dynModel.econ_params["employment_params"]["gamma"]
 
         v_g_schooling_ones = school_value_g
-        v_g_employment_ones = (
-                                vg_leisure
-                                + vg_other
-                                + vg_transport
-                                )
+        v_g_employment_ones = v_g * (nu + small_eta + small_gamma)
         
         l_mean_upper_bound = np.sum([dynModel.econ_params["upper_bounds"][act] for act in eta_activities])
         
@@ -749,7 +755,7 @@ def calculate_M_gamma_and_eta(dynModel):
         # having the same lockdown we should have
         # (1-theta) * v_NLg  as well in the
         # column corresponding to R^q_g
-        work_value_g = (vg * nu)
+        work_value_g = (v_g * nu)
 
         M[LWorkg_idx, Sg_idx] = work_value_g
         M[LWorkg_idx, Eg_idx] = work_value_g
@@ -766,7 +772,7 @@ def calculate_M_gamma_and_eta(dynModel):
             LTransporth_idx = ah*num_controls + controls.index('transport')
             LLeisureh_idx = ah*num_controls + controls.index('leisure')
 
-            activities_value_g = vg * small_eta * (1/num_age_groups)
+            activities_value_g = v_g * small_eta * (1/num_age_groups)
             M[LOtherh_idx, Sg_idx] = activities_value_g
             M[LOtherh_idx, Eg_idx] = activities_value_g
             M[LOtherh_idx, Ig_idx] = activities_value_g
@@ -792,14 +798,14 @@ def calculate_M_gamma_and_eta(dynModel):
         # in lockdown, we should have v_NLg * theta in the
         # column corresponding to R^q_g
         baseline_economic_values = (
-                        vg * small_gamma
+                        v_g * small_gamma
                         )
         gamma[Sg_idx] = baseline_economic_values
         gamma[Eg_idx] = baseline_economic_values
         gamma[Ig_idx] = baseline_economic_values
         gamma[Rg_idx] = baseline_economic_values
 
-        gamma[Rqg_idx] = v_g_UpperBounds
+        gamma[Rqg_idx] = v_g_ones
 
         # Vector eta should have only nonzero elements in the
         # columns corresponding to D_g. We assume here that D(0)=0
@@ -1089,7 +1095,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
         uhat_t = uhat_seq[:,t-k]
         #print("uhat_t is", uhat_t)
 
-        jacob_X = get_Jacobian_X(dynModel, Xhat_t, uhat_t, dynModel.mixing_method)
+        jacob_X = get_Jacobian_X(dynModel, Xhat_t, uhat_t, dynModel.mixing_method, t)
         jacob_u = get_Jacobian_u(dynModel, Xhat_t, uhat_t, dynModel.mixing_method)
 
         # Calculate linearization coefficients for X(t+1)
