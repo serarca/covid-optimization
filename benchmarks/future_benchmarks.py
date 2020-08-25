@@ -437,6 +437,17 @@ def future_policy(experiment_params, icu_threshold, window, plot=False):
 		icus.append(icus_occ)
 	print(icus)
 
+
+	if plot:
+			plot_benchmark(dynModel, 
+			experiment_params["delta_schooling"], 
+			experiment_params["xi"], 
+			experiment_params["icus"], 
+			experiment_params["tests"], 
+			experiment_params["testing"], 
+			simulation_params, 
+			"future")
+
 	result = {
 		"heuristic":"constant",
 		"delta_schooling":experiment_params["delta_schooling"],
@@ -467,7 +478,7 @@ for delta in params_to_try["delta_schooling"]:
 						'tests':tests,
 					}
 
-					result = future_policy(experiment_params, 2000, 1, plot=False)
+					result = future_policy(experiment_params, 2800, 1, plot=True)
 
 					all_results.append(result)
 

@@ -227,7 +227,7 @@ class DynamicalModel:
 	# Given a state and set of alphas, returns the economic value
 	def get_economic_value(self, state, alphas):
 		econ_activities = ["transport","leisure","other"]
-		eta_activities = ["transport","leisure","other","school"]
+		eta_activities = ["transport","leisure","other"]
 		v_employment = 0
 		v_schooling = 0
 		for age_group in state:

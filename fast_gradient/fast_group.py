@@ -58,7 +58,6 @@ class FastDynamicalModel:
 		self.econ_cost_death = np.array([self.econ_params["econ_cost_death"][ag] for ag in age_groups])
 		self.schooling_params = np.array([self.econ_params['schooling_params'][ag] for ag in age_groups])
 
-		
 
 	def params_vector(self, param):
 		v = np.zeros(len(age_groups), order = "C")
@@ -306,15 +305,17 @@ class FastDynamicalModel:
 
 	def get_economic_value(self):
 		econ_activities = ["transport","leisure","other"]
-		eta_activities = ["transport","leisure","other","school"]
+		eta_activities = ["transport","leisure","other"]
 		work_alpha = self.alphas[:,activities.index('work')]
 		school_alpha = self.alphas[:,activities.index('school')]
-		l_mean = np.mean(
+		l_mean = (
 			self.alphas[:,activities.index('transport')]+
 			self.alphas[:,activities.index('leisure')]+
 			self.alphas[:,activities.index('other')]+
 			self.alphas[:,activities.index('school')]
 		)
+
+
 		l_mean_upper = np.mean([self.econ_params['upper_bounds'][act] for act in eta_activities])
 
 		v_employment = (

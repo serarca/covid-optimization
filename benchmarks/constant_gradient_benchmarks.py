@@ -292,7 +292,7 @@ def run_government_policy(experiment_params):
 
 	return result
 
-def run_constant_policy(experiment_params, alpha, plot):
+def run_constant_policy(experiment_params, alpha, plot=False):
 
 	# Create dynamical method
 	dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method, start_day)
@@ -311,10 +311,10 @@ def run_constant_policy(experiment_params, alpha, plot):
 			experiment_params["tests"], 
 			experiment_params["testing"], 
 			simulation_params, 
-			"gradient")
+			"constant_gradient")
 
 	result = {
-		"heuristic":"gradient",
+		"heuristic":"constant",
 		"delta_schooling":experiment_params["delta_schooling"],
 		"xi":experiment_params["xi"],
 		"icus":experiment_params["icus"],
@@ -359,11 +359,11 @@ def run_open(experiment_params):
 
 
 
-def gradient_descent(experiment_params, quar_freq, plot=False):
+def gradient_descent(experiment_params, quar_freq, plot = False):
 
 	intervention_times = [t*quar_freq for t in range(int(simulation_params['days']/quar_freq))]
 
-	x0 = np.zeros(len(intervention_times)*len(age_groups)*len(rel_activities)) + 0.5
+	x0 = np.zeros(len(intervention_times)*len(rel_activities)) + 0.5
 
 	# Create dynamical model
 	fastModel = FastDynamicalModel(universe_params, econ_params, experiment_params, simulation_params['dt'], mixing_method)
@@ -379,10 +379,18 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
 
 	def simulate(x):
 		# Extract vector components
-		x_lockdown = np.reshape(
+		x_lockdown = np.zeros((len(intervention_times),len(age_groups),len(rel_activities)))
+
+
+		x_aux = np.reshape(
 			x,
-			(len(intervention_times),len(age_groups),len(rel_activities))
+			(len(intervention_times),len(rel_activities))
 		)
+
+		for i,t in enumerate(intervention_times):
+			for j,ag in enumerate(age_groups):
+				x_lockdown[i,j,:] = x_aux[i,:]
+
 
 
 		state = initial_state
@@ -423,31 +431,40 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
 		print(total_reward, total_deaths, total_econ)
 		return -total_reward
 
-	lower_bounds_matrix = np.zeros((len(intervention_times),len(age_groups),len(rel_activities)))
+	lower_bounds_matrix = np.zeros((len(intervention_times),len(rel_activities)))
 	for i,act in enumerate(rel_activities):
-		lower_bounds_matrix[:,:,i] += lower_bounds[act]
+		lower_bounds_matrix[:,i] += lower_bounds[act]
 
 
 	
 	full_bounds = Bounds(
 		lower_bounds_matrix.flatten(),
-		np.zeros(len(intervention_times)*len(age_groups)*len(rel_activities)) + 1.0
+		np.zeros(len(intervention_times)*len(rel_activities)) + 1.0
 	)
 
 	result_lockdown = minimize(simulate, x0, method='L-BFGS-B',bounds=full_bounds,options={'eps':10e-8,'maxfun':700000})
 
-	x_lockdown = np.reshape(
-		result_lockdown.x,
-		(len(intervention_times),len(age_groups),len(rel_activities))
-	)
+
+	x_aux = np.reshape(
+			result_lockdown.x,
+			(len(intervention_times),len(rel_activities))
+		)
+
+
+	x_lockdown = np.zeros((len(intervention_times),len(age_groups),len(rel_activities)))
+
+	for i,t in enumerate(intervention_times):
+		for j,ag in enumerate(age_groups):
+			x_lockdown[i,j,:] = x_aux[i,:]
+
 
 	alphas = matrix_to_alphas(x_lockdown, quar_freq)[0]
 
-	with open('./gradient_alphas/delta_%f_xi_%d_icus_%d_tests_%d_testing_%s.yaml'%(experiment_params["delta_schooling"],experiment_params["xi"],experiment_params["icus"],experiment_params["tests"], experiment_params["testing"]), 'w') as file:
+	with open('./constant_gradient_alphas/delta_%f_xi_%d_icus_%d_tests_%d_testing_%s.yaml'%(experiment_params["delta_schooling"],experiment_params["xi"],experiment_params["icus"],experiment_params["tests"], experiment_params["testing"]), 'w') as file:
 		yaml.dump(alphas, file)
 
-	result_policy = run_constant_policy(experiment_params, alphas, plot)
-	result_policy["heuristic"] = "gradient"
+	result_policy = run_constant_policy(experiment_params, alphas, plot=True)
+	result_policy["heuristic"] = "constant_gradient"
 
 	return result_policy
 
@@ -475,4 +492,4 @@ for delta in params_to_try["delta_schooling"]:
 
 
 
-pd.DataFrame(all_results).to_excel(f"gradient_simulations-{simulation_params['days']}-days.xlsx")
+pd.DataFrame(all_results).to_excel(f"gradient_constant_simulations-{simulation_params['days']}-days.xlsx")
