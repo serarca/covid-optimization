@@ -1,13 +1,29 @@
-days_before_gamma: 65.930313
+days_before_gamma: !!python/object/apply:numpy.core.multiarray.scalar
+- !!python/object/apply:numpy.dtype
+  args:
+  - f8
+  - 0
+  - 1
+  state: !!python/tuple
+  - 3
+  - <
+  - null
+  - null
+  - null
+  - -1
+  - -1
+  - 0
+- !!binary |
+  +qWwGBaETkA=
 global-parameters:
   C_H: 20000000.0
   C_ICU: 2500.0
 mixing:
   name: mult
-  param_alpha: 1.67438361
-  param_beta: 3.54751353
-  param_gamma_after: 1.2768961906897378
-  param_gamma_before: 1.81829588
+  param_alpha: 0.23656169968626972
+  param_beta: 1.312547077125725
+  param_gamma_after: 0.7392604113907001
+  param_gamma_before: 1.4785208523518174
 seir-groups:
   age_group_0_9:
     contacts:
@@ -739,9 +755,9 @@ seir-groups:
       p_Iss: 0.32
       sigma: 0.25
 upper_bounds:
-  home: 0.99615458
-  leisure: 0.89687269
-  other: 0.8787483
-  school: 0.96537944
-  transport: 0.90696783
-  work: 0.96665457
+  home: 1.0
+  leisure: 1.0
+  other: 1.0
+  school: 1.0
+  transport: 1.0
+  work: 1.0
