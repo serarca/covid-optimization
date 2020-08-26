@@ -242,9 +242,9 @@ for i,p in enumerate(gov_policy):
 # Parameters to try
 params_to_try = {
 	"delta_schooling":[0.5],
-	"xi":[0, 1e6],
+	"xi":[1e6],
 	"icus":[3000],
-	"tests":[0,30000],
+	"tests":[0],
 	"testing":["homogeneous"]
 }
 
@@ -373,8 +373,6 @@ def run_open(experiment_params):
 	return result
 
 
-
-threshold_policy(experiment_params, thresholds)
 
 all_results = []
 for delta in params_to_try["delta_schooling"]:

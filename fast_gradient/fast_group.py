@@ -308,7 +308,7 @@ class FastDynamicalModel:
 		eta_activities = ["transport","leisure","other"]
 		work_alpha = self.alphas[:,activities.index('work')]
 		school_alpha = self.alphas[:,activities.index('school')]
-		l_mean = (
+		l_mean = np.mean(
 			self.alphas[:,activities.index('transport')]+
 			self.alphas[:,activities.index('leisure')]+
 			self.alphas[:,activities.index('other')]+

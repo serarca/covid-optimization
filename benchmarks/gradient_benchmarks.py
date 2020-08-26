@@ -221,6 +221,7 @@ with open("../parameters/econ.yaml") as file:
 # Read econ parameters
 with open("../lower_bounds/fitted.yaml") as file:
 	lower_bounds = yaml.load(file, Loader=yaml.FullLoader)
+print(lower_bounds)
 
 
 # Define mixing parameter
@@ -236,6 +237,7 @@ for i,p in enumerate(gov_policy):
 for i,p in enumerate(gov_policy):
 	del p['date']
 	del p['days_from_lockdown']
+
 
 
 
@@ -361,9 +363,21 @@ def run_open(experiment_params):
 
 def gradient_descent(experiment_params, quar_freq, plot=False):
 
+
+	# Read the constant alphas to initialize the solution
+	with open('./constant_gradient_alphas/delta_%f_xi_%d_icus_%d_tests_%d_testing_%s.yaml'%(experiment_params["delta_schooling"],experiment_params["xi"],experiment_params["icus"],experiment_params["tests"], experiment_params["testing"])) as file:
+		initial_alphas = yaml.load(file, Loader=yaml.FullLoader)
+
+
+
 	intervention_times = [t*quar_freq for t in range(int(simulation_params['days']/quar_freq))]
 
-	x0 = np.zeros(len(intervention_times)*len(age_groups)*len(rel_activities)) + 0.5
+	x0 = np.zeros(len(intervention_times)*len(age_groups)*len(rel_activities))
+	for i,t in enumerate(intervention_times):
+		for j,ag in enumerate(age_groups):
+			for k,act in enumerate(rel_activities):
+				x0[i*len(age_groups)*len(rel_activities) + j*len(rel_activities) + k] = initial_alphas[ag][act]
+
 
 	# Create dynamical model
 	fastModel = FastDynamicalModel(universe_params, econ_params, experiment_params, simulation_params['dt'], mixing_method)
@@ -426,6 +440,8 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
 	lower_bounds_matrix = np.zeros((len(intervention_times),len(age_groups),len(rel_activities)))
 	for i,act in enumerate(rel_activities):
 		lower_bounds_matrix[:,:,i] += lower_bounds[act]
+
+
 
 
 	

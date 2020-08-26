@@ -182,12 +182,14 @@ def plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params,
 # Global variables
 simulation_params = {
 	'dt':1.0,
-	'days': 90.0,
+	'days': 120,
+	'real_days':90.0,
 	'region': "fitted",
 	'heuristic': 'benchmark',
 	'mixing_method': {'name': 'multi'}
 }
 simulation_params['time_periods'] = int(math.ceil(simulation_params["days"]/simulation_params["dt"]))
+simulation_params['real_time_periods'] = int(math.ceil(simulation_params["real_days"]/simulation_params["dt"]))
 
 age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29', 'age_group_30_39', 'age_group_40_49',
 	'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
@@ -424,8 +426,8 @@ def future_policy(experiment_params, icu_threshold, window, plot=False):
 	print(policies[0:simulation_params['time_periods']])
 
 	icus = []
-	dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method, start_day)
-	for k in range(simulation_params['time_periods']):
+	dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['real_time_periods'], mixing_method, start_day)
+	for k in range(simulation_params['real_time_periods']):
 		if policies[k] == "lockdown":
 			alpha = {ag:full_lockdown_policy for ag in age_groups}
 		elif policies[k] == "open":
