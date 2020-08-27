@@ -210,7 +210,7 @@ with open("../parameters/fitted.yaml") as file:
     universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
 # Read initialization
-with open("../initialization/60days.yaml") as file:
+with open("../initialization/50days.yaml") as file:
 	initialization = yaml.load(file, Loader=yaml.FullLoader)
 	start_day = 60
 
@@ -398,7 +398,17 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 
 	intervention_times = [t*quar_freq for t in range(int(simulation_params['days']/quar_freq))]
 
-	x0 = np.zeros(len(intervention_times)*len(rel_activities)) + 0.5
+	# Read the constant alphas to initialize the solution
+	with open('./constant_gradient_alphas/delta_%f_xi_%d_icus_%d_tests_%d_testing_%s.yaml'%(experiment_params["delta_schooling"],experiment_params["xi"],experiment_params["icus"],experiment_params["tests"], experiment_params["testing"])) as file:
+		initial_alphas = yaml.load(file, Loader=yaml.FullLoader)
+
+
+	x0 = np.zeros(len(intervention_times)*len(rel_activities))
+	for i,t in enumerate(intervention_times):
+		for k,act in enumerate(rel_activities):
+			x0[i*len(rel_activities) + k] = initial_alphas["age_group_30_39"][act]
+
+
 
 	# Create dynamical model
 	fastModel = FastDynamicalModel(universe_params, econ_params, experiment_params, simulation_params['dt'], mixing_method)

@@ -172,7 +172,10 @@ def plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params,
     figure = plt.gcf() # get current figure
     figure.set_size_inches(7*len(groups),24)
     figure.suptitle('Region: %s, %s Heuristic with Total Days: %s, M-test daily capacity: %s, A-test daily capacity: %s, '%(simulation_params['region'],simulation_params['heuristic'],T,K_mtest,K_atest), fontsize=22)
-    plt.savefig("./"+benchmark+"/"+simulation_params['region']+"_"+simulation_params['heuristic']+"_heuristic"+"_n_days_"+str(T)+"_tests_"+str(tests)+ "_icu_cap_"+str(dynModel.icus)+"_deltaS_"+str(delta)+"_xi_"+str(xi)+"_mixing_" + simulation_params['mixing_method']["name"]+"_benckmark_"+benchmark+"_testing"+testing+".pdf")
+    
+    folder = "./"+benchmark+"/"+simulation_params['region']+"_"+simulation_params['heuristic']+"_heuristic"+"_n_days_"+str(T)+"_tests_"+str(tests)+ "_icu_cap_"+str(dynModel.icus)+"_deltaS_"+str(delta)+"_xi_"+str(xi)+"_mixing_" + simulation_params['mixing_method']["name"]+"_benckmark_"+benchmark+"_testing"+testing+".pdf"
+    print(folder)
+    plt.savefig(folder)
 
     plt.close('all')
 
@@ -210,7 +213,7 @@ with open("../parameters/fitted.yaml") as file:
     universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
 # Read initialization
-with open("../initialization/60days.yaml") as file:
+with open("../initialization/50days.yaml") as file:
 	initialization = yaml.load(file, Loader=yaml.FullLoader)
 	start_day = 60
 

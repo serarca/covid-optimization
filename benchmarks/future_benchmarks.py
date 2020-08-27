@@ -212,7 +212,7 @@ with open("../parameters/fitted.yaml") as file:
     universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
 # Read initialization
-with open("../initialization/60days.yaml") as file:
+with open("../initialization/50days.yaml") as file:
 	initialization = yaml.load(file, Loader=yaml.FullLoader)
 	start_day = 60
 
@@ -248,6 +248,11 @@ params_to_try = {
 	"icus":[3000],
 	"tests":[0],
 	"testing":["homogeneous"]
+}
+
+future_params_to_try = {
+	"window":[1,3,7,14],
+	"threshold":[100,500,1000,1500,2500]
 }
 
 experiment_params = {
@@ -387,7 +392,9 @@ def future_policy(experiment_params, icu_threshold, window, plot=False):
 	t = window
 	policies = ["open"]*window
 
+	skip = False
 	while(t<simulation_params['time_periods']):
+		print(skip)
 		print(t)
 		# Create model
 		dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method, start_day)
@@ -401,7 +408,7 @@ def future_policy(experiment_params, icu_threshold, window, plot=False):
 			result = dynModel.take_time_step(m_tests, a_tests, alpha)
 
 		icus_occ = np.sum([result["state"][ag]["ICU"] for ag in age_groups])
-		if icus_occ > icu_threshold:
+		if icus_occ > icu_threshold and not skip:
 			tau = t-window
 			while True:
 				policies[tau] = "lockdown"
@@ -418,11 +425,19 @@ def future_policy(experiment_params, icu_threshold, window, plot=False):
 				icus_occ = np.sum([result["state"][ag]["ICU"] for ag in age_groups])
 				if icus_occ <= icu_threshold:
 					break
+				elif tau == 0:
+					skip = True
+					break
 				else:
 					tau -= 1
+		elif skip:
+			policies+=["open"]
+			t+=1
+			skip = False
 		else:
 			policies+=["open"]
 			t+=1
+			skip = False
 	print(policies[0:simulation_params['time_periods']])
 
 	icus = []
@@ -467,6 +482,8 @@ def future_policy(experiment_params, icu_threshold, window, plot=False):
 
 
 all_results = []
+partial_results = []
+
 for delta in params_to_try["delta_schooling"]:
 	for xi in params_to_try["xi"]:
 		for icus in params_to_try["icus"]:
@@ -479,13 +496,27 @@ for delta in params_to_try["delta_schooling"]:
 						'testing':testing,
 						'tests':tests,
 					}
+					best_reward = -float("inf")
+					best_result = 0
+					for window in future_params_to_try["window"]:
+						for thresh in future_params_to_try["threshold"]:
+							future_params = {
+								"f_threshold":thresh,
+								"f_window":window,
+							}
 
-					result = future_policy(experiment_params, 2800, 1, plot=True)
+							partial_result = future_policy(experiment_params, thresh, window, plot=True)
+							partial_result.update(thresholds)
+							partial_results.append(partial_result)
+							if partial_result["reward"]>best_reward:
+								best_reward = partial_result["reward"]
+								best_result = partial_result
+								print(best_result)
 
-					all_results.append(result)
+					all_results.append(best_result)
 
 
 
 
 pd.DataFrame(all_results).to_excel(f"future_simulations-{simulation_params['days']}-days.xlsx")
-
+pd.DataFrame(all_results).to_excel(f"future_partial_simulations-{simulation_params['days']}-days.xlsx")
