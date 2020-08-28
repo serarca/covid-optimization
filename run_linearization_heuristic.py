@@ -37,14 +37,14 @@ def main():
         "frequencies":[(1,1)]
     }
 
-    n_days = 60
+    n_days = 90
     
     # Final time step is used if we want to evaluate 
     # the hueristic at any time before the n_days
     final_time_step = n_days
     
     # For names of regions see the "parameters" folder
-    region = 'fitted-test'
+    region = 'fitted'
     
     
     Parallel(n_jobs=4)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq)

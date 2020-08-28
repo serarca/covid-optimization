@@ -1401,6 +1401,10 @@ def run_heuristic_linearization(dynModel):
 
             u_vars_vec = mod.addMVar( np.shape(obj_vec), lb=lower_bounds, ub=upper_bounds, obj=obj_vec, name="u")
 
+            mod.addConstrs(u_vars_vec[i] >= lower_bounds[i] for i in range(ut_dim * (T-k)))
+
+            mod.addConstrs(u_vars_vec[i] <= upper_bounds[i] for i in range(ut_dim * (T-k)))
+
             # Sense -1 indicates a maximization problem
             mod.ModelSense = -1
 
@@ -1514,6 +1518,7 @@ def run_heuristic_linearization(dynModel):
 
             # mod.addConstrs(u_vars_vec[i] >= 0 for i in range(ut_dim * (T-k)))
 
+  
 
             # print(f"Optimizing model at time k = {k}")
             mod.optimize()
@@ -1532,9 +1537,14 @@ def run_heuristic_linearization(dynModel):
             print(f"Objective value for Line heur k = {k}: {mod.objVal}")
 
 
-            for i in len(u_vars_vec):
+            for i in range(ut_dim * (T-k)):
                 if u_vars_vec[i].X<-1e-7:
-                    print(f"Negative controls! {u}")
+                    print(f"Negative controls! {u_vars_vec[i].X}")
+                    print(f"Index: {i}")
+                    print(f"Negative control is for time: {i//ut_dim}")
+                    print(f"Negative control is from group: {age_groups[(i%ut_dim) // num_controls]}")
+                    print(f"Negative contorl is for control: {controls[(i%ut_dim) % num_controls]}")
+
             assert (u_vars_vec.X >= -1e-7).all()
 
             if mod.Status != 2:
