@@ -31,20 +31,20 @@ def main():
     # Some paramters to test the linearization heuristic
     params_to_try = {
         "delta_schooling":[0.5],
-        "xi":[60 * 37199.03],
-        "icus":[2000],
-        "tests":[0, 30000],
-        "frequencies":[(1,1), (7,14)]
+        "xi":[1e6],
+        "icus":[3000],
+        "tests":[30000],
+        "frequencies":[(1,1)]
     }
 
-    n_days = 30
+    n_days = 60
     
     # Final time step is used if we want to evaluate 
     # the hueristic at any time before the n_days
-    final_time_step = 90
+    final_time_step = n_days
     
     # For names of regions see the "parameters" folder
-    region = 'fitted'
+    region = 'fitted-test'
     
     
     Parallel(n_jobs=4)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq)
@@ -54,14 +54,14 @@ def main():
     for tests in params_to_try["tests"]
     for test_freq, lockdown_freq in params_to_try['frequencies'])
 
-    run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try, simulation_params_linearization)
+    # run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try)
 
     # unpickle_plot_and_print_results(n_days, params_to_try, simulation_params_linearization)
 
-    load_pickles_and_create_csv(n_days, params_to_try, final_time_step)
+    # load_pickles_and_create_csv(n_days, params_to_try, final_time_step)
 
 def run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq):
-''' Runs the linearization heuristic with the experiment parameters passed as arguments and saves the resulting dynamical model as a pickle object.'''
+    ''' Runs the linearization heuristic with the experiment parameters passed as arguments and saves the resulting dynamical model as a pickle object.'''
 
     experiment_params = {
         'delta_schooling':delta,
@@ -101,8 +101,6 @@ def run_linearization_heuristic(simulation_params, experiment_params):
     # Define time variables
     num_time_periods = int(math.ceil(simulation_params["num_days"]/simulation_params["dt"]))
 
-    # Define mixing method
-    mixing_method = simulation_params['mixing_method']
 
     # Read group parameters
     with open("parameters/"+simulation_params["region"]+".yaml") as file:
@@ -111,7 +109,7 @@ def run_linearization_heuristic(simulation_params, experiment_params):
         universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
         # Read initialization
-    with open("initialization/61days.yaml") as file:
+    with open("initialization/50days.yaml") as file:
         # The FullLoader parameter handles the conversion from YAML
         # scalar values to Python the dictionary format
         initialization = yaml.load(file, Loader=yaml.FullLoader)
@@ -120,12 +118,20 @@ def run_linearization_heuristic(simulation_params, experiment_params):
     with open("parameters/econ.yaml") as file:
         econ_params = yaml.load(file, Loader=yaml.FullLoader)
 
+    
+
+    # Define mixing method
+    mixing_method = universe_params['mixing']
+    
 
     dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], num_time_periods, mixing_method, simulation_params['transport_lb_work_fraction'])
 
     # add parameters for testing capacity
     dynModel.parameters['global-parameters']['C_mtest'] = simulation_params['mtest_cap']
     dynModel.parameters['global-parameters']['C_atest'] = simulation_params['atest_cap']
+
+
+
 
 
     linearization.run_heuristic_linearization(dynModel)
@@ -139,7 +145,7 @@ def run_linearization_heuristic(simulation_params, experiment_params):
     return dynModel
 
 
-def run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try, simulation_params):
+def run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try):
     ''' Loads all the pickled dynamical models and runs them with proportional bouncing, saving the results in another pickle object'''
 
     for delta in params_to_try["delta_schooling"]:
