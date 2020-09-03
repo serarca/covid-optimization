@@ -26,6 +26,18 @@ from aux import *
 from scipy.optimize import Bounds,minimize,LinearConstraint
 
 
+death_prob = {
+	"age_group_0_9":0.002*0.006,
+	"age_group_10_19":0.002*0.006,
+	"age_group_20_29":0.006*0.011,
+	"age_group_30_39":0.013*0.019,
+	"age_group_40_49":0.017*0.033,
+	"age_group_50_59":0.035*0.065,
+	"age_group_60_69":0.071*0.126,
+	"age_group_70_79":0.113*0.21,
+	"age_group_80_plus":0.32*0.316,
+}
+
 def plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params, benchmark):
 
     T = dynModel.time_steps
@@ -156,14 +168,23 @@ def plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params,
         plt.ylim(-1,np.max([max(np.max(dynModel.groups[group].B_H),np.max(dynModel.groups[group].B_ICU)) for group in groups]))
         plt.legend(loc='upper right')
 
-    plt.subplot(13,2,19)
+    # Calulate number of contacts
+    for i,group in enumerate(groups):
+        plt.subplot(14,len(groups),i+1+len(groups)*9)
+        for j,rec_group in enumerate(groups):
+        	plt.plot(time_axis_controls, [dynModel.n_infections[t][group][rec_group]*death_prob[group] for t in range(T)], label=rec_group)
+        plt.legend(loc='upper right')
+
+
+
+    plt.subplot(14,2,21)
     #plt.plot(time_axis, [sum([dynModel.groups[group].H[i] for group in groups]) for i in range(len(time_axis))], label="Total Hospital Beds")
     plt.plot(time_axis, [sum([dynModel.groups[group].ICU[i] for group in groups]) for i in range(len(time_axis))], label="Total ICUs")
     #plt.axhline(y=parameters['global-parameters']['C_H'], color='r', linestyle='dashed', label= "Hospital Capacity")
     plt.axhline(y=dynModel.icus, color='g', linestyle='dashed', label= "ICU Capacity")
     plt.legend(loc='upper right')
 
-    plt.subplot(13,2,20)
+    plt.subplot(14,2,22)
     #plt.plot(time_axis, [sum([dynModel.groups[group].H[i] for group in groups]) for i in range(len(time_axis))], label="Total Hospital Beds")
     plt.plot(time_axis, [sum([dynModel.groups[group].D[i] for group in groups]) for i in range(len(time_axis))], label="Total Deaths")
     #plt.axhline(y=parameters['global-parameters']['C_H'], color='r', linestyle='dashed', label= "Hospital Capacity")
@@ -172,7 +193,10 @@ def plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params,
     figure = plt.gcf() # get current figure
     figure.set_size_inches(7*len(groups),24)
     figure.suptitle('Region: %s, %s Heuristic with Total Days: %s, M-test daily capacity: %s, A-test daily capacity: %s, '%(simulation_params['region'],simulation_params['heuristic'],T,K_mtest,K_atest), fontsize=22)
-    plt.savefig("./"+benchmark+"/"+simulation_params['region']+"_"+simulation_params['heuristic']+"_heuristic"+"_n_days_"+str(T)+"_tests_"+str(tests)+ "_icu_cap_"+str(dynModel.icus)+"_deltaS_"+str(delta)+"_xi_"+str(xi)+"_mixing_" + simulation_params['mixing_method']["name"]+"_benckmark_"+benchmark+"_testing"+testing+".pdf")
+    
+    folder = "./"+benchmark+"/"+simulation_params['region']+"_"+simulation_params['heuristic']+"_heuristic"+"_n_days_"+str(T)+"_tests_"+str(tests)+ "_icu_cap_"+str(dynModel.icus)+"_deltaS_"+str(delta)+"_xi_"+str(xi)+"_mixing_" + simulation_params['mixing_method']["name"]+"_benckmark_"+benchmark+"_testing"+testing+".pdf"
+    print(folder)
+    plt.savefig(folder)
 
     plt.close('all')
 
@@ -210,7 +234,7 @@ with open("../parameters/fitted.yaml") as file:
     universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
 # Read initialization
-with open("../initialization/50days.yaml") as file:
+with open("../initialization/60days.yaml") as file:
 	initialization = yaml.load(file, Loader=yaml.FullLoader)
 	start_day = 60
 
@@ -242,7 +266,7 @@ for i,p in enumerate(gov_policy):
 # Parameters to try
 params_to_try = {
 	"delta_schooling":[0.5],
-	"xi":[1e6],
+	"xi":[0,1e6],
 	"icus":[3000],
 	"tests":[0],
 	"testing":["homogeneous"]
@@ -294,7 +318,7 @@ def run_government_policy(experiment_params):
 
 def run_time_policy(experiment_params, alphas, plot=False):
 	# Create dynamical method
-	dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method, start_day)
+	dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method, start_day, extra_data=True)
 	if experiment_params["testing"] == "homogeneous":
 		m_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
 		a_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
@@ -487,7 +511,7 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 		np.zeros(len(intervention_times)*len(rel_activities)) + 1.0
 	)
 
-	result_lockdown = minimize(simulate, x0, method='L-BFGS-B',bounds=full_bounds,options={'eps':10e-8,'maxfun':700000})
+	result_lockdown = minimize(simulate, x0, method='L-BFGS-B',bounds=full_bounds,options={'eps':10e-2,'maxfun':700000})
 
 
 	x_aux = np.reshape(

@@ -210,7 +210,7 @@ with open("../parameters/fitted.yaml") as file:
     universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
 # Read initialization
-with open("../initialization/50days.yaml") as file:
+with open("../initialization/60days.yaml") as file:
 	initialization = yaml.load(file, Loader=yaml.FullLoader)
 	start_day = 60
 
@@ -242,44 +242,40 @@ for i,p in enumerate(gov_policy):
 # Parameters to try
 params_to_try = {
 	"delta_schooling":[0.5],
-	"xi":[1e6],
+	"xi":[0,1e6],
 	"icus":[3000],
 	"tests":[0],
 	"testing":["homogeneous"]
 }
 
-experiment_params = {
-	"delta_schooling":0.5,
-	"xi":0,
-	"icus":3000,
-	"tests":0,
-	"testing":"homogeneous",
-}
-
 # Some basic policies
 full_open_policy = {
 	"home": 1.0,
-	"leisure": 1.0,
-	"other": 1.0,
-	"school": 1.0,
-	"transport": 1.0,
+	"leisure": 0.0,
+	"other": 0.0,
+	"school": 0.0,
+	"transport": 0.0,
 	"work": 1.0
 }
-full_lockdown_policy = gov_policy[start_lockdown]
+full_lockdown_policy = {
+	"home": 1.0,
+	"leisure": 0.0,
+	"other": 0.0,
+	"school": 0.0,
+	"transport": 0.0,
+	"work": 0.0
+}
 
-print(full_lockdown_policy)
 
 thresholds_to_try = {
-	"icus":[100,500,1000,1500,2000,2500,3000],
-	"beds":[5000,25000,50000,75000,100000,125000,150000],
-	"infection_rate":[0.0001,0.001,0.005,0.01,0.05,0.1,0.2],
+	#"icus":[100*(i+1) for i in range(29)],
+	"icus":[3000],
+	"beds":[1e12],
+	#"beds":[5000*(i+1) for i in range(29)],
+	"infection_rate":[0.001*(i+1) for i in range(29)],
+	"l_school":[0.0,0.5,1.0]
 }
 
-thresholds = {
-	"icus":1000,
-	"beds":50000,
-	"infection_rate":0.01
-}
 
 
 def run_government_policy(experiment_params):
@@ -329,7 +325,7 @@ def run_constant_policy(experiment_params, alpha):
 		dynModel.take_time_step(m_tests, a_tests, alpha)
 
 	result = {
-		"heuristic":"constant",
+		"heuristic":"threshold",
 		"delta_schooling":experiment_params["delta_schooling"],
 		"xi":experiment_params["xi"],
 		"icus":experiment_params["icus"],
@@ -452,18 +448,22 @@ for delta in params_to_try["delta_schooling"]:
 					for icus_t in thresholds_to_try["icus"]:
 						for beds_t in thresholds_to_try["beds"]:
 							for inf_t in thresholds_to_try["infection_rate"]:
-								thresholds = {
-									"icus_t":icus_t,
-									"beds_t":beds_t,
-									"infection_rate_t":inf_t,
-								}
-								partial_result = threshold_policy(experiment_params, thresholds)
-								partial_result.update(thresholds)
-								partial_results.append(partial_result)
-								if partial_result["reward"]>best_reward:
-									best_reward = partial_result["reward"]
-									best_result = partial_result
-									print(best_result)
+								for l_school in thresholds_to_try["l_school"]:
+
+									thresholds = {
+										"icus_t":icus_t,
+										"beds_t":beds_t,
+										"infection_rate_t":inf_t,
+										"l_school":l_school,
+									}
+									partial_result = threshold_policy(experiment_params, thresholds)
+									partial_result.update(thresholds)
+									partial_results.append(partial_result)
+									if partial_result["reward"]>best_reward:
+										best_reward = partial_result["reward"]
+										best_result = partial_result
+										print(best_result)
+									full_open_policy["school"] = l_school
 
 					all_results.append(best_result)
 
@@ -484,6 +484,8 @@ for r in all_results:
 		"beds_t":r["beds_t"],
 		"infection_rate_t":r["infection_rate_t"],
 	}	
+	full_open_policy["school"] = r["l_school"]
+
 	threshold_policy(experiment_params, thresholds, plot=True)
 
 

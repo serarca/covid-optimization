@@ -25,7 +25,6 @@ from fast_group import FastDynamicalModel
 from aux import *
 from scipy.optimize import Bounds,minimize,LinearConstraint
 
-
 death_prob = {
 	"age_group_0_9":0.002*0.006,
 	"age_group_10_19":0.002*0.006,
@@ -37,6 +36,7 @@ death_prob = {
 	"age_group_70_79":0.113*0.21,
 	"age_group_80_plus":0.32*0.316,
 }
+
 
 def plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params, benchmark):
 
@@ -168,23 +168,14 @@ def plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params,
         plt.ylim(-1,np.max([max(np.max(dynModel.groups[group].B_H),np.max(dynModel.groups[group].B_ICU)) for group in groups]))
         plt.legend(loc='upper right')
 
-    # Calulate number of contacts
-    for i,group in enumerate(groups):
-        plt.subplot(14,len(groups),i+1+len(groups)*9)
-        for j,rec_group in enumerate(groups):
-        	plt.plot(time_axis_controls, [dynModel.n_infections[t][group][rec_group]*death_prob[group] for t in range(T)], label=rec_group)
-        plt.legend(loc='upper right')
-
-
-
-    plt.subplot(14,2,21)
+    plt.subplot(13,2,19)
     #plt.plot(time_axis, [sum([dynModel.groups[group].H[i] for group in groups]) for i in range(len(time_axis))], label="Total Hospital Beds")
     plt.plot(time_axis, [sum([dynModel.groups[group].ICU[i] for group in groups]) for i in range(len(time_axis))], label="Total ICUs")
     #plt.axhline(y=parameters['global-parameters']['C_H'], color='r', linestyle='dashed', label= "Hospital Capacity")
     plt.axhline(y=dynModel.icus, color='g', linestyle='dashed', label= "ICU Capacity")
     plt.legend(loc='upper right')
 
-    plt.subplot(14,2,22)
+    plt.subplot(13,2,20)
     #plt.plot(time_axis, [sum([dynModel.groups[group].H[i] for group in groups]) for i in range(len(time_axis))], label="Total Hospital Beds")
     plt.plot(time_axis, [sum([dynModel.groups[group].D[i] for group in groups]) for i in range(len(time_axis))], label="Total Deaths")
     #plt.axhline(y=parameters['global-parameters']['C_H'], color='r', linestyle='dashed', label= "Hospital Capacity")
@@ -193,12 +184,10 @@ def plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params,
     figure = plt.gcf() # get current figure
     figure.set_size_inches(7*len(groups),24)
     figure.suptitle('Region: %s, %s Heuristic with Total Days: %s, M-test daily capacity: %s, A-test daily capacity: %s, '%(simulation_params['region'],simulation_params['heuristic'],T,K_mtest,K_atest), fontsize=22)
-    
-    folder = "./"+benchmark+"/"+simulation_params['region']+"_"+simulation_params['heuristic']+"_heuristic"+"_n_days_"+str(T)+"_tests_"+str(tests)+ "_icu_cap_"+str(dynModel.icus)+"_deltaS_"+str(delta)+"_xi_"+str(xi)+"_mixing_" + simulation_params['mixing_method']["name"]+"_benckmark_"+benchmark+"_testing"+testing+".pdf"
-    print(folder)
-    plt.savefig(folder)
+    plt.savefig("./"+benchmark+"/"+simulation_params['region']+"_"+simulation_params['heuristic']+"_heuristic"+"_n_days_"+str(T)+"_tests_"+str(tests)+ "_icu_cap_"+str(dynModel.icus)+"_deltaS_"+str(delta)+"_xi_"+str(xi)+"_mixing_" + simulation_params['mixing_method']["name"]+"_benckmark_"+benchmark+"_testing"+testing+".pdf")
 
     plt.close('all')
+
 
 
 
@@ -271,38 +260,30 @@ params_to_try = {
 	"testing":["homogeneous"]
 }
 
-experiment_params = {
-	"delta_schooling":0.5,
-	"xi":0,
-	"icus":3000,
-	"tests":0,
-	"testing":"homogeneous",
-}
-
 # Some basic policies
 full_open_policy = {
 	"home": 1.0,
-	"leisure": 1.0,
-	"other": 1.0,
+	"leisure": 0.0,
+	"other": 0.0,
 	"school": 1.0,
-	"transport": 1.0,
+	"transport": 0.0,
 	"work": 1.0
 }
-full_lockdown_policy = gov_policy[start_lockdown]
-
-print(full_lockdown_policy)
-
-thresholds_to_try = {
-	"icus":[500,1000,1500,2000,2500,3000],
-	"beds":[25000,50000,75000,100000,125000,150000],
-	"infection_rate":[0.001,0.005,0.01,0.05,0.1,0.2],
+full_lockdown_policy = {
+	"home": 1.0,
+	"leisure": 0.0,
+	"other": 0.0,
+	"school": 0.0,
+	"transport": 0.0,
+	"work": 0.0
 }
 
-thresholds = {
-	"icus":1000,
-	"beds":50000,
-	"infection_rate":0.01
+
+data_to_try = {
+	"rank":[1,2,3,4,5],
+	"l_school":[0,0.5,1.0]
 }
+
 
 
 def run_government_policy(experiment_params):
@@ -396,7 +377,70 @@ def run_open(experiment_params):
 	return result
 
 
+def age_threshold_policy(experiment_params, data, plot=False):
 
+	dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method, start_day, extra_data=True)
+	if experiment_params["testing"] == "homogeneous":
+		m_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
+		a_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
+
+	# Initialize alpha with full open
+	alpha = {ag:full_open_policy for ag in age_groups}
+	cum_I = []
+
+
+	for t in range(simulation_params['time_periods']):
+		result = dynModel.take_time_step(m_tests, a_tests, alpha)
+		state = result["state"]
+		if (t==0):
+			initial_population = np.sum([state[ag]["N"] for ag in age_groups])
+
+		inf_dict = {ag: sum([dynModel.n_infections[t][ag][ag2] for ag2 in age_groups]) for ag in age_groups}
+		cum_I.append(inf_dict)
+
+		# Drop first entry if larger than 7
+		if len(cum_I)>7:
+			cum_I = cum_I[1:8]
+		pond_infection_rates = {ag:np.mean([cum_I[t][ag]*death_prob[ag]*experiment_params["xi"]-(state[ag]["S"]+state[ag]["E"]+state[ag]["I"]+state[ag]["R"])*dynModel.v_g[ag]*simulation_params['time_periods'] for t in range(len(cum_I))]) for ag in age_groups}
+
+		top = sorted(pond_infection_rates.items(), key=lambda x:-x[1])[:data["rank"]]
+		top = [ag for ag,v in top]
+		print(top)
+		
+		alpha = {
+			ag:(full_lockdown_policy if ag in top else full_open_policy) for ag in age_groups
+		}
+
+
+
+	result = {
+		"heuristic":"age_threshold",
+		"delta_schooling":experiment_params["delta_schooling"],
+		"xi":experiment_params["xi"],
+		"icus":experiment_params["icus"],
+		"tests":experiment_params["tests"],
+		"testing":experiment_params["testing"],
+		"economics_value":dynModel.get_total_economic_value(),
+		"deaths":dynModel.get_total_deaths(),
+		"reward":dynModel.get_total_reward(),	
+	}
+
+	if plot:
+		plot_benchmark(dynModel, 
+			experiment_params["delta_schooling"], 
+			experiment_params["xi"], 
+			experiment_params["icus"], 
+			experiment_params["tests"], 
+			experiment_params["testing"], 
+			simulation_params, 
+			"age_threshold")
+
+
+	return result
+
+
+
+partial_results = []
 all_results = []
 for delta in params_to_try["delta_schooling"]:
 	for xi in params_to_try["xi"]:
@@ -411,21 +455,48 @@ for delta in params_to_try["delta_schooling"]:
 						'tests':tests,
 					}
 
-					result_real = run_government_policy(experiment_params)
-					result_closed = run_full_lockdown(experiment_params)
-					result_open = run_open(experiment_params)
+					best_reward = -float("inf")
+					best_result = 0
+					for rank in data_to_try["rank"]:
+						for l_school in data_to_try["l_school"]:
 
-					all_results.append(result_real)
-					all_results.append(result_closed)
-					all_results.append(result_open)
+							data = {
+								"rank":rank,
+								"l_school":l_school,
+							}
+							partial_result = age_threshold_policy(experiment_params, data)
+							partial_result.update(data)
+							partial_results.append(partial_result)
+							if partial_result["reward"]>best_reward:
+								best_reward = partial_result["reward"]
+								best_result = partial_result
+								print(best_result)
+							full_open_policy["school"] = l_school
 
-					# pickle.dump(dynModel,open(f"dynModel_gov_full_lockd_benchmark_days_{simulation_params['time_periods']}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","wb"))
-
-					# plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params, "govm_full_lockdown")
+					all_results.append(best_result)
 
 
+					#pickle.dump(dynModel,open(f"dynModel_gov_full_lockd_benchmark_days_{simulation_params['time_periods']}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","wb"))
+
+#We plot the winning model
+for r in all_results:
+	experiment_params = {
+		"delta_schooling":r['delta_schooling'],
+		"xi":r['xi'],
+		"icus":r['icus'],
+		"tests":r['tests'],
+		"testing":r['testing'],
+	}
+	data = {
+		"rank":r["rank"],
+		"l_school":r["l_school"],
+	}	
+	full_open_policy["school"] = r["l_school"]
+
+	age_threshold_policy(experiment_params, data, plot=True)
 
 
 
+pd.DataFrame(all_results).to_excel(f"age_threshold_simulations-{simulation_params['days']}-days.xlsx")
+pd.DataFrame(partial_results).to_excel(f"age_threshold_partial_simulations-{simulation_params['days']}-days.xlsx")
 
-pd.DataFrame(all_results).to_excel(f"simulations-{simulation_params['days']}-days.xlsx")

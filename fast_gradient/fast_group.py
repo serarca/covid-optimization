@@ -311,8 +311,7 @@ class FastDynamicalModel:
 		l_mean = np.mean(
 			self.alphas[:,activities.index('transport')]+
 			self.alphas[:,activities.index('leisure')]+
-			self.alphas[:,activities.index('other')]+
-			self.alphas[:,activities.index('school')]
+			self.alphas[:,activities.index('other')]
 		)
 
 

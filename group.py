@@ -4,24 +4,28 @@ import pandas as pd
 import math
 import gurobipy as gb
 
+all_activities = ['home','leisure','other','school','transport','work']
+
 def n_contacts(group_g, group_h, alphas, mixing_method, prob_multiplier):
 
-	n = 0
+	n = {"total":0}
 	if mixing_method['name'] == "maxmin":
 		for activity in alphas[group_g.name]:
-			n += group_g.contacts[activity][group_h.name]*(
+			n["total"] += group_g.contacts[activity][group_h.name]*(
 					(alphas[group_g.name][activity]*math.exp(alphas[group_g.name][activity]*mixing_method['param']) + alphas[group_h.name][activity]*math.exp(alphas[group_h.name][activity]*mixing_method['param']))
 					/(math.exp(alphas[group_g.name][activity]*mixing_method['param'])+math.exp(alphas[group_h.name][activity]*mixing_method['param']))
 				)
 	elif mixing_method['name'] == "mult":
 		for activity in alphas[group_g.name]:
-			n += prob_multiplier*group_g.contacts[activity][group_h.name]*(alphas[group_g.name][activity]**mixing_method['param_alpha'])*(alphas[group_h.name][activity]**mixing_method['param_beta'])
+			value = prob_multiplier*group_g.contacts[activity][group_h.name]*(alphas[group_g.name][activity]**mixing_method['param_alpha'])*(alphas[group_h.name][activity]**mixing_method['param_beta'])
+			n[activity] = value
+			n["total"] += value
 	elif mixing_method['name'] == "min":
 		for activity in alphas[group_g.name]:
-			n += group_g.contacts[activity][group_h.name]*min(alphas[group_g.name][activity],alphas[group_h.name][activity])
+			n["total"] += group_g.contacts[activity][group_h.name]*min(alphas[group_g.name][activity],alphas[group_h.name][activity])
 	elif mixing_method['name'] == "max":
 		for activity in alphas[group_g.name]:
-			n += group_g.contacts[activity][group_h.name]*max(alphas[group_g.name][activity],alphas[group_h.name][activity])
+			n["total"] += group_g.contacts[activity][group_h.name]*max(alphas[group_g.name][activity],alphas[group_h.name][activity])
 	else:
 		assert(False)
 
@@ -70,6 +74,8 @@ class DynamicalModel:
 		# Initialize number of contacts
 		if extra_data:
 			self.n_contacts = [{g_name1:{g_name2:float('inf') for g_name2 in self.groups} for g_name1 in self.groups} for i in range(self.time_steps)]
+			self.n_infections = [{g_name1:{g_name2:float('inf') for g_name2 in self.groups} for g_name1 in self.groups} for i in range(self.time_steps)]
+			self.n_infections_act = [{act: {g_name1:{g_name2:float('inf') for g_name2 in self.groups} for g_name1 in self.groups} for act in all_activities} for i in range(self.time_steps)]
 
 	def take_time_step(self, m_tests, a_tests, alphas, B_H = False, B_ICU = False, B_ICU_perc = False):
 		# store time when current group is being updated
@@ -230,8 +236,12 @@ class DynamicalModel:
 		eta_activities = ["transport","leisure","other"]
 		v_employment = 0
 		v_schooling = 0
+		self.v_g = {}
+		self.econ_gradients = {"work":{},"school":{},"other":{},"leisure":{},"transport":{}}
+
 		for age_group in state:
 			v_g = sum([self.econ_params["employment_params"]["v"][age_group][activity] for activity in econ_activities])
+			self.v_g[age_group] = v_g
 			l_mean = np.mean([np.sum([alphas[ag][act] for act in eta_activities]) for ag in alphas])
 			l_mean_upper_bound = np.sum([self.econ_params["upper_bounds"][act] for act in eta_activities])
 
@@ -257,6 +267,14 @@ class DynamicalModel:
 				self.experiment_params['delta_schooling']*self.econ_params['schooling_params'][age_group]*1.0* 
 				(state[age_group]["Rq"])*self.dt
 			)
+
+			# Calculate econ gradients
+			self.econ_gradients["work"][age_group]=v_g*self.econ_params["employment_params"]["nu"]*(state[age_group]["S"] + state[age_group]["E"] + state[age_group]["I"] + state[age_group]["R"])
+			self.econ_gradients["school"][age_group]=(self.experiment_params['delta_schooling']*self.econ_params['schooling_params'][age_group]* 
+				(state[age_group]["S"] + state[age_group]["E"] + state[age_group]["I"] + state[age_group]["R"])*self.dt
+			)
+			for act in eta_activities:
+				self.econ_gradients[act][age_group]=v_g*self.econ_params["employment_params"]["eta"]*(state[age_group]["S"] + state[age_group]["E"] + state[age_group]["I"] + state[age_group]["R"])/len(eta_activities)
 
 		return v_employment + v_schooling
 
@@ -481,10 +499,14 @@ class SEIR_group:
 					pop_g = g.N[0] + g.Rq[0]
 				else:
 					pop_g = g.N[t] + g.Rq[t]
-				new_contacts = n_contacts(self, g, alphas, self.mixing_method, prob_multiplier)
+				new_contacts_dict = n_contacts(self, g, alphas, self.mixing_method, prob_multiplier)
+				new_contacts = new_contacts_dict["total"]
 				summ_contacts += new_contacts*g.I[t]/(pop_g if pop_g!=0 else 10e-6)
 				if self.parent.extra_data:
 					self.parent.n_contacts[t][self.name][g.name] = new_contacts
+					self.parent.n_infections[t][self.name][g.name] = new_contacts*g.I[t]/(pop_g if pop_g!=0 else 10e-6)*self.S[t]
+					for act in all_activities:
+						self.parent.n_infections_act[t][act][self.name][g.name] = new_contacts_dict[act]*g.I[t]/(pop_g if pop_g!=0 else 10e-6)*self.S[t]
 			self.total_contacts.append(summ_contacts*self.S[t])
 			self.IR.append(summ_contacts)
 
