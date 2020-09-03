@@ -20,6 +20,19 @@ def n_contacts(group_g, group_h, alphas, mixing_method, prob_multiplier):
 			value = prob_multiplier*group_g.contacts[activity][group_h.name]*(alphas[group_g.name][activity]**mixing_method['param_alpha'])*(alphas[group_h.name][activity]**mixing_method['param_beta'])
 			n[activity] = value
 			n["total"] += value
+			if alphas[group_h.name][activity] < 0:
+				print(f"group_h.name: {group_h.name}")
+				print(f"act: {activity}")
+				print(n)
+				print(f"prob_multiplier: {prob_multiplier}")
+				print(f" group_g.contacts[activity][group_h.name]:{group_g.contacts[activity][group_h.name]}")
+				print(f" alphas[group_g.name][activity]:{alphas[group_g.name][activity]}")
+				print(f"alphas[group_h.name][activity] :{alphas[group_h.name][activity]}")
+				print(f"mixing_method['param_alpha']: {mixing_method['param_alpha']}")
+				print(f"mixing_method['param_beta']: {mixing_method['param_beta']}")
+				print(f"alphas[group_g.name][activity]**mixing_method['param_alpha']: {alphas[group_g.name][activity]**mixing_method['param_alpha']}")
+				print(f"alphas[group_h.name][activity]**mixing_method['param_beta']:{alphas[group_h.name][activity]**mixing_method['param_beta']}")
+
 	elif mixing_method['name'] == "min":
 		for activity in alphas[group_g.name]:
 			n["total"] += group_g.contacts[activity][group_h.name]*min(alphas[group_g.name][activity],alphas[group_h.name][activity])
@@ -501,6 +514,7 @@ class SEIR_group:
 					pop_g = g.N[t] + g.Rq[t]
 				new_contacts_dict = n_contacts(self, g, alphas, self.mixing_method, prob_multiplier)
 				new_contacts = new_contacts_dict["total"]
+				assert new_contacts >= 0, (f"New contacts is not nonnnegative: {new_contacts}.")
 				summ_contacts += new_contacts*g.I[t]/(pop_g if pop_g!=0 else 10e-6)
 				if self.parent.extra_data:
 					self.parent.n_contacts[t][self.name][g.name] = new_contacts
@@ -584,25 +598,34 @@ class SEIR_group:
 			- self.parameters['mu']*(self.parameters['p_H'] + self.parameters['p_ICU'])*self.I[self.parent.t]
 		)
 		self.N += [self.N[self.parent.t]+delta_N*self.dt]
+		assert self.N[-1] >= 0, (f"Number of N is negative for t={self.parent.t+1}: {self.N[-1]}")
 
 	# Updates S
 	def update_S(self, m_tests, a_tests):
 		delta_S = -self.parameters['beta']*self.total_contacts[self.parent.t]
 		self.S += [self.S[self.parent.t]+delta_S*self.dt]
+		assert self.S[-1] >= 0, (f"Number of S is negative for t={self.parent.t+1}: {self.S[-1]}")
 
 	# Updates Exposed
 	def update_E(self, m_tests, a_tests):
+
 		delta_E = self.parameters['beta']*self.total_contacts[self.parent.t] - self.parameters['sigma']*self.E[self.parent.t]
+		assert self.E[self.parent.t] + delta_E * self.dt >=0, (f"Total Exposed is nonpositive: {self.E + delta_E * self.dt}. \n Delta E: {delta_E}. \n E at time t: {self.E[self.parent.t]}. \n Total contacts: {self.total_contacts[self.parent.t]}.") 
+		
 		self.E += [self.E[self.parent.t]+delta_E*self.dt]
+
+		assert self.E[-1] >= 0, (f"Number of E is negative for t={self.parent.t+1}: {self.E[-1]}")
 
 
 	# Updates infected
 	def update_I(self, m_tests, a_tests):
 		delta_I = self.parameters['sigma']*self.E[self.parent.t] - self.parameters['mu']*self.I[self.parent.t] - m_tests*self.I[self.parent.t]/(self.N[self.parent.t] if self.N[self.parent.t]!=0 else 10e-6)
 
-		assert self.I[self.parent.t]+delta_I*self.dt >= 0, (f'Total infected is negative: {self.I[self.parent.t]+delta_I*self.dt}. \n  Total m_tests: {m_tests * self.dt * self.I[self.parent.t]/self.N[self.parent.t]}.\n  Total new infected: {self.dt * self.parameters["sigma"]*self.E[self.parent.t]}.\n  Total recovered or going to H, ICU: {self.dt * self.parameters["mu"]*self.I[self.parent.t]}')
+		assert self.I[self.parent.t]+delta_I*self.dt >= 0, (f'Total infected is negative: {self.I[self.parent.t]+delta_I*self.dt}. \n Infected time t: {self.I[self.parent.t]}. \n Delta I: {delta_I}.\n Total N time t: {self.N[self.parent.t]}.\n Total E time t: {self.E[self.parent.t]}.\n M tests at time t: {m_tests}.\n Total m_tests: {m_tests * self.dt * self.I[self.parent.t]/self.N[self.parent.t]}.\n  Total new infected: {self.dt * self.parameters["sigma"]*self.E[self.parent.t]}.\n  Total recovered or going to H, ICU: {self.dt * self.parameters["mu"]*self.I[self.parent.t]}')
 
 		self.I += [self.I[self.parent.t]+delta_I*self.dt]
+
+		assert self.I[-1] >= 0, (f"Number of Infected is negative for t={self.parent.t+1}: {self.I[-1]}")
 
 
 	# Updates recovered
@@ -610,23 +633,33 @@ class SEIR_group:
 		delta_R = self.parameters['mu']*(1-self.parameters["p_H"]-self.parameters["p_ICU"])*self.I[self.parent.t] - a_tests*self.R[self.parent.t]/(self.N[self.parent.t] if self.N[self.parent.t]!=0 else 10e-6)
 		self.R += [self.R[self.parent.t]+delta_R*self.dt]
 
+		assert self.R[-1] >= 0, (f"Number of Recovered is negative for t={self.parent.t+1}: {self.R[-1]}")
+
 
 	# Updates infected in quarantine
 	def update_Ia(self, m_tests, a_tests):
 		delta_Ia = self.parameters['p_Ia']*m_tests*self.I[self.parent.t]/(self.N[self.parent.t] if self.N[self.parent.t]!=0 else 10e-6) - self.parameters['mu']*self.Ia[self.parent.t]
 		self.Ia += [self.Ia[self.parent.t]+delta_Ia*self.dt]
 
+		assert self.Ia[-1] >= 0, (f"Number of Ia is negative for t={self.parent.t+1}: {self.Ia[-1]}")
+
 	def update_Ips(self, m_tests, a_tests):
 		delta_Ips = self.parameters['p_Ips']*m_tests*self.I[self.parent.t]/(self.N[self.parent.t] if self.N[self.parent.t]!=0 else 10e-6) - self.parameters['mu']*self.Ips[self.parent.t]
 		self.Ips += [self.Ips[self.parent.t]+delta_Ips*self.dt]
 
+		assert self.Ips[-1] >= 0, (f"Number of Ips is negative for t={self.parent.t+1}: {self.Ips[-1]}")
+
 	def update_Ims(self, m_tests, a_tests):
 		delta_Ims = self.parameters['p_Ims']*m_tests*self.I[self.parent.t]/(self.N[self.parent.t] if self.N[self.parent.t]!=0 else 10e-6) - self.parameters['mu']*self.Ims[self.parent.t]
 		self.Ims += [self.Ims[self.parent.t]+delta_Ims*self.dt]
+		
+		assert self.Ims[-1] >= 0, (f"Number of Ims is negative for t={self.parent.t+1}: {self.Ims[-1]}")
 
 	def update_Iss(self, m_tests, a_tests):
 		delta_Iss = self.parameters['p_Iss']*m_tests*self.I[self.parent.t]/(self.N[self.parent.t] if self.N[self.parent.t]!=0 else 10e-6) - self.parameters['mu']*self.Iss[self.parent.t]
 		self.Iss += [self.Iss[self.parent.t]+delta_Iss*self.dt]
+
+		assert self.Iss[-1] >= 0, (f"Number of Iss is negative for t={self.parent.t+1}: {self.Iss[-1]}")
 
 
 	# Update recovered in quarentine
@@ -639,6 +672,7 @@ class SEIR_group:
 		)
 		self.Rq += [self.Rq[self.parent.t]+delta_Rq*self.dt]
 
+		assert self.Rq[-1] >= 0, (f"Number of Recovered Quarantined is negative for t={self.parent.t+1}: {self.Rq[-1]}")
 
 	def update_H(self, m_tests, a_tests, h_cap, icu_cap, B_H):
 		tol = 1e-9
@@ -665,6 +699,7 @@ class SEIR_group:
 		)
 		self.H += [self.H[self.parent.t]+delta_H*self.dt- B_H]
 
+		assert self.H[-1] >= 0, (f"Number of Hospitalizations is negative for t={self.parent.t+1}: {self.H[-1]}")
 
 	def update_ICU(self, m_tests, a_tests, h_cap, icu_cap, B_ICU, B_ICU_perc):
 		tol = 1e-9
@@ -696,7 +731,8 @@ class SEIR_group:
 		)
 		self.ICU += [self.ICU[self.parent.t]+delta_ICU*self.dt - B_ICU]
 		#print("update_ICU(): ICU occupancy at end of period t={} for group {} IS {}".format(time_of_flow, self.name,self.ICU[-1]))
-
+		
+		assert self.ICU[-1] >= 0, (f"Number of ICUs is negative for t={self.parent.t+1}: {self.ICU[-1]}")
 
 
 	def update_D(self, m_tests, a_tests, h_cap, icu_cap, B_H, B_ICU, B_ICU_perc):
@@ -733,3 +769,5 @@ class SEIR_group:
 
 		self.D += [self.D[self.parent.t]+delta_D*self.dt+ B_H
 		+ B_ICU]
+
+		assert self.D[-1] >= 0, (f"Number of deaths is negative for t={self.parent.t+1}: {self.D[-1]}")
