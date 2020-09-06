@@ -269,7 +269,7 @@ for i,p in enumerate(gov_policy):
 # Parameters to try
 params_to_try = {
 	"delta_schooling":[0.5],
-	"xi":[0,1e6],
+	"xi":[1e6],
 	"icus":[3000],
 	"tests":[0],
 	"testing":["homogeneous"]
@@ -475,7 +475,7 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
 		np.zeros(len(intervention_times)*len(age_groups)*len(rel_activities)) + 1.0
 	)
 
-	result_lockdown = minimize(simulate, x0, method='L-BFGS-B',bounds=full_bounds,options={'eps':1e-1,'maxfun':700000})
+	result_lockdown = minimize(simulate, x0, method='L-BFGS-B',bounds=full_bounds,options={'eps':1e-1,'maxfun':10000})
 
 	x_lockdown = np.reshape(
 		result_lockdown.x,
@@ -509,7 +509,7 @@ for delta in params_to_try["delta_schooling"]:
 						'tests':tests,
 					}
 					print(experiment_params)
-					result_gradient = gradient_descent(experiment_params, 90, plot=True)
+					result_gradient = gradient_descent(experiment_params, 10, plot=True)
 					all_results.append(result_gradient)
 
 

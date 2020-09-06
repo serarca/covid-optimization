@@ -18,6 +18,7 @@ def n_contacts(group_g, group_h, alphas, mixing_method, prob_multiplier):
 	elif mixing_method['name'] == "mult":
 		for activity in alphas[group_g.name]:
 			value = prob_multiplier*group_g.contacts[activity][group_h.name]*(alphas[group_g.name][activity]**mixing_method['param_alpha'])*(alphas[group_h.name][activity]**mixing_method['param_beta'])
+			
 			n[activity] = value
 			n["total"] += value
 			if alphas[group_h.name][activity] < 0:
@@ -443,7 +444,6 @@ class SEIR_group:
 		self.name = group_parameters['name']
 		self.parameters = group_parameters['parameters']
 		self.contacts = group_parameters['contacts']
-		self.economics = group_parameters['economics']
 		self.initial_conditions = group_initialization
 		self.mixing_method = mixing_method
 		self.time_steps = time_steps
