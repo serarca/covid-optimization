@@ -604,7 +604,7 @@ class SEIR_group:
 	def update_S(self, m_tests, a_tests):
 		delta_S = -self.parameters['beta']*self.total_contacts[self.parent.t]
 		self.S += [self.S[self.parent.t]+delta_S*self.dt]
-		assert self.S[-1] >= 0, (f"Number of S is negative for t={self.parent.t+1}: {self.S[-1]}")
+		assert self.S[-1] >= 0, (f"Number of S is negative for t={self.parent.t+1}: {self.S[-1]} \n Total contacts: {self.total_contacts}")
 
 	# Updates Exposed
 	def update_E(self, m_tests, a_tests):
@@ -732,7 +732,7 @@ class SEIR_group:
 		self.ICU += [self.ICU[self.parent.t]+delta_ICU*self.dt - B_ICU]
 		#print("update_ICU(): ICU occupancy at end of period t={} for group {} IS {}".format(time_of_flow, self.name,self.ICU[-1]))
 		
-		assert self.ICU[-1] >= 0, (f"Number of ICUs is negative for t={self.parent.t+1}: {self.ICU[-1]}")
+		assert self.ICU[-1] >= 0, (f"Number of ICUs is negative for t={self.parent.t+1}: {self.ICU[-1]} \n B_ICU = {B_ICU} \n Delta ICU = {delta_ICU}")
 
 
 	def update_D(self, m_tests, a_tests, h_cap, icu_cap, B_H, B_ICU, B_ICU_perc):
