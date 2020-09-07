@@ -155,7 +155,7 @@ def unpickle_plot_and_print_results(file):
         plt.subplot(13,len(groups),i+1+len(groups)*8)
         plt.plot(time_axis_controls, dynModel.groups[group].B_H, label="Bounced H")
         plt.plot(time_axis_controls, dynModel.groups[group].B_ICU, label="Bounced ICU")
-        plt.ylim(0,np.max([max(np.max(dynModel.groups[group].B_H),np.max(dynModel.groups[group].B_ICU)) for group in groups]))
+        plt.ylim(-1,np.max([max(np.max(dynModel.groups[group].B_H),np.max(dynModel.groups[group].B_ICU)) for group in groups]))
         plt.legend(loc='upper right')
 
     plt.subplot(13,2,19)
