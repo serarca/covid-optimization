@@ -26,7 +26,11 @@ from aux import *
 from scipy.optimize import Bounds,minimize,LinearConstraint
 
 
-death_prob = {
+groups = "one"
+
+proportions = {'age_group_0_9': 0.12999753718396828, 'age_group_10_19': 0.1260199381062682, 'age_group_20_29': 0.13462273540296374, 'age_group_30_39': 0.1432185965976917, 'age_group_40_49': 0.13619350895266272, 'age_group_50_59': 0.1252867882416867, 'age_group_60_69': 0.09586005862219948, 'age_group_70_79': 0.06449748382900194, 'age_group_80_plus': 0.044303353063557066}
+
+death_prob_all = {
 	"age_group_0_9":0.002*0.006,
 	"age_group_10_19":0.002*0.006,
 	"age_group_20_29":0.006*0.011,
@@ -37,6 +41,17 @@ death_prob = {
 	"age_group_70_79":0.113*0.21,
 	"age_group_80_plus":0.32*0.316,
 }
+
+death_prob_one = {
+	"all_age_groups":sum([death_prob_all[ag]*proportions[ag] for ag in death_prob_all])
+}
+
+if groups == "all":
+	death_prob = death_prob_all
+elif groups == "one":
+	death_prob = death_prob_one
+
+
 
 def plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params, benchmark):
 
@@ -214,8 +229,44 @@ simulation_params = {
 }
 simulation_params['time_periods'] = int(math.ceil(simulation_params["days"]/simulation_params["dt"]))
 
-age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29', 'age_group_30_39', 'age_group_40_49',
+if groups == "all":
+	age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29', 'age_group_30_39', 'age_group_40_49',
 	'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
+
+	# Read group parameters
+	with open("../parameters/fitted.yaml") as file:
+	    universe_params = yaml.load(file, Loader=yaml.FullLoader)
+
+	# Read initialization
+	with open("../initialization/60days.yaml") as file:
+		initialization = yaml.load(file, Loader=yaml.FullLoader)
+		start_day = 60
+
+	# Read econ parameters
+	with open("../parameters/econ.yaml") as file:
+		econ_params = yaml.load(file, Loader=yaml.FullLoader)
+
+elif groups == "one":
+	age_groups = ["all_age_groups"]
+
+	# Read group parameters
+	with open("../parameters/one_group_fitted.yaml") as file:
+	    universe_params = yaml.load(file, Loader=yaml.FullLoader)
+
+	# Read initialization
+	with open("../initialization/60days_one_group.yaml") as file:
+		initialization = yaml.load(file, Loader=yaml.FullLoader)
+		start_day = 60
+
+	# Read econ parameters
+	with open("../parameters/one_group_econ.yaml") as file:
+		econ_params = yaml.load(file, Loader=yaml.FullLoader)
+
+# Read lower bounds
+with open("../lower_bounds/fitted.yaml") as file:
+	lower_bounds = yaml.load(file, Loader=yaml.FullLoader)
+
+
 
 
 cont = [ 'S', 'E', 'I', 'R', 'N', 'Ia', 'Ips', \
@@ -230,23 +281,6 @@ rel_activities = ['leisure','other','school','transport','work']
 simulation_params['time_periods'] = int(math.ceil(simulation_params["days"]/simulation_params["dt"]))
 
 
-# Read group parameters
-with open("../parameters/fitted.yaml") as file:
-    universe_params = yaml.load(file, Loader=yaml.FullLoader)
-
-# Read initialization
-with open("../initialization/60days.yaml") as file:
-	initialization = yaml.load(file, Loader=yaml.FullLoader)
-	start_day = 60
-
-# Read econ parameters
-with open("../parameters/econ.yaml") as file:
-	econ_params = yaml.load(file, Loader=yaml.FullLoader)
-
-# Read econ parameters
-with open("../lower_bounds/fitted.yaml") as file:
-	lower_bounds = yaml.load(file, Loader=yaml.FullLoader)
-print(lower_bounds)
 
 
 # Define mixing parameter

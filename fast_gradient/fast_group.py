@@ -3,7 +3,12 @@ import numpy as np
 import pandas as pd
 import math
 
-age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29','age_group_30_39', 'age_group_40_49', 'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
+#age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29','age_group_30_39', 'age_group_40_49', 'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
+age_groups = ["all_age_groups"]
+
+
+
+
 cont = [ 'S', 'E', 'I', 'R', 'N', 'Ia', 'Ips', \
        'Ims', 'Iss', 'Rq', 'H', 'ICU', 'D' ]
 activities = ['home','leisure','other','school','transport','work']
@@ -355,9 +360,6 @@ class SEIR_group:
 		self.name = group_parameters['name']
 		self.parameters = group_parameters['parameters']
 		self.contacts = group_parameters['contacts']
-		self.parameters['work_value'] = group_parameters['economics']['work_value']
-		self.parameters['lockdown_fraction'] = group_parameters['economics']['lockdown_fraction']
-		self.parameters['death_value'] = group_parameters['economics']['death_value']
 		self.mixing_method = mixing_method
 		self.parent = parent
 
