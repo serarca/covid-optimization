@@ -6,7 +6,7 @@ import gurobipy as gb
 
 all_activities = ['home','leisure','other','school','transport','work']
 
-def n_contacts(group_g, group_h, alphas, mixing_method, prob_multiplier):
+def n_contacts(group_g, group_h, alphas, mixing_method):
 
 	n = {"total":0}
 	if mixing_method['name'] == "maxmin":
@@ -17,7 +17,7 @@ def n_contacts(group_g, group_h, alphas, mixing_method, prob_multiplier):
 				)
 	elif mixing_method['name'] == "mult":
 		for activity in alphas[group_g.name]:
-			value = prob_multiplier*group_g.contacts[activity][group_h.name]*(alphas[group_g.name][activity]**mixing_method['param_alpha'])*(alphas[group_h.name][activity]**mixing_method['param_beta'])
+			value = group_g.contacts[activity][group_h.name]*(alphas[group_g.name][activity]**mixing_method['param_alpha'])*(alphas[group_h.name][activity]**mixing_method['param_beta'])
 			
 			n[activity] = value
 			n["total"] += value
@@ -63,6 +63,11 @@ class DynamicalModel:
 		self.a_tests_controls = []
 		self.transport_lb_work_fraction = transport_lb_work_fraction
 		self.start_day = start_day
+
+		# Modify betas
+		for ag in self.parameters['seir-groups']:
+			self.parameters['seir-groups'][ag]['parameters']['beta'] = self.parameters['seir-groups'][ag]['parameters']['beta'][self.start_day:]
+
 
 		# Create groups from parameters
 		self.groups = {}
@@ -512,7 +517,7 @@ class SEIR_group:
 					pop_g = g.N[0] + g.Rq[0]
 				else:
 					pop_g = g.N[t] + g.Rq[t]
-				new_contacts_dict = n_contacts(self, g, alphas, self.mixing_method, prob_multiplier)
+				new_contacts_dict = n_contacts(self, g, alphas, self.mixing_method)
 				new_contacts = new_contacts_dict["total"]
 				assert new_contacts >= 0, (f"New contacts is not nonnnegative: {new_contacts}.")
 				summ_contacts += new_contacts*g.I[t]/(pop_g if pop_g!=0 else 10e-6)
@@ -602,14 +607,14 @@ class SEIR_group:
 
 	# Updates S
 	def update_S(self, m_tests, a_tests):
-		delta_S = -self.parameters['beta']*self.total_contacts[self.parent.t]
+		delta_S = -self.parameters['beta'][self.parent.t]*self.total_contacts[self.parent.t]
 		self.S += [self.S[self.parent.t]+delta_S*self.dt]
 		assert self.S[-1] >= 0, (f"Number of S is negative for t={self.parent.t+1}: {self.S[-1]} \n Total contacts: {self.total_contacts}")
 
 	# Updates Exposed
 	def update_E(self, m_tests, a_tests):
 
-		delta_E = self.parameters['beta']*self.total_contacts[self.parent.t] - self.parameters['sigma']*self.E[self.parent.t]
+		delta_E = self.parameters['beta'][self.parent.t]*self.total_contacts[self.parent.t] - self.parameters['sigma']*self.E[self.parent.t]
 		assert self.E[self.parent.t] + delta_E * self.dt >=0, (f"Total Exposed is nonpositive: {self.E + delta_E * self.dt}. \n Delta E: {delta_E}. \n E at time t: {self.E[self.parent.t]}. \n Total contacts: {self.total_contacts[self.parent.t]}.") 
 		
 		self.E += [self.E[self.parent.t]+delta_E*self.dt]

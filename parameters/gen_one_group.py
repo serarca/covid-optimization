@@ -67,7 +67,11 @@ one_group_universe['seir-groups']["all_age_groups"]["name"] = "all_age_groups"
 # Calculate parameters
 one_group_universe['seir-groups']["all_age_groups"]['parameters'] = {}
 for par in universe_params['seir-groups']["age_group_0_9"]['parameters']:
-	one_group_universe['seir-groups']["all_age_groups"]['parameters'][par] = sum([universe_params['seir-groups'][ag]['parameters'][par]*proportions[ag] for ag in age_groups])
+	if par != "beta":
+		one_group_universe['seir-groups']["all_age_groups"]['parameters'][par] = sum([universe_params['seir-groups'][ag]['parameters'][par]*proportions[ag] for ag in age_groups])
+	else:
+		#one_group_universe['seir-groups']["all_age_groups"]['parameters'][par] = sum([universe_params['seir-groups'][ag]['parameters'][par]*proportions[ag] for ag in age_groups])
+		one_group_universe['seir-groups']["all_age_groups"]['parameters'][par] = [sum([universe_params['seir-groups'][ag]['parameters'][par][t]*proportions[ag] for ag in age_groups]) for t in range(len(universe_params['seir-groups'][ag]['parameters'][par]))]
 
 with open('../parameters/one_group_fitted.yaml', 'w') as file:
     yaml.dump(one_group_universe, file)

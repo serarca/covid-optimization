@@ -3,7 +3,7 @@ from copy import deepcopy
 
 age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29', 'age_group_30_39', 'age_group_40_49', 
 	'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
-age_groups = ['all_age_groups']
+#age_groups = ['all_age_groups']
 
 cont = [ 'S', 'E', 'I', 'R', 'N', 'Ia', 'Ips', \
        'Ims', 'Iss', 'Rq', 'H', 'ICU', 'D' ]
