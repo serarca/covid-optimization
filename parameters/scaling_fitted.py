@@ -16,9 +16,9 @@ scaling = 10000.0
 scaled_fitted = dict(old_fitted)
 
 # Scale global_param
-scaled_fitted["global-parameters"]["C_H"] = scaled_fitted["global-parameters"]["C_H"] * scaling
+scaled_fitted["global-parameters"]["C_H"] = scaled_fitted["global-parameters"]["C_H"] / scaling
 
-scaled_fitted["global-parameters"]["C_ICU"] = scaled_fitted["global-parameters"]["C_ICU"] * scaling
+scaled_fitted["global-parameters"]["C_ICU"] = scaled_fitted["global-parameters"]["C_ICU"] / scaling
 
 
 

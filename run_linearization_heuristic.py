@@ -33,24 +33,25 @@ def main():
     money_scaling = 1
     params_to_try = {
         "delta_schooling":[0.5],
-        "xi":[0, 30 * 37199.03 * scaling / money_scaling],
+        "xi":[30 * 37199.03 * scaling / money_scaling],
         "icus":[3000 / scaling],
         "tests":[0/ scaling],
-        "frequencies":[(7,14), (1,1)],
-        "region":["fitted-scaled"], 
-        "econ": ["econ-scaled"],
-        "init": ["60days-scaled"],
-        "eta":[0, 0.1]
+        "frequencies":[(1,1)],
+        "region":["one_group_fitted-scaled"], 
+        "econ": ["one_group_econ-scaled"],
+        "init": ["60days_one_group-scaled"],
+        "eta":[0.1]
     }
     # params_to_try = {
     #     "delta_schooling":[0.5],
-    #     "xi":[1e6],
+    #     "xi":[30 * 37199.03],
     #     "icus":[3000],
-    #     "tests":[30000],
+    #     "tests":[0],
     #     "frequencies":[(1,1)],
-    #     "region":["fitted"], 
-    #     "econ": ["econ"],
-    #     "init": ["60days"]
+    #     "region":["one_group_fitted"], 
+    #     "econ": ["one_group_econ"],
+    #     "init": ["60days_one_group"],
+    #     "eta":[0.1]
     # }
 
     n_days = 90
@@ -109,9 +110,7 @@ def run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region, tes
         'num_days' : n_days,
         'initial_infected_count' : 1,
         'mixing_method' : {
-            "name":"mult",
-            "param_alpha":1.0,
-            "param_beta":0.5,},
+            "name":"mult"},
         'mtest_cap' : tests,
         'atest_cap' : tests,
         'heuristic': 'linearization',
@@ -147,6 +146,7 @@ def run_linearization_heuristic(simulation_params, experiment_params):
         # The FullLoader parameter handles the conversion from YAML
         # scalar values to Python the dictionary format
         initialization = yaml.load(file, Loader=yaml.FullLoader)
+        start_day = 60
     
     # Read econ parameters
     with open(f"parameters/{simulation_params['econ']}.yaml") as file:
@@ -158,7 +158,7 @@ def run_linearization_heuristic(simulation_params, experiment_params):
     mixing_method = universe_params['mixing']
     
 
-    dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], num_time_periods, mixing_method, simulation_params['transport_lb_work_fraction'])
+    dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], num_time_periods, mixing_method, start_day)
 
     # add parameters for testing capacity
     dynModel.parameters['global-parameters']['C_mtest'] = simulation_params['mtest_cap']
