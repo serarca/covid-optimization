@@ -460,11 +460,6 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 				update_contacts = True
 			else:
 				update_contacts = False
-
-			if start_day + t < universe_params['days_before_gamma']:
-				lockdown_status = "pre-gamma"
-			else:
-				lockdown_status = "post-gamma"
 			
 			# Add home activity to lockdown
 			x_lockdown_all = np.concatenate((np.array([[1.0]]*len(age_groups)),x_lockdown[int(t/quar_freq),:,:]), axis=1)
@@ -475,7 +470,7 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 				m_tests_vec, 
 				a_tests_vec,
 				x_lockdown_all,
-				lockdown_status,
+				start_day+t,
 				update_contacts = update_contacts, 
 				B_H = False, 
 				B_ICU = False,

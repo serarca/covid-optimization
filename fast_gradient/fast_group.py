@@ -45,7 +45,6 @@ class FastDynamicalModel:
 		self.p_ICU = self.params_vector("p_ICU")
 		self.mu = self.params_vector("mu")
 		self.sigma = self.params_vector("sigma")
-		self.beta = self.params_vector("beta")
 		self.p_Ia = self.params_vector("p_Ia")
 		self.p_Ips = self.params_vector("p_Ips")
 		self.p_Ims = self.params_vector("p_Ims")
@@ -55,6 +54,12 @@ class FastDynamicalModel:
 		self.lambda_H_D = self.params_vector("lambda_H_D")
 		self.lambda_ICU_D = self.params_vector("lambda_ICU_D")
 
+		# Initialize beta
+		self.beta = np.zeros((len(age_groups),len(self.groups[age_groups[0]].parameters["beta"])))
+		for i in range(len(age_groups)):
+			for j in range(len(self.groups[age_groups[0]].parameters["beta"])):
+				self.beta[i,j] = self.groups[age_groups[i]].parameters["beta"][j]
+		self.last_beta = 0
 
 		# Process econ data
 		econ_activities = ['transport','leisure','other']
@@ -79,7 +84,7 @@ class FastDynamicalModel:
 					self.M[g1,g2,act] = self.groups[age_groups[g1]].contacts[activities[act]][age_groups[g2]]
 
 
-	def take_time_step(self, state, m_tests, a_tests, alphas, lockdown_status, update_contacts = True, B_H = False, B_ICU = False, B_H_perc = False, B_ICU_perc = False):
+	def take_time_step(self, state, m_tests, a_tests, alphas, t, update_contacts = True, B_H = False, B_ICU = False, B_H_perc = False, B_ICU_perc = False):
 
 		# Store variables
 		self.state = state
@@ -89,15 +94,16 @@ class FastDynamicalModel:
 		self.B_H = B_H
 		self.B_ICU = B_ICU
 		self.overflow_icu = 0
-		self.lockdown_status = lockdown_status
+		self.t = t
 
 		# Create new state
 		self.new_state = np.zeros((len(age_groups),len(cont)), order = "C")
 
 		# Update contact matric
-		if update_contacts or lockdown_status!=self.original_lockdown_status:
+		if update_contacts or self.beta[0,t]!=self.last_beta:
+			print(self.t,self.beta[0,t]!=self.last_beta)
 			self.update_contact_matrix()
-			self.original_lockdown_status = lockdown_status
+			self.last_beta = self.beta[0,t]
 
 		# Update total contacts
 		pop = self.state[:,cont.index("N")] + self.state[:,cont.index("Rq")]
@@ -192,15 +198,6 @@ class FastDynamicalModel:
 
 	def update_contact_matrix(self):
 
-		if "fixed_gamma" in self.mixing_method:
-			prob_multiplier = self.mixing_method["fixed_gamma"]
-		elif self.lockdown_status == "pre-gamma":
-			prob_multiplier = self.mixing_method["param_gamma_before"]
-		elif self.lockdown_status == "post-gamma":
-			prob_multiplier = self.mixing_method["param_gamma_after"]
-		else:
-			assert(False)
-
 
 		for g1 in range(len(age_groups)):
 			for g2 in range(len(age_groups)):
@@ -212,7 +209,7 @@ class FastDynamicalModel:
 								/(math.exp(self.alphas[g1,act]*self.mixing_method['param'])+math.exp(self.alphas[g2,act]*self.mixing_method['param']))
 							)
 					elif self.mixing_method['name'] == "mult":
-						self.contact_matrix[g1,g2] += prob_multiplier*self.M[g1,g2,act]*(self.alphas[g1,act]**self.mixing_method['param_alpha'])*(self.alphas[g2,act]**self.mixing_method['param_beta'])
+						self.contact_matrix[g1,g2] += self.M[g1,g2,act]*(self.alphas[g1,act]**self.mixing_method['param_alpha'])*(self.alphas[g2,act]**self.mixing_method['param_beta'])
 					else:
 						assert(False)
 
@@ -237,12 +234,12 @@ class FastDynamicalModel:
 
 	def update_S(self):
 		self.new_state[:,cont.index("S")] = self.state[:,cont.index("S")]+(
-			- self.beta*self.total_contacts
+			- self.beta[:,self.t]*self.total_contacts
 		)*self.dt
 
 	def update_E(self):
 		self.new_state[:,cont.index("E")] = self.state[:,cont.index("E")]+(
-			self.beta*self.total_contacts - self.sigma*self.state[:,cont.index("E")]
+			self.beta[:,self.t]*self.total_contacts - self.sigma*self.state[:,cont.index("E")]
 		)*self.dt
 
 	def update_I(self):

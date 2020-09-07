@@ -499,14 +499,6 @@ class SEIR_group:
 
 
 	def update_total_contacts(self, t, alphas):
-		# Calculate the multiplier
-		if t+self.parent.start_day<self.parent.parameters['days_before_gamma']:
-			lock_state = "pre-gamma"
-			prob_multiplier = self.mixing_method["param_gamma_before"]
-		else:
-			lock_state = "post-gamma"
-			prob_multiplier = self.mixing_method["param_gamma_after"]
-
 
 		if (len(self.total_contacts) == t):
 			summ_contacts = 0
