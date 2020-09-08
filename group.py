@@ -21,11 +21,11 @@ def n_contacts(group_g, group_h, alphas, mixing_method):
 			
 			n[activity] = value
 			n["total"] += value
+			
 			if alphas[group_h.name][activity] < 0:
 				print(f"group_h.name: {group_h.name}")
 				print(f"act: {activity}")
 				print(n)
-				print(f"prob_multiplier: {prob_multiplier}")
 				print(f" group_g.contacts[activity][group_h.name]:{group_g.contacts[activity][group_h.name]}")
 				print(f" alphas[group_g.name][activity]:{alphas[group_g.name][activity]}")
 				print(f"alphas[group_h.name][activity] :{alphas[group_h.name][activity]}")

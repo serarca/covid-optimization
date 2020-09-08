@@ -31,30 +31,30 @@ def main():
     # Some paramters to test the linearization heuristic
     scaling = 10000
     money_scaling = 1
-    params_to_try = {
-        "delta_schooling":[0.5],
-        "xi":[30 * 37199.03 * scaling / money_scaling],
-        "icus":[3000 / scaling],
-        "tests":[0/ scaling],
-        "frequencies":[(1,1)],
-        "region":["one_group_fitted-scaled"], 
-        "econ": ["one_group_econ-scaled"],
-        "init": ["60days_one_group-scaled"],
-        "eta":[0.1]
-    }
     # params_to_try = {
     #     "delta_schooling":[0.5],
-    #     "xi":[30 * 37199.03],
-    #     "icus":[3000],
-    #     "tests":[0],
+    #     "xi":[30 * 37199.03 * scaling / money_scaling],
+    #     "icus":[3000 / scaling],
+    #     "tests":[0/ scaling],
     #     "frequencies":[(1,1)],
-    #     "region":["one_group_fitted"], 
-    #     "econ": ["one_group_econ"],
-    #     "init": ["60days_one_group"],
+    #     "region":["one_group_fitted-scaled-test"], 
+    #     "econ": ["one_group_econ-scaled"],
+    #     "init": ["60days_one_group-scaled"],
     #     "eta":[0.1]
     # }
+    params_to_try = {
+        "delta_schooling":[0.5],
+        "xi":[30 * 37199.03],
+        "icus":[3000],
+        "tests":[0],
+        "frequencies":[(1,1)],
+        "region":["one_group_fitted"], 
+        "econ": ["one_group_econ-zeroEconVal"],
+        "init": ["60days_one_group"],
+        "eta":[0.1]
+    }
 
-    n_days = 90
+    n_days = 50
     
     # Final time step is used if we want to evaluate 
     # the hueristic at any time before the n_days

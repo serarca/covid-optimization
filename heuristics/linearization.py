@@ -1595,11 +1595,11 @@ def run_heuristic_linearization(dynModel):
             uhat_seq = uvars_opt
             assert (uhat_seq>=-1e-7).all()
             
-            for ti in range(T-k):
-                for act in activities:
-                    act_indices = slice(controls.index(act), ut_dim, num_controls)
-                    if (uvars_opt[act_indices, ti] >0).any():
-                        print(f"At time {ti+k} for subproblem {k} the activity {act} has non-zero lockdown.")
+            # for ti in range(T-k):
+            #     for act in activities:
+            #         act_indices = slice(controls.index(act), ut_dim, num_controls)
+            #         if (uvars_opt[act_indices, ti] >0).any():
+            #             print(f"At time {ti+k} for subproblem {k} the activity {act} has non-zero lockdown.")
 
 
         uopt_seq[:,k] = uvars_opt[:,0]
