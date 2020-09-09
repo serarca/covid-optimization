@@ -24,6 +24,7 @@ import numpy as np
 from fast_group import FastDynamicalModel
 from aux import *
 from scipy.optimize import Bounds,minimize,LinearConstraint
+from copy import deepcopy
 
 
 groups = "one"
@@ -347,6 +348,9 @@ def run_government_policy(experiment_params):
 
 
 	alphas_vec = []
+	l_policy = []
+	a_tests_policy = []
+	m_tests_policy = []
 
 	for t in range(simulation_params['time_periods']):
 		index = t+start_day
@@ -363,18 +367,43 @@ def run_government_policy(experiment_params):
 
 	for t in range(simulation_params['time_periods']):
 		dynModel.take_time_step(m_tests, a_tests, alphas_vec[t])
+		l_policy.append(deepcopy(alphas_vec[t]))
+		a_tests_policy.append(deepcopy(a_tests))
+		m_tests_policy.append(deepcopy(m_tests))
 
 	result = {
-		"heuristic":"real",
-		"delta_schooling":experiment_params["delta_schooling"],
-		"xi":experiment_params["xi"],
-		"icus":experiment_params["icus"],
-		"tests":experiment_params["tests"],
-		"testing":experiment_params["testing"],
-		"economics_value":dynModel.get_total_economic_value(),
-		"deaths":dynModel.get_total_deaths(),
-		"reward":dynModel.get_total_reward(),	
+		"lockdown_heuristic":"real",
+		"groups":groups,
+		"experiment_params":{
+			"delta_schooling":experiment_params["delta_schooling"],
+			"xi":experiment_params["xi"],
+			"icus":experiment_params["icus"],
+			"n_a_tests":experiment_params["tests"],
+			"n_m_tests":experiment_params["tests"],
+			"start_day":start_day,
+			"T":simulation_params['time_periods'],
+		},
+		"testing_heuristic":experiment_params["testing"],
+		"results":{
+			"economics_value":float(dynModel.get_total_economic_value()),
+			"deaths":float(dynModel.get_total_deaths()),
+			"reward":float(dynModel.get_total_reward()),
+		},
+		"policy":l_policy,
+		"a_tests":a_tests_policy,
+		"m_tests":m_tests_policy,
 	}
+	result["filename"] = "%s/xi-%d_icus-%d_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f"%(
+		result["lockdown_heuristic"],
+		result["experiment_params"]["xi"],
+		result["experiment_params"]["icus"],
+		result["experiment_params"]["n_a_tests"],
+		result["experiment_params"]["n_m_tests"],
+		result["experiment_params"]["T"],
+		result["experiment_params"]["start_day"],
+		result["groups"],
+		result["experiment_params"]["delta_schooling"],
+	)
 
 	return result
 
@@ -450,12 +479,10 @@ for delta in params_to_try["delta_schooling"]:
 					}
 
 					result_real = run_government_policy(experiment_params)
-					result_closed = run_full_lockdown(experiment_params)
-					result_open = run_open(experiment_params)
+					#result_closed = run_full_lockdown(experiment_params)
+					#result_open = run_open(experiment_params)
 
 					all_results.append(result_real)
-					all_results.append(result_closed)
-					all_results.append(result_open)
 
 					# pickle.dump(dynModel,open(f"dynModel_gov_full_lockd_benchmark_days_{simulation_params['time_periods']}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","wb"))
 
@@ -463,7 +490,11 @@ for delta in params_to_try["delta_schooling"]:
 
 
 
+for r in all_results:
+	fn =  "results/"+r["filename"]+".yaml"
+	print(fn)
+	with open(fn, 'w') as file:
+		yaml.dump(r, file)
 
 
-
-pd.DataFrame(all_results).to_excel(f"simulations-{simulation_params['days']}-days.xlsx")
+#pd.DataFrame(all_results).to_excel(f"simulations-{simulation_params['days']}-days.xlsx")
