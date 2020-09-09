@@ -71,6 +71,7 @@ for h in heuristics:
 				assert(False)
 
 			experiment_params = result["experiment_params"]
+			econ_params["employment_params"]["eta"] = result["experiment_params"]["eta"]
 
 			dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, 1, experiment_params["T"], universe_params["mixing"], start_day)
 
@@ -85,6 +86,7 @@ for h in heuristics:
 				"n_a_tests":result["experiment_params"]["n_a_tests"],
 				"n_m_tests":result["experiment_params"]["n_m_tests"],
 				"test_heuristic":result["testing_heuristic"],
+				"eta":result["experiment_params"]["eta"],
 				"economics_value":dynModel.get_total_economic_value(),
 				"deaths":dynModel.get_total_deaths(),
 				"reward":dynModel.get_total_reward(),	

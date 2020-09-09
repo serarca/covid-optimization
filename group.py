@@ -21,11 +21,11 @@ def n_contacts(group_g, group_h, alphas, mixing_method):
 			
 			n[activity] = value
 			n["total"] += value
+
 			if alphas[group_h.name][activity] < 0:
 				print(f"group_h.name: {group_h.name}")
 				print(f"act: {activity}")
 				print(n)
-				print(f"prob_multiplier: {prob_multiplier}")
 				print(f" group_g.contacts[activity][group_h.name]:{group_g.contacts[activity][group_h.name]}")
 				print(f" alphas[group_g.name][activity]:{alphas[group_g.name][activity]}")
 				print(f"alphas[group_h.name][activity] :{alphas[group_h.name][activity]}")
@@ -99,6 +99,7 @@ class DynamicalModel:
 	def take_time_step(self, m_tests, a_tests, alphas, B_H = False, B_ICU = False, B_ICU_perc = False):
 		# store time when current group is being updated
 		time_of_flow = self.t
+		
 		for n in self.groups:
 			self.groups[n].update_total_contacts(time_of_flow, alphas)
 
@@ -341,6 +342,27 @@ class DynamicalModel:
 
 
 	def write_state(self, t, X):
+		if t > self.t:
+			for group_name in X.keys():
+				self.groups[group_name].S += [0 for i in range(t - self.t)]
+				self.groups[group_name].E+= [0 for i in range(t - self.t)]
+				self.groups[group_name].I+= [0 for i in range(t - self.t)]
+				self.groups[group_name].R+= [0 for i in range(t - self.t)]
+				self.groups[group_name].N+= [0 for i in range(t - self.t)]
+				self.groups[group_name].Ia+= [0 for i in range(t - self.t)]
+				self.groups[group_name].Ips+= [0 for i in range(t - self.t)]
+				self.groups[group_name].Ims+= [0 for i in range(t - self.t)]
+				self.groups[group_name].Iss+= [0 for i in range(t - self.t)]
+				self.groups[group_name].Rq+= [0 for i in range(t - self.t)]
+				self.groups[group_name].H+= [0 for i in range(t - self.t)]
+				self.groups[group_name].ICU+= [0 for i in range(t - self.t)]
+				self.groups[group_name].D+= [0 for i in range(t - self.t)]
+				self.groups[group_name].total_contacts += [0 for i in range(t - self.t)]
+				self.groups[group_name].B_ICU += [0 for i in range(t - self.t)]
+				self.groups[group_name].B_H += [0 for i in range(t - self.t)]
+				
+				
+
 		for group_name in X.keys():
 			self.groups[group_name].S[t] = X[group_name]['S']
 			self.groups[group_name].E[t] = X[group_name]['E']

@@ -566,7 +566,7 @@ def dict_to_X(X_dict):
 
 ####################################
 # Function that returns f(X(t), u(t))  = X(t+1). Does not change dynModel.
-def get_F(dynModel, X, u):
+def get_F(dynModel, X, u, t):
     ''' Will return the next states given the state X and
     controls u. For this, it replaces the current state in
     dynModel for X, runs one step with controls u, extracts the
@@ -583,19 +583,15 @@ def get_F(dynModel, X, u):
 
     # We save the initial time of dynModel to revert back to
     initial_time_of_model = dynModel.t
-    # print("Initial time of model: {}".format(initial_time_of_model))
-
-
     initial_state_dict = dynModel.get_state(dynModel.t)
+
 
     # Covert array into dictionary
     X_dict = X_to_dict(X)
 
     # Determine the testing at time t given by u
     u_hat_dict, alphas = buildAlphaDict(u)
-    # print("==========")
-    # print(u)
-    # print(alphas)
+
 
     m_tests = {}
     a_tests = {}
@@ -627,7 +623,9 @@ def get_F(dynModel, X, u):
     ########################################
 
     # Write X_dict as current state of dynModel
-    dynModel.write_state(dynModel.t, X_dict)
+    dynModel.write_state(t, X_dict)
+    dynModel.t = t
+
 
     # Run a step of the dyn model
     if prorrated:
@@ -648,13 +646,15 @@ def get_F(dynModel, X, u):
 
     # Erase the states after t so as to reset the dyn model, also populate t with correct state
     dynModel.reset_time(initial_time_of_model)
-
+    
 
     dynModel.write_state(dynModel.t, initial_state_dict)
 
     # print("Finished Running get_F")
     # print("*-*-*-*-*-*-*-*-*-*-*-*-*")
 
+    assert dynModel.t == initial_time_of_model
+    assert dynModel.get_state(dynModel.t) == initial_state_dict
 
     # Return dynModel to initial state
     return X_next_step
@@ -1090,7 +1090,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
         #print("uhat_t is", uhat_t)
 
         jacob_X = get_Jacobian_X(dynModel, Xhat_t, uhat_t, dynModel.mixing_method, t)
-        jacob_u = get_Jacobian_u(dynModel, Xhat_t, uhat_t, dynModel.mixing_method,t)
+        jacob_u = get_Jacobian_u(dynModel, Xhat_t, uhat_t, dynModel.mixing_method, t)
 
         # Calculate linearization coefficients for X(t+1)
         At[t] = np.eye(Xt_dim) + dynModel.dt * jacob_X
@@ -1100,7 +1100,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
         # print("********************************")
 
 
-        gf_vec = get_F(dynModel, Xhat_t, uhat_t)
+        gf_vec = get_F(dynModel, Xhat_t, uhat_t, t)
         ct[t] = dynModel.dt * (gf_vec - jacob_X @ Xhat_t ) - jacob_u @ uhat_t #Revisit whether we need to multiply entire expression with dt
 
         tol = 1e-6
@@ -1120,13 +1120,13 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
         for ag in range(num_age_groups):
             ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
             BounceICUg_idx = ag*num_controls + controls.index('BounceICU_g')
-            #print("At[t][ICU] is equal to", At[t][ICUg_idx,:])
-            #print("Bt[t][ICU] is equal to", Bt[t][ICUg_idx,:])
+            # print("At[t][ICU] is equal to", At[t][ICUg_idx,:])
+            # print("Bt[t][ICU] is equal to", Bt[t][ICUg_idx,:])
             # print("for group", ag, age_groups[ag], "ct[t][ICU] is equal to", ct[t][ICUg_idx])
             # print("components are", gf_vec[ICUg_idx], x_approx[ICUg_idx], u_approx[ICUg_idx])
-            assert(abs(ct[t][ICUg_idx]) < 0.01)
+            assert(abs(ct[t][ICUg_idx]) < 0.0001)
 
-            #if (abs(ct[t][ICUg_idx]) > tol):
+            # if (abs(ct[t][ICUg_idx]) > tol):
             #    print("ct[t][ICU] is not zero and equal to", ct[t][ICUg_idx])
 
 
@@ -1228,7 +1228,7 @@ def run_heuristic_linearization(dynModel):
 
     max_step_size = 0.1
     threshold = 0.01
-    max_inner_iterations = 1/max_step_size
+    max_inner_iterations = 2/max_step_size
 
     # shorthand for a few useful parameters
     T = dynModel.time_steps
@@ -1427,73 +1427,74 @@ def run_heuristic_linearization(dynModel):
 
             
 
-            # # Weekly testing constraints
-            # if test_freq > 1:
-            #     m_test_id = controls.index('Nmtest_g')
-            #     a_test_id = controls.index('Natest_g')
+            # Weekly testing constraints
+            if test_freq > 1:
+                m_test_id = controls.index('Nmtest_g')
+                a_test_id = controls.index('Natest_g')
 
-            #     if (T-k) % test_freq != 0 and k != 0:
-            #         #Fix the first control to be equal to the control at time k-1
-            #         for ag in range(num_age_groups):
-            #             m_test_idx = m_test_id + ag * num_controls
-            #             a_test_idx = a_test_id + ag * num_controls
+                if (T-k) % test_freq != 0 and k != 0:
+                    #Fix the first control to be equal to the control at time k-1
+                    for ag in range(num_age_groups):
+                        m_test_idx = m_test_id + ag * num_controls
+                        a_test_idx = a_test_id + ag * num_controls
 
-            #             mod.addConstr(u_vars_vec[m_test_idx] == dynModel.m_tests_controls[k-1][age_groups[ag]])
-            #             mod.addConstr(u_vars_vec[a_test_idx] == dynModel.a_tests_controls[k-1][age_groups[ag]])
-
-
-            #     #Obeserve that we will have one constraint for each window of size test_freq, of which we have (T-k+test_freq-1)//test_freq)
-            #     #
-            #     # weeklyTestingConstMatrix = np.zeros(2 * num_age_groups * ((T-k+test_freq-1)//test_freq), ut_dim * (T-k))
-            #     #
-
-            #     row_index = 0
-            #     time_index = T-k
-            #     while time_index > 0:
-            #         for ag in range(num_age_groups):
-            #             m_test_idx = m_test_id + ag * num_controls
-            #             a_test_idx = a_test_id + ag * num_controls
-            #             for window in range(1, min(time_index, test_freq)):
-            #                 # print(time_index-window)
-            #                 # print(time_index-window-1)
-            #                 mod.addConstr(u_vars_vec[(time_index-window) * ut_dim + m_test_idx] == u_vars_vec[(time_index-window-1) * ut_dim + m_test_idx])
-            #                 mod.addConstr(u_vars_vec[(time_index-window) * ut_dim + a_test_idx] == u_vars_vec[(time_index-window-1) * ut_dim + a_test_idx])
-
-            #         time_index = max(time_index - test_freq, 0)
-
-            # if lockdown_freq > 1:
-
-            #     if (T-k) % lockdown_freq != 0 and k != 0:
-            #         #Fix the first control to be equal to the control at time k-1
-            #         for ag in range(num_age_groups):
-            #             for act in activities:
-            #                 act_lock_id = controls.index(act)
-            #                 act_lock_idx = act_lock_id + ag * num_controls
-
-            #                 mod.addConstr(u_vars_vec[act_lock_idx] == dynModel.lockdown_controls[k-1][age_groups[ag]][act])
+                        mod.addConstr(u_vars_vec[m_test_idx] == dynModel.m_tests_controls[k-1][age_groups[ag]])
+                        mod.addConstr(u_vars_vec[a_test_idx] == dynModel.a_tests_controls[k-1][age_groups[ag]])
 
 
+                #Obeserve that we will have one constraint for each window of size test_freq, of which we have (T-k+test_freq-1)//test_freq)
+                #
+                # weeklyTestingConstMatrix = np.zeros(2 * num_age_groups * ((T-k+test_freq-1)//test_freq), ut_dim * (T-k))
+                #
 
-            # #Obeserve that we will have one constraint for each window of size test_freq, of which we have (T-k+test_freq-1)//test_freq)
-            # #
-            # # weeklyTestingConstMatrix = np.zeros(2 * num_age_groups * ((T-k+test_freq-1)//test_freq), ut_dim * (T-k))
-            # #
+                row_index = 0
+                time_index = T-k
+                while time_index > 0:
+                    for ag in range(num_age_groups):
+                        m_test_idx = m_test_id + ag * num_controls
+                        a_test_idx = a_test_id + ag * num_controls
+                        for window in range(1, min(time_index, test_freq)):
+                            # print(time_index-window)
+                            # print(time_index-window-1)
+                            mod.addConstr(u_vars_vec[(time_index-window) * ut_dim + m_test_idx] == u_vars_vec[(time_index-window-1) * ut_dim + m_test_idx])
+                            mod.addConstr(u_vars_vec[(time_index-window) * ut_dim + a_test_idx] == u_vars_vec[(time_index-window-1) * ut_dim + a_test_idx])
 
-            #     row_index = 0
-            #     time_index = T-k
-            #     while time_index > 0:
-            #         for ag in range(num_age_groups):
-            #             for act in activities:
-            #                 act_lock_id = controls.index(act)
-            #                 act_lock_idx = act_lock_id + ag * num_controls
+                    time_index = max(time_index - test_freq, 0)
 
-            #                 for window in range(1, min(time_index, lockdown_freq)):
-            #                 # print(time_index-window)
-            #                 # print(time_index-window-1)
+            # Bieekly lockdown constraints
+            if lockdown_freq > 1:
 
-            #                     mod.addConstr(u_vars_vec[(time_index-window) * ut_dim + act_lock_idx] == u_vars_vec[(time_index-window-1) * ut_dim + act_lock_idx])
+                if (T-k) % lockdown_freq != 0 and k != 0:
+                    #Fix the first control to be equal to the control at time k-1
+                    for ag in range(num_age_groups):
+                        for act in activities:
+                            act_lock_id = controls.index(act)
+                            act_lock_idx = act_lock_id + ag * num_controls
 
-            #         time_index = max(time_index - lockdown_freq, 0)
+                            mod.addConstr(u_vars_vec[act_lock_idx] == dynModel.lockdown_controls[k-1][age_groups[ag]][act])
+
+
+
+            #Obeserve that we will have one constraint for each window of size test_freq, of which we have (T-k+test_freq-1)//test_freq)
+            #
+            # weeklyTestingConstMatrix = np.zeros(2 * num_age_groups * ((T-k+test_freq-1)//test_freq), ut_dim * (T-k))
+            #
+
+                row_index = 0
+                time_index = T-k
+                while time_index > 0:
+                    for ag in range(num_age_groups):
+                        for act in activities:
+                            act_lock_id = controls.index(act)
+                            act_lock_idx = act_lock_id + ag * num_controls
+
+                            for window in range(1, min(time_index, lockdown_freq)):
+                            # print(time_index-window)
+                            # print(time_index-window-1)
+
+                                mod.addConstr(u_vars_vec[(time_index-window) * ut_dim + act_lock_idx] == u_vars_vec[(time_index-window-1) * ut_dim + act_lock_idx])
+
+                    time_index = max(time_index - lockdown_freq, 0)
 
 
 
@@ -1544,19 +1545,20 @@ def run_heuristic_linearization(dynModel):
                         print(f"Unbounded ray has positive value for group: {age_groups[(i%ut_dim) // num_controls]}")
                         print(f"Unbounded ray has positive value for control: {controls[(i%ut_dim) % num_controls]}")
                 
-                mod.write(f"LP_lineariz_k={k}.lp")
+            # mod.write(f"LP_lineariz_k={k}.lp")
             print(f"Objective value for Line heur k = {k}: {mod.objVal}")
 
+        
 
             for i in range(ut_dim * (T-k)):
-                if u_vars_vec[i].X<-1e-7:
+                if u_vars_vec[i].X<-1e-6:
                     print(f"Negative controls! {u_vars_vec[i].X}")
                     print(f"Index: {i}")
                     print(f"Negative control is for time: {i//ut_dim}")
                     print(f"Negative control is from group: {age_groups[(i%ut_dim) // num_controls]}")
                     print(f"Negative contorl is for control: {controls[(i%ut_dim) % num_controls]}")
 
-            assert (u_vars_vec.X >= -1e-7).all()
+            assert (u_vars_vec.X >= -1e-6).all()
 
             if mod.Status != 2:
                 print("Optimization did not finish correctly!")
@@ -1571,7 +1573,7 @@ def run_heuristic_linearization(dynModel):
 
             # mod.write(f"LP_lineariz_k={k}.lp")
 
-
+            
 
             # extract decisions for current period (testing and alphas)
             uvars_opt = np.reshape(u_vars_vec.X, np.shape(obj_coefs), 'F')
@@ -1595,11 +1597,11 @@ def run_heuristic_linearization(dynModel):
             uhat_seq = uvars_opt
             assert (uhat_seq>=-1e-7).all()
             
-            for ti in range(T-k):
-                for act in activities:
-                    act_indices = slice(controls.index(act), ut_dim, num_controls)
-                    if (uvars_opt[act_indices, ti] >0).any():
-                        print(f"At time {ti+k} for subproblem {k} the activity {act} has non-zero lockdown.")
+            # for ti in range(T-k):
+            #     for act in activities:
+            #         act_indices = slice(controls.index(act), ut_dim, num_controls)
+            #         if (uvars_opt[act_indices, ti] >0).any():
+            #             print(f"At time {ti+k} for subproblem {k} the activity {act} has non-zero lockdown.")
 
 
         uopt_seq[:,k] = uvars_opt[:,0]
@@ -1623,8 +1625,8 @@ def run_heuristic_linearization(dynModel):
 
         # update uhat_sequence
         uhat_seq = uvars_opt[:, 1:]
-        print(f"u_optSeq at time {k} is {uopt_seq[:,k]}")
-        print(f"uhat_seq is {uhat_seq}")
+        # print(f"u_optSeq at time {k} is {uopt_seq[:,k]}")
+        # print(f"uhat_seq is {uhat_seq}")
         #
         # for ti in range(T-k):
         #     for act in activities:

@@ -27,20 +27,20 @@ from joblib import Parallel, delayed
 
 
 def main():
-
+    # 30 * 37199.03
     # Some paramters to test the linearization heuristic
     scaling = 10000
     money_scaling = 1
     params_to_try = {
         "delta_schooling":[0.5],
-        "xi":[30 * 37199.03 * scaling / money_scaling],
+        "xi":[0, 1e6 * scaling / money_scaling],
         "icus":[3000 / scaling],
         "tests":[0/ scaling],
-        "frequencies":[(1,1)],
+        "frequencies":[(7,14)],
         "region":["one_group_fitted-scaled"], 
         "econ": ["one_group_econ-scaled"],
         "init": ["60days_one_group-scaled"],
-        "eta":[0.1]
+        "eta":[0.1, 0]
     }
     # params_to_try = {
     #     "delta_schooling":[0.5],

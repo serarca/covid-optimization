@@ -382,6 +382,7 @@ def run_government_policy(experiment_params):
 			"n_m_tests":experiment_params["tests"],
 			"start_day":start_day,
 			"T":simulation_params['time_periods'],
+			"eta":econ_params["employment_params"]["eta"],
 		},
 		"testing_heuristic":experiment_params["testing"],
 		"results":{
