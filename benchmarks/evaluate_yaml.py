@@ -28,30 +28,38 @@ from aux import *
 from scipy.optimize import Bounds,minimize,LinearConstraint
 from copy import deepcopy
 
-# Read group parameters
-with open("../parameters/fitted.yaml") as file:
-    universe_params_all = yaml.load(file, Loader=yaml.FullLoader)
-
-# Read econ parameters
-with open("../parameters/econ.yaml") as file:
-	econ_params_all = yaml.load(file, Loader=yaml.FullLoader)
-
-# Read group parameters
-with open("../parameters/one_group_fitted.yaml") as file:
-    universe_params_one = yaml.load(file, Loader=yaml.FullLoader)
-
-# Read econ parameters
-with open("../parameters/one_group_econ.yaml") as file:
-	econ_params_one = yaml.load(file, Loader=yaml.FullLoader)
 
 
-heuristics = ["real"]
+
+heuristics = ["real","full_open","full_lockdown","constant_gradient","time_gradient","age_group_gradient"]
 all_data = []
 
 for h in heuristics:
 	for n in os.listdir("results/%s/"%h):
-		with open("results/%s/%s"%(h,n)) as file:
-			result = yaml.load(file, Loader=yaml.FullLoader)
+		if n[0:2] == "xi":
+
+			print(h,n)
+			with open("results/%s/%s"%(h,n)) as file:
+				result = yaml.load(file, Loader=yaml.FullLoader)
+
+			
+			# Read group parameters
+			with open("../parameters/fitted.yaml") as file:
+			    universe_params_all = yaml.load(file, Loader=yaml.FullLoader)
+
+			# Read econ parameters
+			with open("../parameters/econ.yaml") as file:
+				econ_params_all = yaml.load(file, Loader=yaml.FullLoader)
+
+			# Read group parameters
+			with open("../parameters/one_group_fitted.yaml") as file:
+			    universe_params_one = yaml.load(file, Loader=yaml.FullLoader)
+
+			# Read econ parameters
+			with open("../parameters/one_group_econ.yaml") as file:
+				econ_params_one = yaml.load(file, Loader=yaml.FullLoader)
+
+
 			start_day = result["experiment_params"]["start_day"]
 
 			if result["groups"] == "one":

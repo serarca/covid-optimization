@@ -304,19 +304,12 @@ for i,p in enumerate(gov_policy):
 # Parameters to try
 params_to_try = {
 	"delta_schooling":[0.5],
-	"xi":[0,1e6],
+	"xi":[0,1e6,30*37199.03],
 	"icus":[3000],
 	"tests":[0],
 	"testing":["homogeneous"]
 }
 
-experiment_params = {
-	"delta_schooling":0.5,
-	"xi":0,
-	"icus":3000,
-	"tests":0,
-	"testing":"homogeneous",
-}
 
 # Some basic policies
 full_open_policy = {
@@ -394,17 +387,20 @@ def run_government_policy(experiment_params):
 		"a_tests":a_tests_policy,
 		"m_tests":m_tests_policy,
 	}
-	result["filename"] = "%s/xi-%d_icus-%d_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f"%(
+	result["filename"] = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f"%(
 		result["lockdown_heuristic"],
 		result["experiment_params"]["xi"],
 		result["experiment_params"]["icus"],
+		result["testing_heuristic"],
 		result["experiment_params"]["n_a_tests"],
 		result["experiment_params"]["n_m_tests"],
 		result["experiment_params"]["T"],
 		result["experiment_params"]["start_day"],
 		result["groups"],
 		result["experiment_params"]["delta_schooling"],
+		result["experiment_params"]["eta"]
 	)
+
 
 	return result
 
@@ -435,32 +431,155 @@ def run_constant_policy(experiment_params, alpha):
 
 def run_full_lockdown(experiment_params):
 
-	ag_alpha = gov_policy[start_lockdown]
+	ag_alpha = {
+		"home": 1.0,
+	    "leisure": 0,
+	    "other": 0,
+	    "school": 0,
+	    "transport": 0,
+	    "work": 0,
+	}
 
 	alpha = {
 		ag:ag_alpha for ag in age_groups
 	}
 
-	result = run_constant_policy(experiment_params, alpha)
-	result["heuristic"] = "full-lockdown"
+	l_policy = []
+	a_tests_policy = []
+	m_tests_policy = []
+
+	# Create dynamical method
+	dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method, start_day)
+	if experiment_params["testing"] == "homogeneous":
+		m_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
+		a_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
+
+	for t in range(simulation_params['time_periods']):
+		dynModel.take_time_step(m_tests, a_tests, alpha)
+		l_policy.append(deepcopy(alpha))
+		a_tests_policy.append(deepcopy(a_tests))
+		m_tests_policy.append(deepcopy(m_tests))
+
+
+
+	result = {
+		"lockdown_heuristic":"full_lockdown",
+		"groups":groups,
+		"experiment_params":{
+			"delta_schooling":experiment_params["delta_schooling"],
+			"xi":experiment_params["xi"],
+			"icus":experiment_params["icus"],
+			"n_a_tests":experiment_params["tests"],
+			"n_m_tests":experiment_params["tests"],
+			"start_day":start_day,
+			"T":simulation_params['time_periods'],
+			"eta":econ_params["employment_params"]["eta"],
+		},
+		"testing_heuristic":experiment_params["testing"],
+		"results":{
+			"economics_value":float(dynModel.get_total_economic_value()),
+			"deaths":float(dynModel.get_total_deaths()),
+			"reward":float(dynModel.get_total_reward()),
+		},
+		"policy":l_policy,
+		"a_tests":a_tests_policy,
+		"m_tests":m_tests_policy,
+	}
+	result["filename"] = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f"%(
+		result["lockdown_heuristic"],
+		result["experiment_params"]["xi"],
+		result["experiment_params"]["icus"],
+		result["testing_heuristic"],
+		result["experiment_params"]["n_a_tests"],
+		result["experiment_params"]["n_m_tests"],
+		result["experiment_params"]["T"],
+		result["experiment_params"]["start_day"],
+		result["groups"],
+		result["experiment_params"]["delta_schooling"],
+		result["experiment_params"]["eta"]
+	)
+
+
+
+
+
+
+
 	return result
 
 def run_open(experiment_params):
 	ag_alpha = {
 		"home": 1.0,
-		"leisure": 1.0,
-		"other": 1.0,
-		"school": 1.0,
-		"transport": 1.0,
-		"work": 1.0
+	    "leisure": 1.0,
+	    "other": 1.0,
+	    "school": 1.0,
+	    "transport": 1.0,
+	    "work": 1.0,
 	}
 
 	alpha = {
 		ag:ag_alpha for ag in age_groups
 	}
 
-	result = run_constant_policy(experiment_params, alpha)
-	result["heuristic"] = "full-open"
+	l_policy = []
+	a_tests_policy = []
+	m_tests_policy = []
+
+	# Create dynamical method
+	dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method, start_day)
+	if experiment_params["testing"] == "homogeneous":
+		m_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
+		a_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
+
+	for t in range(simulation_params['time_periods']):
+		dynModel.take_time_step(m_tests, a_tests, alpha)
+		l_policy.append(deepcopy(alpha))
+		a_tests_policy.append(deepcopy(a_tests))
+		m_tests_policy.append(deepcopy(m_tests))
+
+
+
+	result = {
+		"lockdown_heuristic":"full_open",
+		"groups":groups,
+		"experiment_params":{
+			"delta_schooling":experiment_params["delta_schooling"],
+			"xi":experiment_params["xi"],
+			"icus":experiment_params["icus"],
+			"n_a_tests":experiment_params["tests"],
+			"n_m_tests":experiment_params["tests"],
+			"start_day":start_day,
+			"T":simulation_params['time_periods'],
+			"eta":econ_params["employment_params"]["eta"],
+		},
+		"testing_heuristic":experiment_params["testing"],
+		"results":{
+			"economics_value":float(dynModel.get_total_economic_value()),
+			"deaths":float(dynModel.get_total_deaths()),
+			"reward":float(dynModel.get_total_reward()),
+		},
+		"policy":l_policy,
+		"a_tests":a_tests_policy,
+		"m_tests":m_tests_policy,
+	}
+
+	result["filename"] = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f"%(
+		result["lockdown_heuristic"],
+		result["experiment_params"]["xi"],
+		result["experiment_params"]["icus"],
+		result["testing_heuristic"],
+		result["experiment_params"]["n_a_tests"],
+		result["experiment_params"]["n_m_tests"],
+		result["experiment_params"]["T"],
+		result["experiment_params"]["start_day"],
+		result["groups"],
+		result["experiment_params"]["delta_schooling"],
+		result["experiment_params"]["eta"]
+	)
+
+
+
+
 	return result
 
 
@@ -480,10 +599,12 @@ for delta in params_to_try["delta_schooling"]:
 					}
 
 					result_real = run_government_policy(experiment_params)
-					#result_closed = run_full_lockdown(experiment_params)
-					#result_open = run_open(experiment_params)
+					result_closed = run_full_lockdown(experiment_params)
+					result_open = run_open(experiment_params)
 
 					all_results.append(result_real)
+					all_results.append(result_closed)
+					all_results.append(result_open)
 
 					# pickle.dump(dynModel,open(f"dynModel_gov_full_lockd_benchmark_days_{simulation_params['time_periods']}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","wb"))
 
