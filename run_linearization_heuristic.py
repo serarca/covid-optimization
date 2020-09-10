@@ -33,14 +33,15 @@ def main():
     money_scaling = 1
     params_to_try = {
         "delta_schooling":[0.5],
-        "xi":[0, 1e6 * scaling / money_scaling],
+        "xi":[0, 30 * 37199.03 * scaling / money_scaling],
         "icus":[3000 / scaling],
-        "tests":[0/ scaling],
-        "frequencies":[(7,14)],
+        "tests":[0],
+        # , 30000 / scaling],
+        "frequencies":[(1,1), (7,14)],
         "region":["one_group_fitted-scaled"], 
         "econ": ["one_group_econ-scaled"],
         "init": ["60days_one_group-scaled"],
-        "eta":[0.1, 0]
+        "eta":[0, 0.1]
     }
     # params_to_try = {
     #     "delta_schooling":[0.5],
@@ -55,7 +56,9 @@ def main():
     # }
 
     n_days = 90
-    
+    groups = "one"
+    start_day = 60
+
     # Final time step is used if we want to evaluate 
     # the hueristic at any time before the n_days
     final_time_step = n_days
@@ -64,7 +67,7 @@ def main():
     # region = 'fitted'
     
     
-    Parallel(n_jobs=4)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta)
+    Parallel(n_jobs=4)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day)
     for delta in params_to_try["delta_schooling"]
     for xi in params_to_try["xi"]
     for icus in params_to_try["icus"]
@@ -86,13 +89,15 @@ def main():
 
     #                                 run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta)
 
-    run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try)
+    # run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try, groups)
 
     # unpickle_plot_and_print_results(n_days, params_to_try, simulation_params_linearization)
 
-    load_pickles_and_create_csv(n_days, params_to_try, final_time_step)
+    load_pickles_and_create_yaml(n_days, params_to_try, final_time_step, groups, start_day, scaling)
 
-def run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta):
+    load_pickles_and_create_csv(n_days, params_to_try, final_time_step, groups)
+
+def run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day):
     ''' Runs the linearization heuristic with the experiment parameters passed as arguments and saves the resulting dynamical model as a pickle object.'''
 
     experiment_params = {
@@ -120,12 +125,12 @@ def run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region, tes
         'eta': eta
     }
 
-    dynModel_linearization_heur = run_linearization_heuristic(simulation_params_linearization, experiment_params)
+    dynModel_linearization_heur = run_linearization_heuristic(simulation_params_linearization, experiment_params, start_day)
 
-    pickle.dump(dynModel_linearization_heur,open(f"linearization_heuristic_dyn_models/dynModel_linHeur_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}_testFreq={test_freq}_lockFreq={lockdown_freq}_eta={eta}.p","wb"))
+    pickle.dump(dynModel_linearization_heur,open(f"linearization_heuristic_dyn_models/dynModel_linHeur_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}_testFreq={test_freq}_lockFreq={lockdown_freq}_eta={eta}_groups={groups}.p","wb"))
 
 
-def run_linearization_heuristic(simulation_params, experiment_params):
+def run_linearization_heuristic(simulation_params, experiment_params, start_day):
     ''' Takes a set of simulation_params and experiment parameters (delta_school, emotional cost of deaths (xi), max icus, max tests, testing and lockdown frequencies) and a set of simulation paramters (required by the constructor in group.py), creates a dynamical system, runs the linearization heuristic and returns the dynamical system after running the heuristic. 
     '''
 
@@ -146,7 +151,7 @@ def run_linearization_heuristic(simulation_params, experiment_params):
         # The FullLoader parameter handles the conversion from YAML
         # scalar values to Python the dictionary format
         initialization = yaml.load(file, Loader=yaml.FullLoader)
-        start_day = 60
+        
     
     # Read econ parameters
     with open(f"parameters/{simulation_params['econ']}.yaml") as file:
@@ -180,7 +185,7 @@ def run_linearization_heuristic(simulation_params, experiment_params):
     return dynModel
 
 
-def run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try):
+def run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try, groups):
     ''' Loads all the pickled dynamical models and runs them with proportional bouncing, saving the results in another pickle object'''
 
     for delta in params_to_try["delta_schooling"]:
@@ -189,12 +194,12 @@ def run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try):
                 for tests in params_to_try["tests"]:
                     for test_freq, lockdown_freq in params_to_try['frequencies']:
                         for eta in params_to_try["eta"]:
-                            pickled_dyn_model = f"linearization_heuristic_dyn_models/dynModel_linHeur_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}_testFreq={test_freq}_lockFreq={lockdown_freq}_eta={eta}.p"
+                            pickled_dyn_model = f"linearization_heuristic_dyn_models/dynModel_linHeur_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}_testFreq={test_freq}_lockFreq={lockdown_freq}_eta={eta}_groups={groups}.p"
 
-                            run_dyn_model_with_no_bouncing_and_pickle(pickled_dyn_model)
+                            run_dyn_model_with_no_bouncing_and_pickle(pickled_dyn_model, groups)
 
 
-def run_dyn_model_with_no_bouncing_and_pickle(pickled_dyn_model):
+def run_dyn_model_with_no_bouncing_and_pickle(pickled_dyn_model, groups):
     ''' Loads a pickled dynamical model and re-runs it with proportional-bouncing, then saves the resulting dynamical model into another pickle object'''
 
     dynModel = pickle.load(open(pickled_dyn_model,"rb"))
@@ -214,10 +219,10 @@ def run_dyn_model_with_no_bouncing_and_pickle(pickled_dyn_model):
     dynModel.reset_time(0)
     dynModel.simulate(m_tests_cont, a_tests_cont, lockdowns)
 
-    pickle.dump(dynModel,open(f"linearization_heuristic_dyn_models/dynModel_linHeur_Prop_Bouncing_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}_testFreq={dynModel.experiment_params['test_freq']}_lockFreq={dynModel.experiment_params['lockdown_freq']}_eta={dynModel.econ_params['employment_params']['eta']}.p","wb"))
+    pickle.dump(dynModel,open(f"linearization_heuristic_dyn_models/dynModel_linHeur_Prop_Bouncing_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}_testFreq={dynModel.experiment_params['test_freq']}_lockFreq={dynModel.experiment_params['lockdown_freq']}_eta={dynModel.econ_params['employment_params']['eta']}_groups={groups}.p","wb"))
 
 
-def load_pickles_and_create_csv(n_days, params_to_try, final_time_step):
+def load_pickles_and_create_csv(n_days, params_to_try, final_time_step, groups):
     ''' Loads all pickled dynamical models and creates an excel spreadsheet to visualize the resulting metrics.'''
 
     results = []
@@ -229,7 +234,7 @@ def load_pickles_and_create_csv(n_days, params_to_try, final_time_step):
                         for test_freq, lockdown_freq in params_to_try['frequencies']:
                             for eta in params_to_try["eta"]:
                             
-                                dynModel = pickle.load(open(f"linearization_heuristic_dyn_models/dynModel_linHeur{heur}_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}_testFreq={test_freq}_lockFreq={lockdown_freq}_eta={eta}.p","rb"))
+                                dynModel = pickle.load(open(f"linearization_heuristic_dyn_models/dynModel_linHeur{heur}_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}_testFreq={test_freq}_lockFreq={lockdown_freq}_eta={eta}_groups={groups}.p","rb"))
 
                                 results.append({
                                     "heuristic":f"linearization_heuristic{heur}",
@@ -247,6 +252,58 @@ def load_pickles_and_create_csv(n_days, params_to_try, final_time_step):
                             })
 
     pd.DataFrame(results).to_excel(f"linearization_heuristic_dyn_models/linearization_heuristic_results_{n_days}_days.xlsx")
+
+def load_pickles_and_create_yaml(n_days, params_to_try, final_time_step, groups, start_day, scaling):
+    ''' Loads all pickled dynamical models and creates an excel spreadsheet to visualize the resulting metrics.'''
+
+    results = []
+    for delta in params_to_try["delta_schooling"]:
+        for xi in params_to_try["xi"]:
+            for icus in params_to_try["icus"]:
+                for tests in params_to_try["tests"]:
+                    for heur in ["","_Prop_Bouncing"]:
+                        for test_freq, lockdown_freq in params_to_try['frequencies']:
+                            for eta in params_to_try["eta"]:
+                            
+                                dynModel = pickle.load(open(f"linearization_heuristic_dyn_models/dynModel_linHeur{heur}_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}_testFreq={test_freq}_lockFreq={lockdown_freq}_eta={eta}_groups={groups}.p","rb"))
+
+
+                                result = {
+                                        "lockdown_heuristic":f"linearization_heuristic{heur}",
+                                        "groups":groups,
+                                        "experiment_params":{
+                                            "delta_schooling":delta,
+                                            "xi":xi/scaling,
+                                            "icus":icus * scaling,
+                                            "n_a_tests":tests * scaling,
+                                            "n_m_tests":tests * scaling,
+                                            "start_day":start_day,
+                                            "T":n_days,
+                                            "eta":eta,
+                                            "lockdown_freq":lockdown_freq,
+                                            "test_freq":test_freq
+                                        },
+                                        "testing_heuristic":f"linearization_heuristic{heur}",
+                                        "results":{
+                                            "economics_value":float(dynModel.get_total_economic_value()),
+                                            "deaths":float(dynModel.get_total_deaths()) * scaling,
+                                            "reward":float(dynModel.get_total_reward()),
+                                        },
+                                        "policy":dynModel.lockdown_controls,
+                                        "a_tests":[{g: test * scaling for g,test in a.items()} for a in dynModel.a_tests_controls],
+                                        "m_tests":[{g: test * scaling for g,test in m.items()}  for m in dynModel.m_tests_controls],
+                                        
+                                }
+
+                                result["filename"] = f"{result['lockdown_heuristic']}/xi-{result['experiment_params']['xi']}_icus-{result['experiment_params']['icus']}_testing-{result['testing_heuristic']}_natests-{result['experiment_params']['n_a_tests']}_nmtests-{result['experiment_params']['n_m_tests']}_T-{result['experiment_params']['T']}_startday-{result['experiment_params']['start_day']}_groups-{result['groups']}_dschool-{result['experiment_params']['delta_schooling']}_eta-{result['experiment_params']['eta']}_lockdownFreq-{result['experiment_params']['lockdown_freq']}_testingFreq-{result['experiment_params']['test_freq']}"
+
+                                fn =  f"benchmarks/results/{result['filename']}.yaml"
+                                
+                                with open(fn, 'w') as file:
+                                    yaml.dump(result, file)
+
+
+
 
 
 def unpickle_plot_and_print_results(n_days, params_to_try, simulation_params):

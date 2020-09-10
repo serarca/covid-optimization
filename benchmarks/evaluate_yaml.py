@@ -31,7 +31,7 @@ from copy import deepcopy
 
 
 
-heuristics = ["real","full_open","full_lockdown","constant_gradient","time_gradient","age_group_gradient"]
+heuristics = ["linearization_heuristic", "linearization_heuristic_Prop_Bouncing","real","full_open","full_lockdown","constant_gradient","time_gradient","age_group_gradient"]
 all_data = []
 
 for h in heuristics:
@@ -40,7 +40,7 @@ for h in heuristics:
 
 			print(h,n)
 			with open("results/%s/%s"%(h,n)) as file:
-				result = yaml.load(file, Loader=yaml.FullLoader)
+				result = yaml.load(file, Loader=yaml.UnsafeLoader)
 
 			
 			# Read group parameters
@@ -87,6 +87,7 @@ for h in heuristics:
 				dynModel.take_time_step(result["m_tests"][t], result["a_tests"][t], result["policy"][t])
 
 			data = {
+				"T": result["experiment_params"]["T"],
 				"lock_heuristic":result["lockdown_heuristic"],
 				"delta_schooling":result["experiment_params"]["delta_schooling"],
 				"xi":result["experiment_params"]["xi"],
@@ -99,6 +100,9 @@ for h in heuristics:
 				"deaths":dynModel.get_total_deaths(),
 				"reward":dynModel.get_total_reward(),	
 			}
+			if h in ["linearization_heuristic", "linearization_heuristic_Prop_Bouncing"]:
+				data["lock_freq"] = result["experiment_params"]["lockdown_freq"]
+				data["test_freq"] = result["experiment_params"]["test_freq"]
 			all_data.append(data)
 
 pd.DataFrame(all_data).to_excel("results/results.xlsx")

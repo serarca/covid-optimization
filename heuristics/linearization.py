@@ -1224,6 +1224,16 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
 def run_heuristic_linearization(dynModel):
     """Run the heuristic based on linearization. Takes a dynamical model, resets the time to 0, and runs it following the linearization heuristic. Returns the dynamical model after running it."""
 
+    age_groups = dynModel.groups.keys()
+    num_age_groups = len(age_groups)
+    num_compartments = len(SEIR_groups)
+    num_controls = len(controls)
+    num_activities = len(activities)
+
+    Xt_dim = num_compartments * num_age_groups
+    ut_dim = num_controls * num_age_groups
+
+
     dynModel.reset_time(0)
 
     max_step_size = 0.1
