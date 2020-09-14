@@ -35,12 +35,12 @@ def main():
         "delta_schooling":[0.5],
         "xi":[0, 30 * 37199.03 * scaling / money_scaling],
         "icus":[3000 / scaling],
-        "tests":[0],
+        "tests":[0, 30000 / scaling, 60000 / scaling],
         # , 30000 / scaling],
         "frequencies":[(1,1), (7,14)],
-        "region":["one_group_fitted-scaled"], 
-        "econ": ["one_group_econ-scaled"],
-        "init": ["60days_one_group-scaled"],
+        "region":["fitted-scaled"], 
+        "econ": ["econ-scaled"],
+        "init": ["60days-scaled"],
         "eta":[0, 0.1]
     }
     # params_to_try = {
@@ -56,7 +56,7 @@ def main():
     # }
 
     n_days = 90
-    groups = "one"
+    groups = "all"
     start_day = 60
 
     # Final time step is used if we want to evaluate 
@@ -89,7 +89,7 @@ def main():
 
     #                                 run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta)
 
-    # run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try, groups)
+    run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try, groups)
 
     # unpickle_plot_and_print_results(n_days, params_to_try, simulation_params_linearization)
 

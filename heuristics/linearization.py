@@ -47,8 +47,8 @@ def log_execution_time(function):
 ##################################################
 
 
-# age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29','age_group_30_39', 'age_group_40_49', 'age_group_50_59', 'age_group_60_69', 'age_group_70_79','age_group_80_plus']
-age_groups = ["all_age_groups"]
+age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29','age_group_30_39', 'age_group_40_49', 'age_group_50_59', 'age_group_60_69', 'age_group_70_79','age_group_80_plus']
+# age_groups = ["all_age_groups"]
 SEIR_groups = [ 'S_g', 'E_g', 'I_g', 'R_g', 'N_g', 'Ia_g', 'Ips_g', \
        'Ims_g', 'Iss_g', 'Rq_g', 'H_g', 'ICU_g', 'D_g' ]
 activities = ['home','leisure','other','school','transport','work']
@@ -1224,21 +1224,21 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
 def run_heuristic_linearization(dynModel):
     """Run the heuristic based on linearization. Takes a dynamical model, resets the time to 0, and runs it following the linearization heuristic. Returns the dynamical model after running it."""
 
-    age_groups = dynModel.groups.keys()
-    num_age_groups = len(age_groups)
-    num_compartments = len(SEIR_groups)
-    num_controls = len(controls)
-    num_activities = len(activities)
+    # age_groups = dynModel.groups.keys()
+    # num_age_groups = len(age_groups)
+    # num_compartments = len(SEIR_groups)
+    # num_controls = len(controls)
+    # num_activities = len(activities)
 
-    Xt_dim = num_compartments * num_age_groups
-    ut_dim = num_controls * num_age_groups
+    # Xt_dim = num_compartments * num_age_groups
+    # ut_dim = num_controls * num_age_groups
 
 
     dynModel.reset_time(0)
 
-    max_step_size = 0.1
+    max_step_size = 0.2
     threshold = 0.01
-    max_inner_iterations = 2/max_step_size
+    max_inner_iterations = 1.5/max_step_size
 
     # shorthand for a few useful parameters
     T = dynModel.time_steps

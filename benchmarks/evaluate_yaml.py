@@ -87,6 +87,7 @@ for h in heuristics:
 				dynModel.take_time_step(result["m_tests"][t], result["a_tests"][t], result["policy"][t])
 
 			data = {
+				"groups": result["groups"],
 				"T": result["experiment_params"]["T"],
 				"lock_heuristic":result["lockdown_heuristic"],
 				"delta_schooling":result["experiment_params"]["delta_schooling"],
