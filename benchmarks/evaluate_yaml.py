@@ -31,7 +31,7 @@ from copy import deepcopy
 
 
 
-heuristics = ["real","full_open","full_lockdown","constant_gradient","time_gradient","age_group_gradient"]
+heuristics = ["real","full_open","full_lockdown","constant_gradient","time_gradient","age_group_gradient","linearization_heuristic","linearization_heuristic_Prop_Bouncing"]
 all_data = []
 
 for h in heuristics:
@@ -103,12 +103,14 @@ for h in heuristics:
 				"economics_value":dynModel.get_total_economic_value(),
 				"deaths":dynModel.get_total_deaths(),
 				"reward":dynModel.get_total_reward(),
-				"policy_freq":result["experiment_params"]["policy_freq"],
 				"test_freq":result["experiment_params"]["test_freq"],
 			}
 			if h in ["linearization_heuristic", "linearization_heuristic_Prop_Bouncing"]:
 				data["lock_freq"] = result["experiment_params"]["lockdown_freq"]
 				data["test_freq"] = result["experiment_params"]["test_freq"]
+			else:
+				data["lock_freq"] = result["experiment_params"]["policy_freq"],
+			
 			all_data.append(data)
 
 pd.DataFrame(all_data).to_excel("results/results.xlsx")
