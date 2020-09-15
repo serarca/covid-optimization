@@ -38,9 +38,9 @@ def main():
         "tests":[0, 30000 / scaling, 60000 / scaling],
         # , 30000 / scaling],
         "frequencies":[(1,1), (7,14)],
-        "region":["fitted-scaled"], 
-        "econ": ["econ-scaled"],
-        "init": ["60days-scaled"],
+        "region":["one_group_fitted-scaled"], 
+        "econ": ["one_group_econ-scaled"],
+        "init": ["60days_one_group-scaled"],
         "eta":[0, 0.1]
     }
     # params_to_try = {
@@ -56,7 +56,7 @@ def main():
     # }
 
     n_days = 90
-    groups = "all"
+    groups = "one"
     start_day = 60
 
     # Final time step is used if we want to evaluate 
