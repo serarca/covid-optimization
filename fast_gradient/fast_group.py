@@ -2,9 +2,10 @@ from collections import defaultdict
 import numpy as np
 import pandas as pd
 import math
+from copy import deepcopy
 
-#age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29','age_group_30_39', 'age_group_40_49', 'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
-age_groups = ["all_age_groups"]
+age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29','age_group_30_39', 'age_group_40_49', 'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
+#age_groups = ["all_age_groups"]
 
 
 
@@ -15,13 +16,17 @@ activities = ['home','leisure','other','school','transport','work']
 
 
 class FastDynamicalModel:
-	def __init__(self, parameters, econ_params, experiment_params, dt, mixing_method):
-		self.parameters = parameters
-		self.econ_params = econ_params
-		self.experiment_params = experiment_params
+	def __init__(self, parameters, econ_params, experiment_params, dt, mixing_method, horizon, start_day):
+		self.parameters = deepcopy(parameters)
+		self.econ_params = deepcopy(econ_params)
+		self.experiment_params = deepcopy(experiment_params)
 		self.dt = dt
 		self.mixing_method = mixing_method
 		self.original_lockdown_status = 0
+		self.horizon = horizon
+		self.END_DAYS = 14
+		self.age_groups = list(self.parameters['seir-groups'].keys())
+		self.start_day = start_day
 
 		# Create groups from parameters
 		self.groups = {}
@@ -58,8 +63,12 @@ class FastDynamicalModel:
 		self.beta = np.zeros((len(age_groups),len(self.groups[age_groups[0]].parameters["beta"])))
 		for i in range(len(age_groups)):
 			for j in range(len(self.groups[age_groups[0]].parameters["beta"])):
-				self.beta[i,j] = self.groups[age_groups[i]].parameters["beta"][j]
+				if j<horizon:
+					self.beta[i,j] = self.groups[age_groups[i]].parameters["beta"][j+self.start_day]
+				else:
+					self.beta[i,j] = 0
 		self.last_beta = 0
+
 
 		# Process econ data
 		econ_activities = ['transport','leisure','other']
@@ -83,6 +92,12 @@ class FastDynamicalModel:
 				for act in range(len(activities)):
 					self.M[g1,g2,act] = self.groups[age_groups[g1]].contacts[activities[act]][age_groups[g2]]
 
+	# Takes a step that is a full-open policy
+	def take_end_step(self, state):
+
+		return self.take_time_step(state, np.zeros(len(self.age_groups)), np.zeros(len(self.age_groups)), np.zeros((len(self.age_groups),len(activities)))+1.0, self.horizon+1)
+
+
 
 	def take_time_step(self, state, m_tests, a_tests, alphas, t, update_contacts = True, B_H = False, B_ICU = False, B_H_perc = False, B_ICU_perc = False):
 
@@ -103,6 +118,7 @@ class FastDynamicalModel:
 		if update_contacts or self.beta[0,t]!=self.last_beta:
 			self.update_contact_matrix()
 			self.last_beta = self.beta[0,t]
+
 
 		# Update total contacts
 		pop = self.state[:,cont.index("N")] + self.state[:,cont.index("Rq")]
@@ -303,6 +319,7 @@ class FastDynamicalModel:
 			+ self.B_H
 			+ self.B_ICU
 		)*self.dt
+
 
 	def get_economic_value(self):
 		econ_activities = ["transport","leisure","other"]

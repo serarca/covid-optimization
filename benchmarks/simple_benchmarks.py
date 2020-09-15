@@ -27,7 +27,7 @@ from scipy.optimize import Bounds,minimize,LinearConstraint
 from copy import deepcopy
 
 
-groups = "one"
+groups = "all"
 
 proportions = {'age_group_0_9': 0.12999753718396828, 'age_group_10_19': 0.1260199381062682, 'age_group_20_29': 0.13462273540296374, 'age_group_30_39': 0.1432185965976917, 'age_group_40_49': 0.13619350895266272, 'age_group_50_59': 0.1252867882416867, 'age_group_60_69': 0.09586005862219948, 'age_group_70_79': 0.06449748382900194, 'age_group_80_plus': 0.044303353063557066}
 
@@ -53,8 +53,14 @@ elif groups == "one":
 	death_prob = death_prob_one
 
 
-
-
+full_open_policy = {
+	"home": 1.0,
+	"leisure": 1.0,
+	"other": 1.0,
+	"school": 1.0,
+	"transport": 1.0,
+	"work": 1.0
+}	
 
 
 def plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params, benchmark):
@@ -304,7 +310,7 @@ for i,p in enumerate(gov_policy):
 # Parameters to try
 params_to_try = {
 	"delta_schooling":[0.5],
-	"xi":[0,1e6,30*37199.03],
+	"xi":[0,30*37199.03],
 	"icus":[3000],
 	"tests":[0],
 	"testing":["homogeneous"]
@@ -312,14 +318,7 @@ params_to_try = {
 
 
 # Some basic policies
-full_open_policy = {
-	"home": 1.0,
-	"leisure": 1.0,
-	"other": 1.0,
-	"school": 1.0,
-	"transport": 1.0,
-	"work": 1.0
-}
+
 full_lockdown_policy = gov_policy[start_lockdown]
 
 print(full_lockdown_policy)
@@ -338,7 +337,6 @@ thresholds = {
 
 
 def run_government_policy(experiment_params):
-
 
 	alphas_vec = []
 	l_policy = []
@@ -364,6 +362,13 @@ def run_government_policy(experiment_params):
 		a_tests_policy.append(deepcopy(a_tests))
 		m_tests_policy.append(deepcopy(m_tests))
 
+	# Finish with the last steps
+	end_alphas, end_a_tests, end_m_tests = dynModel.take_end_steps()
+
+	l_policy += end_alphas
+	a_tests_policy += end_a_tests
+	m_tests_policy += end_m_tests
+
 	result = {
 		"lockdown_heuristic":"real",
 		"groups":groups,
@@ -376,6 +381,9 @@ def run_government_policy(experiment_params):
 			"start_day":start_day,
 			"T":simulation_params['time_periods'],
 			"eta":econ_params["employment_params"]["eta"],
+			"test_freq":1,
+			"policy_freq":1,
+			"end_days":14,
 		},
 		"testing_heuristic":experiment_params["testing"],
 		"results":{
@@ -387,7 +395,8 @@ def run_government_policy(experiment_params):
 		"a_tests":a_tests_policy,
 		"m_tests":m_tests_policy,
 	}
-	result["filename"] = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f"%(
+
+	result["filename"] = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d"%(
 		result["lockdown_heuristic"],
 		result["experiment_params"]["xi"],
 		result["experiment_params"]["icus"],
@@ -398,7 +407,9 @@ def run_government_policy(experiment_params):
 		result["experiment_params"]["start_day"],
 		result["groups"],
 		result["experiment_params"]["delta_schooling"],
-		result["experiment_params"]["eta"]
+		result["experiment_params"]["eta"],
+		result["experiment_params"]["test_freq"],
+		result["experiment_params"]["policy_freq"],
 	)
 
 
@@ -460,7 +471,11 @@ def run_full_lockdown(experiment_params):
 		a_tests_policy.append(deepcopy(a_tests))
 		m_tests_policy.append(deepcopy(m_tests))
 
+	end_alphas, end_a_tests, end_m_tests = dynModel.take_end_steps()
 
+	l_policy += end_alphas
+	a_tests_policy += end_a_tests
+	m_tests_policy += end_m_tests
 
 	result = {
 		"lockdown_heuristic":"full_lockdown",
@@ -474,6 +489,9 @@ def run_full_lockdown(experiment_params):
 			"start_day":start_day,
 			"T":simulation_params['time_periods'],
 			"eta":econ_params["employment_params"]["eta"],
+			"test_freq":1,
+			"policy_freq":1,
+			"end_days":14,
 		},
 		"testing_heuristic":experiment_params["testing"],
 		"results":{
@@ -485,7 +503,8 @@ def run_full_lockdown(experiment_params):
 		"a_tests":a_tests_policy,
 		"m_tests":m_tests_policy,
 	}
-	result["filename"] = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f"%(
+
+	result["filename"] = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d"%(
 		result["lockdown_heuristic"],
 		result["experiment_params"]["xi"],
 		result["experiment_params"]["icus"],
@@ -496,9 +515,10 @@ def run_full_lockdown(experiment_params):
 		result["experiment_params"]["start_day"],
 		result["groups"],
 		result["experiment_params"]["delta_schooling"],
-		result["experiment_params"]["eta"]
+		result["experiment_params"]["eta"],
+		result["experiment_params"]["test_freq"],
+		result["experiment_params"]["policy_freq"],
 	)
-
 
 
 
@@ -537,8 +557,13 @@ def run_open(experiment_params):
 		a_tests_policy.append(deepcopy(a_tests))
 		m_tests_policy.append(deepcopy(m_tests))
 
+	end_alphas, end_a_tests, end_m_tests = dynModel.take_end_steps()
 
+	l_policy += end_alphas
+	a_tests_policy += end_a_tests
+	m_tests_policy += end_m_tests
 
+	
 	result = {
 		"lockdown_heuristic":"full_open",
 		"groups":groups,
@@ -551,6 +576,9 @@ def run_open(experiment_params):
 			"start_day":start_day,
 			"T":simulation_params['time_periods'],
 			"eta":econ_params["employment_params"]["eta"],
+			"test_freq":1,
+			"policy_freq":1,
+			"end_days":14,
 		},
 		"testing_heuristic":experiment_params["testing"],
 		"results":{
@@ -563,7 +591,7 @@ def run_open(experiment_params):
 		"m_tests":m_tests_policy,
 	}
 
-	result["filename"] = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f"%(
+	result["filename"] = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d"%(
 		result["lockdown_heuristic"],
 		result["experiment_params"]["xi"],
 		result["experiment_params"]["icus"],
@@ -574,10 +602,10 @@ def run_open(experiment_params):
 		result["experiment_params"]["start_day"],
 		result["groups"],
 		result["experiment_params"]["delta_schooling"],
-		result["experiment_params"]["eta"]
+		result["experiment_params"]["eta"],
+		result["experiment_params"]["test_freq"],
+		result["experiment_params"]["policy_freq"],
 	)
-
-
 
 
 	return result

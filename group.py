@@ -3,8 +3,20 @@ import numpy as np
 import pandas as pd
 import math
 import gurobipy as gb
+from copy import deepcopy
 
 all_activities = ['home','leisure','other','school','transport','work']
+END_DAYS = 14
+
+full_open_policy = {
+	"home": 1.0,
+	"leisure": 1.0,
+	"other": 1.0,
+	"school": 1.0,
+	"transport": 1.0,
+	"work": 1.0
+}	
+
 
 def n_contacts(group_g, group_h, alphas, mixing_method):
 
@@ -48,13 +60,14 @@ def n_contacts(group_g, group_h, alphas, mixing_method):
 
 class DynamicalModel:
 	def __init__(self, parameters, econ_params, experiment_params, initialization, dt, time_steps, mixing_method, start_day, transport_lb_work_fraction = 0 , extra_data = False):
-		self.parameters = parameters
-		self.econ_params = econ_params
-		self.experiment_params = experiment_params
+		self.parameters = deepcopy(parameters)
+		self.econ_params = deepcopy(econ_params)
+		self.experiment_params = deepcopy(experiment_params)
 		self.t = 0
 		self.dt = dt
-		self.time_steps = time_steps
-		self.initialization = initialization
+		self.END_DAYS = END_DAYS
+		self.time_steps = time_steps + END_DAYS
+		self.initialization = deepcopy(initialization)
 		self.mixing_method = mixing_method
 		self.extra_data = extra_data
 		self.use_gurobi_vars = False
@@ -63,10 +76,13 @@ class DynamicalModel:
 		self.a_tests_controls = []
 		self.transport_lb_work_fraction = transport_lb_work_fraction
 		self.start_day = start_day
+		self.age_groups = list(self.parameters['seir-groups'].keys())
 
 		# Modify betas
 		for ag in self.parameters['seir-groups']:
-			self.parameters['seir-groups'][ag]['parameters']['beta'] = self.parameters['seir-groups'][ag]['parameters']['beta'][self.start_day:]
+			self.parameters['seir-groups'][ag]['parameters']['beta'] = self.parameters['seir-groups'][ag]['parameters']['beta'][self.start_day:self.start_day+self.time_steps]
+			for k in range(END_DAYS):
+				self.parameters['seir-groups'][ag]['parameters']['beta'][self.time_steps-k-1] = 0.0
 
 
 		# Create groups from parameters
@@ -95,6 +111,24 @@ class DynamicalModel:
 			self.n_contacts = [{g_name1:{g_name2:float('inf') for g_name2 in self.groups} for g_name1 in self.groups} for i in range(self.time_steps)]
 			self.n_infections = [{g_name1:{g_name2:float('inf') for g_name2 in self.groups} for g_name1 in self.groups} for i in range(self.time_steps)]
 			self.n_infections_act = [{act: {g_name1:{g_name2:float('inf') for g_name2 in self.groups} for g_name1 in self.groups} for act in all_activities} for i in range(self.time_steps)]
+
+	def take_end_steps(self):
+
+		all_m_tests = []
+		all_a_tests = []
+		all_alphas = []
+		for t in range(END_DAYS):
+			m_tests = {ag:0 for ag in self.age_groups}
+			a_tests = {ag:0 for ag in self.age_groups}
+			alphas = {ag:deepcopy(full_open_policy) for ag in self.age_groups}
+			self.take_time_step(m_tests, a_tests, alphas)
+			all_m_tests.append(m_tests)
+			all_a_tests.append(a_tests)
+			all_alphas.append(alphas)
+		assert(self.t == self.time_steps)
+
+		return (all_alphas,all_a_tests,all_m_tests)
+
 
 	def take_time_step(self, m_tests, a_tests, alphas, B_H = False, B_ICU = False, B_ICU_perc = False):
 		# store time when current group is being updated
@@ -790,3 +824,7 @@ class SEIR_group:
 		+ B_ICU]
 
 		assert self.D[-1] >= 0, (f"Number of deaths is negative for t={self.parent.t+1}: {self.D[-1]}")
+
+
+
+

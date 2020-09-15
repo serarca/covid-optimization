@@ -80,11 +80,14 @@ for h in heuristics:
 
 			experiment_params = result["experiment_params"]
 			econ_params["employment_params"]["eta"] = result["experiment_params"]["eta"]
+			econ_params["employment_params"]["nu"] = 1- econ_params["employment_params"]["gamma"] - econ_params["employment_params"]["eta"]
 
 			dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, 1, experiment_params["T"], universe_params["mixing"], start_day)
 
 			for t in range(experiment_params["T"]):
 				dynModel.take_time_step(result["m_tests"][t], result["a_tests"][t], result["policy"][t])
+
+			dynModel.take_end_steps()
 
 			data = {
 				"lock_heuristic":result["lockdown_heuristic"],
