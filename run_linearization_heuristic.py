@@ -19,7 +19,10 @@ import math
 import pprint
 from time import time
 
-import pickle
+try:
+    import cPickle as pickle
+except:
+    import pickle
 import pandas as pd
 import logging
 
@@ -30,18 +33,21 @@ def main():
     # 30 * 37199.03
     # Some paramters to test the linearization heuristic
     scaling = 10000
-    money_scaling = 1
+    money_scaling = 10000
     params_to_try = {
         "delta_schooling":[0.5],
-        "xi":[0, 30 * 37199.03 * scaling / money_scaling],
+        "xi":[0],
+        # , 30 * 37199.03 * scaling / money_scaling],
         "icus":[3000 / scaling],
-        "tests":[0, 30000 / scaling, 60000 / scaling],
+        "tests":[30000 / scaling],
+        #  60000 / scaling],
         # , 30000 / scaling],
-        "frequencies":[(1,1) , (7,14)],
+        "frequencies":[(1,1)],
+        #  (7,14)],
         "region":["fitted-scaled"], 
         "econ": ["econ-scaled"],
         "init": ["60days-scaled"],
-        "eta":[0, 0.1]
+        "eta":[0.1]
     }
     # params_to_try = {
     #     "delta_schooling":[0.5],
@@ -55,7 +61,7 @@ def main():
     #     "eta":[0.1]
     # }
 
-    n_days = 90
+    n_days = 1
     groups = "all"
     start_day = 60
 
@@ -93,7 +99,7 @@ def main():
 
     # unpickle_plot_and_print_results(n_days, params_to_try, simulation_params_linearization)
 
-    load_pickles_and_create_yaml(n_days, params_to_try, final_time_step, groups, start_day, scaling)
+    load_pickles_and_create_yaml(n_days, params_to_try, final_time_step, groups, start_day, scaling, money_scaling)
 
     # load_pickles_and_create_csv(n_days, params_to_try, final_time_step, groups)
 
@@ -127,7 +133,7 @@ def run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region, tes
 
     dynModel_linearization_heur = run_linearization_heuristic(simulation_params_linearization, experiment_params, start_day)
 
-    pickle.dump(dynModel_linearization_heur,open(f"linearization_heuristic_dyn_models/dynModel_linHeur_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}_testFreq={test_freq}_lockFreq={lockdown_freq}_eta={eta}_groups={groups}.p","wb"))
+    pickle.dump(dynModel_linearization_heur,open(f"linearization_heuristic_dyn_models/dynModel_linHeur_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}_testFreq={test_freq}_lockFreq={lockdown_freq}_eta={eta}_groups={groups}.p","wb"), protocol=-1)
 
 
 def run_linearization_heuristic(simulation_params, experiment_params, start_day):
@@ -161,9 +167,11 @@ def run_linearization_heuristic(simulation_params, experiment_params, start_day)
 
     # Define mixing method
     mixing_method = universe_params['mixing']
+
+    eta = simulation_params["eta"]
     
 
-    dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], num_time_periods, mixing_method, start_day)
+    dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], num_time_periods, mixing_method, start_day, eta)
 
     # add parameters for testing capacity
     dynModel.parameters['global-parameters']['C_mtest'] = simulation_params['mtest_cap']
@@ -204,7 +212,7 @@ def run_dyn_model_with_no_bouncing_and_pickle(pickled_dyn_model, groups):
 
     dynModel = pickle.load(open(pickled_dyn_model,"rb"))
 
-    n_days = int(dynModel.time_steps * dynModel.dt)
+    n_days = int(dynModel.time_steps-dynModel.END_DAYS * dynModel.dt)
     delta = dynModel.experiment_params['delta_schooling']
     xi = dynModel.experiment_params['xi']
     icus = dynModel.icus
@@ -219,7 +227,7 @@ def run_dyn_model_with_no_bouncing_and_pickle(pickled_dyn_model, groups):
     dynModel.reset_time(0)
     dynModel.simulate(m_tests_cont, a_tests_cont, lockdowns)
 
-    pickle.dump(dynModel,open(f"linearization_heuristic_dyn_models/dynModel_linHeur_Prop_Bouncing_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}_testFreq={dynModel.experiment_params['test_freq']}_lockFreq={dynModel.experiment_params['lockdown_freq']}_eta={dynModel.econ_params['employment_params']['eta']}_groups={groups}.p","wb"))
+    pickle.dump(dynModel,open(f"linearization_heuristic_dyn_models/dynModel_linHeur_Prop_Bouncing_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}_testFreq={dynModel.experiment_params['test_freq']}_lockFreq={dynModel.experiment_params['lockdown_freq']}_eta={dynModel.econ_params['employment_params']['eta']}_groups={groups}.p","wb"), protocol=-1)
 
 
 def load_pickles_and_create_csv(n_days, params_to_try, final_time_step, groups):
@@ -253,7 +261,7 @@ def load_pickles_and_create_csv(n_days, params_to_try, final_time_step, groups):
 
     pd.DataFrame(results).to_excel(f"linearization_heuristic_dyn_models/linearization_heuristic_results_{n_days}_days.xlsx")
 
-def load_pickles_and_create_yaml(n_days, params_to_try, final_time_step, groups, start_day, scaling):
+def load_pickles_and_create_yaml(n_days, params_to_try, final_time_step, groups, start_day, scaling, money_scaling):
     ''' Loads all pickled dynamical models and creates an excel spreadsheet to visualize the resulting metrics.'''
 
     results = []
@@ -273,7 +281,7 @@ def load_pickles_and_create_yaml(n_days, params_to_try, final_time_step, groups,
                                         "groups":groups,
                                         "experiment_params":{
                                             "delta_schooling":delta,
-                                            "xi":xi/scaling,
+                                            "xi":(xi/scaling) * money_scaling, 
                                             "icus":icus * scaling,
                                             "n_a_tests":tests * scaling,
                                             "n_m_tests":tests * scaling,
@@ -285,7 +293,7 @@ def load_pickles_and_create_yaml(n_days, params_to_try, final_time_step, groups,
                                         },
                                         "testing_heuristic":f"linearization_heuristic{heur}",
                                         "results":{
-                                            "economics_value":float(dynModel.get_total_economic_value()),
+                                            "economics_value":float(dynModel.get_total_economic_value()) * money_scaling,
                                             "deaths":float(dynModel.get_total_deaths()) * scaling,
                                             "reward":float(dynModel.get_total_reward()),
                                         },

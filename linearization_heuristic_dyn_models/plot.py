@@ -40,6 +40,8 @@ def unpickle_plot_and_print_results(file):
     # That array holds the lockdown decisions for that age group and that activity used in the simulation of dynModel.
     lockdowns_sim = {}
     for n in dynModel.groups:
+        print(dynModel.parameters["seir-groups"][n]['parameters']['beta'])
+        print(dynModel.groups[n].parameters['beta'])
         lockdowns_sim[n] = {}
         for act in dynModel.lockdown_controls[0][n]:
             lockdowns_sim[n][act] = np.zeros(T)
