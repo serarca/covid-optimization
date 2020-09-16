@@ -59,7 +59,7 @@ def n_contacts(group_g, group_h, alphas, mixing_method):
 
 
 class DynamicalModel:
-	def __init__(self, parameters, econ_params, experiment_params, initialization, dt, time_steps, mixing_method, start_day, transport_lb_work_fraction = 0 , extra_data = False):
+	def __init__(self, parameters, econ_params, experiment_params, initialization, dt, time_steps, mixing_method, start_day, eta, transport_lb_work_fraction = 0 , extra_data = False):
 		self.parameters = deepcopy(parameters)
 		self.econ_params = deepcopy(econ_params)
 		self.experiment_params = deepcopy(experiment_params)
@@ -84,6 +84,9 @@ class DynamicalModel:
 			for k in range(END_DAYS):
 				self.parameters['seir-groups'][ag]['parameters']['beta'][self.time_steps-k-1] = 0.0
 
+		# Modify eta
+		econ_params["employment_params"]["eta"] = eta
+		econ_params["employment_params"]["nu"] = 1 - eta - econ_params["employment_params"]["gamma"]
 
 		# Create groups from parameters
 		self.groups = {}

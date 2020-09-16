@@ -28,10 +28,16 @@ class FastDynamicalModel:
 		self.age_groups = list(self.parameters['seir-groups'].keys())
 		self.start_day = start_day
 
+		# Modify eta
+		econ_params["employment_params"]["eta"] = eta
+		econ_params["employment_params"]["nu"] = 1 - eta - econ_params["employment_params"]["gamma"]
+
+
 		# Create groups from parameters
 		self.groups = {}
 		for n in parameters['seir-groups']:
 			self.groups[n] = SEIR_group(parameters['seir-groups'][n], self.dt, self.mixing_method, self)
+
 
 
 		# Fix number of beds and icus
