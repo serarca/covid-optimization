@@ -85,13 +85,13 @@ class DynamicalModel:
 				self.parameters['seir-groups'][ag]['parameters']['beta'][self.time_steps-k-1] = 0.0
 
 		# Modify eta
-		econ_params["employment_params"]["eta"] = eta
-		econ_params["employment_params"]["nu"] = 1 - eta - econ_params["employment_params"]["gamma"]
+		self.econ_params["employment_params"]["eta"] = eta
+		self.econ_params["employment_params"]["nu"] = 1 - eta - self.econ_params["employment_params"]["gamma"]
 
 		# Create groups from parameters
 		self.groups = {}
 		for n in parameters['seir-groups']:
-			self.groups[n] = SEIR_group(parameters['seir-groups'][n], initialization[n], self.dt, self.mixing_method, self.time_steps, self)
+			self.groups[n] = SEIR_group(self.parameters['seir-groups'][n], self.initialization[n], self.dt, self.mixing_method, self.time_steps, self)
 
 		# Attach other groups to each group
 		for n in self.groups:
@@ -107,7 +107,7 @@ class DynamicalModel:
 		self.deaths = [float("nan")]
 
 		# Initialize total population
-		self.total_population = sum([sum([initialization[group][cat] for cat in initialization[group].keys()]) for group in initialization.keys()])
+		self.total_population = sum([sum([self.initialization[group][cat] for cat in self.initialization[group].keys()]) for group in self.initialization.keys()])
 
 		# Initialize number of contacts
 		if extra_data:

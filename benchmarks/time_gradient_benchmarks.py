@@ -26,7 +26,13 @@ from aux import *
 from scipy.optimize import Bounds,minimize,LinearConstraint
 
 
-groups = "all"
+# Parameters to try
+with open("../parameters/run_params.yaml") as file:
+	run_params = yaml.load(file, Loader=yaml.FullLoader)["params_to_try"]
+
+params_to_try = run_params["params_to_try"]
+groups = run_params["groups"]
+
 
 
 
@@ -108,15 +114,7 @@ for i,p in enumerate(gov_policy):
 
 
 
-# Parameters to try
-params_to_try = {
-	"delta_schooling":[0.5],
-	"xi":[0,30*37199.03],
-	"icus":[3000],
-	"tests":[0],
-	"testing":["homogeneous"],
-	"eta":[0,0.1],
-}
+
 
 
 

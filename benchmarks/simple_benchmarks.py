@@ -27,7 +27,14 @@ from scipy.optimize import Bounds,minimize,LinearConstraint
 from copy import deepcopy
 
 
-groups = "all"
+# Parameters to try
+with open("../parameters/run_params.yaml") as file:
+	run_params = yaml.load(file, Loader=yaml.FullLoader)
+
+params_to_try = run_params["params_to_try"]
+groups = run_params["groups"]
+
+
 
 proportions = {'age_group_0_9': 0.12999753718396828, 'age_group_10_19': 0.1260199381062682, 'age_group_20_29': 0.13462273540296374, 'age_group_30_39': 0.1432185965976917, 'age_group_40_49': 0.13619350895266272, 'age_group_50_59': 0.1252867882416867, 'age_group_60_69': 0.09586005862219948, 'age_group_70_79': 0.06449748382900194, 'age_group_80_plus': 0.044303353063557066}
 
@@ -146,15 +153,6 @@ for i,p in enumerate(gov_policy):
 
 
 
-# Parameters to try
-params_to_try = {
-	"delta_schooling":[0.5],
-	"xi":[0,30*37199.03],
-	"icus":[3000],
-	"tests":[0],
-	"testing":["homogeneous"],
-	"eta":[0,0.1],
-}
 
 
 # Some basic policies

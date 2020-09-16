@@ -26,7 +26,6 @@ from aux import *
 from scipy.optimize import Bounds,minimize,LinearConstraint
 
 
-
 # Parameters to try
 with open("../parameters/run_params.yaml") as file:
 	run_params = yaml.load(file, Loader=yaml.FullLoader)
@@ -121,11 +120,75 @@ for i,p in enumerate(gov_policy):
 
 
 
-def gradient_descent(experiment_params, quar_freq, plot = False):
+def gradient_descent(experiment_params, quar_freq, plot=False):
 
-	intervention_times = [t*quar_freq for t in range(int(simulation_params['days']/quar_freq))]
 
-	x0 = np.zeros(len(intervention_times)*len(rel_activities)) + 0.5
+	result = {
+		"lockdown_heuristic":"dynamic_gradient",
+		"groups":groups,
+		"experiment_params":{
+			"delta_schooling":experiment_params["delta_schooling"],
+			"xi":experiment_params["xi"],
+			"icus":experiment_params["icus"],
+			"n_a_tests":experiment_params["tests"],
+			"n_m_tests":experiment_params["tests"],
+			"start_day":start_day,
+			"T":simulation_params['time_periods'],
+			"eta":econ_params["employment_params"]["eta"],
+			"test_freq":simulation_params["days"],
+			"policy_freq":quar_freq,
+			"end_days":14,			
+		},
+		"testing_heuristic":experiment_params["testing"],
+	}
+	result["filename"] = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d"%(
+		result["lockdown_heuristic"],
+		result["experiment_params"]["xi"],
+		result["experiment_params"]["icus"],
+		result["testing_heuristic"],
+		result["experiment_params"]["n_a_tests"],
+		result["experiment_params"]["n_m_tests"],
+		result["experiment_params"]["T"],
+		result["experiment_params"]["start_day"],
+		result["groups"],
+		result["experiment_params"]["delta_schooling"],
+		result["experiment_params"]["eta"],
+		result["experiment_params"]["test_freq"],
+		result["experiment_params"]["policy_freq"],
+	)
+
+
+	constant_gradients_filename = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d"%(
+		"constant_gradient",
+		result["experiment_params"]["xi"],
+		result["experiment_params"]["icus"],
+		result["testing_heuristic"],
+		result["experiment_params"]["n_a_tests"],
+		result["experiment_params"]["n_m_tests"],
+		result["experiment_params"]["T"],
+		result["experiment_params"]["start_day"],
+		result["groups"],
+		result["experiment_params"]["delta_schooling"],
+		result["experiment_params"]["eta"],
+		90,
+		90,
+	)
+
+
+	# Read the constant alphas to initialize the solution
+	with open("results/"+constant_gradients_filename+".yaml") as file:
+		initial_alphas = yaml.load(file, Loader=yaml.FullLoader)["policy"][0]
+
+
+
+	intervention_times = [t*quar_freq for t in range(int((simulation_params['days']-1)/quar_freq)+1)]
+
+	x0 = np.zeros(len(intervention_times)*len(age_groups)*len(rel_activities))
+	for i,t in enumerate(intervention_times):
+		for j,ag in enumerate(age_groups):
+			for k,act in enumerate(rel_activities):
+				x0[i*len(age_groups)*len(rel_activities) + j*len(rel_activities) + k] = initial_alphas[ag][act]
+
 
 	# Create dynamical model
 	fastModel = FastDynamicalModel(universe_params, econ_params, experiment_params, simulation_params['dt'], mixing_method, simulation_params['time_periods'], start_day, experiment_params["eta"])
@@ -141,18 +204,10 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 
 	def simulate(x):
 		# Extract vector components
-		x_lockdown = np.zeros((len(intervention_times),len(age_groups),len(rel_activities)))
-
-
-		x_aux = np.reshape(
+		x_lockdown = np.reshape(
 			x,
-			(len(intervention_times),len(rel_activities))
+			(len(intervention_times),len(age_groups),len(rel_activities))
 		)
-
-		for i,t in enumerate(intervention_times):
-			for j,ag in enumerate(age_groups):
-				x_lockdown[i,j,:] = x_aux[i,:]
-
 
 
 		state = initial_state
@@ -192,37 +247,33 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 			total_econ += econs['economic_value']
 
 
+
+
 		print(total_reward, total_deaths, total_econ)
 		return -total_reward
 
-	lower_bounds_matrix = np.zeros((len(intervention_times),len(rel_activities)))
+	lower_bounds_matrix = np.zeros((len(intervention_times),len(age_groups),len(rel_activities)))
 	for i,act in enumerate(rel_activities):
-		lower_bounds_matrix[:,i] += lower_bounds[act]
+		lower_bounds_matrix[:,:,i] += lower_bounds[act]
+
+
 
 
 	
 	full_bounds = Bounds(
 		lower_bounds_matrix.flatten(),
-		np.zeros(len(intervention_times)*len(rel_activities)) + 1.0
+		np.zeros(len(intervention_times)*len(age_groups)*len(rel_activities)) + 1.0
 	)
 
-	result_lockdown = minimize(simulate, x0, method='L-BFGS-B',bounds=full_bounds,options={'eps':10e-2,'maxfun':700000})
+	result_lockdown = minimize(simulate, x0, method='L-BFGS-B',bounds=full_bounds,options={'eps':1e-1,'maxfun':700000})
 
+	x_lockdown = np.reshape(
+		result_lockdown.x,
+		(len(intervention_times),len(age_groups),len(rel_activities))
+	)
 
-	x_aux = np.reshape(
-			result_lockdown.x,
-			(len(intervention_times),len(rel_activities))
-		)
+	alpha = matrix_to_alphas(x_lockdown, quar_freq)
 
-
-	x_lockdown = np.zeros((len(intervention_times),len(age_groups),len(rel_activities)))
-
-	for i,t in enumerate(intervention_times):
-		for j,ag in enumerate(age_groups):
-			x_lockdown[i,j,:] = x_aux[i,:]
-
-
-	alpha = matrix_to_alphas(x_lockdown, quar_freq)[0]
 
 	l_policy = []
 	a_tests_policy = []
@@ -234,8 +285,8 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 		a_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
 
 	for t in range(simulation_params['time_periods']):
-		dynModel.take_time_step(m_tests, a_tests, alpha)
-		l_policy.append(deepcopy(alpha))
+		dynModel.take_time_step(m_tests, a_tests, alpha[t])
+		l_policy.append(deepcopy(alpha[t]))
 		a_tests_policy.append(deepcopy(a_tests))
 		m_tests_policy.append(deepcopy(m_tests))
 
@@ -246,24 +297,7 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 	a_tests_policy += end_a_tests
 	m_tests_policy += end_m_tests
 
-
-	result = {
-		"lockdown_heuristic":"constant_gradient",
-		"groups":groups,
-		"experiment_params":{
-			"delta_schooling":experiment_params["delta_schooling"],
-			"xi":experiment_params["xi"],
-			"icus":experiment_params["icus"],
-			"n_a_tests":experiment_params["tests"],
-			"n_m_tests":experiment_params["tests"],
-			"start_day":start_day,
-			"T":simulation_params['time_periods'],
-			"eta":experiment_params["eta"],
-			"test_freq":simulation_params["days"],
-			"policy_freq":simulation_params["days"],
-			"end_days":14,
-		},
-		"testing_heuristic":experiment_params["testing"],
+	result.update({
 		"results":{
 			"economics_value":float(dynModel.get_total_economic_value()),
 			"deaths":float(dynModel.get_total_deaths()),
@@ -272,29 +306,9 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 		"policy":l_policy,
 		"a_tests":a_tests_policy,
 		"m_tests":m_tests_policy,
-	}
-
-	result["filename"] = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d"%(
-		result["lockdown_heuristic"],
-		result["experiment_params"]["xi"],
-		result["experiment_params"]["icus"],
-		result["testing_heuristic"],
-		result["experiment_params"]["n_a_tests"],
-		result["experiment_params"]["n_m_tests"],
-		result["experiment_params"]["T"],
-		result["experiment_params"]["start_day"],
-		result["groups"],
-		result["experiment_params"]["delta_schooling"],
-		result["experiment_params"]["eta"],
-		result["experiment_params"]["test_freq"],
-		result["experiment_params"]["policy_freq"],
-	)
+	})
 
 	return result
-
-
-
-
 
 
 
@@ -313,11 +327,8 @@ for delta in params_to_try["delta_schooling"]:
 							'tests':tests,
 							'eta':eta,
 						}
-						print(experiment_params)
-						result_gradient = gradient_descent(experiment_params, int(simulation_params["days"]), plot=True)
+						result_gradient = gradient_descent(experiment_params, 14, plot=True)
 						all_results.append(result_gradient)
-
-
 
 
 

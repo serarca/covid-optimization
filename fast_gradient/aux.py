@@ -1,8 +1,18 @@
 import numpy as np
 from copy import deepcopy
+import yaml
 
-age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29', 'age_group_30_39', 'age_group_40_49',	'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
-#age_groups = ['all_age_groups']
+# Parameters to try
+with open("../parameters/run_params.yaml") as file:
+	run_params = yaml.load(file, Loader=yaml.FullLoader)
+print(run_params)
+groups = run_params["groups"]
+
+if groups == "all":
+	age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29', 'age_group_30_39', 'age_group_40_49',	'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
+elif groups == "one":
+	age_groups = ['all_age_groups']
+
 
 cont = [ 'S', 'E', 'I', 'R', 'N', 'Ia', 'Ips', \
        'Ims', 'Iss', 'Rq', 'H', 'ICU', 'D' ]
