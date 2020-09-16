@@ -67,16 +67,16 @@ def main():
     # region = 'fitted'
     
     
-    Parallel(n_jobs=4)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day)
-    for delta in params_to_try["delta_schooling"]
-    for xi in params_to_try["xi"]
-    for icus in params_to_try["icus"]
-    for tests in params_to_try["tests"]
-    for test_freq, lockdown_freq in params_to_try['frequencies']
-    for econ in params_to_try['econ']
-    for init in params_to_try['init']
-    for region in params_to_try['region']
-    for eta in params_to_try['eta'])
+    # Parallel(n_jobs=4)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day)
+    # for delta in params_to_try["delta_schooling"]
+    # for xi in params_to_try["xi"]
+    # for icus in params_to_try["icus"]
+    # for tests in params_to_try["tests"]
+    # for test_freq, lockdown_freq in params_to_try['frequencies']
+    # for econ in params_to_try['econ']
+    # for init in params_to_try['init']
+    # for region in params_to_try['region']
+    # for eta in params_to_try['eta'])
 
     # for delta in params_to_try["delta_schooling"]:
     #     for xi in params_to_try["xi"]:
@@ -95,7 +95,7 @@ def main():
 
     load_pickles_and_create_yaml(n_days, params_to_try, final_time_step, groups, start_day, scaling)
 
-    load_pickles_and_create_csv(n_days, params_to_try, final_time_step, groups)
+    # load_pickles_and_create_csv(n_days, params_to_try, final_time_step, groups)
 
 def run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day):
     ''' Runs the linearization heuristic with the experiment parameters passed as arguments and saves the resulting dynamical model as a pickle object.'''

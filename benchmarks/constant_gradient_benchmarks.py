@@ -112,119 +112,13 @@ params_to_try = {
 	"delta_schooling":[0.5],
 	"xi":[0,30*37199.03],
 	"icus":[3000],
-	"tests":[30000],
-	"testing":["homogeneous"]
-}
-
-experiment_params = {
-	"delta_schooling":0.5,
-	"xi":0,
-	"icus":3000,
-	"tests":0,
-	"testing":"homogeneous",
+	"tests":[0],
+	"testing":["homogeneous"],
+	"eta":[0,0.1],
 }
 
 
-def run_government_policy(experiment_params):
 
-
-	alphas_vec = []
-
-	for t in range(simulation_params['time_periods']):
-		index = t+start_day
-		if t+start_day >= len(gov_policy):
-			alphas_vec.append({ag:gov_policy[-1] for ag in age_groups})
-		else:
-			alphas_vec.append({ag:gov_policy[t+start_day] for ag in age_groups})
-
-	# Create dynamical method
-	dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method, start_day)
-	if experiment_params["testing"] == "homogeneous":
-		m_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
-		a_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
-
-	for t in range(simulation_params['time_periods']):
-		dynModel.take_time_step(m_tests, a_tests, alphas_vec[t])
-
-	result = {
-		"heuristic":"real",
-		"delta_schooling":experiment_params["delta_schooling"],
-		"xi":experiment_params["xi"],
-		"icus":experiment_params["icus"],
-		"tests":experiment_params["tests"],
-		"testing":experiment_params["testing"],
-		"economics_value":dynModel.get_total_economic_value(),
-		"deaths":dynModel.get_total_deaths(),
-		"reward":dynModel.get_total_reward(),	
-	}
-
-	return result
-
-def run_constant_policy(experiment_params, alpha, plot=False):
-
-	# Create dynamical method
-	dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method, start_day, extra_data = True)
-	if experiment_params["testing"] == "homogeneous":
-		m_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
-		a_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
-
-	for t in range(simulation_params['time_periods']):
-		dynModel.take_time_step(m_tests, a_tests, alpha)
-
-
-	if plot:
-			plot_benchmark(dynModel, 
-			experiment_params["delta_schooling"], 
-			experiment_params["xi"], 
-			experiment_params["icus"], 
-			experiment_params["tests"], 
-			experiment_params["testing"], 
-			simulation_params, 
-			"constant_gradient")
-
-	result = {
-		"heuristic":"constant",
-		"delta_schooling":experiment_params["delta_schooling"],
-		"xi":experiment_params["xi"],
-		"icus":experiment_params["icus"],
-		"tests":experiment_params["tests"],
-		"testing":experiment_params["testing"],
-		"economics_value":dynModel.get_total_economic_value(),
-		"deaths":dynModel.get_total_deaths(),
-		"reward":dynModel.get_total_reward(),	
-	}
-
-	return result
-
-def run_full_lockdown(experiment_params):
-
-	ag_alpha = gov_policy[start_lockdown]
-
-	alpha = {
-		ag:ag_alpha for ag in age_groups
-	}
-
-	result = run_constant_policy(experiment_params, alpha)
-	result["heuristic"] = "full-lockdown"
-	return result
-
-def run_open(experiment_params):
-	ag_alpha = {
-		"home": 1.0,
-		"leisure": 1.0,
-		"other": 1.0,
-		"school": 1.0,
-		"transport": 1.0,
-		"work": 1.0
-	}
-
-	alpha = {
-		ag:ag_alpha for ag in age_groups
-	}
-
-	result = run_constant_policy(experiment_params, alpha)
-	result["heuristic"] = "full-open"
-	return result
 
 
 
@@ -235,7 +129,7 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 	x0 = np.zeros(len(intervention_times)*len(rel_activities)) + 0.5
 
 	# Create dynamical model
-	fastModel = FastDynamicalModel(universe_params, econ_params, experiment_params, simulation_params['dt'], mixing_method, simulation_params['time_periods'], start_day)
+	fastModel = FastDynamicalModel(universe_params, econ_params, experiment_params, simulation_params['dt'], mixing_method, simulation_params['time_periods'], start_day, experiment_params["eta"])
 	initial_state = state_to_matrix(initialization)
 
 	if experiment_params["testing"] == "homogeneous":
@@ -335,7 +229,7 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 	a_tests_policy = []
 	m_tests_policy = []
 	# Create dynamical method
-	dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method, start_day, extra_data = True)
+	dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method, start_day, experiment_params["eta"], extra_data = True)
 	if experiment_params["testing"] == "homogeneous":
 		m_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
 		a_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
@@ -365,7 +259,7 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 			"n_m_tests":experiment_params["tests"],
 			"start_day":start_day,
 			"T":simulation_params['time_periods'],
-			"eta":econ_params["employment_params"]["eta"],
+			"eta":experiment_params["eta"],
 			"test_freq":simulation_params["days"],
 			"policy_freq":simulation_params["days"],
 			"end_days":14,
@@ -411,16 +305,18 @@ for delta in params_to_try["delta_schooling"]:
 		for icus in params_to_try["icus"]:
 			for tests in params_to_try["tests"]:
 				for testing in params_to_try["testing"]:
-					experiment_params = {
-						'delta_schooling':delta,
-						'xi':xi,
-						'icus':icus,
-						'testing':testing,
-						'tests':tests,
-					}
-					print(experiment_params)
-					result_gradient = gradient_descent(experiment_params, int(simulation_params["days"]), plot=True)
-					all_results.append(result_gradient)
+					for eta in params_to_try["eta"]:
+						experiment_params = {
+							'delta_schooling':delta,
+							'xi':xi,
+							'icus':icus,
+							'testing':testing,
+							'tests':tests,
+							'eta':eta,
+						}
+						print(experiment_params)
+						result_gradient = gradient_descent(experiment_params, int(simulation_params["days"]), plot=True)
+						all_results.append(result_gradient)
 
 
 

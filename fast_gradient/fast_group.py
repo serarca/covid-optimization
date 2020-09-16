@@ -16,7 +16,7 @@ activities = ['home','leisure','other','school','transport','work']
 
 
 class FastDynamicalModel:
-	def __init__(self, parameters, econ_params, experiment_params, dt, mixing_method, horizon, start_day):
+	def __init__(self, parameters, econ_params, experiment_params, dt, mixing_method, horizon, start_day, eta):
 		self.parameters = deepcopy(parameters)
 		self.econ_params = deepcopy(econ_params)
 		self.experiment_params = deepcopy(experiment_params)
