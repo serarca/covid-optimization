@@ -93,6 +93,7 @@ class DynamicalModel:
 		for n in parameters['seir-groups']:
 			self.groups[n] = SEIR_group(self.parameters['seir-groups'][n], self.initialization[n], self.dt, self.mixing_method, self.time_steps, self)
 
+
 		# Attach other groups to each group
 		for n in self.groups:
 			self.groups[n].attach_other_groups(self.groups)

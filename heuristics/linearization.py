@@ -7,7 +7,7 @@ import sys
 from threadpoolctl import threadpool_limits
 import numpy as np
 
-threadpool_limits(limits=2, user_api='blas')
+threadpool_limits(limits=1, user_api='blas')
 
 import pandas as pd
 import math
@@ -47,8 +47,8 @@ def log_execution_time(function):
 ##################################################
 
 
-# age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29','age_group_30_39', 'age_group_40_49', 'age_group_50_59', 'age_group_60_69', 'age_group_70_79','age_group_80_plus']
-age_groups = ["all_age_groups"]
+age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29','age_group_30_39', 'age_group_40_49', 'age_group_50_59', 'age_group_60_69', 'age_group_70_79','age_group_80_plus']
+# age_groups = ["all_age_groups"]
 SEIR_groups = [ 'S_g', 'E_g', 'I_g', 'R_g', 'N_g', 'Ia_g', 'Ips_g', \
        'Ims_g', 'Iss_g', 'Rq_g', 'H_g', 'ICU_g', 'D_g' ]
 activities = ['home','leisure','other','school','transport','work']
@@ -1238,7 +1238,7 @@ def run_heuristic_linearization(dynModel):
 
     max_step_size = 0.1
     threshold = 0.01
-    max_inner_iterations = 3/max_step_size
+    max_inner_iterations = 2/max_step_size
 
     # shorthand for a few useful parameters
     T = dynModel.time_steps
@@ -1524,7 +1524,7 @@ def run_heuristic_linearization(dynModel):
             # optimize the model
 
             # ToDo: Remove when running as it reduces efficiency
-            # mod.Params.InfUnbdInfo = 1
+            mod.Params.InfUnbdInfo = 1
 
             # mod.addConstrs(u_vars_vec[i] >= 0 for i in range(ut_dim * (T-k)))
 
@@ -1532,10 +1532,12 @@ def run_heuristic_linearization(dynModel):
 
             # print(f"Optimizing model at time k = {k}")
             mod.optimize()
+            print(f"Objective value for Line heur k = {k}: {mod.objVal}")
+            print(f"Gurobi status: {mod.Status}")
 
             # Print model statistics
-            # mod.printStats()
-            # print(mod.Kappa)
+            mod.printStats()
+            print(mod.Kappa)
 
             if( mod.Status ==  gb.GRB.INFEASIBLE ):
                 # model was infeasible
@@ -1543,7 +1545,7 @@ def run_heuristic_linearization(dynModel):
                 mod.write(f"LP_lineariz_IIS_k={k}.ilp")
                 print("ERROR. Problem infeasible at time k={}. Halting...".format(k))
                 assert(False)
-            print(f"Gurobi status: {mod.Status}")
+            
             
             if mod.Status == 5:
                 print(mod.UnbdRay)
@@ -1556,8 +1558,7 @@ def run_heuristic_linearization(dynModel):
                         print(f"Unbounded ray has positive value for control: {controls[(i%ut_dim) % num_controls]}")
                 
             # mod.write(f"LP_lineariz_k={k}.lp")
-            print(f"Objective value for Line heur k = {k}: {mod.objVal}")
-
+           
         
 
             for i in range(ut_dim * (T-k)):
