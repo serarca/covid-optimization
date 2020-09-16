@@ -37,7 +37,7 @@ def main():
         "icus":[3000 / scaling],
         "tests":[0, 30000 / scaling, 60000 / scaling],
         # , 30000 / scaling],
-        "frequencies":[(1,1), (7,14)],
+        "frequencies":[(1,1) , (7,14)],
         "region":["fitted-scaled"], 
         "econ": ["econ-scaled"],
         "init": ["60days-scaled"],
@@ -67,16 +67,16 @@ def main():
     # region = 'fitted'
     
     
-    # Parallel(n_jobs=4)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day)
-    # for delta in params_to_try["delta_schooling"]
-    # for xi in params_to_try["xi"]
-    # for icus in params_to_try["icus"]
-    # for tests in params_to_try["tests"]
-    # for test_freq, lockdown_freq in params_to_try['frequencies']
-    # for econ in params_to_try['econ']
-    # for init in params_to_try['init']
-    # for region in params_to_try['region']
-    # for eta in params_to_try['eta'])
+    Parallel(n_jobs=4)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day)
+    for delta in params_to_try["delta_schooling"]
+    for xi in params_to_try["xi"]
+    for icus in params_to_try["icus"]
+    for tests in params_to_try["tests"]
+    for test_freq, lockdown_freq in params_to_try['frequencies']
+    for econ in params_to_try['econ']
+    for init in params_to_try['init']
+    for region in params_to_try['region']
+    for eta in params_to_try['eta'])
 
     # for delta in params_to_try["delta_schooling"]:
     #     for xi in params_to_try["xi"]:
