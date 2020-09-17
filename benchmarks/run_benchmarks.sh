@@ -1,0 +1,5 @@
+python simple_benchmarks.py
+python constant_gradient_benchmarks.py
+python age_group_gradient_benchmarks.py
+python time_gradient_benchmarks.py
+python evaluate_yaml.py

@@ -277,11 +277,7 @@ for h in heuristics:
 			}
 			death_prob = death_prob_all if (result["groups"]=="all") else death_prob_one
 
-<<<<<<< HEAD
 			#plot_benchmark(dynModel, result)
-=======
-			# plot_benchmark(dynModel, result)
->>>>>>> 53ed815e204c495fa1f882bb16f62b24547d5c28
 
 			data = {
 				"groups": result["groups"],

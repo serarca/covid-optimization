@@ -128,8 +128,8 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 			"delta_schooling":experiment_params["delta_schooling"],
 			"xi":experiment_params["xi"],
 			"icus":experiment_params["icus"],
-			"n_a_tests":experiment_params["tests"],
-			"n_m_tests":experiment_params["tests"],
+			"n_a_tests":experiment_params["tests"][1],
+			"n_m_tests":experiment_params["tests"][0],
 			"start_day":start_day,
 			"T":simulation_params['time_periods'],
 			"eta":econ_params["employment_params"]["eta"],
@@ -193,8 +193,8 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 	initial_state = state_to_matrix(initialization)
 
 	if experiment_params["testing"] == "homogeneous":
-		m_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
-		a_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
+		m_tests = {ag:experiment_params["tests"][0]/len(age_groups) for ag in age_groups}
+		a_tests = {ag:experiment_params["tests"][1]/len(age_groups) for ag in age_groups}
 
 	m_tests_vec = dict_to_vector(m_tests)
 	a_tests_vec = dict_to_vector(a_tests)
@@ -291,8 +291,8 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 	m_tests_policy = []
 	dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method, start_day, experiment_params["eta"], extra_data=True)
 	if experiment_params["testing"] == "homogeneous":
-		m_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
-		a_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
+		m_tests = {ag:experiment_params["tests"][0]/len(age_groups) for ag in age_groups}
+		a_tests = {ag:experiment_params["tests"][1]/len(age_groups) for ag in age_groups}
 
 	for t in range(simulation_params['time_periods']):
 		dynModel.take_time_step(m_tests, a_tests, alphas[t])
