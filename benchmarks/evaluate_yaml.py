@@ -274,7 +274,7 @@ for h in heuristics:
 			}
 			death_prob = death_prob_all if (result["groups"]=="all") else death_prob_one
 
-			plot_benchmark(dynModel, result)
+			# plot_benchmark(dynModel, result)
 
 			data = {
 				"groups": result["groups"],
