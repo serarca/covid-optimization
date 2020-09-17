@@ -208,12 +208,12 @@ def plot_benchmark(dynModel, result):
 
 
 
-heuristics = ["real","full_open","full_lockdown","constant_gradient","time_gradient","age_group_gradient","linearization_heuristic","linearization_heuristic_Prop_Bouncing"]
+heuristics = ["real","full_open","full_lockdown","constant_gradient","time_gradient","age_group_gradient"]
 all_data = []
 
 for h in heuristics:
 	for n in os.listdir("results/%s/"%h):
-		if n[0:2] == "xi":
+		if n[0:2] == "xi" and (".pdf" not in n):
 
 			print(h,n)
 			with open("results/%s/%s"%(h,n)) as file:

@@ -14,6 +14,7 @@ sys.path.insert(0, parent_dir+"/fast_gradient")
 sys.path.insert(0, current_dir+"/heuristics/LP-Models")
 parent_dir = current_dir[:current_dir.rfind(os.path.sep)]
 sys.path.insert(0, parent_dir)
+import time
 
 from group import SEIR_group, DynamicalModel
 import math
@@ -24,17 +25,19 @@ import numpy as np
 from fast_group import FastDynamicalModel
 from aux import *
 from scipy.optimize import Bounds,minimize,LinearConstraint
-
-
-# Parameters to try
-with open("../parameters/run_params.yaml") as file:
-	run_params = yaml.load(file, Loader=yaml.FullLoader)
-
-params_to_try = run_params["params_to_try"]
-groups = run_params["groups"]
+from random import sample 
 
 
 
+groups = "one"
+experiment_params = {
+	'delta_schooling':0.5,
+	'xi':1115970.9,
+	'icus':3000,
+	'testing':"homogeneous",
+	'tests':0,
+	'eta':0.1,
+}
 
 # Global variables
 simulation_params = {
@@ -74,6 +77,33 @@ elif groups == "one":
 	with open("../initialization/60days_one_group.yaml") as file:
 		initialization = yaml.load(file, Loader=yaml.FullLoader)
 		start_day = 60
+	population = sum([initialization["all_age_groups"][cont] for cont in initialization["all_age_groups"]])
+
+
+	infected_perc = sample([0.1,0.01,0.001,0.0001,0.00001,0.000001],1)[0]*np.random.random()
+	n_icu = sample([1.0,0.1,0.01,0],1)[0]*experiment_params["icus"] * np.random.random()
+	recovered_perc = sample([0.9,0.1,0.001,0.0001,0],1)[0]*np.random.random()
+
+
+	s_perc = 1.0 - recovered_perc - infected_perc
+	
+	initialization = {'all_age_groups': 
+		{'D': 0, 
+		'E': infected_perc/2*(population-5*n_icu), 
+		'H': 4*n_icu, 
+		'I': infected_perc/2*(population-5*n_icu), 
+		'ICU': n_icu, 
+		'Ia': 0.0, 
+		'Ims': 0.0, 
+		'Ips': 0.0, 
+		'Iss': 0.0, 
+		'N': population, 
+		'R': recovered_perc*(population-5*n_icu), 
+		'Rq': 0,
+		'S': s_perc*(population-5*n_icu)}
+	}
+
+	assert(sum([initialization['all_age_groups'][cont] for cont in initialization['all_age_groups'] if cont!="N"]) == population)
 
 	# Read econ parameters
 	with open("../parameters/one_group_econ.yaml") as file:
@@ -98,31 +128,22 @@ rel_activities = ['leisure','other','school','transport','work']
 simulation_params['time_periods'] = int(math.ceil(simulation_params["days"]/simulation_params["dt"]))
 
 
+
+
 # Define mixing parameter
 mixing_method = universe_params["mixing"]
 
-# Load gov policy
-with open("../policies/fitted.yaml") as file:
-	gov_policy = yaml.load(file, Loader=yaml.FullLoader)
-for i,p in enumerate(gov_policy):
-	if p["days_from_lockdown"] == 0:
-		start_lockdown = i
-		break
-for i,p in enumerate(gov_policy):
-	del p['date']
-	del p['days_from_lockdown']
 
 
 
 
 
 
+def gradient_descent(experiment_params, quar_freq, plot=False):
 
-
-def gradient_descent(experiment_params, quar_freq, plot = False):
 
 	result = {
-		"lockdown_heuristic":"time_gradient",
+		"lockdown_heuristic":"dynamic_gradient",
 		"groups":groups,
 		"experiment_params":{
 			"delta_schooling":experiment_params["delta_schooling"],
@@ -135,7 +156,7 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 			"eta":econ_params["employment_params"]["eta"],
 			"test_freq":simulation_params["days"],
 			"policy_freq":quar_freq,
-			"end_days":14,		
+			"end_days":14,			
 		},
 		"testing_heuristic":experiment_params["testing"],
 	}
@@ -155,6 +176,7 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 		result["experiment_params"]["policy_freq"],
 	)
 
+
 	constant_gradients_filename = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d"%(
 		"constant_gradient",
 		result["experiment_params"]["xi"],
@@ -167,26 +189,15 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 		result["groups"],
 		result["experiment_params"]["delta_schooling"],
 		result["experiment_params"]["eta"],
-		90, 
+		90,
 		90,
 	)
 
 
+
 	intervention_times = [t*quar_freq for t in range(int((simulation_params['days']-1)/quar_freq)+1)]
 
-	# Read the constant alphas to initialize the solution
-	with open("results/"+constant_gradients_filename+".yaml") as file:
-		initial_alphas = yaml.load(file, Loader=yaml.FullLoader)["policy"][0]
-
-
-	x0 = np.zeros(len(intervention_times)*len(rel_activities))
-	for i,t in enumerate(intervention_times):
-		for k,act in enumerate(rel_activities):
-			if groups == "one":
-				x0[i*len(rel_activities) + k] = initial_alphas["all_age_groups"][act]
-			elif groups == "all":
-				x0[i*len(rel_activities) + k] = initial_alphas["age_group_30_39"][act]
-
+	x0 = np.random.random(len(intervention_times)*len(age_groups)*len(rel_activities))
 
 	# Create dynamical model
 	fastModel = FastDynamicalModel(universe_params, econ_params, experiment_params, simulation_params['dt'], mixing_method, simulation_params['time_periods'], start_day, experiment_params["eta"])
@@ -202,18 +213,10 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 
 	def simulate(x):
 		# Extract vector components
-		x_lockdown = np.zeros((len(intervention_times),len(age_groups),len(rel_activities)))
-
-
-		x_aux = np.reshape(
+		x_lockdown = np.reshape(
 			x,
-			(len(intervention_times),len(rel_activities))
+			(len(intervention_times),len(age_groups),len(rel_activities))
 		)
-
-		for i,t in enumerate(intervention_times):
-			for j,ag in enumerate(age_groups):
-				x_lockdown[i,j,:] = x_aux[i,:]
-
 
 
 		state = initial_state
@@ -253,52 +256,50 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 			total_econ += econs['economic_value']
 
 
+
+
 		print(total_reward, total_deaths, total_econ)
 		return -total_reward
 
-	lower_bounds_matrix = np.zeros((len(intervention_times),len(rel_activities)))
+	lower_bounds_matrix = np.zeros((len(intervention_times),len(age_groups),len(rel_activities)))
 	for i,act in enumerate(rel_activities):
-		lower_bounds_matrix[:,i] += lower_bounds[act]
+		lower_bounds_matrix[:,:,i] += lower_bounds[act]
+
+
 
 
 	
 	full_bounds = Bounds(
 		lower_bounds_matrix.flatten(),
-		np.zeros(len(intervention_times)*len(rel_activities)) + 1.0
+		np.zeros(len(intervention_times)*len(age_groups)*len(rel_activities)) + 1.0
 	)
 
-	result_lockdown = minimize(simulate, x0, method='L-BFGS-B',bounds=full_bounds,options={'eps':10e-2,'maxfun':700000})
+	result_lockdown = minimize(simulate, x0, method='L-BFGS-B',bounds=full_bounds,options={'eps':1e-1,'maxfun':700000})
 
+	x_lockdown = np.reshape(
+		result_lockdown.x,
+		(len(intervention_times),len(age_groups),len(rel_activities))
+	)
 
-	x_aux = np.reshape(
-			result_lockdown.x,
-			(len(intervention_times),len(rel_activities))
-		)
-
-
-	x_lockdown = np.zeros((len(intervention_times),len(age_groups),len(rel_activities)))
-
-	for i,t in enumerate(intervention_times):
-		for j,ag in enumerate(age_groups):
-			x_lockdown[i,j,:] = x_aux[i,:]
-
-
-	alphas = matrix_to_alphas(x_lockdown, quar_freq)
+	alpha = matrix_to_alphas(x_lockdown, quar_freq)
 
 
 	l_policy = []
 	a_tests_policy = []
 	m_tests_policy = []
-	dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method, start_day, experiment_params["eta"], extra_data=True)
+	states = [initialization]
+	# Create dynamical method
+	dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method, start_day, experiment_params["eta"], extra_data = True)
 	if experiment_params["testing"] == "homogeneous":
 		m_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
 		a_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
 
 	for t in range(simulation_params['time_periods']):
-		dynModel.take_time_step(m_tests, a_tests, alphas[t])
-		l_policy.append(deepcopy(alphas[t]))
+		r = dynModel.take_time_step(m_tests, a_tests, alpha[t])
+		l_policy.append(deepcopy(alpha[t]))
 		a_tests_policy.append(deepcopy(a_tests))
 		m_tests_policy.append(deepcopy(m_tests))
+		states.append(r["state"])
 
 
 	end_alphas, end_a_tests, end_m_tests = dynModel.take_end_steps()
@@ -306,7 +307,6 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 	l_policy += end_alphas
 	a_tests_policy += end_a_tests
 	m_tests_policy += end_m_tests
-
 
 	result.update({
 		"results":{
@@ -317,41 +317,17 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 		"policy":l_policy,
 		"a_tests":a_tests_policy,
 		"m_tests":m_tests_policy,
+		"states":states,
 	})
-
-
-
-
 
 	return result
 
 
 
+result_gradient = gradient_descent(experiment_params, 14)
 
-all_results = []
-for delta in params_to_try["delta_schooling"]:
-	for xi in params_to_try["xi"]:
-		for icus in params_to_try["icus"]:
-			for tests in params_to_try["tests"]:
-				for testing in params_to_try["testing"]:
-					for eta in params_to_try["eta"]:
-						experiment_params = {
-							'delta_schooling':delta,
-							'xi':xi,
-							'icus':icus,
-							'testing':testing,
-							'tests':tests,
-							'eta':eta,
-						}					
-						result_gradient = gradient_descent(experiment_params, 14, plot=True)
-						all_results.append(result_gradient)
+with open("runs/run_%s.yaml"%str(time.time()), 'w') as file:
+		yaml.dump(result_gradient, file)
 
 
 
-
-
-for r in all_results:
-	fn =  "results/"+r["filename"]+".yaml"
-	print(fn)
-	with open(fn, 'w') as file:
-		yaml.dump(r, file)
