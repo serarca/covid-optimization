@@ -943,13 +943,13 @@ experiment_params:
   icus: 3000
   n_a_tests: 30000
   n_m_tests: 30000
-  policy_freq: 1
+  policy_freq: 90.0
   start_day: 60
-  test_freq: 1
+  test_freq: 90.0
   xi: 1115970.9
-filename: full_open/xi-1115970_icus-3000_testing-homogeneous_natests-30000_nmtests-30000_T-90_startday-60_groups-all_dschool-0.500000_eta-0.100000_freq-1-1
+filename: age_group_gradient/xi-1115970_icus-3000_testing-homogeneous_natests-30000_nmtests-30000_T-90_startday-60_groups-all_dschool-0.500000_eta-0.100000_freq-90-90
 groups: all
-lockdown_heuristic: full_open
+lockdown_heuristic: age_group_gradient
 m_tests:
 - age_group_0_9: 3333.3333333333335
   age_group_10_19: 3333.3333333333335
@@ -1890,5674 +1890,5674 @@ m_tests:
 policy:
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
-  age_group_50_59:
-    home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+  age_group_50_59:
+    home: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
+    leisure: 0.3622072686480146
+    other: 0.48241731955768924
     school: 1.0
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_10_19:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.16398816489987958
+    school: 0.42931012871813234
+    transport: 0.8625649328023823
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.08259232915491403
+    other: 0.0
+    school: 0.0
     transport: 1.0
-    work: 1.0
+    work: 0.47829812956426415
   age_group_30_39:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
     transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_50_59:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.0
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
-    transport: 1.0
+    leisure: 0.0
+    other: 0.0
+    school: 0.0
+    transport: 0.7314697794711799
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 1.0
-    other: 1.0
-    school: 1.0
+    leisure: 0.41742437415333217
+    other: 0.6011523084033457
+    school: 0.07048667077993828
     transport: 1.0
-    work: 1.0
+    work: 0.0
   age_group_80_plus:
     home: 1.0
     leisure: 1.0
-    other: 1.0
-    school: 1.0
+    other: 0.5046064904436873
+    school: 0.17544943744827607
     transport: 1.0
-    work: 1.0
+    work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 1.0
@@ -8441,7 +8441,7 @@ policy:
     transport: 1.0
     work: 1.0
 results:
-  deaths: 94376.22793168796
-  economics_value: 56462550823.73626
-  reward: -56289721573.5535
+  deaths: 11287.41168423393
+  economics_value: 53989611758.28776
+  reward: 40597207176.73793
 testing_heuristic: homogeneous

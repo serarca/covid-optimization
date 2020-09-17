@@ -8,8 +8,10 @@ params_to_try:
   icus:
     - 3000
   tests:
-    - 0
-    - 30000
+    - [0,0]
+    - [0,30000]
+    - [30000,0]
+    - [30000,30000]
   testing:
     - homogeneous
   eta:

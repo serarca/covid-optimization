@@ -300,7 +300,7 @@ class DynamicalModel:
 		for age_group in state:
 			v_g = sum([self.econ_params["employment_params"]["v"][age_group][activity] for activity in econ_activities])
 			self.v_g[age_group] = v_g
-			l_mean = np.mean([np.sum([alphas[ag][act] for act in eta_activities]) for ag in alphas])
+			l_mean = np.mean([np.sum([alphas[ag][act] for act in eta_activities]) for ag in alphas])/3.0
 			l_mean_upper_bound = np.sum([self.econ_params["upper_bounds"][act] for act in eta_activities])
 
 			v_employment_g = 0
@@ -309,13 +309,14 @@ class DynamicalModel:
 						self.econ_params["employment_params"]["eta"]*l_mean+
 						self.econ_params["employment_params"]["gamma"]
 					)*(state[age_group]["S"] + state[age_group]["E"] + state[age_group]["I"] + state[age_group]["R"])* self.dt
+
 			# Add contribution of people fully recovered
 			v_employment_g += v_g*(
 						self.econ_params["employment_params"]["nu"]*1.0+
 						self.econ_params["employment_params"]["eta"]*1.0+
 						self.econ_params["employment_params"]["gamma"]
 			)*state[age_group]["Rq"]* self.dt
-			
+
 			v_employment += v_employment_g
 			# Add schooling contributions
 			v_schooling += (

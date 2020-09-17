@@ -34,8 +34,6 @@ with open("../parameters/run_params.yaml") as file:
 params_to_try = run_params["params_to_try"]
 groups = run_params["groups"]
 
-
-
 proportions = {'age_group_0_9': 0.12999753718396828, 'age_group_10_19': 0.1260199381062682, 'age_group_20_29': 0.13462273540296374, 'age_group_30_39': 0.1432185965976917, 'age_group_40_49': 0.13619350895266272, 'age_group_50_59': 0.1252867882416867, 'age_group_60_69': 0.09586005862219948, 'age_group_70_79': 0.06449748382900194, 'age_group_80_plus': 0.044303353063557066}
 
 death_prob_all = {
@@ -159,19 +157,6 @@ for i,p in enumerate(gov_policy):
 
 full_lockdown_policy = gov_policy[start_lockdown]
 
-print(full_lockdown_policy)
-
-thresholds_to_try = {
-	"icus":[500,1000,1500,2000,2500,3000],
-	"beds":[25000,50000,75000,100000,125000,150000],
-	"infection_rate":[0.001,0.005,0.01,0.05,0.1,0.2],
-}
-
-thresholds = {
-	"icus":1000,
-	"beds":50000,
-	"infection_rate":0.01
-}
 
 
 def run_government_policy(experiment_params):
@@ -191,8 +176,8 @@ def run_government_policy(experiment_params):
 	# Create dynamical method
 	dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method, start_day, experiment_params["eta"])
 	if experiment_params["testing"] == "homogeneous":
-		m_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
-		a_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
+		m_tests = {ag:experiment_params["tests"][0]/len(age_groups) for ag in age_groups}
+		a_tests = {ag:experiment_params["tests"][1]/len(age_groups) for ag in age_groups}
 
 	for t in range(simulation_params['time_periods']):
 		dynModel.take_time_step(m_tests, a_tests, alphas_vec[t])
@@ -214,8 +199,8 @@ def run_government_policy(experiment_params):
 			"delta_schooling":experiment_params["delta_schooling"],
 			"xi":experiment_params["xi"],
 			"icus":experiment_params["icus"],
-			"n_a_tests":experiment_params["tests"],
-			"n_m_tests":experiment_params["tests"],
+			"n_a_tests":experiment_params["tests"][1],
+			"n_m_tests":experiment_params["tests"][0],
 			"start_day":start_day,
 			"T":simulation_params['time_periods'],
 			"eta":experiment_params["eta"],
@@ -277,8 +262,8 @@ def run_full_lockdown(experiment_params):
 	# Create dynamical method
 	dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method, start_day, experiment_params["eta"])
 	if experiment_params["testing"] == "homogeneous":
-		m_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
-		a_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
+		m_tests = {ag:experiment_params["tests"][0]/len(age_groups) for ag in age_groups}
+		a_tests = {ag:experiment_params["tests"][1]/len(age_groups) for ag in age_groups}
 
 	for t in range(simulation_params['time_periods']):
 		dynModel.take_time_step(m_tests, a_tests, alpha)
@@ -299,8 +284,8 @@ def run_full_lockdown(experiment_params):
 			"delta_schooling":experiment_params["delta_schooling"],
 			"xi":experiment_params["xi"],
 			"icus":experiment_params["icus"],
-			"n_a_tests":experiment_params["tests"],
-			"n_m_tests":experiment_params["tests"],
+			"n_a_tests":experiment_params["tests"][1],
+			"n_m_tests":experiment_params["tests"][0],
 			"start_day":start_day,
 			"T":simulation_params['time_periods'],
 			"eta":experiment_params["eta"],
@@ -363,8 +348,8 @@ def run_open(experiment_params):
 	# Create dynamical method
 	dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method, start_day, experiment_params["eta"])
 	if experiment_params["testing"] == "homogeneous":
-		m_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
-		a_tests = {ag:experiment_params["tests"]/len(age_groups) for ag in age_groups}
+		m_tests = {ag:experiment_params["tests"][0]/len(age_groups) for ag in age_groups}
+		a_tests = {ag:experiment_params["tests"][1]/len(age_groups) for ag in age_groups}
 
 	for t in range(simulation_params['time_periods']):
 		dynModel.take_time_step(m_tests, a_tests, alpha)
@@ -378,7 +363,7 @@ def run_open(experiment_params):
 	a_tests_policy += end_a_tests
 	m_tests_policy += end_m_tests
 
-	
+
 	result = {
 		"lockdown_heuristic":"full_open",
 		"groups":groups,
@@ -386,8 +371,8 @@ def run_open(experiment_params):
 			"delta_schooling":experiment_params["delta_schooling"],
 			"xi":experiment_params["xi"],
 			"icus":experiment_params["icus"],
-			"n_a_tests":experiment_params["tests"],
-			"n_m_tests":experiment_params["tests"],
+			"n_a_tests":experiment_params["tests"][1],
+			"n_m_tests":experiment_params["tests"][0],
 			"start_day":start_day,
 			"T":simulation_params['time_periods'],
 			"eta":experiment_params["eta"],
@@ -451,9 +436,6 @@ for delta in params_to_try["delta_schooling"]:
 						all_results.append(result_closed)
 						all_results.append(result_open)
 
-						# pickle.dump(dynModel,open(f"dynModel_gov_full_lockd_benchmark_days_{simulation_params['time_periods']}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}.p","wb"))
-
-						# plot_benchmark(dynModel, delta, xi, icus, tests, testing, simulation_params, "govm_full_lockdown")
 
 
 
