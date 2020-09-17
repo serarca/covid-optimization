@@ -11,7 +11,7 @@ region = args.region
 
 # Import data
 old_init = yaml.load(open( "60days.yaml", "rb" ))
-scaling = 10000.0
+scaling = 1000.0
 
 # Construct initialization
 scaled_init_dict = {}

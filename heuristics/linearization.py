@@ -832,7 +832,7 @@ def calculate_all_constraints(dynModel, bounce_existing, h_cap_flag=False):
     # M-tests : 1
     # A-tests: 1
     # lockdown: (number of age groups) x (number of activities)
-    num_constraints = 5 + 2*num_age_groups
+    num_constraints = 3 + 2*num_age_groups
 
     # initialize Gamma_x and Gamma_u matrices with zeros
     Gamma_x = np.zeros((num_constraints, Xt_dim), dtype=numpyArrayDatatype)
@@ -981,12 +981,12 @@ def calculate_all_constraints(dynModel, bounce_existing, h_cap_flag=False):
         curr_constr += 1
 
     ################ Constraint for M-test capacity
-    Nmtestg_idx_all = slice(controls.index('Nmtest_g'),ut_dim,num_controls)
-    Gamma_u[curr_constr,Nmtestg_idx_all] = 1
-    K[curr_constr,:] = dynModel.parameters['global-parameters']['C_mtest'] * dynModel.dt
+    # Nmtestg_idx_all = slice(controls.index('Nmtest_g'),ut_dim,num_controls)
+    # Gamma_u[curr_constr,Nmtestg_idx_all] = 1
+    # K[curr_constr,:] = dynModel.parameters['global-parameters']['C_mtest'] * dynModel.dt
 
-    all_labels += ["Mtest_cap"]
-    curr_constr += 1
+    # all_labels += ["Mtest_cap"]
+    # curr_constr += 1
 
     Nmtestg_idx_all = slice(controls.index('Nmtest_g'),ut_dim,num_controls)
     Gamma_u[curr_constr,Nmtestg_idx_all] = 1
@@ -996,12 +996,12 @@ def calculate_all_constraints(dynModel, bounce_existing, h_cap_flag=False):
     curr_constr += 1
 
     ################ Constraint for A-test capacity
-    Natestg_idx_all = slice(controls.index('Natest_g'),ut_dim,num_controls)
-    Gamma_u[curr_constr,Natestg_idx_all] = 1
-    K[curr_constr,:] = dynModel.parameters['global-parameters']['C_atest'] * dynModel.dt
+    # Natestg_idx_all = slice(controls.index('Natest_g'),ut_dim,num_controls)
+    # Gamma_u[curr_constr,Natestg_idx_all] = 1
+    # K[curr_constr,:] = dynModel.parameters['global-parameters']['C_atest'] * dynModel.dt
 
-    all_labels += ["Atest_cap"]
-    curr_constr += 1
+    # all_labels += ["Atest_cap"]
+    # curr_constr += 1
 
     Natestg_idx_all = slice(controls.index('Natest_g'),ut_dim,num_controls)
     Gamma_u[curr_constr,Natestg_idx_all] = 1
@@ -1022,6 +1022,8 @@ def calculate_all_constraints(dynModel, bounce_existing, h_cap_flag=False):
     #         all_labels += ["lockdown_%s_%s" %(age_groups[ag],act)]
     #         curr_constr += 1
 
+    
+    assert(len(all_labels) == num_constraints)
 
 
     return Gamma_x, Gamma_u, K, all_labels
@@ -1221,7 +1223,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
 # Main function: runs the linearization heuristic
 # @profile
 # @log_execution_time
-def run_heuristic_linearization(dynModel):
+def run_heuristic_linearization(dynModel, trust_region_radius=0.1, max_inner_iterations_mult=2):
     """Run the heuristic based on linearization. Takes a dynamical model, resets the time to 0, and runs it following the linearization heuristic. Returns the dynamical model after running it."""
 
     # age_groups = dynModel.groups.keys()
@@ -1236,15 +1238,15 @@ def run_heuristic_linearization(dynModel):
 
     dynModel.reset_time(0)
 
-    max_step_size = 0.1
+    # trust_region_radius = 0.1
     threshold = 0.01
-    max_inner_iterations = 2/max_step_size
+    max_inner_iterations = max_inner_iterations_mult / trust_region_radius
 
     # shorthand for a few useful parameters
     T = dynModel.time_steps
     Xt_dim = num_compartments * num_age_groups
     ut_dim = num_controls * num_age_groups
-    num_constraints = 5 + 2*num_age_groups
+    num_constraints = 3 + 2*num_age_groups
 
     # some boolean flags for running the heuristic
     use_bounce_var = True   # whether to use the optimal bounce variables when forecasting the new X_hat
@@ -1287,11 +1289,11 @@ def run_heuristic_linearization(dynModel):
     Natestg_idx_all = slice(controls.index('Natest_g'),ut_dim,num_controls)
     uhat_seq[Natestg_idx_all,:] = dynModel.parameters['global-parameters']['C_atest']/num_age_groups
 
-    # Starting the uhat_seq with all lockdowns set to 1 (fully open)
+    # Starting the uhat_seq with all lockdowns set to 0.5 (fully open)
     for t in range(T):
         for act in activities:
             act_indices = slice(controls.index(act), ut_dim, num_controls)
-            uhat_seq[act_indices,t] = 1.0
+            uhat_seq[act_indices,t] = 0.5
 
     # Random lockdowns
             # uhat_seq[act_indices,:] = random.uniform(0,1)
@@ -1322,9 +1324,15 @@ def run_heuristic_linearization(dynModel):
 
         all_lockdowns_idx_all_times =  lock_work_idx_all_times + lock_other_idx_all_times + lock_school_idx_all_times + lock_leisure_idx_all_times + lock_transport_idx_all_times
 
+        a_test_idx_all_times = [controls.index('Natest_g') + i*num_controls for i in range((T-k)*num_age_groups)]
+
+        m_test_idx_all_times = [controls.index('Nmtest_g') + i*num_controls for i in range((T-k)*num_age_groups)]
+
 
         inner_iterations = 0
         u_hat_lockdown_difference = threshold + 1
+
+        all_u_hat_seq = [uhat_seq]
 
         while inner_iterations < max_inner_iterations and u_hat_lockdown_difference > threshold:
 
@@ -1378,38 +1386,53 @@ def run_heuristic_linearization(dynModel):
 
             for i in range(len(obj_vec)):
                 if i in all_lockdowns_idx_all_times:
-                    lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - max_step_size, 0)
+                    lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - trust_region_radius, 0)
                     
                     assert lower_bounds[i] >= 0
 
-                    upper_bounds[i] = min(uhat_seq[i%ut_dim, i//ut_dim] + max_step_size, 1)
+                    upper_bounds[i] = min(uhat_seq[i%ut_dim, i//ut_dim] + trust_region_radius, 1)
 
                 if i in lock_home_idx_all_times:
                     upper_bounds[i] = 1
                     lower_bounds[i] = 1
 
+                if i in a_test_idx_all_times:
+                    lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - (trust_region_radius * dynModel.parameters['global-parameters']['C_atest']), 0)
+                    
+                    assert lower_bounds[i] >= 0
+
+                    upper_bounds[i] = min(uhat_seq[i%ut_dim, i//ut_dim] + (trust_region_radius * dynModel.parameters['global-parameters']['C_atest']), dynModel.parameters['global-parameters']['C_atest'])
+
+                if i in m_test_idx_all_times:
+                    lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - (trust_region_radius * dynModel.parameters['global-parameters']['C_mtest']), 0)
+                    
+                    assert lower_bounds[i] >= 0
+
+                    upper_bounds[i] = min(uhat_seq[i%ut_dim, i//ut_dim] + (trust_region_radius * dynModel.parameters['global-parameters']['C_mtest']), dynModel.parameters['global-parameters']['C_mtest'])
+
+
                 # if i in lock_work_idx_all_times:
-                #     lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - max_step_size, 0)
-                #     upper_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim]  max_step_size, 1)
+                #     lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - trust_region_radius, 0)
+                #     upper_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim]  trust_region_radius, 1)
                 # if i in lock_other_idx_all_times:
-                #     lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - max_step_size, 0)
+                #     lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - trust_region_radius, 0)
                 #     upper_bounds[i] = 0
                 # if i in lock_school_idx_all_times:
-                #     lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - max_step_size, 0)
+                #     lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - trust_region_radius, 0)
                 #     upper_bounds[i] = 0
                 # if i in lock_leisure_idx_all_times:
-                #     lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - max_step_size, 0)
+                #     lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - trust_region_radius, 0)
                 #     upper_bounds[i] = 0
                 # if i in lock_transport_idx_all_times:
-                #     lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - max_step_size, 0)
+                #     lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - trust_region_radius, 0)
                 #     upper_bounds[i] = 0
 
 
             u_vars_vec = mod.addMVar( np.shape(obj_vec), lb=lower_bounds, ub=upper_bounds, obj=obj_vec, name="u")
 
-            mod.addConstrs(u_vars_vec[i] >= lower_bounds[i] for i in range(ut_dim * (T-k)))
+            # mod.addConstrs(u_vars_vec[i] >= lower_bounds[i] for i in range(ut_dim * (T-k)))
 
-            mod.addConstrs(u_vars_vec[i] <= upper_bounds[i] for i in range(ut_dim * (T-k)))
+            # mod.addConstrs(u_vars_vec[i] <= upper_bounds[i] for i in range(ut_dim * (T-k)))
 
             # Sense -1 indicates a maximization problem
             mod.ModelSense = -1
@@ -1524,7 +1547,7 @@ def run_heuristic_linearization(dynModel):
             # optimize the model
 
             # ToDo: Remove when running as it reduces efficiency
-            mod.Params.InfUnbdInfo = 1
+            # mod.Params.InfUnbdInfo = 1
 
             # mod.addConstrs(u_vars_vec[i] >= 0 for i in range(ut_dim * (T-k)))
 
@@ -1536,8 +1559,13 @@ def run_heuristic_linearization(dynModel):
             print(f"Gurobi status: {mod.Status}")
 
             # Print model statistics
-            mod.printStats()
-            print(mod.Kappa)
+            # mod.printStats()
+            # print(mod.Kappa)
+
+            if mod.Kappa > 10000:
+                mod.write(f"LP_lineariz_k={k}.lp")
+                assert(False)
+                
 
             if( mod.Status ==  gb.GRB.INFEASIBLE ):
                 # model was infeasible
@@ -1567,9 +1595,9 @@ def run_heuristic_linearization(dynModel):
                     print(f"Index: {i}")
                     print(f"Negative control is for time: {i//ut_dim}")
                     print(f"Negative control is from group: {age_groups[(i%ut_dim) // num_controls]}")
-                    print(f"Negative contorl is for control: {controls[(i%ut_dim) % num_controls]}")
+                    print(f"Negative control is for control: {controls[(i%ut_dim) % num_controls]}")
 
-            assert (u_vars_vec.X >= -1e-6).all()
+            assert (u_vars_vec.X >= -1e-7).all()
 
             if mod.Status != 2:
                 print("Optimization did not finish correctly!")
@@ -1596,7 +1624,9 @@ def run_heuristic_linearization(dynModel):
             
 
             # Norm Infinity
-            u_hat_lockdown_difference = max([abs(uvars_opt[i%ut_dim, i//ut_dim] - uhat_seq[i%ut_dim, i//ut_dim]) for i in all_lockdowns_idx_all_times])
+            u_hat_lockdown_difference = min([max(max([abs(uvars_opt[i%ut_dim, i//ut_dim] - previous_u_hat_seq[i%ut_dim, i//ut_dim]) for i in all_lockdowns_idx_all_times]), max([abs(uvars_opt[i%ut_dim, i//ut_dim] - previous_u_hat_seq[i%ut_dim, i//ut_dim]) / (dynModel.parameters['global-parameters']['C_atest'] if dynModel.parameters['global-parameters']['C_atest']>0 else 1e-5) for i in a_test_idx_all_times]), max([abs(uvars_opt[i%ut_dim, i//ut_dim] - previous_u_hat_seq[i%ut_dim, i//ut_dim]) / (dynModel.parameters['global-parameters']['C_mtest'] if dynModel.parameters['global-parameters']['C_mtest']>0 else 1e-5) for i in m_test_idx_all_times])) for previous_u_hat_seq in all_u_hat_seq])
+
+            print(u_hat_lockdown_difference)
 
             u_hat_difference = max([abs(uvars_opt[i, j] - uhat_seq[i, j]) for i in range(ut_dim) for j in range(T-k)])
 
@@ -1606,6 +1636,8 @@ def run_heuristic_linearization(dynModel):
             inner_iterations += 1
 
             uhat_seq = uvars_opt
+            all_u_hat_seq += [uhat_seq]
+
             assert (uhat_seq>=-1e-7).all()
             
             # for ti in range(T-k):
