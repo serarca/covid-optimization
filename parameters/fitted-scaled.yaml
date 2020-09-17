@@ -1,13 +1,13 @@
-days_before_gamma: 61.031924329999995
+days_before_gamma: 61.0319243
 global-parameters:
-  C_H: 2000.0
-  C_ICU: 0.3
+  C_H: 20000.0
+  C_ICU: 2.5
 mixing:
   name: mult
-  param_alpha: 0.23656169968626972
-  param_beta: 1.312547077125725
-  param_gamma_after: 0.7392604113907001
-  param_gamma_before: 1.4785208523518174
+  param_alpha: 0.236561708
+  param_beta: 1.31254708
+  param_gamma_after: 0.739260425
+  param_gamma_before: 1.47852085
 seir-groups:
   age_group_0_9:
     contacts:
@@ -72,7 +72,7 @@ seir-groups:
         age_group_70_79: 0.0
         age_group_80_plus: 0.0
     economics:
-      death_value: 10000000000.0
+      death_value: 1000000000.0
       lockdown_fraction: 0.5
       work_value: 0.0
     name: age_group_0_9
@@ -883,7 +883,7 @@ seir-groups:
         age_group_70_79: 0.0248286848859295
         age_group_80_plus: 0.0
     economics:
-      death_value: 10000000000.0
+      death_value: 1000000000.0
       lockdown_fraction: 0.5
       work_value: 0.0
     name: age_group_10_19
@@ -1694,7 +1694,7 @@ seir-groups:
         age_group_70_79: 0.01333755619024
         age_group_80_plus: 0.0045206549064481
     economics:
-      death_value: 10000000000.0
+      death_value: 1000000000.0
       lockdown_fraction: 0.5
       work_value: 38.961495895150684
     name: age_group_20_29
@@ -2505,7 +2505,7 @@ seir-groups:
         age_group_70_79: 0.054432591030281
         age_group_80_plus: 0.0166147255815513
     economics:
-      death_value: 10000000000.0
+      death_value: 1000000000.0
       lockdown_fraction: 0.5
       work_value: 85.28878053728769
     name: age_group_30_39
@@ -3316,7 +3316,7 @@ seir-groups:
         age_group_70_79: 0.139910171960376
         age_group_80_plus: 0.265366515692924
     economics:
-      death_value: 10000000000.0
+      death_value: 1000000000.0
       lockdown_fraction: 0.5
       work_value: 109.06185238356166
     name: age_group_40_49
@@ -4127,7 +4127,7 @@ seir-groups:
         age_group_70_79: 0.0389815780619081
         age_group_80_plus: 0.016092408556702
     economics:
-      death_value: 10000000000.0
+      death_value: 1000000000.0
       lockdown_fraction: 0.5
       work_value: 90.93383013698627
     name: age_group_50_59
@@ -4938,7 +4938,7 @@ seir-groups:
         age_group_70_79: 0.0203483640752388
         age_group_80_plus: 0.0
     economics:
-      death_value: 10000000000.0
+      death_value: 1000000000.0
       lockdown_fraction: 0.5
       work_value: 22.733457534246575
     name: age_group_60_69
@@ -5749,7 +5749,7 @@ seir-groups:
         age_group_70_79: 0.0261632927191551
         age_group_80_plus: 0.0
     economics:
-      death_value: 10000000000.0
+      death_value: 1000000000.0
       lockdown_fraction: 0.5
       work_value: 0.0
     name: age_group_70_79
@@ -6560,7 +6560,7 @@ seir-groups:
         age_group_70_79: 0.0
         age_group_80_plus: 0.0
     economics:
-      death_value: 10000000000.0
+      death_value: 1000000000.0
       lockdown_fraction: 0.5
       work_value: 0.0
     name: age_group_80_plus

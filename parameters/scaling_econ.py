@@ -11,7 +11,7 @@ region = args.region
 
 # Import data
 old_econ = yaml.load(open( "econ.yaml", "rb" ))
-scaling = 10000.0
+scaling = 1000.0
 money_scaling = 10000.0
 
 scaled_econ = dict(old_econ)

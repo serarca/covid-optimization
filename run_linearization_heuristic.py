@@ -25,30 +25,43 @@ except:
     import pickle
 import pandas as pd
 import logging
+import itertools as it
 
 from joblib import Parallel, delayed
 
 
 def main():
+
+    instance_index = 0
+
+    if len(sys.argv) > 1:
+        instance_index = int(sys.argv[1])
+
     # 30 * 37199.03
     # Some paramters to test the linearization heuristic
     scaling = 10000
-    money_scaling = 10000
+    money_scaling = 1000
+    
     params_to_try = {
         "delta_schooling":[0.5],
-        "xi":[0],
+        "xi":[0, 30 * 37199.03 * scaling / money_scaling],
         # , 30 * 37199.03 * scaling / money_scaling],
         "icus":[3000 / scaling],
-        "tests":[30000 / scaling],
+        "tests":[0, 30000 / scaling],
         #  60000 / scaling],
         # , 30000 / scaling],
-        "frequencies":[(1,1)],
+        "frequencies":[(1,1), (7,14)],
         #  (7,14)],
         "region":["fitted-scaled"], 
         "econ": ["econ-scaled"],
         "init": ["60days-scaled"],
-        "eta":[0.1]
+        "eta":[0, 0.1]
     }
+
+
+    all_instances = list(it.product(*(params_to_try[param] for param in sorted(params_to_try))))
+
+
     # params_to_try = {
     #     "delta_schooling":[0.5],
     #     "xi":[30 * 37199.03],
@@ -61,9 +74,13 @@ def main():
     #     "eta":[0.1]
     # }
 
-    n_days = 1
+    n_days = 90
     groups = "all"
     start_day = 60
+
+    scaling_econ_param(scaling, money_scaling)
+    scaling_fitted(scaling, money_scaling)
+    scaling_init(scaling)
 
     # Final time step is used if we want to evaluate 
     # the hueristic at any time before the n_days
@@ -71,37 +88,26 @@ def main():
     
     # For names of regions see the "parameters" folder
     # region = 'fitted'
-    
-    
-    Parallel(n_jobs=4)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day)
-    for delta in params_to_try["delta_schooling"]
-    for xi in params_to_try["xi"]
-    for icus in params_to_try["icus"]
-    for tests in params_to_try["tests"]
-    for test_freq, lockdown_freq in params_to_try['frequencies']
-    for econ in params_to_try['econ']
-    for init in params_to_try['init']
-    for region in params_to_try['region']
-    for eta in params_to_try['eta'])
 
-    # for delta in params_to_try["delta_schooling"]:
-    #     for xi in params_to_try["xi"]:
-    #         for icus in params_to_try["icus"]:
-    #             for tests in params_to_try["tests"]:
-    #                 for test_freq, lockdown_freq in params_to_try['frequencies']:
-    #                     for econ in params_to_try['econ']:
-    #                         for init in params_to_try['init']:
-    #                             for region in params_to_try['region']:
+    delta = all_instances[instance_index][0]
+    xi = all_instances[instance_index][1]
+    icus = all_instances[instance_index][2]
+    tests = all_instances[instance_index][3]
+    test_freq = all_instances[instance_index][4][0]
+    lockdown_freq = all_instances[instance_index][4][1]
+    region = all_instances[instance_index][5]
+    econ = all_instances[instance_index][6]
+    init = all_instances[instance_index][7]
+    eta = all_instances[instance_index][8]
 
-    #                                 run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta)
 
-    run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try, groups)
+    run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day)
 
-    # unpickle_plot_and_print_results(n_days, params_to_try, simulation_params_linearization)
+    run_pickled_dynModels_prop_bouncing(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day)
 
-    load_pickles_and_create_yaml(n_days, params_to_try, final_time_step, groups, start_day, scaling, money_scaling)
+    for heur in ["", "_Prop_Bouncing"]:
+        load_pickle_and_create_yaml(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, scaling, money_scaling, heur)
 
-    # load_pickles_and_create_csv(n_days, params_to_try, final_time_step, groups)
 
 def run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day):
     ''' Runs the linearization heuristic with the experiment parameters passed as arguments and saves the resulting dynamical model as a pickle object.'''
@@ -193,6 +199,14 @@ def run_linearization_heuristic(simulation_params, experiment_params, start_day)
     return dynModel
 
 
+def run_pickled_dynModels_prop_bouncing(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day):
+    ''' Loads all the pickled dynamical models and runs them with proportional bouncing, saving the results in another pickle object'''
+
+    pickled_dyn_model = f"linearization_heuristic_dyn_models/dynModel_linHeur_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}_testFreq={test_freq}_lockFreq={lockdown_freq}_eta={eta}_groups={groups}.p"
+
+    run_dyn_model_with_no_bouncing_and_pickle(pickled_dyn_model, groups)
+
+
 def run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try, groups):
     ''' Loads all the pickled dynamical models and runs them with proportional bouncing, saving the results in another pickle object'''
 
@@ -260,6 +274,48 @@ def load_pickles_and_create_csv(n_days, params_to_try, final_time_step, groups):
                             })
 
     pd.DataFrame(results).to_excel(f"linearization_heuristic_dyn_models/linearization_heuristic_results_{n_days}_days.xlsx")
+
+
+def load_pickle_and_create_yaml(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, scaling, money_scaling, heur):
+    ''' Loads all pickled dynamical models and creates an excel spreadsheet to visualize the resulting metrics.'''
+
+    dynModel = pickle.load(open(f"linearization_heuristic_dyn_models/dynModel_linHeur{heur}_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}_testFreq={test_freq}_lockFreq={lockdown_freq}_eta={eta}_groups={groups}.p","rb"))
+
+
+    result = {
+            "lockdown_heuristic":f"linearization_heuristic{heur}",
+            "groups":groups,
+            "experiment_params":{
+                "delta_schooling":delta,
+                "xi":(xi/scaling) * money_scaling, 
+                "icus":icus * scaling,
+                "n_a_tests":tests * scaling,
+                "n_m_tests":tests * scaling,
+                "start_day":start_day,
+                "T":n_days,
+                "eta":eta,
+                "lockdown_freq":lockdown_freq,
+                "test_freq":test_freq
+            },
+            "testing_heuristic":f"linearization_heuristic{heur}",
+            "results":{
+                "economics_value":float(dynModel.get_total_economic_value()) * money_scaling,
+                "deaths":float(dynModel.get_total_deaths()) * scaling,
+                "reward":float(dynModel.get_total_reward()),
+            },
+            "policy":dynModel.lockdown_controls,
+            "a_tests":[{g: test * scaling for g,test in a.items()} for a in dynModel.a_tests_controls],
+            "m_tests":[{g: test * scaling for g,test in m.items()}  for m in dynModel.m_tests_controls],
+            
+    }
+
+    result["filename"] = f"{result['lockdown_heuristic']}/xi-{result['experiment_params']['xi']}_icus-{result['experiment_params']['icus']}_testing-{result['testing_heuristic']}_natests-{result['experiment_params']['n_a_tests']}_nmtests-{result['experiment_params']['n_m_tests']}_T-{result['experiment_params']['T']}_startday-{result['experiment_params']['start_day']}_groups-{result['groups']}_dschool-{result['experiment_params']['delta_schooling']}_eta-{result['experiment_params']['eta']}_lockdownFreq-{result['experiment_params']['lockdown_freq']}_testingFreq-{result['experiment_params']['test_freq']}"
+
+    fn =  f"benchmarks/results/{result['filename']}.yaml"
+    
+    with open(fn, 'w') as file:
+        yaml.dump(result, file)
+
 
 def load_pickles_and_create_yaml(n_days, params_to_try, final_time_step, groups, start_day, scaling, money_scaling):
     ''' Loads all pickled dynamical models and creates an excel spreadsheet to visualize the resulting metrics.'''
@@ -476,9 +532,87 @@ def unpickle_plot_and_print_results(n_days, params_to_try, simulation_params):
                                 plt.close()
 
 
+def scaling_econ_param(scaling, money_scaling):
+    # Import data
+    old_econ = yaml.load(open( "parameters/econ.yaml", "rb" ),Loader=yaml.FullLoader)
+    # scaling = 1000.0
+    # money_scaling = 10000.0
+
+    scaled_econ = dict(old_econ)
+
+    # Scale Econ cost of death
+    for group in scaled_econ["econ_cost_death"]:
+        scaled_econ["econ_cost_death"][group] = (scaled_econ["econ_cost_death"][group] * scaling / money_scaling)
+
+    # Scale employment param
+
+    for group in scaled_econ["employment_params"]["v"]:
+        scaled_econ["employment_params"]["v"][group]["leisure"] = scaled_econ["employment_params"]["v"][group]["leisure"] * scaling / money_scaling
+        scaled_econ["employment_params"]["v"][group]["other"] = scaled_econ["employment_params"]["v"][group]["other"] * scaling / money_scaling
+        scaled_econ["employment_params"]["v"][group]["transport"] = scaled_econ["employment_params"]["v"][group]["transport"] * scaling / money_scaling
+
+    # Scale schooling params
+
+    for group in scaled_econ["schooling_params"]:
+        scaled_econ["schooling_params"][group] = scaled_econ["schooling_params"][group] * scaling / money_scaling
+
+
+    with open('parameters/econ-scaled.yaml', 'w') as file:
+        yaml.dump(scaled_econ, file)
+
+def scaling_init(scaling):
+    # Import data
+    old_init = yaml.load(open( "initialization/60days.yaml", "rb" ), Loader=yaml.FullLoader)
+    # scaling = 1000.0
+
+    # Construct initialization
+    scaled_init_dict = {}
+    for group in old_init:
+        scaled_init_dict[group] = {
+                "S": old_init[group]["S"] / scaling,
+                "E": old_init[group]["E"] / scaling,
+                "I": old_init[group]["I"] / scaling,
+                "R": old_init[group]["R"] / scaling,
+                "Ia": old_init[group]["Ia"] / scaling,
+                "Ips": old_init[group]["Ips"] / scaling,
+                "Ims": old_init[group]["Ims"] / scaling,
+                "Iss": old_init[group]["Iss"] / scaling,
+                "Rq": old_init[group]["Rq"] / scaling,
+                "H": old_init[group]["H"] / scaling,
+                "ICU": old_init[group]["ICU"] / scaling,
+                "D": old_init[group]["D"] / scaling,
+        }
+
+    with open('initialization/60days-scaled.yaml', 'w') as file:
+        yaml.dump(scaled_init_dict, file)
+
+
+def scaling_fitted(scaling, money_scaling):
+    # Import data
+    old_fitted = yaml.load(open( "parameters/fitted.yaml", "rb" ), Loader=yaml.FullLoader)
+    scaling = 1000.0
+
+    scaled_fitted = dict(old_fitted)
+
+    # Scale global_param
+    scaled_fitted["global-parameters"]["C_H"] = scaled_fitted["global-parameters"]["C_H"] / scaling
+
+    scaled_fitted["global-parameters"]["C_ICU"] = scaled_fitted["global-parameters"]["C_ICU"] / scaling
 
 
 
+    for group_h in scaled_fitted["seir-groups"]:
+        # # Scale contacts
+        # for act in scaled_fitted["seir-groups"][group_h]["contacts"]:
+        #     for group_g in scaled_fitted["seir-groups"][group_h]["contacts"][act]:
+        #         scaled_fitted["seir-groups"][group_h]["contacts"][act][group_g] = scaled_fitted["seir-groups"][group_h]["contacts"][act][group_g] * scaling
+        
+        # Scale econ death value
+        scaled_fitted["seir-groups"][group_h]["economics"]["death_value"] = scaled_fitted["seir-groups"][group_h]["economics"]["death_value"] * scaling
+            
+
+    with open('parameters/fitted-scaled.yaml', 'w') as file:
+        yaml.dump(scaled_fitted, file)
 
 
 def plot_logging(file):

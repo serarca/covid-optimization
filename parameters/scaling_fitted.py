@@ -11,7 +11,7 @@ region = args.region
 
 # Import data
 old_fitted = yaml.load(open( "fitted.yaml", "rb" ))
-scaling = 10000.0
+scaling = 1000.0
 
 scaled_fitted = dict(old_fitted)
 
