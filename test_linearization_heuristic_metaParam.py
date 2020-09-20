@@ -44,10 +44,10 @@ def main():
     
     params_to_try = {
         "delta_schooling":[0.5],
-        "xi":[30 * 37199.03 * scaling / money_scaling],
+        "xi":[0, 30 * 37199.03 * scaling / money_scaling],
         # , 30 * 37199.03 * scaling / money_scaling],
         "icus":[3000 / scaling],
-        "tests":[30000 / scaling],
+        "tests":[0, 30000 / scaling, 60000 / scaling],
         #  60000 / scaling],
         # , 30000 / scaling],
         "frequencies":[(1,1)],
@@ -55,8 +55,8 @@ def main():
         "region":["fitted-scaled"], 
         "econ": ["econ-scaled"],
         "init": ["60days-scaled"],
-        "eta":[0.1],
-        "trust_region_radius":[0.025, 0.05, 0.1, 0.2, 0.3],
+        "eta":[0, 0.1],
+        "trust_region_radius":[0.05, 0.1, 0.2, 0.3],
         "max_inner_iterations_mult":[1, 1.5, 2, 3]
     }
 
@@ -90,6 +90,7 @@ def main():
     trust_region_radius = all_instances[instance_index][9]
     max_inner_iterations_mult = all_instances[instance_index][10]
 
+    print(all_instances[instance_index])
 
     run_lin_heur_and_save_output(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult)
 
@@ -125,7 +126,7 @@ def run_lin_heur_and_save_output(delta, xi, icus, tests, n_days, region, test_fr
 
     total_reward, total_running_time = run_linearization_heuristic(simulation_params_linearization, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult)
 
-    with open(f"linearization_heur_meta_param_testing/testing_outputs_ndays={n_days}.csv", "a+") as file:
+    with open(f"linearization_heur_meta_param_testing/testing_outputs_ndays={n_days}_eta={eta}_tests={tests}_xi={xi}.csv", "a+") as file:
         file.write(f"{trust_region_radius}, {max_inner_iterations_mult}, {max_inner_iterations_mult/trust_region_radius}, {total_reward}, {total_running_time} \n")
         file.close()
 

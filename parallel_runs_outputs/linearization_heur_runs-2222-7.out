@@ -1,0 +1,13 @@
+(0.5, 0, 0.3, 3.0, (7, 14), 'fitted-scaled', 'econ-scaled', '60days-scaled', 0.1)
+Traceback (most recent call last):
+  File "run_linearization_heuristic.py", line 676, in <module>
+    main()
+  File "run_linearization_heuristic.py", line 105, in main
+    run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day)
+  File "run_linearization_heuristic.py", line 141, in run_lin_heur_and_pickle_dynModel
+    dynModel_linearization_heur = run_linearization_heuristic(simulation_params_linearization, experiment_params, start_day)
+  File "run_linearization_heuristic.py", line 176, in run_linearization_heuristic
+    mixing_method = universe_params['mixing']
+TypeError: 'NoneType' object is not subscriptable
+srun: error: yen10: task 0: Exited with exit code 1
+srun: Terminating job step 2227.0

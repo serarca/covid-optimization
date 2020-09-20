@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "test_linearization_heuristic_metaParam.py", line 278, in <module>
+    main()
+  File "test_linearization_heuristic_metaParam.py", line 94, in main
+    run_lin_heur_and_save_output(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult)
+  File "test_linearization_heuristic_metaParam.py", line 126, in run_lin_heur_and_save_output
+    total_reward, total_running_time = run_linearization_heuristic(simulation_params_linearization, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult)
+  File "test_linearization_heuristic_metaParam.py", line 164, in run_linearization_heuristic
+    mixing_method = universe_params['mixing']
+TypeError: 'NoneType' object is not subscriptable
+srun: error: yen10: task 0: Exited with exit code 1
+srun: Terminating job step 2235.0

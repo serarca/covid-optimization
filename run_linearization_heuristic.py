@@ -59,7 +59,7 @@ def main():
     }
 
 
-    all_instances = list(it.product(*(params_to_try[param] for param in sorted(params_to_try))))
+    all_instances = list(it.product(*(params_to_try[param] for param in params_to_try)))
 
 
     # params_to_try = {
@@ -93,6 +93,7 @@ def main():
     xi = all_instances[instance_index][1]
     icus = all_instances[instance_index][2]
     tests = all_instances[instance_index][3]
+    print(all_instances[instance_index])
     test_freq = all_instances[instance_index][4][0]
     lockdown_freq = all_instances[instance_index][4][1]
     region = all_instances[instance_index][5]
