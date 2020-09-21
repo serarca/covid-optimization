@@ -43,7 +43,7 @@ def main():
     
     params_to_try = {
         "delta_schooling":[0.5],
-        "xi":[0, 30 * 37199.03 * scaling / money_scaling],
+        "xi":[0],
         # , 30 * 37199.03 * scaling / money_scaling],
         "icus":[3000 / scaling],
         "tests":[0, 30000 / scaling],
@@ -54,7 +54,7 @@ def main():
         "region":["fitted-scaled"], 
         "econ": ["econ-scaled"],
         "init": ["60days-scaled"],
-        "eta":[0, 0.1]
+        "eta":[0.1]
     }
 
 
@@ -86,16 +86,16 @@ def main():
     # region = 'fitted'
     
     
-    # Parallel(n_jobs=4)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day)
-    # for delta in params_to_try["delta_schooling"]
-    # for xi in params_to_try["xi"]
-    # for icus in params_to_try["icus"]
-    # for tests in params_to_try["tests"]
-    # for test_freq, lockdown_freq in params_to_try['frequencies']
-    # for econ in params_to_try['econ']
-    # for init in params_to_try['init']
-    # for region in params_to_try['region']
-    # for eta in params_to_try['eta'])
+    Parallel(n_jobs=4)(delayed(run_lin_heur_and_pickle_dynModel)(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day)
+    for delta in params_to_try["delta_schooling"]
+    for xi in params_to_try["xi"]
+    for icus in params_to_try["icus"]
+    for tests in params_to_try["tests"]
+    for test_freq, lockdown_freq in params_to_try['frequencies']
+    for econ in params_to_try['econ']
+    for init in params_to_try['init']
+    for region in params_to_try['region']
+    for eta in params_to_try['eta'])
 
     # for delta in params_to_try["delta_schooling"]:
     #     for xi in params_to_try["xi"]:
@@ -195,7 +195,7 @@ def run_linearization_heuristic(simulation_params, experiment_params, start_day)
     dynModel.econ_params["employment_params"]["eta"] = simulation_params["eta"]
 
 
-    linearization.run_heuristic_linearization(dynModel)
+    linearization.run_heuristic_linearization(dynModel, 0.2, 1)
 
     end_time = time()
 
