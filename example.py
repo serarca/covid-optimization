@@ -42,7 +42,7 @@ with open("./parameters/fitted.yaml") as file:
     universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
 # Read initialization
-with open("./initialization/64days.yaml") as file:
+with open("./initialization/60days.yaml") as file:
 	initialization = yaml.load(file, Loader=yaml.FullLoader)
 	start_day = 61
 
@@ -79,7 +79,7 @@ for t in range(simulation_params['time_periods']):
 	else:
 		del gov_policy[t+start_lockdown_day]['date']
 		del gov_policy[t+start_lockdown_day]['days_from_lockdown']
-		del gov_policy[t+start_lockdown_day]['lockdown']
+		# del gov_policy[t+start_lockdown_day]['lockdown']
 		alphas_vec.append({ag:gov_policy[t+start_lockdown_day] for ag in age_groups})
 
 
@@ -117,12 +117,12 @@ results = {
 	"reward":dynModel.get_total_reward(),
 }
 
+print("Number of deaths {}".format(dynModel.get_total_deaths()))
+print("Total reward {}".format(dynModel.get_total_reward()))
+print("Total economic value {}".format(dynModel.get_total_economic_value()))
 
-
-
-
-
-
-
-
-
+for name, group in dynModel.groups.items():
+	deaths = 0
+	for day in range(simulation_params["days"]):
+		deaths += group.D[day + 1]-group.D[day]
+	print("Number of deaths for group {} is {}".format(name, deaths))

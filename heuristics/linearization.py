@@ -1236,6 +1236,7 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.1, max_inner_ite
     # ut_dim = num_controls * num_age_groups
 
 
+    start_time = time()
     dynModel.reset_time(0)
 
     # trust_region_radius = 0.1
@@ -1305,11 +1306,14 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.1, max_inner_ite
 
     # a python list with the indices for all home lockdown decisions for all groups and periods
 
+    end_time = time()
+    print("Init takes {}".format(end_time - start_time))
 
     dynModel.shadowPrices = {}
 
     for k in range(T):
 
+        start_time = time()
         lock_home_idx_all_times = [controls.index('home') + i*num_controls for i in range((T-k)*num_age_groups)]
 
         lock_work_idx_all_times = [controls.index('work') + i*num_controls for i in range((T-k)*num_age_groups)]
@@ -1328,6 +1332,8 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.1, max_inner_ite
 
         m_test_idx_all_times = [controls.index('Nmtest_g') + i*num_controls for i in range((T-k)*num_age_groups)]
 
+        end_time = time()
+        print("For k init takes {}".format(end_time - start_time))
 
         inner_iterations = 0
         u_hat_lockdown_difference = threshold + 1
@@ -1340,20 +1346,33 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.1, max_inner_ite
             # print("\n\n HEURISTIC RUNNING FOR TIME k= {}.".format(k))
 
 
+            start_time = time()
             # calculate state trajectory X_hat and corresponging controls new_uhat
             Xhat_seq, uhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq, use_bounce_var)
 
             assert( np.shape(Xhat_seq) == (Xt_dim,T-k+1) )
             assert( np.shape(uhat_seq) == (ut_dim,T-k) )
 
+            end_time = time()
+            print("While compute trajectory takes {}".format(end_time - start_time))
 
             ICUidx_all = slice(SEIR_groups.index('ICU_g'), Xt_dim, num_compartments)
+
+            start_time = time()
 
             # calculate objective parameters d, e
             D,E = calculate_objective_time_dependent_coefs(dynModel, k, Xhat_seq, uhat_seq)
 
+            end_time = time()
+            print("While compute objective parameters d,e takes {}".format(end_time - start_time))
+
+            start_time = time()
+
             # get coefficients for decisions in all constraints and objective
             constr_coefs, constr_consts, obj_coefs = calculate_all_coefs(dynModel,k,Xhat_seq,uhat_seq,Gamma_x,Gamma_u,D,E)
+
+            end_time = time()
+            print("While compute coefficients and constraints takes {}".format(end_time - start_time))
 
             assert( np.shape(obj_coefs) == (ut_dim,T-k) )
             assert( len(constr_coefs) == T-k )
@@ -1365,6 +1384,8 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.1, max_inner_ite
                 for i in range(num_constraints):
                     assert( np.shape(constr_coefs[t][i])==np.shape(uhat_seq) )
                     assert( np.shape(constr_consts[t][i])==() )
+
+            start_time = time()
 
             # create empty model
             mod = gb.Model("Linearization Heuristic")
@@ -1433,6 +1454,12 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.1, max_inner_ite
             # mod.addConstrs(u_vars_vec[i] >= lower_bounds[i] for i in range(ut_dim * (T-k)))
 
             # mod.addConstrs(u_vars_vec[i] <= upper_bounds[i] for i in range(ut_dim * (T-k)))
+            end_time = time()
+            print("While compute gurobi init first takes {}".format(end_time - start_time))
+
+            start_time = time()
+
+            # mod.addConstrs(u_vars_vec[i] <= upper_bounds[i] for i in range(ut_dim * (T-k)))
 
             # Sense -1 indicates a maximization problem
             mod.ModelSense = -1
@@ -1443,6 +1470,11 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.1, max_inner_ite
 
 
             # No Constraint on Transport
+            # work_index = controls.index('work')
+            # transport_index = controls.index('transport')
+            # TransportConstMatrix = np.zeros(((T-k) * num_age_groups, ut_dim * (T-k)), dtype=numpyArrayDatatype)
+            # TransportConstRHSVector = np.zeros(((T-k) *num_age_groups,), dtype=numpyArrayDatatype)
+            
             # work_index = controls.index('work')
             # transport_index = controls.index('transport')
             # TransportConstMatrix = np.zeros(((T-k) * num_age_groups, ut_dim * (T-k)), dtype=numpyArrayDatatype)
@@ -1549,9 +1581,12 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.1, max_inner_ite
             # ToDo: Remove when running as it reduces efficiency
             # mod.Params.InfUnbdInfo = 1
 
+            end_time = time()
+            print("While compute gurobi init takes {}".format(end_time - start_time))
+
             # mod.addConstrs(u_vars_vec[i] >= 0 for i in range(ut_dim * (T-k)))
 
-  
+            start_time = time()
 
             # print(f"Optimizing model at time k = {k}")
             mod.optimize()
@@ -1566,6 +1601,11 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.1, max_inner_ite
                 mod.write(f"LP_lineariz_k={k}.lp")
                 assert(False)
                 
+
+            end_time = time()
+            print("While compute gurobi optimization takes {}".format(end_time - start_time))
+
+            start_time = time()
 
             if( mod.Status ==  gb.GRB.INFEASIBLE ):
                 # model was infeasible
@@ -1645,8 +1685,12 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.1, max_inner_ite
             #         act_indices = slice(controls.index(act), ut_dim, num_controls)
             #         if (uvars_opt[act_indices, ti] >0).any():
             #             print(f"At time {ti+k} for subproblem {k} the activity {act} has non-zero lockdown.")
+    
+            end_time = time()
+            print("While compute gurobi status takes {}".format(end_time - start_time))
 
 
+        start_time = time()
         uopt_seq[:,k] = uvars_opt[:,0]
         uk_opt_dict, alphak_opt_dict = buildAlphaDict(uvars_opt[:,0])
 
@@ -1668,6 +1712,9 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.1, max_inner_ite
 
         # update uhat_sequence
         uhat_seq = uvars_opt[:, 1:]
+        end_time = time()
+        print("For conclusion takes {}".format(end_time - start_time))
+
         # print(f"u_optSeq at time {k} is {uopt_seq[:,k]}")
         # print(f"uhat_seq is {uhat_seq}")
         #

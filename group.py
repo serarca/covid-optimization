@@ -485,6 +485,13 @@ class DynamicalModel:
 		print("Deaths "+str(self.get_total_deaths()))
 		print("Total Reward "+str(self.get_total_reward()))
 
+		for name, group in self.groups.items():
+			deaths = 0
+			no_days = len(group.D) - 1
+			for day in range(no_days):
+				deaths += group.D[day + 1]-group.D[day]
+			print("Number of deaths for group {} is {}".format(name, deaths))
+
 	def get_pandas_summary(self):
 		d = {
 			"S": [sum([self.groups[g].S[t] for g in self.groups ]) for t in range(self.t+1)],
