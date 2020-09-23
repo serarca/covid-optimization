@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "test_linearization_heuristic_metaParam.py", line 278, in <module>
+    main()
+  File "test_linearization_heuristic_metaParam.py", line 94, in main
+    run_lin_heur_and_save_output(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult)
+  File "test_linearization_heuristic_metaParam.py", line 126, in run_lin_heur_and_save_output
+    total_reward, total_running_time = run_linearization_heuristic(simulation_params_linearization, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult)
+  File "test_linearization_heuristic_metaParam.py", line 180, in run_linearization_heuristic
+    linearization.run_heuristic_linearization(dynModel, trust_region_radius, max_inner_iterations_mult)
+  File "/usr/local/ifs/projects/daniancu-covid-targets/covid-optimization/heuristics/linearization.py", line 1272, in run_heuristic_linearization
+    Gamma_x, Gamma_u, K, all_labels = calculate_all_constraints(dynModel,bounce_existing)
+  File "/usr/local/ifs/projects/daniancu-covid-targets/covid-optimization/heuristics/linearization.py", line 901, in calculate_all_constraints
+    mu_g = curr_group.parameters['mu']
+KeyError: 'mu'
+srun: error: yen10: task 0: Exited with exit code 1
+srun: Terminating job step 2089.0

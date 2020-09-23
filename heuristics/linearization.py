@@ -1223,7 +1223,7 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
 # Main function: runs the linearization heuristic
 # @profile
 # @log_execution_time
-def run_heuristic_linearization(dynModel, trust_region_radius=0.1, max_inner_iterations_mult=2):
+def run_heuristic_linearization(dynModel, trust_region_radius=0.1, max_inner_iterations_mult=1):
     """Run the heuristic based on linearization. Takes a dynamical model, resets the time to 0, and runs it following the linearization heuristic. Returns the dynamical model after running it."""
 
     # age_groups = dynModel.groups.keys()
@@ -1562,7 +1562,7 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.1, max_inner_ite
             # mod.printStats()
             # print(mod.Kappa)
 
-            if mod.Kappa > 10000:
+            if mod.Kappa > 1000000000:
                 mod.write(f"LP_lineariz_k={k}.lp")
                 assert(False)
                 

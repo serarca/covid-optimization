@@ -208,8 +208,9 @@ def plot_benchmark(dynModel, result):
 
 
 
-#heuristics = ["real","full_open","full_lockdown","constant_gradient","time_gradient","age_group_gradient","dynamic_gradient","linearization_heuristic", "linearization_heuristic_Prop_Bouncing"]
-heuristics = ["real","full_open","full_lockdown","constant_gradient","time_gradient","age_group_gradient","dynamic_gradient"]
+heuristics = ["real","full_open","full_lockdown","constant_gradient","time_gradient","age_group_gradient","dynamic_gradient","linearization_heuristic", "linearization_heuristic_Prop_Bouncing"]
+#heuristics = ["real","full_open","full_lockdown","constant_gradient","time_gradient","age_group_gradient","dynamic_gradient"]
+#heuristics = ["real","full_open","full_lockdown"]
 
 
 all_data = []

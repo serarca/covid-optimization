@@ -8,7 +8,7 @@
 
  
 
-#SBATCH --array=0-14              # there is a max array size - 512 tasks
+#SBATCH --array=28,29,30,31,34,45,46,54,55       # there is a max array size - 512 tasks
 
 #SBATCH -J meta_param_linearization_heur_runs
 
@@ -18,7 +18,7 @@
 
 #SBATCH -c 1                              # one core per task
 
-#SBATCH -t 5:00:00
+#SBATCH -t 6:00:00
 
 ##SBATCH --mem=2gb
 
