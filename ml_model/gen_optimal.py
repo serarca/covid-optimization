@@ -177,23 +177,6 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
 	)
 
 
-	constant_gradients_filename = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d"%(
-		"constant_gradient",
-		result["experiment_params"]["xi"],
-		result["experiment_params"]["icus"],
-		result["testing_heuristic"],
-		result["experiment_params"]["n_a_tests"],
-		result["experiment_params"]["n_m_tests"],
-		result["experiment_params"]["T"],
-		result["experiment_params"]["start_day"],
-		result["groups"],
-		result["experiment_params"]["delta_schooling"],
-		result["experiment_params"]["eta"],
-		90,
-		90,
-	)
-
-
 
 	intervention_times = [t*quar_freq for t in range(int((simulation_params['days']-1)/quar_freq)+1)]
 
