@@ -52,9 +52,9 @@ def main():
         # , 30000 / scaling],
         "frequencies":[(1,1), (7,14)],
         #  (7,14)],
-        "region":["fitted-scaled"], 
-        "econ": ["econ-scaled"],
-        "init": ["60days-scaled"],
+        "region":["one_group_fitted-scaled"], 
+        "econ": ["one_group_econ-scaled"],
+        "init": ["60days_one_group-scaled"],
         "eta":[0, 0.1]
     }
 
@@ -75,7 +75,7 @@ def main():
     # }
 
     n_days = 90
-    groups = "all"
+    groups = "one"
     start_day = 60
 
     # scaling_econ_param(scaling, money_scaling)

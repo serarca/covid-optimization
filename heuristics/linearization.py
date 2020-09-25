@@ -47,8 +47,8 @@ def log_execution_time(function):
 ##################################################
 
 
-age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29','age_group_30_39', 'age_group_40_49', 'age_group_50_59', 'age_group_60_69', 'age_group_70_79','age_group_80_plus']
-# age_groups = ["all_age_groups"]
+# age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29','age_group_30_39', 'age_group_40_49', 'age_group_50_59', 'age_group_60_69', 'age_group_70_79','age_group_80_plus']
+age_groups = ["all_age_groups"]
 SEIR_groups = [ 'S_g', 'E_g', 'I_g', 'R_g', 'N_g', 'Ia_g', 'Ips_g', \
        'Ims_g', 'Iss_g', 'Rq_g', 'H_g', 'ICU_g', 'D_g' ]
 activities = ['home','leisure','other','school','transport','work']
@@ -1264,7 +1264,7 @@ def get_real_reward(dynModel, uhat_seq):
 # Main function: runs the linearization heuristic
 # @profile
 # @log_execution_time
-def run_heuristic_linearization(dynModel, trust_region_radius=0.1, max_inner_iterations_mult=1):
+def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_iterations_mult=2):
     """Run the heuristic based on linearization. Takes a dynamical model, resets the time to 0, and runs it following the linearization heuristic. Returns the dynamical model after running it."""
 
     # age_groups = dynModel.groups.keys()
@@ -1317,7 +1317,7 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.1, max_inner_ite
     assert( np.shape(Gamma_u) == (num_constraints,ut_dim) )
     assert( np.shape(K) == (num_constraints,T) )
    
-    h = "dynamic_gradient"
+    h = "time_gradient"
     n = "xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d.yaml"%(
 		dynModel.experiment_params["xi"]*0.1,
 		dynModel.experiment_params["icus"]*10000,
@@ -1326,7 +1326,7 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.1, max_inner_ite
 		dynModel.parameters['global-parameters']['C_mtest']*10000,
 		dynModel.time_steps - dynModel.END_DAYS,
 		dynModel.start_day,
-		"all",
+		"one",
 		dynModel.experiment_params["delta_schooling"],
 		dynModel.econ_params["employment_params"]["eta"],
 		90,

@@ -212,7 +212,7 @@ def plot_benchmark(dynModel, result):
 #heuristics = ["real","full_open","full_lockdown","constant_gradient","time_gradient","age_group_gradient","dynamic_gradient"]
 heuristics = ["real","full_open","full_lockdown","constant_gradient","time_gradient"]
 #heuristics = ["dynamic_gradient"]
-groups = "one"
+groups = "all"
 
 
 all_data = []
@@ -306,5 +306,5 @@ for h in heuristics:
 			
 			all_data.append(data)
 
-pd.DataFrame(all_data).to_excel("results/results.xlsx")
+pd.DataFrame(all_data).to_excel("results/results-groups={groups}.xlsx")
 
