@@ -78,9 +78,9 @@ def main():
     groups = "all"
     start_day = 60
 
-    scaling_econ_param(scaling, money_scaling)
-    scaling_fitted(scaling, money_scaling)
-    scaling_init(scaling)
+    # scaling_econ_param(scaling, money_scaling)
+    # scaling_fitted(scaling, money_scaling)
+    # scaling_init(scaling)
 
     # Final time step is used if we want to evaluate 
     # the hueristic at any time before the n_days
@@ -602,14 +602,14 @@ def scaling_fitted(scaling, money_scaling):
 
 
 
-    for group_h in scaled_fitted["seir-groups"]:
+    # for group_h in scaled_fitted["seir-groups"]:
         # # Scale contacts
         # for act in scaled_fitted["seir-groups"][group_h]["contacts"]:
         #     for group_g in scaled_fitted["seir-groups"][group_h]["contacts"][act]:
         #         scaled_fitted["seir-groups"][group_h]["contacts"][act][group_g] = scaled_fitted["seir-groups"][group_h]["contacts"][act][group_g] * scaling
         
         # Scale econ death value
-        scaled_fitted["seir-groups"][group_h]["economics"]["death_value"] = scaled_fitted["seir-groups"][group_h]["economics"]["death_value"] * scaling
+        # scaled_fitted["seir-groups"][group_h]["economics"]["death_value"] = scaled_fitted["seir-groups"][group_h]["economics"]["death_value"] * scaling
             
 
     with open('parameters/fitted-scaled.yaml', 'w') as file:
