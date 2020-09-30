@@ -939,15 +939,15 @@ experiment_params:
   T: 90
   delta_schooling: 0.5
   end_days: 14
-  eta: 0.1
+  eta: 0
   icus: 3000
   n_a_tests: 0
   n_m_tests: 0
   policy_freq: 14
   start_day: 60
   test_freq: 90.0
-  xi: 0
-filename: dynamic_gradient/xi-0_icus-3000_testing-homogeneous_natests-0_nmtests-0_T-90_startday-60_groups-all_dschool-0.500000_eta-0.100000_freq-90-14
+  xi: 5207864.2
+filename: dynamic_gradient/xi-5207864_icus-3000_testing-homogeneous_natests-0_nmtests-0_T-90_startday-60_groups-all_dschool-0.500000_eta-0.000000_freq-90-14
 groups: all
 lockdown_heuristic: dynamic_gradient
 m_tests:
@@ -1892,44 +1892,44 @@ policy:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.05690981518677372
+    transport: 0.6358510045314925
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5983268263168515
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.11579813631079343
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5683028460349344
   age_group_60_69:
     home: 1.0
     leisure: 0.0
@@ -1946,53 +1946,53 @@ policy:
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04302382728746331
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.05690981518677372
+    transport: 0.6358510045314925
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5983268263168515
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.11579813631079343
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5683028460349344
   age_group_60_69:
     home: 1.0
     leisure: 0.0
@@ -2009,53 +2009,53 @@ policy:
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04302382728746331
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.05690981518677372
+    transport: 0.6358510045314925
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5983268263168515
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.11579813631079343
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5683028460349344
   age_group_60_69:
     home: 1.0
     leisure: 0.0
@@ -2072,53 +2072,53 @@ policy:
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04302382728746331
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.05690981518677372
+    transport: 0.6358510045314925
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5983268263168515
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.11579813631079343
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5683028460349344
   age_group_60_69:
     home: 1.0
     leisure: 0.0
@@ -2135,53 +2135,53 @@ policy:
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04302382728746331
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.05690981518677372
+    transport: 0.6358510045314925
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5983268263168515
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.11579813631079343
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5683028460349344
   age_group_60_69:
     home: 1.0
     leisure: 0.0
@@ -2198,53 +2198,53 @@ policy:
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04302382728746331
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.05690981518677372
+    transport: 0.6358510045314925
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5983268263168515
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.11579813631079343
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5683028460349344
   age_group_60_69:
     home: 1.0
     leisure: 0.0
@@ -2261,53 +2261,53 @@ policy:
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04302382728746331
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.05690981518677372
+    transport: 0.6358510045314925
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5983268263168515
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.11579813631079343
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5683028460349344
   age_group_60_69:
     home: 1.0
     leisure: 0.0
@@ -2324,53 +2324,53 @@ policy:
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04302382728746331
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.05690981518677372
+    transport: 0.6358510045314925
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5983268263168515
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.11579813631079343
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5683028460349344
   age_group_60_69:
     home: 1.0
     leisure: 0.0
@@ -2387,53 +2387,53 @@ policy:
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04302382728746331
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.05690981518677372
+    transport: 0.6358510045314925
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5983268263168515
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.11579813631079343
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5683028460349344
   age_group_60_69:
     home: 1.0
     leisure: 0.0
@@ -2450,53 +2450,53 @@ policy:
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04302382728746331
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.05690981518677372
+    transport: 0.6358510045314925
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5983268263168515
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.11579813631079343
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5683028460349344
   age_group_60_69:
     home: 1.0
     leisure: 0.0
@@ -2513,53 +2513,53 @@ policy:
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04302382728746331
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.05690981518677372
+    transport: 0.6358510045314925
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5983268263168515
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.11579813631079343
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5683028460349344
   age_group_60_69:
     home: 1.0
     leisure: 0.0
@@ -2576,53 +2576,53 @@ policy:
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04302382728746331
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.05690981518677372
+    transport: 0.6358510045314925
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5983268263168515
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.11579813631079343
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5683028460349344
   age_group_60_69:
     home: 1.0
     leisure: 0.0
@@ -2639,53 +2639,53 @@ policy:
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04302382728746331
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.05690981518677372
+    transport: 0.6358510045314925
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5983268263168515
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.11579813631079343
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5683028460349344
   age_group_60_69:
     home: 1.0
     leisure: 0.0
@@ -2702,53 +2702,53 @@ policy:
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04302382728746331
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.05690981518677372
+    transport: 0.6358510045314925
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5983268263168515
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.11579813631079343
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.5683028460349344
   age_group_60_69:
     home: 1.0
     leisure: 0.0
@@ -2765,46 +2765,46 @@ policy:
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04302382728746331
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.21671774092780177
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.01745125653839649
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.8491384664396384
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.8185705545405154
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
@@ -2815,7 +2815,7 @@ policy:
   age_group_60_69:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.039077933102198065
     school: 0.0
     transport: 0.0
     work: 1.0
@@ -2824,50 +2824,50 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.048982697023296225
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04294434047118619
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.21671774092780177
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.01745125653839649
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.8491384664396384
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.8185705545405154
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
@@ -2878,7 +2878,7 @@ policy:
   age_group_60_69:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.039077933102198065
     school: 0.0
     transport: 0.0
     work: 1.0
@@ -2887,50 +2887,50 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.048982697023296225
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04294434047118619
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.21671774092780177
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.01745125653839649
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.8491384664396384
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.8185705545405154
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
@@ -2941,7 +2941,7 @@ policy:
   age_group_60_69:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.039077933102198065
     school: 0.0
     transport: 0.0
     work: 1.0
@@ -2950,50 +2950,50 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.048982697023296225
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04294434047118619
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.21671774092780177
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.01745125653839649
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.8491384664396384
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.8185705545405154
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
@@ -3004,7 +3004,7 @@ policy:
   age_group_60_69:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.039077933102198065
     school: 0.0
     transport: 0.0
     work: 1.0
@@ -3013,50 +3013,50 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.048982697023296225
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04294434047118619
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.21671774092780177
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.01745125653839649
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.8491384664396384
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.8185705545405154
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
@@ -3067,7 +3067,7 @@ policy:
   age_group_60_69:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.039077933102198065
     school: 0.0
     transport: 0.0
     work: 1.0
@@ -3076,50 +3076,50 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.048982697023296225
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04294434047118619
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.21671774092780177
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.01745125653839649
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.8491384664396384
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.8185705545405154
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
@@ -3130,7 +3130,7 @@ policy:
   age_group_60_69:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.039077933102198065
     school: 0.0
     transport: 0.0
     work: 1.0
@@ -3139,50 +3139,50 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.048982697023296225
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04294434047118619
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.21671774092780177
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.01745125653839649
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.8491384664396384
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.8185705545405154
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
@@ -3193,7 +3193,7 @@ policy:
   age_group_60_69:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.039077933102198065
     school: 0.0
     transport: 0.0
     work: 1.0
@@ -3202,50 +3202,50 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.048982697023296225
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04294434047118619
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.21671774092780177
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.01745125653839649
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.8491384664396384
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.8185705545405154
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
@@ -3256,7 +3256,7 @@ policy:
   age_group_60_69:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.039077933102198065
     school: 0.0
     transport: 0.0
     work: 1.0
@@ -3265,50 +3265,50 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.048982697023296225
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04294434047118619
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.21671774092780177
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.01745125653839649
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.8491384664396384
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.8185705545405154
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
@@ -3319,7 +3319,7 @@ policy:
   age_group_60_69:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.039077933102198065
     school: 0.0
     transport: 0.0
     work: 1.0
@@ -3328,50 +3328,50 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.048982697023296225
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04294434047118619
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.21671774092780177
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.01745125653839649
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.8491384664396384
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.8185705545405154
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
@@ -3382,7 +3382,7 @@ policy:
   age_group_60_69:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.039077933102198065
     school: 0.0
     transport: 0.0
     work: 1.0
@@ -3391,50 +3391,50 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.048982697023296225
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04294434047118619
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.21671774092780177
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.01745125653839649
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.8491384664396384
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.8185705545405154
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
@@ -3445,7 +3445,7 @@ policy:
   age_group_60_69:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.039077933102198065
     school: 0.0
     transport: 0.0
     work: 1.0
@@ -3454,50 +3454,50 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.048982697023296225
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04294434047118619
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.21671774092780177
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.01745125653839649
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.8491384664396384
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.8185705545405154
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
@@ -3508,7 +3508,7 @@ policy:
   age_group_60_69:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.039077933102198065
     school: 0.0
     transport: 0.0
     work: 1.0
@@ -3517,50 +3517,50 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.048982697023296225
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04294434047118619
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.21671774092780177
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.01745125653839649
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.8491384664396384
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.8185705545405154
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
@@ -3571,7 +3571,7 @@ policy:
   age_group_60_69:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.039077933102198065
     school: 0.0
     transport: 0.0
     work: 1.0
@@ -3580,50 +3580,50 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.048982697023296225
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04294434047118619
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
-    transport: 0.0
+    school: 0.21671774092780177
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.01745125653839649
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 0.8491384664396384
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.8185705545405154
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
@@ -3634,7 +3634,7 @@ policy:
   age_group_60_69:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.039077933102198065
     school: 0.0
     transport: 0.0
     work: 1.0
@@ -3643,43 +3643,43 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.048982697023296225
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04294434047118619
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
-    transport: 0.0
+    other: 0.010082427236550512
+    school: 0.751732608572174
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.17704978807961305
     transport: 0.0
-    work: 1.0
+    work: 0.9708799985349328
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 1.0
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.9341747442395968
   age_group_40_49:
     home: 1.0
     leisure: 0.0
@@ -3704,45 +3704,45 @@ policy:
   age_group_70_79:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.09184082956376304
     school: 0.0
-    transport: 0.0
+    transport: 0.9894532071370608
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04373560893473828
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
-    transport: 0.0
+    other: 0.010082427236550512
+    school: 0.751732608572174
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.17704978807961305
     transport: 0.0
-    work: 1.0
+    work: 0.9708799985349328
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 1.0
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.9341747442395968
   age_group_40_49:
     home: 1.0
     leisure: 0.0
@@ -3767,45 +3767,45 @@ policy:
   age_group_70_79:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.09184082956376304
     school: 0.0
-    transport: 0.0
+    transport: 0.9894532071370608
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04373560893473828
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
-    transport: 0.0
+    other: 0.010082427236550512
+    school: 0.751732608572174
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.17704978807961305
     transport: 0.0
-    work: 1.0
+    work: 0.9708799985349328
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 1.0
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.9341747442395968
   age_group_40_49:
     home: 1.0
     leisure: 0.0
@@ -3830,45 +3830,45 @@ policy:
   age_group_70_79:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.09184082956376304
     school: 0.0
-    transport: 0.0
+    transport: 0.9894532071370608
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04373560893473828
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
-    transport: 0.0
+    other: 0.010082427236550512
+    school: 0.751732608572174
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.17704978807961305
     transport: 0.0
-    work: 1.0
+    work: 0.9708799985349328
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 1.0
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.9341747442395968
   age_group_40_49:
     home: 1.0
     leisure: 0.0
@@ -3893,45 +3893,45 @@ policy:
   age_group_70_79:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.09184082956376304
     school: 0.0
-    transport: 0.0
+    transport: 0.9894532071370608
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04373560893473828
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
-    transport: 0.0
+    other: 0.010082427236550512
+    school: 0.751732608572174
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.17704978807961305
     transport: 0.0
-    work: 1.0
+    work: 0.9708799985349328
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 1.0
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.9341747442395968
   age_group_40_49:
     home: 1.0
     leisure: 0.0
@@ -3956,45 +3956,45 @@ policy:
   age_group_70_79:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.09184082956376304
     school: 0.0
-    transport: 0.0
+    transport: 0.9894532071370608
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04373560893473828
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
-    transport: 0.0
+    other: 0.010082427236550512
+    school: 0.751732608572174
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.17704978807961305
     transport: 0.0
-    work: 1.0
+    work: 0.9708799985349328
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 1.0
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.9341747442395968
   age_group_40_49:
     home: 1.0
     leisure: 0.0
@@ -4019,45 +4019,45 @@ policy:
   age_group_70_79:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.09184082956376304
     school: 0.0
-    transport: 0.0
+    transport: 0.9894532071370608
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04373560893473828
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
-    transport: 0.0
+    other: 0.010082427236550512
+    school: 0.751732608572174
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.17704978807961305
     transport: 0.0
-    work: 1.0
+    work: 0.9708799985349328
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 1.0
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.9341747442395968
   age_group_40_49:
     home: 1.0
     leisure: 0.0
@@ -4082,45 +4082,45 @@ policy:
   age_group_70_79:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.09184082956376304
     school: 0.0
-    transport: 0.0
+    transport: 0.9894532071370608
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04373560893473828
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
-    transport: 0.0
+    other: 0.010082427236550512
+    school: 0.751732608572174
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.17704978807961305
     transport: 0.0
-    work: 1.0
+    work: 0.9708799985349328
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 1.0
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.9341747442395968
   age_group_40_49:
     home: 1.0
     leisure: 0.0
@@ -4145,45 +4145,45 @@ policy:
   age_group_70_79:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.09184082956376304
     school: 0.0
-    transport: 0.0
+    transport: 0.9894532071370608
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04373560893473828
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
-    transport: 0.0
+    other: 0.010082427236550512
+    school: 0.751732608572174
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.17704978807961305
     transport: 0.0
-    work: 1.0
+    work: 0.9708799985349328
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 1.0
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.9341747442395968
   age_group_40_49:
     home: 1.0
     leisure: 0.0
@@ -4208,45 +4208,45 @@ policy:
   age_group_70_79:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.09184082956376304
     school: 0.0
-    transport: 0.0
+    transport: 0.9894532071370608
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04373560893473828
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
-    transport: 0.0
+    other: 0.010082427236550512
+    school: 0.751732608572174
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.17704978807961305
     transport: 0.0
-    work: 1.0
+    work: 0.9708799985349328
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 1.0
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.9341747442395968
   age_group_40_49:
     home: 1.0
     leisure: 0.0
@@ -4271,45 +4271,45 @@ policy:
   age_group_70_79:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.09184082956376304
     school: 0.0
-    transport: 0.0
+    transport: 0.9894532071370608
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04373560893473828
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
-    transport: 0.0
+    other: 0.010082427236550512
+    school: 0.751732608572174
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.17704978807961305
     transport: 0.0
-    work: 1.0
+    work: 0.9708799985349328
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 1.0
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.9341747442395968
   age_group_40_49:
     home: 1.0
     leisure: 0.0
@@ -4334,45 +4334,45 @@ policy:
   age_group_70_79:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.09184082956376304
     school: 0.0
-    transport: 0.0
+    transport: 0.9894532071370608
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04373560893473828
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
-    transport: 0.0
+    other: 0.010082427236550512
+    school: 0.751732608572174
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.17704978807961305
     transport: 0.0
-    work: 1.0
+    work: 0.9708799985349328
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 1.0
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.9341747442395968
   age_group_40_49:
     home: 1.0
     leisure: 0.0
@@ -4397,45 +4397,45 @@ policy:
   age_group_70_79:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.09184082956376304
     school: 0.0
-    transport: 0.0
+    transport: 0.9894532071370608
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04373560893473828
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
-    transport: 0.0
+    other: 0.010082427236550512
+    school: 0.751732608572174
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.17704978807961305
     transport: 0.0
-    work: 1.0
+    work: 0.9708799985349328
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 1.0
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.9341747442395968
   age_group_40_49:
     home: 1.0
     leisure: 0.0
@@ -4460,45 +4460,45 @@ policy:
   age_group_70_79:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.09184082956376304
     school: 0.0
-    transport: 0.0
+    transport: 0.9894532071370608
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04373560893473828
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
-    transport: 0.0
+    other: 0.010082427236550512
+    school: 0.751732608572174
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
-    school: 1.0
+    school: 0.17704978807961305
     transport: 0.0
-    work: 1.0
+    work: 0.9708799985349328
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
-    work: 1.0
+    transport: 1.0
+    work: 0.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
     transport: 0.0
-    work: 1.0
+    work: 0.9341747442395968
   age_group_40_49:
     home: 1.0
     leisure: 0.0
@@ -4523,29 +4523,29 @@ policy:
   age_group_70_79:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.09184082956376304
     school: 0.0
-    transport: 0.0
+    transport: 0.9894532071370608
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04373560893473828
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.03511957371020182
+    other: 0.07325588071906265
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
+    other: 0.008325134754724756
+    school: 0.529951597929824
     transport: 0.0
     work: 1.0
   age_group_20_29:
@@ -4553,14 +4553,14 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4693924296431931
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -4585,30 +4585,30 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.0182353349335667
+    other: 0.33011952956238344
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04441540898294169
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.03511957371020182
+    other: 0.07325588071906265
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
+    other: 0.008325134754724756
+    school: 0.529951597929824
     transport: 0.0
     work: 1.0
   age_group_20_29:
@@ -4616,14 +4616,14 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4693924296431931
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -4648,30 +4648,30 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.0182353349335667
+    other: 0.33011952956238344
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04441540898294169
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.03511957371020182
+    other: 0.07325588071906265
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
+    other: 0.008325134754724756
+    school: 0.529951597929824
     transport: 0.0
     work: 1.0
   age_group_20_29:
@@ -4679,14 +4679,14 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4693924296431931
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -4711,30 +4711,30 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.0182353349335667
+    other: 0.33011952956238344
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04441540898294169
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.03511957371020182
+    other: 0.07325588071906265
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
+    other: 0.008325134754724756
+    school: 0.529951597929824
     transport: 0.0
     work: 1.0
   age_group_20_29:
@@ -4742,14 +4742,14 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4693924296431931
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -4774,30 +4774,30 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.0182353349335667
+    other: 0.33011952956238344
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04441540898294169
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.03511957371020182
+    other: 0.07325588071906265
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
+    other: 0.008325134754724756
+    school: 0.529951597929824
     transport: 0.0
     work: 1.0
   age_group_20_29:
@@ -4805,14 +4805,14 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4693924296431931
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -4837,30 +4837,30 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.0182353349335667
+    other: 0.33011952956238344
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04441540898294169
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.03511957371020182
+    other: 0.07325588071906265
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
+    other: 0.008325134754724756
+    school: 0.529951597929824
     transport: 0.0
     work: 1.0
   age_group_20_29:
@@ -4868,14 +4868,14 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4693924296431931
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -4900,30 +4900,30 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.0182353349335667
+    other: 0.33011952956238344
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04441540898294169
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.03511957371020182
+    other: 0.07325588071906265
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
+    other: 0.008325134754724756
+    school: 0.529951597929824
     transport: 0.0
     work: 1.0
   age_group_20_29:
@@ -4931,14 +4931,14 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4693924296431931
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -4963,30 +4963,30 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.0182353349335667
+    other: 0.33011952956238344
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04441540898294169
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.03511957371020182
+    other: 0.07325588071906265
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
+    other: 0.008325134754724756
+    school: 0.529951597929824
     transport: 0.0
     work: 1.0
   age_group_20_29:
@@ -4994,14 +4994,14 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4693924296431931
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -5026,30 +5026,30 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.0182353349335667
+    other: 0.33011952956238344
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04441540898294169
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.03511957371020182
+    other: 0.07325588071906265
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
+    other: 0.008325134754724756
+    school: 0.529951597929824
     transport: 0.0
     work: 1.0
   age_group_20_29:
@@ -5057,14 +5057,14 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4693924296431931
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -5089,30 +5089,30 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.0182353349335667
+    other: 0.33011952956238344
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04441540898294169
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.03511957371020182
+    other: 0.07325588071906265
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
+    other: 0.008325134754724756
+    school: 0.529951597929824
     transport: 0.0
     work: 1.0
   age_group_20_29:
@@ -5120,14 +5120,14 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4693924296431931
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -5152,30 +5152,30 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.0182353349335667
+    other: 0.33011952956238344
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04441540898294169
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.03511957371020182
+    other: 0.07325588071906265
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
+    other: 0.008325134754724756
+    school: 0.529951597929824
     transport: 0.0
     work: 1.0
   age_group_20_29:
@@ -5183,14 +5183,14 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4693924296431931
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -5215,30 +5215,30 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.0182353349335667
+    other: 0.33011952956238344
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04441540898294169
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.03511957371020182
+    other: 0.07325588071906265
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
+    other: 0.008325134754724756
+    school: 0.529951597929824
     transport: 0.0
     work: 1.0
   age_group_20_29:
@@ -5246,14 +5246,14 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4693924296431931
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -5278,30 +5278,30 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.0182353349335667
+    other: 0.33011952956238344
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04441540898294169
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.03511957371020182
+    other: 0.07325588071906265
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
+    other: 0.008325134754724756
+    school: 0.529951597929824
     transport: 0.0
     work: 1.0
   age_group_20_29:
@@ -5309,14 +5309,14 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4693924296431931
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -5341,30 +5341,30 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.0182353349335667
+    other: 0.33011952956238344
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04441540898294169
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.03511957371020182
+    other: 0.07325588071906265
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
-    school: 1.0
+    other: 0.008325134754724756
+    school: 0.529951597929824
     transport: 0.0
     work: 1.0
   age_group_20_29:
@@ -5372,14 +5372,14 @@ policy:
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4693924296431931
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -5404,45 +5404,45 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.0182353349335667
+    other: 0.33011952956238344
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
+    leisure: 1.0
     other: 0.0
-    school: 0.0
-    transport: 0.0
+    school: 0.04441540898294169
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2164012875162822
+    other: 0.291081835656568
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 1.0
-    transport: 0.0
+    transport: 0.22265439155264455
     work: 1.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.8501790404072138
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -5467,45 +5467,45 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2798509164929613
+    other: 0.5047532432563308
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.0795008065148622
+    school: 0.01828161682868961
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2164012875162822
+    other: 0.291081835656568
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 1.0
-    transport: 0.0
+    transport: 0.22265439155264455
     work: 1.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.8501790404072138
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -5530,45 +5530,45 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2798509164929613
+    other: 0.5047532432563308
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.0795008065148622
+    school: 0.01828161682868961
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2164012875162822
+    other: 0.291081835656568
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 1.0
-    transport: 0.0
+    transport: 0.22265439155264455
     work: 1.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.8501790404072138
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -5593,45 +5593,45 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2798509164929613
+    other: 0.5047532432563308
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.0795008065148622
+    school: 0.01828161682868961
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2164012875162822
+    other: 0.291081835656568
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 1.0
-    transport: 0.0
+    transport: 0.22265439155264455
     work: 1.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.8501790404072138
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -5656,45 +5656,45 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2798509164929613
+    other: 0.5047532432563308
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.0795008065148622
+    school: 0.01828161682868961
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2164012875162822
+    other: 0.291081835656568
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 1.0
-    transport: 0.0
+    transport: 0.22265439155264455
     work: 1.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.8501790404072138
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -5719,45 +5719,45 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2798509164929613
+    other: 0.5047532432563308
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.0795008065148622
+    school: 0.01828161682868961
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2164012875162822
+    other: 0.291081835656568
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 1.0
-    transport: 0.0
+    transport: 0.22265439155264455
     work: 1.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.8501790404072138
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -5782,45 +5782,45 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2798509164929613
+    other: 0.5047532432563308
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.0795008065148622
+    school: 0.01828161682868961
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2164012875162822
+    other: 0.291081835656568
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 1.0
-    transport: 0.0
+    transport: 0.22265439155264455
     work: 1.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.8501790404072138
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -5845,45 +5845,45 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2798509164929613
+    other: 0.5047532432563308
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.0795008065148622
+    school: 0.01828161682868961
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2164012875162822
+    other: 0.291081835656568
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 1.0
-    transport: 0.0
+    transport: 0.22265439155264455
     work: 1.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.8501790404072138
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -5908,45 +5908,45 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2798509164929613
+    other: 0.5047532432563308
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.0795008065148622
+    school: 0.01828161682868961
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2164012875162822
+    other: 0.291081835656568
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 1.0
-    transport: 0.0
+    transport: 0.22265439155264455
     work: 1.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.8501790404072138
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -5971,45 +5971,45 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2798509164929613
+    other: 0.5047532432563308
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.0795008065148622
+    school: 0.01828161682868961
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2164012875162822
+    other: 0.291081835656568
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 1.0
-    transport: 0.0
+    transport: 0.22265439155264455
     work: 1.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.8501790404072138
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -6034,45 +6034,45 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2798509164929613
+    other: 0.5047532432563308
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.0795008065148622
+    school: 0.01828161682868961
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2164012875162822
+    other: 0.291081835656568
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 1.0
-    transport: 0.0
+    transport: 0.22265439155264455
     work: 1.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.8501790404072138
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -6097,45 +6097,45 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2798509164929613
+    other: 0.5047532432563308
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.0795008065148622
+    school: 0.01828161682868961
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2164012875162822
+    other: 0.291081835656568
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 1.0
-    transport: 0.0
+    transport: 0.22265439155264455
     work: 1.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.8501790404072138
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -6160,45 +6160,45 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2798509164929613
+    other: 0.5047532432563308
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.0795008065148622
+    school: 0.01828161682868961
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2164012875162822
+    other: 0.291081835656568
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 1.0
-    transport: 0.0
+    transport: 0.22265439155264455
     work: 1.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.8501790404072138
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -6223,45 +6223,45 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2798509164929613
+    other: 0.5047532432563308
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.0795008065148622
+    school: 0.01828161682868961
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2164012875162822
+    other: 0.291081835656568
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 1.0
-    transport: 0.0
+    transport: 0.22265439155264455
     work: 1.0
   age_group_20_29:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.8501790404072138
     work: 1.0
   age_group_40_49:
     home: 1.0
@@ -6286,1277 +6286,1277 @@ policy:
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.2798509164929613
+    other: 0.5047532432563308
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.0795008065148622
+    school: 0.01828161682868961
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8898058465161782
+    other: 0.7557893204147267
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.06443090617975167
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.1987215373839653
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.7241589702175028
     work: 1.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.3918000958433267
     work: 1.0
   age_group_60_69:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4877808255326545
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.6097340013576135
+    other: 0.7070626251930153
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.26576738248945175
+    school: 0.01830191783536059
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8898058465161782
+    other: 0.7557893204147267
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.06443090617975167
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.1987215373839653
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.7241589702175028
     work: 1.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.3918000958433267
     work: 1.0
   age_group_60_69:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4877808255326545
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.6097340013576135
+    other: 0.7070626251930153
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.26576738248945175
+    school: 0.01830191783536059
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8898058465161782
+    other: 0.7557893204147267
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.06443090617975167
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.1987215373839653
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.7241589702175028
     work: 1.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.3918000958433267
     work: 1.0
   age_group_60_69:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4877808255326545
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.6097340013576135
+    other: 0.7070626251930153
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.26576738248945175
+    school: 0.01830191783536059
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8898058465161782
+    other: 0.7557893204147267
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.06443090617975167
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.1987215373839653
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.7241589702175028
     work: 1.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.3918000958433267
     work: 1.0
   age_group_60_69:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4877808255326545
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.6097340013576135
+    other: 0.7070626251930153
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.26576738248945175
+    school: 0.01830191783536059
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8898058465161782
+    other: 0.7557893204147267
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.06443090617975167
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.1987215373839653
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.7241589702175028
     work: 1.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.3918000958433267
     work: 1.0
   age_group_60_69:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4877808255326545
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.6097340013576135
+    other: 0.7070626251930153
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.26576738248945175
+    school: 0.01830191783536059
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8898058465161782
+    other: 0.7557893204147267
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.06443090617975167
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.1987215373839653
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.7241589702175028
     work: 1.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.3918000958433267
     work: 1.0
   age_group_60_69:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4877808255326545
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.6097340013576135
+    other: 0.7070626251930153
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.26576738248945175
+    school: 0.01830191783536059
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8898058465161782
+    other: 0.7557893204147267
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.06443090617975167
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.1987215373839653
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.7241589702175028
     work: 1.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.3918000958433267
     work: 1.0
   age_group_60_69:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4877808255326545
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.6097340013576135
+    other: 0.7070626251930153
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.26576738248945175
+    school: 0.01830191783536059
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8898058465161782
+    other: 0.7557893204147267
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.06443090617975167
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.1987215373839653
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.7241589702175028
     work: 1.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.3918000958433267
     work: 1.0
   age_group_60_69:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4877808255326545
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.6097340013576135
+    other: 0.7070626251930153
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.26576738248945175
+    school: 0.01830191783536059
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8898058465161782
+    other: 0.7557893204147267
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.06443090617975167
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.1987215373839653
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.7241589702175028
     work: 1.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.3918000958433267
     work: 1.0
   age_group_60_69:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4877808255326545
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.6097340013576135
+    other: 0.7070626251930153
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.26576738248945175
+    school: 0.01830191783536059
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8898058465161782
+    other: 0.7557893204147267
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.06443090617975167
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.1987215373839653
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.7241589702175028
     work: 1.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.3918000958433267
     work: 1.0
   age_group_60_69:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4877808255326545
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.6097340013576135
+    other: 0.7070626251930153
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.26576738248945175
+    school: 0.01830191783536059
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8898058465161782
+    other: 0.7557893204147267
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.06443090617975167
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.1987215373839653
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.7241589702175028
     work: 1.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.3918000958433267
     work: 1.0
   age_group_60_69:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4877808255326545
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.6097340013576135
+    other: 0.7070626251930153
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.26576738248945175
+    school: 0.01830191783536059
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8898058465161782
+    other: 0.7557893204147267
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.06443090617975167
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.1987215373839653
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.7241589702175028
     work: 1.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.3918000958433267
     work: 1.0
   age_group_60_69:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4877808255326545
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.6097340013576135
+    other: 0.7070626251930153
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.26576738248945175
+    school: 0.01830191783536059
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8898058465161782
+    other: 0.7557893204147267
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.06443090617975167
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.1987215373839653
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.7241589702175028
     work: 1.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.3918000958433267
     work: 1.0
   age_group_60_69:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4877808255326545
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.6097340013576135
+    other: 0.7070626251930153
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.26576738248945175
+    school: 0.01830191783536059
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8898058465161782
+    other: 0.7557893204147267
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_10_19:
     home: 1.0
     leisure: 0.0
-    other: 0.0
+    other: 0.06443090617975167
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.1987215373839653
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.7241589702175028
     work: 1.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.3918000958433267
     work: 1.0
   age_group_60_69:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.4877808255326545
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.6097340013576135
+    other: 0.7070626251930153
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.26576738248945175
+    school: 0.01830191783536059
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 1.0
+    other: 0.9700522127669462
     school: 1.0
-    transport: 0.0
-    work: 0.0
+    transport: 1.0
+    work: 0.07769768190811653
   age_group_10_19:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8382246766111363
+    other: 0.7188039273447479
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.9568981481323897
+    other: 0.12639174710660653
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.04919641081882021
+    other: 0.23386717269267787
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.06411393886960266
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.9674007396028069
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.0443468473210858
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.9055177315832762
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8417364468912769
+    other: 0.836154872995788
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.6835793455078628
+    school: 0.01855974004968353
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 1.0
+    other: 0.9700522127669462
     school: 1.0
-    transport: 0.0
-    work: 0.0
+    transport: 1.0
+    work: 0.07769768190811653
   age_group_10_19:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8382246766111363
+    other: 0.7188039273447479
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.9568981481323897
+    other: 0.12639174710660653
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.04919641081882021
+    other: 0.23386717269267787
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.06411393886960266
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.9674007396028069
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.0443468473210858
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.9055177315832762
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8417364468912769
+    other: 0.836154872995788
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.6835793455078628
+    school: 0.01855974004968353
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 1.0
+    other: 0.9700522127669462
     school: 1.0
-    transport: 0.0
-    work: 0.0
+    transport: 1.0
+    work: 0.07769768190811653
   age_group_10_19:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8382246766111363
+    other: 0.7188039273447479
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.9568981481323897
+    other: 0.12639174710660653
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.04919641081882021
+    other: 0.23386717269267787
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.06411393886960266
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.9674007396028069
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.0443468473210858
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.9055177315832762
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8417364468912769
+    other: 0.836154872995788
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.6835793455078628
+    school: 0.01855974004968353
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 1.0
+    other: 0.9700522127669462
     school: 1.0
-    transport: 0.0
-    work: 0.0
+    transport: 1.0
+    work: 0.07769768190811653
   age_group_10_19:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8382246766111363
+    other: 0.7188039273447479
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.9568981481323897
+    other: 0.12639174710660653
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.04919641081882021
+    other: 0.23386717269267787
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.06411393886960266
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.9674007396028069
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.0443468473210858
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.9055177315832762
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8417364468912769
+    other: 0.836154872995788
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.6835793455078628
+    school: 0.01855974004968353
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 1.0
+    other: 0.9700522127669462
     school: 1.0
-    transport: 0.0
-    work: 0.0
+    transport: 1.0
+    work: 0.07769768190811653
   age_group_10_19:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8382246766111363
+    other: 0.7188039273447479
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.9568981481323897
+    other: 0.12639174710660653
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.04919641081882021
+    other: 0.23386717269267787
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.06411393886960266
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.9674007396028069
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.0443468473210858
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.9055177315832762
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8417364468912769
+    other: 0.836154872995788
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.6835793455078628
+    school: 0.01855974004968353
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 1.0
+    other: 0.9700522127669462
     school: 1.0
-    transport: 0.0
-    work: 0.0
+    transport: 1.0
+    work: 0.07769768190811653
   age_group_10_19:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8382246766111363
+    other: 0.7188039273447479
     school: 1.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_20_29:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.9568981481323897
+    other: 0.12639174710660653
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_30_39:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.04919641081882021
+    other: 0.23386717269267787
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_40_49:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.06411393886960266
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 1.0
   age_group_50_59:
     home: 1.0
     leisure: 0.0
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.9674007396028069
     work: 1.0
   age_group_60_69:
     home: 1.0
-    leisure: 0.0
+    leisure: 0.0443468473210858
     other: 0.0
     school: 0.0
-    transport: 0.0
+    transport: 0.9055177315832762
     work: 1.0
   age_group_70_79:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
+    leisure: 0.8417364468912769
+    other: 0.836154872995788
     school: 0.0
-    transport: 0.0
+    transport: 1.0
     work: 0.0
   age_group_80_plus:
     home: 1.0
-    leisure: 0.0
-    other: 0.0
-    school: 0.0
-    transport: 0.0
+    leisure: 1.0
+    other: 0.6835793455078628
+    school: 0.01855974004968353
+    transport: 1.0
     work: 0.0
 - age_group_0_9:
     home: 1.0
@@ -8441,7 +8441,7 @@ policy:
     transport: 1.0
     work: 1.0
 results:
-  deaths: 12498.933304608574
-  economics_value: 52115056651.764565
-  reward: 51089721434.40168
+  deaths: 6382.705118730167
+  economics_value: 48669564150.794876
+  reward: 15135457666.979565
 testing_heuristic: homogeneous
