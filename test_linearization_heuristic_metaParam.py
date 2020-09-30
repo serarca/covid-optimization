@@ -44,31 +44,30 @@ def main():
     
     params_to_try = {
         "delta_schooling":[0.5],
-        "xi":[0, 30 * 37199.03 * scaling / money_scaling],
-        # , 30 * 37199.03 * scaling / money_scaling],
+        "xi":[30 * 37199.03 * scaling / money_scaling],
         "icus":[3000 / scaling],
-        "tests":[0, 30000 / scaling, 60000 / scaling],
+        "tests":[0, 30000 / scaling],
         #  60000 / scaling],
         # , 30000 / scaling],
         "frequencies":[(1,1)],
         #  (7,14)],
-        "region":["fitted-scaled"], 
-        "econ": ["econ-scaled"],
-        "init": ["60days-scaled"],
+        "region":["one_group_fitted-scaled"], 
+        "econ": ["one_group_econ-scaled"],
+        "init": ["60days_one_group-scaled"],
         "eta":[0, 0.1],
-        "trust_region_radius":[0.05, 0.1, 0.2, 0.3],
-        "max_inner_iterations_mult":[1, 1.5, 2, 3]
+        "trust_region_radius":[0.05,0.1,0.2,0.4,0.6],
+        "max_inner_iterations_mult":[1, 1.5, 2]
     }
 
     all_instances = list(it.product(*(params_to_try[param] for param in params_to_try)))
 
     n_days = 90
-    groups = "all"
+    groups = "one"
     start_day = 60
 
-    scaling_econ_param(scaling, money_scaling)
-    scaling_fitted(scaling, money_scaling)
-    scaling_init(scaling)
+    scaling_econ_param(scaling, money_scaling, groups)
+    scaling_fitted(scaling, money_scaling, groups)
+    scaling_init(scaling, groups)
 
     # Final time step is used if we want to evaluate 
     # the hueristic at any time before the n_days
@@ -126,7 +125,7 @@ def run_lin_heur_and_save_output(delta, xi, icus, tests, n_days, region, test_fr
 
     total_reward, total_running_time = run_linearization_heuristic(simulation_params_linearization, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult)
 
-    with open(f"linearization_heur_meta_param_testing/testing_outputs_ndays={n_days}_eta={eta}_tests={tests}_xi={xi}.csv", "a+") as file:
+    with open(f"linearization_heur_meta_param_testing/testing_outputs_ndays={n_days}_eta={eta}_tests={tests}_xi={xi}_groups={groups}.csv", "a+") as file:
         file.write(f"{trust_region_radius}, {max_inner_iterations_mult}, {max_inner_iterations_mult/trust_region_radius}, {total_reward}, {total_running_time} \n")
         file.close()
 
@@ -191,9 +190,13 @@ def run_linearization_heuristic(simulation_params, experiment_params, start_day,
 
     return total_reward, total_running_time
 
-def scaling_econ_param(scaling, money_scaling):
+def scaling_econ_param(scaling, money_scaling, groups):
     # Import data
-    old_econ = yaml.load(open( "parameters/econ.yaml", "rb" ),Loader=yaml.FullLoader)
+    if groups == "all":
+        old_econ = yaml.load(open( "parameters/econ.yaml", "rb" ),Loader=yaml.FullLoader)
+    elif groups == "one":
+        old_econ = yaml.load(open( "parameters/one_group_econ.yaml", "rb" ),Loader=yaml.FullLoader)
+    
     # scaling = 1000.0
     # money_scaling = 10000.0
 
@@ -216,12 +219,23 @@ def scaling_econ_param(scaling, money_scaling):
         scaled_econ["schooling_params"][group] = scaled_econ["schooling_params"][group] * scaling / money_scaling
 
 
-    with open('parameters/econ-scaled.yaml', 'w') as file:
-        yaml.dump(scaled_econ, file)
+    if groups == "all":
+        with open('parameters/econ-scaled.yaml', 'w') as file:
+            yaml.dump(scaled_econ, file)
+    elif groups == "one":
+        with open('parameters/one_group_econ-scaled.yaml', 'w') as file:
+            yaml.dump(scaled_econ, file)
+    
+    
 
-def scaling_init(scaling):
+def scaling_init(scaling, groups):
     # Import data
-    old_init = yaml.load(open( "initialization/60days.yaml", "rb" ), Loader=yaml.FullLoader)
+    if groups == "all":
+        old_init = yaml.load(open( "initialization/60days.yaml", "rb" ), Loader=yaml.FullLoader)
+    elif groups == "one":
+        old_init = yaml.load(open( "initialization/60days_one_group.yaml", "rb" ), Loader=yaml.FullLoader)
+
+    
     # scaling = 1000.0
 
     # Construct initialization
@@ -242,14 +256,26 @@ def scaling_init(scaling):
                 "D": old_init[group]["D"] / scaling,
         }
 
-    with open('initialization/60days-scaled.yaml', 'w') as file:
-        yaml.dump(scaled_init_dict, file)
+    if groups == "all":
+        with open('initialization/60days-scaled.yaml', 'w') as file:
+            yaml.dump(scaled_init_dict, file)
+    elif groups == "one":
+        with open('initialization/60days_one_group-scaled.yaml', 'w') as file:
+            yaml.dump(scaled_init_dict, file)
+
+    
 
 
-def scaling_fitted(scaling, money_scaling):
-    # Import data
-    old_fitted = yaml.load(open( "parameters/fitted.yaml", "rb" ), Loader=yaml.FullLoader)
-    scaling = 1000.0
+def scaling_fitted(scaling, money_scaling, groups):
+
+    if groups == "all":
+        # Import data
+        old_fitted = yaml.load(open( "parameters/fitted.yaml", "rb" ), Loader=yaml.FullLoader)
+    elif groups == "one":
+        # Import data
+        old_fitted = yaml.load(open( "parameters/one_group_fitted.yaml", "rb" ), Loader=yaml.FullLoader)
+
+    # scaling = 1000.0
 
     scaled_fitted = dict(old_fitted)
 
@@ -260,18 +286,22 @@ def scaling_fitted(scaling, money_scaling):
 
 
 
-    for group_h in scaled_fitted["seir-groups"]:
+    # for group_h in scaled_fitted["seir-groups"]:
         # # Scale contacts
         # for act in scaled_fitted["seir-groups"][group_h]["contacts"]:
         #     for group_g in scaled_fitted["seir-groups"][group_h]["contacts"][act]:
         #         scaled_fitted["seir-groups"][group_h]["contacts"][act][group_g] = scaled_fitted["seir-groups"][group_h]["contacts"][act][group_g] * scaling
         
         # Scale econ death value
-        scaled_fitted["seir-groups"][group_h]["economics"]["death_value"] = scaled_fitted["seir-groups"][group_h]["economics"]["death_value"] * scaling
+        # scaled_fitted["seir-groups"][group_h]["economics"]["death_value"] = scaled_fitted["seir-groups"][group_h]["economics"]["death_value"] * scaling
             
 
-    with open('parameters/fitted-scaled.yaml', 'w') as file:
-        yaml.dump(scaled_fitted, file)
+    if groups == "all":
+        with open('parameters/fitted-scaled.yaml', 'w') as file:
+            yaml.dump(scaled_fitted, file)
+    elif groups == "one":
+        with open('parameters/one_group_fitted-scaled.yaml', 'w') as file:
+            yaml.dump(scaled_fitted, file)
 
 
 

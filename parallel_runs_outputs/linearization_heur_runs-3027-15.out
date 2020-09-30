@@ -1,0 +1,29 @@
+(0.5, 11159709.0, 0.3, 3.0, (7, 14), 'fitted-scaled', 'econ-scaled', '60days-scaled', 0.1)
+Total Reward at the start of the inner iterations: 41591525.53728164
+Using license file /software/non-free/Gurobi/gurobi902/linux64/gurobi.lic
+Set parameter TokenServer to value license4.stanford.edu
+Gurobi status: 3
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 18330 Constrs, 9360 Vars, 6093325 NZs
+  Matrix coefficient range    : [ 1.00091e-13, 1 ]
+  Objective coefficient range : [ 3.99698e-20, 1.63882e+07 ]
+  Variable bound range        : [ 0.00191976, 1 ]
+  RHS coefficient range       : [ 2.22863e-06, 3 ]
+Traceback (most recent call last):
+  File "run_linearization_heuristic.py", line 676, in <module>
+    main()
+  File "run_linearization_heuristic.py", line 105, in main
+    run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day)
+  File "run_linearization_heuristic.py", line 141, in run_lin_heur_and_pickle_dynModel
+    dynModel_linearization_heur = run_linearization_heuristic(simulation_params_linearization, experiment_params, start_day)
+  File "run_linearization_heuristic.py", line 192, in run_linearization_heuristic
+    linearization.run_heuristic_linearization(dynModel)
+  File "/usr/local/ifs/projects/daniancu-covid-targets/covid-optimization/heuristics/linearization.py", line 1631, in run_heuristic_linearization
+    print(mod.Kappa)
+  File "model.pxi", line 343, in gurobipy.Model.__getattr__
+  File "model.pxi", line 1772, in gurobipy.Model.getAttr
+  File "attrutil.pxi", line 100, in gurobipy.__getattr
+AttributeError: Unable to retrieve attribute 'Kappa'
+srun: error: yen10: task 0: Exited with exit code 1
+srun: Terminating job step 3027.0
