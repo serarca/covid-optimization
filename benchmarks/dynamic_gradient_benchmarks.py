@@ -134,7 +134,7 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
 			"n_m_tests":experiment_params["tests"][0],
 			"start_day":start_day,
 			"T":simulation_params['time_periods'],
-			"eta":econ_params["employment_params"]["eta"],
+			"eta":experiment_params["eta"],
 			"test_freq":simulation_params["days"],
 			"policy_freq":quar_freq,
 			"end_days":14,			
@@ -152,7 +152,7 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
 		result["experiment_params"]["start_day"],
 		result["groups"],
 		result["experiment_params"]["delta_schooling"],
-		result["experiment_params"]["eta"],
+		experiment_params["eta"],
 		result["experiment_params"]["test_freq"],
 		result["experiment_params"]["policy_freq"],
 	)
@@ -169,7 +169,7 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
 		result["experiment_params"]["start_day"],
 		result["groups"],
 		result["experiment_params"]["delta_schooling"],
-		result["experiment_params"]["eta"],
+		experiment_params["eta"],
 		90,
 		90,
 	)

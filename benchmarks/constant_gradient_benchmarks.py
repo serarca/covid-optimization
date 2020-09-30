@@ -285,7 +285,7 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 		result["experiment_params"]["start_day"],
 		result["groups"],
 		result["experiment_params"]["delta_schooling"],
-		result["experiment_params"]["eta"],
+		experiment_params["eta"],
 		result["experiment_params"]["test_freq"],
 		result["experiment_params"]["policy_freq"],
 	)
