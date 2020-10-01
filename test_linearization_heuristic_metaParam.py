@@ -44,30 +44,34 @@ def main():
     
     params_to_try = {
         "delta_schooling":[0.5],
-        "xi":[30 * 37199.03 * scaling / money_scaling],
+        "xi":[0, 30 * 37199.03 * scaling / money_scaling, 140 * 37199.03 * scaling / money_scaling],
         "icus":[3000 / scaling],
-        "tests":[0, 30000 / scaling],
+        "tests":[0],
+        # , 30000 / scaling],
         #  60000 / scaling],
         # , 30000 / scaling],
-        "frequencies":[(1,1)],
-        #  (7,14)],
-        "region":["one_group_fitted-scaled"], 
-        "econ": ["one_group_econ-scaled"],
-        "init": ["60days_one_group-scaled"],
-        "eta":[0, 0.1],
-        "trust_region_radius":[0.05,0.1,0.2,0.4,0.6],
-        "max_inner_iterations_mult":[1, 1.5, 2]
+        "frequencies":[(7,14)],
+        #   (7,14)],
+        "region":["fitted-scaled"], 
+        "econ": ["econ-scaled"],
+        "init": ["60days-scaled"],
+        "eta":[0.1, 0],
+        "trust_region_radius":[0,0.05,0.1,0.2,0.4,0.6],
+        "max_inner_iterations_mult":[1, 1.5, 2],
+        "initial_uhat":["dynamic_gradient", "full_lockdown", "full_open"]
     }
 
     all_instances = list(it.product(*(params_to_try[param] for param in params_to_try)))
 
     n_days = 90
-    groups = "one"
+    groups = "all"
     start_day = 60
 
-    scaling_econ_param(scaling, money_scaling, groups)
-    scaling_fitted(scaling, money_scaling, groups)
-    scaling_init(scaling, groups)
+    print(len(all_instances))
+
+    # scaling_econ_param(scaling, money_scaling, groups)
+    # scaling_fitted(scaling, money_scaling, groups)
+    # scaling_init(scaling, groups)
 
     # Final time step is used if we want to evaluate 
     # the hueristic at any time before the n_days
@@ -88,14 +92,15 @@ def main():
     eta = all_instances[instance_index][8]
     trust_region_radius = all_instances[instance_index][9]
     max_inner_iterations_mult = all_instances[instance_index][10]
+    initial_uhat = all_instances[instance_index][11]
 
     print(all_instances[instance_index])
 
-    run_lin_heur_and_save_output(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult)
+    run_lin_heur_and_save_output(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat)
 
 
 
-def run_lin_heur_and_save_output(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult):
+def run_lin_heur_and_save_output(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat):
     ''' Runs the linearization heuristic with the experiment parameters passed as arguments and saves the relevant output.'''
 
     experiment_params = {
@@ -123,15 +128,15 @@ def run_lin_heur_and_save_output(delta, xi, icus, tests, n_days, region, test_fr
         'eta': eta
     }
 
-    total_reward, total_running_time = run_linearization_heuristic(simulation_params_linearization, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult)
+    total_reward, total_running_time = run_linearization_heuristic(simulation_params_linearization, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat)
 
-    with open(f"linearization_heur_meta_param_testing/testing_outputs_ndays={n_days}_eta={eta}_tests={tests}_xi={xi}_groups={groups}.csv", "a+") as file:
-        file.write(f"{trust_region_radius}, {max_inner_iterations_mult}, {max_inner_iterations_mult/trust_region_radius}, {total_reward}, {total_running_time} \n")
+    with open(f"linearization_heur_meta_param_testing/testing_outputs_ndays={n_days}_eta={eta}_tests={tests}_xi={xi}_freq={lockdown_freq}_groups={groups}_initial_uhat={initial_uhat}.csv", "a+") as file:
+        file.write(f"{trust_region_radius}, {max_inner_iterations_mult}, {max_inner_iterations_mult/trust_region_radius if trust_region_radius > 0 else 0}, {total_reward}, {total_running_time} \n")
         file.close()
 
 
 
-def run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult):
+def run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat):
     ''' Takes a set of simulation_params and experiment parameters (delta_school, emotional cost of deaths (xi), max icus, max tests, testing and lockdown frequencies) and a set of simulation paramters (required by the constructor in group.py), creates a dynamical system, runs the linearization heuristic and returns the dynamical system after running the heuristic. 
     '''
 
@@ -177,7 +182,7 @@ def run_linearization_heuristic(simulation_params, experiment_params, start_day,
     dynModel.econ_params["employment_params"]["eta"] = simulation_params["eta"]
 
 
-    linearization.run_heuristic_linearization(dynModel, trust_region_radius, max_inner_iterations_mult)
+    linearization.run_heuristic_linearization(dynModel, trust_region_radius, max_inner_iterations_mult, initial_uhat)
 
     end_time = time()
 

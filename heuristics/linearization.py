@@ -47,8 +47,8 @@ def log_execution_time(function):
 ##################################################
 
 
-# age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29','age_group_30_39', 'age_group_40_49', 'age_group_50_59', 'age_group_60_69', 'age_group_70_79','age_group_80_plus']
-age_groups = ["all_age_groups"]
+age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29','age_group_30_39', 'age_group_40_49', 'age_group_50_59', 'age_group_60_69', 'age_group_70_79','age_group_80_plus']
+# age_groups = ["all_age_groups"]
 SEIR_groups = [ 'S_g', 'E_g', 'I_g', 'R_g', 'N_g', 'Ia_g', 'Ips_g', \
        'Ims_g', 'Iss_g', 'Rq_g', 'H_g', 'ICU_g', 'D_g' ]
 activities = ['home','leisure','other','school','transport','work']
@@ -1264,7 +1264,7 @@ def get_real_reward(dynModel, uhat_seq):
 # Main function: runs the linearization heuristic
 # @profile
 # @log_execution_time
-def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_iterations_mult=2):
+def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_iterations_mult=2, initial_uhat="dynamic_gradient"):
     """Run the heuristic based on linearization. Takes a dynamical model, resets the time to 0, and runs it following the linearization heuristic. Returns the dynamical model after running it."""
 
     # age_groups = dynModel.groups.keys()
@@ -1281,7 +1281,7 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
 
     # trust_region_radius = 0.1
     threshold = 0.001
-    max_inner_iterations = max_inner_iterations_mult / trust_region_radius
+    max_inner_iterations = max_inner_iterations_mult / trust_region_radius if trust_region_radius>0 else 1
 
     # shorthand for a few useful parameters
     T = dynModel.time_steps
@@ -1317,31 +1317,11 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
     assert( np.shape(Gamma_u) == (num_constraints,ut_dim) )
     assert( np.shape(K) == (num_constraints,T) )
    
-    h = "time_gradient"
-    n = "xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d.yaml"%(
-		dynModel.experiment_params["xi"]*0.1,
-		dynModel.experiment_params["icus"]*10000,
-		"homogeneous",
-		dynModel.parameters['global-parameters']['C_atest']*10000,
-		dynModel.parameters['global-parameters']['C_mtest']*10000,
-		dynModel.time_steps - dynModel.END_DAYS,
-		dynModel.start_day,
-		"one",
-		dynModel.experiment_params["delta_schooling"],
-		dynModel.econ_params["employment_params"]["eta"],
-		90,
-		14
-	)
-
-    with open("benchmarks/results/%s/%s"%(h,n)) as file:
-        result = yaml.load(file, Loader=yaml.FullLoader)
-
-
-
-    # uptimal decisions
+    # optimal decisions
     uopt_seq = np.zeros((ut_dim,T), dtype=numpyArrayDatatype)
 
-    # pick a starting u_hat sequence
+    # initialize a starting u_hat sequence with full lockdown, 
+    # no tests, and no bouncing
     uhat_seq = np.zeros((ut_dim,T), dtype=numpyArrayDatatype)
 
     # for now, homogenous testing
@@ -1351,15 +1331,50 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
     Natestg_idx_all = slice(controls.index('Natest_g'),ut_dim,num_controls)
     uhat_seq[Natestg_idx_all,:] = dynModel.parameters['global-parameters']['C_atest']/num_age_groups
 
-    # Starting the uhat_seq with all lockdowns set to 0.5 (fully open)
-    for t in range(T):
-        for ag in range(num_age_groups):
-            for act in activities:
-                act_index = (controls.index(act) + num_controls * ag)
-                uhat_seq[act_index,t] = result["policy"][t][age_groups[ag]][act]
+    # Initialize lockdown policy for first u_hat
 
-    # Random lockdowns
-            # uhat_seq[act_indices,:] = random.uniform(0,1)
+    if initial_uhat in ["dynamic_gradient", "time_gradient"]:
+        h = initial_uhat
+        n = "xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d.yaml"%(
+            dynModel.experiment_params["xi"]*0.1,
+            dynModel.experiment_params["icus"]*10000,
+            "homogeneous",
+            dynModel.parameters['global-parameters']['C_atest']*10000,
+            dynModel.parameters['global-parameters']['C_mtest']*10000,
+            dynModel.time_steps - dynModel.END_DAYS,
+            dynModel.start_day,
+            "all",
+            dynModel.experiment_params["delta_schooling"],
+            dynModel.econ_params["employment_params"]["eta"],
+            90,
+            14
+        )
+
+        with open("benchmarks/results/%s/%s"%(h,n)) as file:
+            result = yaml.load(file, Loader=yaml.FullLoader)
+
+        # Starting the uhat_seq with all lockdowns set to 0.5 (fully open)
+        for t in range(T):
+            for ag in range(num_age_groups):
+                for act in activities:
+                    act_index = (controls.index(act) + num_controls * ag)
+                    uhat_seq[act_index,t] = result["policy"][t][age_groups[ag]][act]
+    
+    if initial_uhat == "random":
+        for act in activities:
+            act_indices = slice(controls.index(act), ut_dim, num_controls)
+            # Random lockdowns
+            uhat_seq[act_indices,:] = random.uniform(0,1)
+
+    if initial_uhat == "full_lockdown":
+        # the controls are initialized in full lockdown
+        pass 
+
+    if initial_uhat == "full_open":
+        for act in activities:
+            act_indices = slice(controls.index(act), ut_dim, num_controls)
+            # Random lockdowns
+            uhat_seq[act_indices,:] = 1
 
 
     # and home lockdown variables all 1
@@ -1530,73 +1545,52 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
             
 
             # Weekly testing constraints
-            if test_freq > 1:
+            if test_freq > 1 and (dynModel.parameters['global-parameters']['C_atest'] > 0 or dynModel.parameters['global-parameters']['C_mtest'] > 0):
                 m_test_id = controls.index('Nmtest_g')
                 a_test_id = controls.index('Natest_g')
 
-                if (T-k) % test_freq != 0 and k != 0:
-                    #Fix the first control to be equal to the control at time k-1
-                    for ag in range(num_age_groups):
-                        m_test_idx = m_test_id + ag * num_controls
-                        a_test_idx = a_test_id + ag * num_controls
+                for time_index in range(T - dynModel.END_DAYS):
 
-                        mod.addConstr(u_vars_vec[m_test_idx] == dynModel.m_tests_controls[k-1][age_groups[ag]])
-                        mod.addConstr(u_vars_vec[a_test_idx] == dynModel.a_tests_controls[k-1][age_groups[ag]])
+                    if time_index == k and (time_index % lockdown_freq) != 0:
+                        #Fix the first control to be equal to the control at time k-1
+                        for ag in range(num_age_groups):
+                            m_test_idx = m_test_id + ag * num_controls
+                            a_test_idx = a_test_id + ag * num_controls
+
+                            mod.addConstr(u_vars_vec[m_test_idx] == dynModel.m_tests_controls[k-1][age_groups[ag]])
+                            mod.addConstr(u_vars_vec[a_test_idx] == dynModel.a_tests_controls[k-1][age_groups[ag]])
+
+                    
+                    if time_index > k and (time_index % lockdown_freq) != 0:
+                        for ag in range(num_age_groups):
+                            m_test_idx = m_test_id + ag * num_controls
+                            a_test_idx = a_test_id + ag * num_controls
+
+                            mod.addConstr(u_vars_vec[(time_index - k) * ut_dim + m_test_idx] == u_vars_vec[(time_index - k - 1) * ut_dim + m_test_idx])
+                            mod.addConstr(u_vars_vec[(time_index - k) * ut_dim + a_test_idx] == u_vars_vec[(time_index - k - 1) * ut_dim + a_test_idx])
 
 
-                #Obeserve that we will have one constraint for each window of size test_freq, of which we have (T-k+test_freq-1)//test_freq)
-                #
-                # weeklyTestingConstMatrix = np.zeros(2 * num_age_groups * ((T-k+test_freq-1)//test_freq), ut_dim * (T-k))
-                #
-
-                row_index = 0
-                time_index = T-k
-                while time_index > 0:
-                    for ag in range(num_age_groups):
-                        m_test_idx = m_test_id + ag * num_controls
-                        a_test_idx = a_test_id + ag * num_controls
-                        for window in range(1, min(time_index, test_freq)):
-                            # print(time_index-window)
-                            # print(time_index-window-1)
-                            mod.addConstr(u_vars_vec[(time_index-window) * ut_dim + m_test_idx] == u_vars_vec[(time_index-window-1) * ut_dim + m_test_idx])
-                            mod.addConstr(u_vars_vec[(time_index-window) * ut_dim + a_test_idx] == u_vars_vec[(time_index-window-1) * ut_dim + a_test_idx])
-
-                    time_index = max(time_index - test_freq, 0)
-
-            # Bieekly lockdown constraints
+            # Biweekly lockdown constraints
             if lockdown_freq > 1:
 
-                if (T-k) % lockdown_freq != 0 and k != 0:
-                    #Fix the first control to be equal to the control at time k-1
-                    for ag in range(num_age_groups):
-                        for act in activities:
-                            act_lock_id = controls.index(act)
-                            act_lock_idx = act_lock_id + ag * num_controls
+                for time_index in range(T - dynModel.END_DAYS):
 
-                            mod.addConstr(u_vars_vec[act_lock_idx] == dynModel.lockdown_controls[k-1][age_groups[ag]][act])
+                    if time_index == k and (time_index % lockdown_freq) != 0:
+                        #Fix the first control to be equal to the control at time k-1
+                        for ag in range(num_age_groups):
+                            for act in activities:
+                                act_lock_id = controls.index(act)
+                                act_lock_idx = act_lock_id + ag * num_controls
 
+                                mod.addConstr(u_vars_vec[act_lock_idx] == dynModel.lockdown_controls[k-1][age_groups[ag]][act], name="biweekly-initial")
+                    
+                    if time_index > k and (time_index % lockdown_freq) != 0:
+                        for ag in range(num_age_groups):
+                            for act in activities:
+                                act_lock_id = controls.index(act)
+                                act_lock_idx = act_lock_id + ag * num_controls
 
-
-            #Obeserve that we will have one constraint for each window of size test_freq, of which we have (T-k+test_freq-1)//test_freq)
-            #
-            # weeklyTestingConstMatrix = np.zeros(2 * num_age_groups * ((T-k+test_freq-1)//test_freq), ut_dim * (T-k))
-            #
-
-                row_index = 0
-                time_index = T-k
-                while time_index > 0:
-                    for ag in range(num_age_groups):
-                        for act in activities:
-                            act_lock_id = controls.index(act)
-                            act_lock_idx = act_lock_id + ag * num_controls
-
-                            for window in range(1, min(time_index, lockdown_freq)):
-                            # print(time_index-window)
-                            # print(time_index-window-1)
-
-                                mod.addConstr(u_vars_vec[(time_index-window) * ut_dim + act_lock_idx] == u_vars_vec[(time_index-window-1) * ut_dim + act_lock_idx])
-
-                    time_index = max(time_index - lockdown_freq, 0)
+                                mod.addConstr(u_vars_vec[(time_index - k) * ut_dim + act_lock_idx] == u_vars_vec[(time_index - k - 1) * ut_dim + act_lock_idx])
 
 
 
@@ -1628,7 +1622,7 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
 
             # Print model statistics
             mod.printStats()
-            print(mod.Kappa)
+            # print(mod.Kappa)
                 
 
             if( mod.Status ==  gb.GRB.INFEASIBLE ):
