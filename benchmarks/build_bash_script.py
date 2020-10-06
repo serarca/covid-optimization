@@ -50,7 +50,6 @@ for delta in params_to_try["delta_schooling"]:
 						    	)
 						    )
 
-open('parallel_bash.sh', 'w').close()
 for delta in params_to_try["delta_schooling"]:
 	for xi in params_to_try["xi"]:
 		for icus in params_to_try["icus"]:
@@ -64,8 +63,6 @@ for delta in params_to_try["delta_schooling"]:
 						    	)
 						    )
 
-
-open('parallel_bash.sh', 'w').close()
 for delta in params_to_try["delta_schooling"]:
 	for xi in params_to_try["xi"]:
 		for icus in params_to_try["icus"]:
