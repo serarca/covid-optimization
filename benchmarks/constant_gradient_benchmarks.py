@@ -27,9 +27,32 @@ from scipy.optimize import Bounds,minimize,LinearConstraint
 
 
 
-# Parameters to try
-with open("../parameters/run_params.yaml") as file:
-	run_params = yaml.load(file, Loader=yaml.FullLoader)
+
+parser = argparse.ArgumentParser(description='Arguments')
+parser.add_argument('--delta', action="store", dest='delta', type=float)
+parser.add_argument('--icus', action="store", dest='icus', type=int)
+parser.add_argument('--eta', action="store", dest='eta', type=float)
+parser.add_argument('--groups', action="store", dest='groups', type=str)
+parser.add_argument('--xi', action="store", dest='xi', type=float)
+parser.add_argument('--a_tests', action="store", dest='a_tests', type=int)
+parser.add_argument('--m_tests', action="store", dest='m_tests', type=int)
+
+
+args = parser.parse_args()
+
+run_params = {
+	"groups":args.groups,
+	"params_to_try":{
+		"delta_schooling":[args.delta],
+		"icus":[args.icus],
+		"eta":[args.eta],
+		"tests":[[args.m_tests, args.a_tests]],
+		"xi":[args.xi],
+		"testing":["homogeneous"]
+	}
+}
+
+print(run_params)
 
 params_to_try = run_params["params_to_try"]
 groups = run_params["groups"]

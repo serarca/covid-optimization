@@ -29,14 +29,22 @@ from random import sample
 
 
 
-groups = "one"
+
+
+
+
+groups = "all"
+
 experiment_params = {
 	'delta_schooling':0.5,
-	'xi':1115970.9,
 	'icus':3000,
 	'testing':"homogeneous",
 	'tests':0,
 	'eta':0.1,
+}
+
+intervals = {
+	"xi":[0,5207864]
 }
 
 # Global variables
@@ -66,6 +74,14 @@ if groups == "all":
 	with open("../parameters/econ.yaml") as file:
 		econ_params = yaml.load(file, Loader=yaml.FullLoader)
 
+	for group in age_groups:
+		population = sum([initialization[group][cont] for cont in initialization[group] if cont!="N"] )
+		infected_perc = sample([0.1,0.01,0.001,0.0001,0.00001,0.000001],1)[0]*np.random.random()
+		n_icu = sample([1.0,0.1,0.01,0],1)[0]*experiment_params["icus"] * np.random.random()
+		recovered_perc = sample([0.9,0.1,0.001,0.0001,0],1)[0]*np.random.random()
+
+
+
 elif groups == "one":
 	age_groups = ["all_age_groups"]
 
@@ -77,7 +93,7 @@ elif groups == "one":
 	with open("../initialization/60days_one_group.yaml") as file:
 		initialization = yaml.load(file, Loader=yaml.FullLoader)
 		start_day = 60
-	population = sum([initialization["all_age_groups"][cont] for cont in initialization["all_age_groups"] if cont!="N"])
+	population = sum([initialization["all_age_groups"][cont] for cont in initialization["all_age_groups"]])
 
 
 	infected_perc = sample([0.1,0.01,0.001,0.0001,0.00001,0.000001],1)[0]*np.random.random()
