@@ -10,4 +10,4 @@
 ml python/3.6.1
 python3 simple_benchmarks.py --delta 1.000000 --icus 2900 --eta 0.000000 --groups all --xi 3719903.000000 --a_tests 30000 --m_tests 30000
 python3 constant_gradient_benchmarks.py --delta 1.000000 --icus 2900 --eta 0.000000 --groups all --xi 3719903.000000 --a_tests 30000 --m_tests 30000
-python3 constant_gradient_benchmarks.py --delta 1.000000 --icus 2900 --eta 0.000000 --groups all --xi 3719903.000000 --a_tests 30000 --m_tests 30000
+python3 dynamic_gradient_benchmarks.py --delta 1.000000 --icus 2900 --eta 0.000000 --groups all --xi 3719903.000000 --a_tests 30000 --m_tests 30000
