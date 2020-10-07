@@ -109,7 +109,7 @@ python3 dynamic_gradient_benchmarks.py --delta %f --icus %d --eta %f --groups al
 								)
 							)
 						with open('sherlock_scripts/sherlock_master.sh', 'a') as the_file:
-							the_file.write("sbatch sherlock_scripts/script_%d.sh\n"%counter)
+							the_file.write("sbatch script_%d.sh\n"%counter)
 						counter+=1
 
 
