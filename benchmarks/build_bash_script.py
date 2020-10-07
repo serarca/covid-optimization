@@ -79,7 +79,7 @@ for delta in params_to_try["delta_schooling"]:
 # Now write the sherlock scripts
 
 counter = 0
-open('sherlock_scripts/sherlock_master.sh', 'w').close()
+open('sherlock_master.sh', 'w').close()
 for delta in params_to_try["delta_schooling"]:
 	for xi in params_to_try["xi"]:
 		for icus in params_to_try["icus"]:
@@ -108,8 +108,8 @@ python3 dynamic_gradient_benchmarks.py --delta %f --icus %d --eta %f --groups al
 									delta, icus, eta, xi, tests[1], tests[0]
 								)
 							)
-						with open('sherlock_scripts/sherlock_master.sh', 'a') as the_file:
-							the_file.write("sbatch script_%d.sh\n"%counter)
+						with open('sherlock_master.sh', 'a') as the_file:
+							the_file.write("sbatch sherlock_scripts/script_%d.sh\n"%counter)
 						counter+=1
 
 
