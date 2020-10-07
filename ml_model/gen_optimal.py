@@ -77,7 +77,7 @@ elif groups == "one":
 	with open("../initialization/60days_one_group.yaml") as file:
 		initialization = yaml.load(file, Loader=yaml.FullLoader)
 		start_day = 60
-	population = sum([initialization["all_age_groups"][cont] for cont in initialization["all_age_groups"]])
+	population = sum([initialization["all_age_groups"][cont] for cont in initialization["all_age_groups"] if cont!="N"])
 
 
 	infected_perc = sample([0.1,0.01,0.001,0.0001,0.00001,0.000001],1)[0]*np.random.random()
