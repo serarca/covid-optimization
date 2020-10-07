@@ -109,7 +109,7 @@ python3 constant_gradient_benchmarks.py --delta %f --icus %d --eta %f --groups a
 								)
 							)
 						with open('sherlock_master.sh', 'a') as the_file:
-							the_file.write("source sherlock_scripts/script_%d.sh\n"%counter)
+							the_file.write("sbatch sherlock_scripts/script_%d.sh\n"%counter)
 						counter+=1
 
 
