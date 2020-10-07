@@ -287,7 +287,7 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
 		np.zeros(len(intervention_times)*len(age_groups)*len(rel_activities)) + 1.0
 	)
 
-	result_lockdown = minimize(simulate, x0, method='L-BFGS-B',bounds=full_bounds,options={'eps':1e-1,'maxfun':700000})
+	result_lockdown = minimize(simulate, x0, method='L-BFGS-B',bounds=full_bounds,options={'eps':1e-1,'maxiter':200})
 
 	x_lockdown = np.reshape(
 		result_lockdown.x,

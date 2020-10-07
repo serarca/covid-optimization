@@ -25,7 +25,7 @@ from fast_group import FastDynamicalModel
 from aux import *
 from scipy.optimize import Bounds,minimize,LinearConstraint
 from copy import deepcopy
-
+from os import path
 
 
 
@@ -79,7 +79,10 @@ for delta in params_to_try["delta_schooling"]:
 # Now write the sherlock scripts
 
 counter = 0
-open('sherlock_master.sh', 'w').close()
+open('sherlock_master_1.sh', 'w').close()
+open('sherlock_master_2.sh', 'w').close()
+open('sherlock_master_remaining.sh', 'w').close()
+
 for delta in params_to_try["delta_schooling"]:
 	for xi in params_to_try["xi"]:
 		for icus in params_to_try["icus"]:
@@ -93,7 +96,7 @@ for delta in params_to_try["delta_schooling"]:
 #
 #SBATCH --job-name=test
 #
-#SBATCH --time=1:00:00
+#SBATCH --time=2:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=1G
@@ -108,8 +111,20 @@ python3 dynamic_gradient_benchmarks.py --delta %f --icus %d --eta %f --groups al
 									delta, icus, eta, xi, tests[1], tests[0]
 								)
 							)
-						with open('sherlock_master.sh', 'a') as the_file:
-							the_file.write("sbatch sherlock_scripts/script_%d.sh\n"%counter)
+						if counter < 540:
+							with open('sherlock_master_1.sh', 'a') as the_file:
+								the_file.write("sbatch sherlock_scripts/script_%d.sh\n"%counter)
+						else:
+							with open('sherlock_master_2.sh', 'a') as the_file:
+								the_file.write("sbatch sherlock_scripts/script_%d.sh\n"%counter)
+						filename = "results/dynamic_gradient/xi-%d_icus-%d_testing-homogeneous_natests-%d_nmtests-%d_T-90_startday-60_groups-all_dschool-%f_eta-%f_freq-90-14.yaml"%(
+							xi,icus,tests[1],tests[0],delta,eta
+						)
+						if (not path.exists(filename)):
+							with open('sherlock_master_remaining.sh', 'a') as the_file:
+								the_file.write("sbatch sherlock_scripts/script_%d.sh\n"%counter)
+
+
 						counter+=1
 
 
