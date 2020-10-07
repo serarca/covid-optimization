@@ -66,6 +66,7 @@ def main():
     n_days = 90
     groups = "all"
     start_day = 60
+    optimize_bouncing = False
 
     print(len(all_instances))
 
@@ -96,11 +97,11 @@ def main():
 
     print(all_instances[instance_index])
 
-    run_lin_heur_and_save_output(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat)
+    run_lin_heur_and_save_output(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing)
 
 
 
-def run_lin_heur_and_save_output(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat):
+def run_lin_heur_and_save_output(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing):
     ''' Runs the linearization heuristic with the experiment parameters passed as arguments and saves the relevant output.'''
 
     experiment_params = {
@@ -128,15 +129,15 @@ def run_lin_heur_and_save_output(delta, xi, icus, tests, n_days, region, test_fr
         'eta': eta
     }
 
-    total_reward, total_running_time = run_linearization_heuristic(simulation_params_linearization, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat)
+    total_reward, total_running_time = run_linearization_heuristic(simulation_params_linearization, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing)
 
-    with open(f"linearization_heur_meta_param_testing/testing_outputs_ndays={n_days}_eta={eta}_tests={tests}_xi={xi}_freq={lockdown_freq}_groups={groups}_initial_uhat={initial_uhat}.csv", "a+") as file:
+    with open(f"linearization_heur_meta_param_testing/testing_outputs_ndays={n_days}_eta={eta}_tests={tests}_xi={xi}_freq={lockdown_freq}_groups={groups}_initial_uhat={initial_uhat}_opt_bouncing={optimize_bouncing}.csv", "a+") as file:
         file.write(f"{trust_region_radius}, {max_inner_iterations_mult}, {max_inner_iterations_mult/trust_region_radius if trust_region_radius > 0 else 0}, {total_reward}, {total_running_time} \n")
         file.close()
 
 
 
-def run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat):
+def run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing):
     ''' Takes a set of simulation_params and experiment parameters (delta_school, emotional cost of deaths (xi), max icus, max tests, testing and lockdown frequencies) and a set of simulation paramters (required by the constructor in group.py), creates a dynamical system, runs the linearization heuristic and returns the dynamical system after running the heuristic. 
     '''
 
@@ -182,7 +183,7 @@ def run_linearization_heuristic(simulation_params, experiment_params, start_day,
     dynModel.econ_params["employment_params"]["eta"] = simulation_params["eta"]
 
 
-    linearization.run_heuristic_linearization(dynModel, trust_region_radius, max_inner_iterations_mult, initial_uhat)
+    linearization.run_heuristic_linearization(dynModel, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing)
 
     end_time = time()
 
