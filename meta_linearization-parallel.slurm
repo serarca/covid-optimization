@@ -8,7 +8,7 @@
 
  
 
-#SBATCH --array=299   # there is a max array size - 512 tasks
+#SBATCH --array=320   # there is a max array size - 512 tasks
 
 #SBATCH -J meta_param_linearization_heur_runs
 
@@ -28,7 +28,7 @@
 
  
 
-#SBATCH -n 24
+#SBATCH -n 4
 
 #SBATCH --mem-per-cpu=7gb
 
@@ -48,7 +48,7 @@ module load gurobipy3
 # source activate myenv
 
  
-for i in {0..23}; do
+for i in {0..3}; do
     srun --exclusive -n 1 python3 test_linearization_heuristic_metaParam.py $((SLURM_ARRAY_TASK_ID+i)) &
 done
 

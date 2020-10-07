@@ -1231,6 +1231,7 @@ def get_real_reward(dynModel, uhat_seq):
 
     original_time = dynModel.t
 
+    print(max(uhat_seq.shape[1]-dynModel.END_DAYS,0))
     for i in range(uhat_seq.shape[1]):
     
         u_dict, alpha_dict = buildAlphaDict(uhat_seq[:,i])
@@ -1264,7 +1265,7 @@ def get_real_reward(dynModel, uhat_seq):
 # Main function: runs the linearization heuristic
 # @profile
 # @log_execution_time
-def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_iterations_mult=2, initial_uhat="dynamic_gradient"):
+def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_iterations_mult=2, initial_uhat="dynamic_gradient", optimize_bouncing=True):
     """Run the heuristic based on linearization. Takes a dynamical model, resets the time to 0, and runs it following the linearization heuristic. Returns the dynamical model after running it."""
 
     # age_groups = dynModel.groups.keys()
@@ -1318,7 +1319,7 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
     assert( np.shape(K) == (num_constraints,T) )
    
     # optimal decisions
-    uopt_seq = np.zeros((ut_dim,T), dtype=numpyArrayDatatype)
+    # uopt_seq = np.zeros((ut_dim,T), dtype=numpyArrayDatatype)
 
     # initialize a starting u_hat sequence with full lockdown, 
     # no tests, and no bouncing
@@ -1328,7 +1329,7 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
     Nmtestg_idx_all = slice(controls.index('Nmtest_g'),ut_dim,num_controls)
     uhat_seq[Nmtestg_idx_all,:] = dynModel.parameters['global-parameters']['C_mtest']/num_age_groups
 
-    Natestg_idx_all = slice(controls.index('Natest_g'),ut_dim,num_controls)
+    Natestg_idx_all = slice(controls.index('Natest_g'), ut_dim,num_controls)
     uhat_seq[Natestg_idx_all,:] = dynModel.parameters['global-parameters']['C_atest']/num_age_groups
 
     # Initialize lockdown policy for first u_hat
@@ -1353,7 +1354,7 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
         with open("benchmarks/results/%s/%s"%(h,n)) as file:
             result = yaml.load(file, Loader=yaml.FullLoader)
 
-        # Starting the uhat_seq with all lockdowns set to 0.5 (fully open)
+        # Starting the uhat_seq 
         for t in range(T):
             for ag in range(num_age_groups):
                 for act in activities:
@@ -1406,6 +1407,11 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
 
         m_test_idx_all_times = [controls.index('Nmtest_g') + i*num_controls for i in range((T-k)*num_age_groups)]
 
+        icu_bouncing_idx_all_times =  [controls.index('BounceICU_g') + i*num_controls for i in range((T-k)*num_age_groups)]
+
+        hospital_bouncing_idx_all_times =  [controls.index('BounceH_g') + i*num_controls for i in range((T-k)*num_age_groups)]
+
+        all_bouncing_idx_all_times = hospital_bouncing_idx_all_times + icu_bouncing_idx_all_times
 
         inner_iterations = 0
         u_hat_lockdown_difference = threshold + 1
@@ -1682,31 +1688,37 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
             
 
             # extract decisions for current period (testing and alphas)
-            uvars_opt = np.reshape(u_vars_vec.X, np.shape(obj_coefs), 'F')
-            reward = get_real_reward(dynModel, uvars_opt)
+            uhat_seq = np.reshape(u_vars_vec.X, np.shape(obj_coefs), 'F')
+
+            
+            if optimize_bouncing is False:
+                for i in range(len(obj_vec)):
+                    if i in all_bouncing_idx_all_times:
+                        uhat_seq[i%ut_dim, i//ut_dim] = 0
+                Xhat_seq, uhat_seq = get_X_hat_sequence(dynModel, k, uhat_seq, use_bounce_var)
+
+            reward = get_real_reward(dynModel, uhat_seq)
 
             print(f"Actual reward of current solution: {reward}")
 
             # Save best reward and decisions
             if reward > best_uhat_and_reward[1]:
-                best_uhat_and_reward = (uvars_opt, reward)
+                best_uhat_and_reward = (uhat_seq, reward)
 
             # Norm Infinity
-            u_hat_lockdown_difference = min([max([abs(uvars_opt[i%ut_dim, i//ut_dim] - previous_u_hat_seq[0][i%ut_dim, i//ut_dim]) for i in all_lockdowns_idx_all_times]) + max([abs(uvars_opt[i%ut_dim, i//ut_dim] - previous_u_hat_seq[0][i%ut_dim, i//ut_dim]) / (dynModel.parameters['global-parameters']['C_atest'] if dynModel.parameters['global-parameters']['C_atest']>0 else 1e-5) for i in a_test_idx_all_times]) + max([abs(uvars_opt[i%ut_dim, i//ut_dim] - previous_u_hat_seq[0][i%ut_dim, i//ut_dim]) / (dynModel.parameters['global-parameters']['C_mtest'] if dynModel.parameters['global-parameters']['C_mtest']>0 else 1e-5) for i in m_test_idx_all_times]) for previous_u_hat_seq in all_u_hat_seq_and_rewards])
+            u_hat_lockdown_difference = min([max([abs(uhat_seq[i%ut_dim, i//ut_dim] - previous_u_hat_seq[0][i%ut_dim, i//ut_dim]) for i in all_lockdowns_idx_all_times]) + max([abs(uhat_seq[i%ut_dim, i//ut_dim] - previous_u_hat_seq[0][i%ut_dim, i//ut_dim]) / (dynModel.parameters['global-parameters']['C_atest'] if dynModel.parameters['global-parameters']['C_atest']>0 else 1e-5) for i in a_test_idx_all_times]) + max([abs(uhat_seq[i%ut_dim, i//ut_dim] - previous_u_hat_seq[0][i%ut_dim, i//ut_dim]) / (dynModel.parameters['global-parameters']['C_mtest'] if dynModel.parameters['global-parameters']['C_mtest']>0 else 1e-5) for i in m_test_idx_all_times]) for previous_u_hat_seq in all_u_hat_seq_and_rewards])
 
             
 
-            # u_hat_lockwdown_difference = min(max([abs(uvars_opt[i, j] - uhat_seq[i, j]) for i in range(ut_dim) for j in range(T-k)]), abs(reward - all_u_hat_seq_and_rewards[-1][1]))
+            # u_hat_lockwdown_difference = min(max([abs(uhat_seq[i, j] - uhat_seq[i, j]) for i in range(ut_dim) for j in range(T-k)]), abs(reward - all_u_hat_seq_and_rewards[-1][1]))
 
             print(f"Minimum Difference with past solutions:{u_hat_lockdown_difference}.")
-
 
             if u_hat_lockdown_difference < 1e-6:
                 print(f"New solution equals old solution at k={k}")
 
             inner_iterations += 1
 
-            uhat_seq = uvars_opt
             all_u_hat_seq_and_rewards += [(uhat_seq, reward)]
 
             assert (uhat_seq>=-1e-6).all()
@@ -1718,7 +1730,8 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
             #             print(f"At time {ti+k} for subproblem {k} the activity {act} has non-zero lockdown.")
 
 
-        uopt_seq[:,k] = best_uhat_and_reward[0][:,0]
+        # uopt_seq[:,k] = best_uhat_and_reward[0][:,0]
+        
         uk_opt_dict, alphak_opt_dict = buildAlphaDict(best_uhat_and_reward[0][:,0])
 
         m_tests = {}
@@ -1732,13 +1745,17 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
             a_tests[ag] = uk_opt_dict[ag]['Natest_g']
 
         # take one time step in dynamical system
-        if(use_bounce_var):
+        if(use_bounce_var and optimize_bouncing):
             dynModel.take_time_step(m_tests, a_tests, alphak_opt_dict, BH, BICU)
         else:
             dynModel.take_time_step(m_tests, a_tests, alphak_opt_dict)
 
         # update uhat_sequence
         uhat_seq = best_uhat_and_reward[0][:, 1:]
+
+            
+
+
        
         # print(f"u_optSeq at time {k} is {uopt_seq[:,k]}")
         # print(f"uhat_seq is {uhat_seq}")

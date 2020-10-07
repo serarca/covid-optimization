@@ -41,21 +41,24 @@ def main():
     # Some paramters to test the linearization heuristic
     scaling = 10000
     money_scaling = 1000
-    
+    xi_mult_values = [0,10,25,50,100,150]
+    testing_values = [0, 30000, 60000, 120000]
+    icu_values = [2000, 2300, 2600, 2900, 3200]
+
     params_to_try = {
-        "delta_schooling":[0.5],
-        "xi":[0, 30 * 37199.03 * scaling / money_scaling],
-        # , 30 * 37199.03 * scaling / money_scaling],
-        "icus":[3000 / scaling],
-        "tests":[0, 30000 / scaling],
-        #  60000 / scaling],
-        # , 30000 / scaling],
-        "frequencies":[(1,1), (7,14)],
-        #  (7,14)],
-        "region":["one_group_fitted-scaled"], 
-        "econ": ["one_group_econ-scaled"],
-        "init": ["60days_one_group-scaled"],
-        "eta":[0, 0.1]
+        "delta_schooling":[0.5, 1, 5],
+        "xi":[mult * 37199.03 * scaling / money_scaling for mult in xi_mult_values],
+        "icus":[ic / scaling for ic in icu_values],
+        "tests":[test_cap / scaling for test_cap in testing_values],
+        "frequencies":[(7,14)],
+        "region":["fitted-scaled"], 
+        "econ": ["econ-scaled"],
+        "init": ["60days-scaled"],
+        "eta":[0, 0.1, 0.2],
+        "trust_region_radius":[0.05],
+        "max_inner_iterations_mult":[2],
+        "initial_uhat":["full_lockdown", "full_open"]
+        # "dynamic_gradient",
     }
 
 
@@ -75,8 +78,12 @@ def main():
     # }
 
     n_days = 90
-    groups = "one"
+    groups = "all"
     start_day = 60
+    optimize_bouncing = False
+
+    print(len(all_instances))
+
 
     # scaling_econ_param(scaling, money_scaling)
     # scaling_fitted(scaling, money_scaling)
@@ -100,14 +107,87 @@ def main():
     econ = all_instances[instance_index][6]
     init = all_instances[instance_index][7]
     eta = all_instances[instance_index][8]
+    trust_region_radius = all_instances[instance_index][9]
+    max_inner_iterations_mult = all_instances[instance_index][10]
+    initial_uhat = all_instances[instance_index][11]
+    
+
+    run_lin_heur_and_save_yaml(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling)
+    
+    
+    # run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day)
+
+    # run_pickled_dynModels_prop_bouncing(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day)
+
+    # for heur in ["", "_Prop_Bouncing"]:
+    #     load_pickle_and_create_yaml(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, scaling, money_scaling, heur)
 
 
-    run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day)
+def run_lin_heur_and_save_yaml(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling):
+    ''' Runs the linearization heuristic with the experiment parameters passed as arguments and saves the resulting dynamical model as a pickle object.'''
 
-    run_pickled_dynModels_prop_bouncing(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day)
+    experiment_params = {
+        'delta_schooling':delta,
+        'xi':xi,
+        'icus':icus,
+        'test_freq': test_freq,
+        'lockdown_freq': lockdown_freq
+    }
 
-    for heur in ["", "_Prop_Bouncing"]:
-        load_pickle_and_create_yaml(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, scaling, money_scaling, heur)
+    simulation_params = {
+        'dt':1.0,
+        'region': region,
+        'quar_freq': 1,
+        'num_days' : n_days,
+        'initial_infected_count' : 1,
+        'mixing_method' : {
+            "name":"mult"},
+        'mtest_cap' : tests,
+        'atest_cap' : tests,
+        'heuristic': 'linearization',
+        'transport_lb_work_fraction': 0.25,
+        'econ': econ,
+        'init': init,
+        'eta': eta
+    }
+
+    dynModel = run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing)
+
+    result = {
+            "lockdown_heuristic":f"linearization_heuristic_optBouncing={optimize_bouncing}",
+            "groups":groups,
+            "experiment_params":{
+                "delta_schooling":delta,
+                "xi":(xi/scaling) * money_scaling, 
+                "icus":icus * scaling,
+                "n_a_tests":tests * scaling,
+                "n_m_tests":tests * scaling,
+                "start_day":start_day,
+                "T":n_days,
+                "eta":eta,
+                "lockdown_freq":lockdown_freq,
+                "test_freq":test_freq
+            },
+            "testing_heuristic":f"linearization_heuristic",
+            "results":{
+                "economics_value":float(dynModel.get_total_economic_value()) * money_scaling,
+                "deaths":float(dynModel.get_total_deaths()) * scaling,
+                "reward":float(dynModel.get_total_reward()),
+            },
+            "policy":dynModel.lockdown_controls,
+            "a_tests":[{g: test * scaling for g,test in a.items()} for a in dynModel.a_tests_controls],
+            "m_tests":[{g: test * scaling for g,test in m.items()}  for m in dynModel.m_tests_controls]
+    }
+
+    result["filename"] = f"{result['lockdown_heuristic']}/xi-{result['experiment_params']['xi']}_icus-{result['experiment_params']['icus']}_testing-{result['testing_heuristic']}_natests-{result['experiment_params']['n_a_tests']}_nmtests-{result['experiment_params']['n_m_tests']}_T-{result['experiment_params']['T']}_startday-{result['experiment_params']['start_day']}_groups-{result['groups']}_dschool-{result['experiment_params']['delta_schooling']}_eta-{result['experiment_params']['eta']}_lockdownFreq-{result['experiment_params']['lockdown_freq']}_testingFreq-{result['experiment_params']['test_freq']}"
+
+    fn =  f"benchmarks/results/{result['filename']}.yaml"
+    
+    with open(fn, 'w') as file:
+        yaml.dump(result, file)
+
+
+
 
 
 def run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day):
@@ -143,7 +223,7 @@ def run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region, tes
     pickle.dump(dynModel_linearization_heur,open(f"linearization_heuristic_dyn_models/dynModel_linHeur_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}_testFreq={test_freq}_lockFreq={lockdown_freq}_eta={eta}_groups={groups}.p","wb"), protocol=-1)
 
 
-def run_linearization_heuristic(simulation_params, experiment_params, start_day):
+def run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing):
     ''' Takes a set of simulation_params and experiment parameters (delta_school, emotional cost of deaths (xi), max icus, max tests, testing and lockdown frequencies) and a set of simulation paramters (required by the constructor in group.py), creates a dynamical system, runs the linearization heuristic and returns the dynamical system after running the heuristic. 
     '''
 
@@ -189,7 +269,7 @@ def run_linearization_heuristic(simulation_params, experiment_params, start_day)
     dynModel.econ_params["employment_params"]["eta"] = simulation_params["eta"]
 
 
-    linearization.run_heuristic_linearization(dynModel)
+    linearization.run_heuristic_linearization(dynModel, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing)
 
     end_time = time()
 
@@ -614,6 +694,121 @@ def scaling_fitted(scaling, money_scaling):
 
     with open('parameters/fitted-scaled.yaml', 'w') as file:
         yaml.dump(scaled_fitted, file)
+
+
+def scaling_econ_param(scaling, money_scaling, groups):
+    # Import data
+    if groups == "all":
+        old_econ = yaml.load(open( "parameters/econ.yaml", "rb" ),Loader=yaml.FullLoader)
+    elif groups == "one":
+        old_econ = yaml.load(open( "parameters/one_group_econ.yaml", "rb" ),Loader=yaml.FullLoader)
+    
+    # scaling = 1000.0
+    # money_scaling = 10000.0
+
+    scaled_econ = dict(old_econ)
+
+    # Scale Econ cost of death
+    for group in scaled_econ["econ_cost_death"]:
+        scaled_econ["econ_cost_death"][group] = (scaled_econ["econ_cost_death"][group] * scaling / money_scaling)
+
+    # Scale employment param
+
+    for group in scaled_econ["employment_params"]["v"]:
+        scaled_econ["employment_params"]["v"][group]["leisure"] = scaled_econ["employment_params"]["v"][group]["leisure"] * scaling / money_scaling
+        scaled_econ["employment_params"]["v"][group]["other"] = scaled_econ["employment_params"]["v"][group]["other"] * scaling / money_scaling
+        scaled_econ["employment_params"]["v"][group]["transport"] = scaled_econ["employment_params"]["v"][group]["transport"] * scaling / money_scaling
+
+    # Scale schooling params
+
+    for group in scaled_econ["schooling_params"]:
+        scaled_econ["schooling_params"][group] = scaled_econ["schooling_params"][group] * scaling / money_scaling
+
+
+    if groups == "all":
+        with open('parameters/econ-scaled.yaml', 'w') as file:
+            yaml.dump(scaled_econ, file)
+    elif groups == "one":
+        with open('parameters/one_group_econ-scaled.yaml', 'w') as file:
+            yaml.dump(scaled_econ, file)
+    
+    
+
+def scaling_init(scaling, groups):
+    # Import data
+    if groups == "all":
+        old_init = yaml.load(open( "initialization/60days.yaml", "rb" ), Loader=yaml.FullLoader)
+    elif groups == "one":
+        old_init = yaml.load(open( "initialization/60days_one_group.yaml", "rb" ), Loader=yaml.FullLoader)
+
+    
+    # scaling = 1000.0
+
+    # Construct initialization
+    scaled_init_dict = {}
+    for group in old_init:
+        scaled_init_dict[group] = {
+                "S": old_init[group]["S"] / scaling,
+                "E": old_init[group]["E"] / scaling,
+                "I": old_init[group]["I"] / scaling,
+                "R": old_init[group]["R"] / scaling,
+                "Ia": old_init[group]["Ia"] / scaling,
+                "Ips": old_init[group]["Ips"] / scaling,
+                "Ims": old_init[group]["Ims"] / scaling,
+                "Iss": old_init[group]["Iss"] / scaling,
+                "Rq": old_init[group]["Rq"] / scaling,
+                "H": old_init[group]["H"] / scaling,
+                "ICU": old_init[group]["ICU"] / scaling,
+                "D": old_init[group]["D"] / scaling,
+        }
+
+    if groups == "all":
+        with open('initialization/60days-scaled.yaml', 'w') as file:
+            yaml.dump(scaled_init_dict, file)
+    elif groups == "one":
+        with open('initialization/60days_one_group-scaled.yaml', 'w') as file:
+            yaml.dump(scaled_init_dict, file)
+
+    
+
+
+def scaling_fitted(scaling, money_scaling, groups):
+
+    if groups == "all":
+        # Import data
+        old_fitted = yaml.load(open( "parameters/fitted.yaml", "rb" ), Loader=yaml.FullLoader)
+    elif groups == "one":
+        # Import data
+        old_fitted = yaml.load(open( "parameters/one_group_fitted.yaml", "rb" ), Loader=yaml.FullLoader)
+
+    # scaling = 1000.0
+
+    scaled_fitted = dict(old_fitted)
+
+    # Scale global_param
+    scaled_fitted["global-parameters"]["C_H"] = scaled_fitted["global-parameters"]["C_H"] / scaling
+
+    scaled_fitted["global-parameters"]["C_ICU"] = scaled_fitted["global-parameters"]["C_ICU"] / scaling
+
+
+
+    # for group_h in scaled_fitted["seir-groups"]:
+        # # Scale contacts
+        # for act in scaled_fitted["seir-groups"][group_h]["contacts"]:
+        #     for group_g in scaled_fitted["seir-groups"][group_h]["contacts"][act]:
+        #         scaled_fitted["seir-groups"][group_h]["contacts"][act][group_g] = scaled_fitted["seir-groups"][group_h]["contacts"][act][group_g] * scaling
+        
+        # Scale econ death value
+        # scaled_fitted["seir-groups"][group_h]["economics"]["death_value"] = scaled_fitted["seir-groups"][group_h]["economics"]["death_value"] * scaling
+            
+
+    if groups == "all":
+        with open('parameters/fitted-scaled.yaml', 'w') as file:
+            yaml.dump(scaled_fitted, file)
+    elif groups == "one":
+        with open('parameters/one_group_fitted-scaled.yaml', 'w') as file:
+            yaml.dump(scaled_fitted, file)
+
 
 
 def plot_logging(file):
