@@ -8,7 +8,7 @@
 
  
 
-#SBATCH --array=0-20   # there is a max array size - 512 tasks
+#SBATCH --array=21-40   # there is a max array size - 512 tasks
 
 #SBATCH -J run_linearization_heuristic
 
@@ -28,7 +28,7 @@
 
  
 
-#SBATCH -n 50
+#SBATCH -n 30
 
 #SBATCH --mem-per-cpu=7gb
 
@@ -48,7 +48,7 @@ module load gurobipy3
 # source activate myenv
 
  
-for i in {0..49}; do
+for i in {0..29}; do
     srun --exclusive -n 1 python3 run_linearization_heuristic.py $((SLURM_ARRAY_TASK_ID * 50 + i)) &
 done
 

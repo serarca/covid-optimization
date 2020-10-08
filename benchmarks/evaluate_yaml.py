@@ -208,7 +208,7 @@ def plot_benchmark(dynModel, result):
 
 
 
-heuristics = ["dynamic_gradient","linearization_heuristic", "linearization_heuristic_Prop_Bouncing"]
+heuristics = ["dynamic_gradient","linearization_heuristic_optBouncing=False_initial_uhat=full_lockdown", "linearization_heuristic_optBouncing=False_initial_uhat=full_open","real","full_open","full_lockdown","constant_gradient","time_gradient"]
 # heuristics = ["real","full_open","full_lockdown","constant_gradient","time_gradient","age_group_gradient","dynamic_gradient"]
 # heuristics = ["real","full_open","full_lockdown","constant_gradient","time_gradient"]
 #heuristics = ["dynamic_gradient"]
@@ -280,7 +280,7 @@ for h in heuristics:
 			}
 			death_prob = death_prob_all if (result["groups"]=="all") else death_prob_one
 
-			plot_benchmark(dynModel, result)
+			# plot_benchmark(dynModel, result)
 
 			data = {
 				"groups": result["groups"],

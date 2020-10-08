@@ -27,7 +27,7 @@ import pandas as pd
 import logging
 import itertools as it
 
-from joblib import Parallel, delayed
+#from joblib import Parallel, delayed
 
 
 def main():
@@ -154,7 +154,7 @@ def run_lin_heur_and_save_yaml(delta, xi, icus, tests, n_days, region, test_freq
     dynModel = run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing)
 
     result = {
-            "lockdown_heuristic":f"linearization_heuristic_optBouncing={optimize_bouncing}",
+            "lockdown_heuristic":f"linearization_heuristic_optBouncing={optimize_bouncing}_initial_uhat={initial_uhat}",
             "groups":groups,
             "experiment_params":{
                 "delta_schooling":delta,
