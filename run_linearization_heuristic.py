@@ -49,7 +49,8 @@ def main():
         "delta_schooling":[0.5, 1, 5],
         "xi":[mult * 37199.03 * scaling / money_scaling for mult in xi_mult_values],
         "icus":[ic / scaling for ic in icu_values],
-        "tests":[test_cap / scaling for test_cap in testing_values],
+        "mtests":[test_cap / scaling for test_cap in testing_values],
+        # "atests":[test_cap / scaling for test_cap in testing_values],
         "frequencies":[(7,14)],
         "region":["fitted-scaled"], 
         "econ": ["econ-scaled"],
@@ -57,8 +58,8 @@ def main():
         "eta":[0, 0.1, 0.2],
         "trust_region_radius":[0.05],
         "max_inner_iterations_mult":[2],
-        "initial_uhat":["full_lockdown", "full_open"]
-        # "dynamic_gradient",
+        "initial_uhat":["dynamic_gradient"]
+        # "full_lockdown", "full_open","dynamic_gradient",
     }
 
 
@@ -99,7 +100,10 @@ def main():
     delta = all_instances[instance_index][0]
     xi = all_instances[instance_index][1]
     icus = all_instances[instance_index][2]
-    tests = all_instances[instance_index][3]
+    mtests = all_instances[instance_index][3]
+    atests = mtests
+
+    # atests = all_instances[instance_index][4]
     print(all_instances[instance_index])
     test_freq = all_instances[instance_index][4][0]
     lockdown_freq = all_instances[instance_index][4][1]
@@ -112,7 +116,7 @@ def main():
     initial_uhat = all_instances[instance_index][11]
     
 
-    run_lin_heur_and_save_yaml(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling)
+    run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling)
     
     
     # run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day)
@@ -123,7 +127,7 @@ def main():
     #     load_pickle_and_create_yaml(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, scaling, money_scaling, heur)
 
 
-def run_lin_heur_and_save_yaml(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling):
+def run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling):
     ''' Runs the linearization heuristic with the experiment parameters passed as arguments and saves the resulting dynamical model as a pickle object.'''
 
     experiment_params = {
@@ -142,8 +146,8 @@ def run_lin_heur_and_save_yaml(delta, xi, icus, tests, n_days, region, test_freq
         'initial_infected_count' : 1,
         'mixing_method' : {
             "name":"mult"},
-        'mtest_cap' : tests,
-        'atest_cap' : tests,
+        'mtest_cap' : mtests,
+        'atest_cap' : atests,
         'heuristic': 'linearization',
         'transport_lb_work_fraction': 0.25,
         'econ': econ,
@@ -160,8 +164,8 @@ def run_lin_heur_and_save_yaml(delta, xi, icus, tests, n_days, region, test_freq
                 "delta_schooling":delta,
                 "xi":(xi/scaling) * money_scaling, 
                 "icus":icus * scaling,
-                "n_a_tests":tests * scaling,
-                "n_m_tests":tests * scaling,
+                "n_a_tests":atests * scaling,
+                "n_m_tests":mtests * scaling,
                 "start_day":start_day,
                 "T":n_days,
                 "eta":eta,
