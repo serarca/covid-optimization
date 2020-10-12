@@ -1,0 +1,22 @@
+groups: all
+params_to_try:
+  delta_schooling:
+    - 0.5
+  xi:
+    # - 0
+    - 1115970.9
+  icus:
+    - 3000
+  tests:
+    - 30000
+  frequencies:
+    - [1, 1]
+  region:
+    - "fitted"
+  econ:
+    - "econ"
+  init:
+    - "60days"
+  eta:
+    # - 0
+    - 0.1
