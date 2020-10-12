@@ -9,11 +9,10 @@ parser.add_argument("-region", "--region", help="Region")
 args = parser.parse_args()
 
 # Import data
-data_dict = pickle.load( open( "../data/data_dict.p", "rb" ) )
-
+data_dict = pickle.load( open( "./data_dict.p", "rb" ) )
 
 # Choose default parameters
-region = args.region
+region = "Ile-de-France"
 
 
 
@@ -53,6 +52,10 @@ for group in data_dict['age_groups']:
 			"lambda_H_D": float(data_dict['SEIR_parameters']['lambda_HD'][group]),
 			"lambda_ICU_R": float(data_dict['SEIR_parameters']['lambda_ICUR'][group]),
 			"lambda_ICU_D": float(data_dict['SEIR_parameters']['lambda_ICUD'][group]),
+			"p_ss":float(data_dict['SEIR_parameters']['p_ss'][group]),
+			"R_0":float(data_dict['SEIR_parameters']['R_0'][group]),
+			"p_ICU_cond_ss":float(data_dict['SEIR_parameters']['p_ICU_cond_ss'][group]),
+			"p_death_cond_ss":float(data_dict['SEIR_parameters']['p_death_cond_ss'][group]),
 		},
 		"economics":{
 			"work_value": float(data_dict['economic_value'][(region,group)]),

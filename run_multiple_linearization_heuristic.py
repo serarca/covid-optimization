@@ -54,7 +54,11 @@ def main():
         "region":["fitted-scaled"], 
         "econ": ["econ-scaled"],
         "init": ["60days-scaled"],
-        "eta":[0.1]
+        "eta":[0.1],
+        "trust_region_radius":[0.05],
+        "max_inner_iterations_mult":[2],
+        "initial_uhat":["full_lockdown", "full_open"]
+        # "dynamic_gradient",
     }
 
 
@@ -73,6 +77,7 @@ def main():
     n_days = 90
     groups = "all"
     start_day = 60
+    optimize_bouncing = False
 
     scaling_econ_param(scaling, money_scaling)
     scaling_fitted(scaling, money_scaling)

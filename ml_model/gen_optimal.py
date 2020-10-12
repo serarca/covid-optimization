@@ -77,7 +77,7 @@ elif groups == "one":
 	with open("../initialization/60days_one_group.yaml") as file:
 		initialization = yaml.load(file, Loader=yaml.FullLoader)
 		start_day = 60
-	population = sum([initialization["all_age_groups"][cont] for cont in initialization["all_age_groups"]])
+	population = sum([initialization["all_age_groups"][cont] for cont in initialization["all_age_groups"] if cont!="N"])
 
 
 	infected_perc = sample([0.1,0.01,0.001,0.0001,0.00001,0.000001],1)[0]*np.random.random()
@@ -174,23 +174,6 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
 		result["experiment_params"]["eta"],
 		result["experiment_params"]["test_freq"],
 		result["experiment_params"]["policy_freq"],
-	)
-
-
-	constant_gradients_filename = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d"%(
-		"constant_gradient",
-		result["experiment_params"]["xi"],
-		result["experiment_params"]["icus"],
-		result["testing_heuristic"],
-		result["experiment_params"]["n_a_tests"],
-		result["experiment_params"]["n_m_tests"],
-		result["experiment_params"]["T"],
-		result["experiment_params"]["start_day"],
-		result["groups"],
-		result["experiment_params"]["delta_schooling"],
-		result["experiment_params"]["eta"],
-		90,
-		90,
 	)
 
 

@@ -27,9 +27,38 @@ from scipy.optimize import Bounds,minimize,LinearConstraint
 from copy import deepcopy
 
 
-# Parameters to try
-with open("../parameters/run_params.yaml") as file:
-	run_params = yaml.load(file, Loader=yaml.FullLoader)
+
+parser = argparse.ArgumentParser(description='Arguments')
+parser.add_argument('--delta', action="store", dest='delta', type=float)
+parser.add_argument('--icus', action="store", dest='icus', type=int)
+parser.add_argument('--eta', action="store", dest='eta', type=float)
+parser.add_argument('--groups', action="store", dest='groups', type=str)
+parser.add_argument('--xi', action="store", dest='xi', type=float)
+parser.add_argument('--a_tests', action="store", dest='a_tests', type=int)
+parser.add_argument('--m_tests', action="store", dest='m_tests', type=int)
+
+
+args = parser.parse_args()
+
+run_params = {
+	"groups":args.groups,
+	"params_to_try":{
+		"delta_schooling":[args.delta],
+		"icus":[args.icus],
+		"eta":[args.eta],
+		"tests":[[args.m_tests, args.a_tests]],
+		"xi":[args.xi],
+		"testing":["homogeneous"]
+	}
+}
+
+print(run_params)
+
+
+
+# # Parameters to try
+# with open("../parameters/run_params.yaml") as file:
+# 	run_params = yaml.load(file, Loader=yaml.FullLoader)
 
 params_to_try = run_params["params_to_try"]
 groups = run_params["groups"]
@@ -230,7 +259,7 @@ def run_government_policy(experiment_params):
 		result["experiment_params"]["start_day"],
 		result["groups"],
 		result["experiment_params"]["delta_schooling"],
-		result["experiment_params"]["eta"],
+		experiment_params["eta"],
 		result["experiment_params"]["test_freq"],
 		result["experiment_params"]["policy_freq"],
 	)
@@ -315,7 +344,7 @@ def run_full_lockdown(experiment_params):
 		result["experiment_params"]["start_day"],
 		result["groups"],
 		result["experiment_params"]["delta_schooling"],
-		result["experiment_params"]["eta"],
+		experiment_params["eta"],
 		result["experiment_params"]["test_freq"],
 		result["experiment_params"]["policy_freq"],
 	)
@@ -402,7 +431,7 @@ def run_open(experiment_params):
 		result["experiment_params"]["start_day"],
 		result["groups"],
 		result["experiment_params"]["delta_schooling"],
-		result["experiment_params"]["eta"],
+		experiment_params["eta"],
 		result["experiment_params"]["test_freq"],
 		result["experiment_params"]["policy_freq"],
 	)

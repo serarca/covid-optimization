@@ -635,6 +635,7 @@ class SEIR_group:
 		self.total_contacts = self.total_contacts[0:new_time]
 		self.B_ICU = self.B_ICU[0:new_time]
 		self.B_H = self.B_H[0:new_time]
+		
 
 
 	# Gives flow of how many people flowing to H
@@ -778,7 +779,7 @@ class SEIR_group:
 			summ_entering_icu += entering_icu[n]
 			summ_staying_icu += (1-g.parameters['lambda_ICU_R']-g.parameters['lambda_ICU_D'])*g.ICU[self.parent.t]
 
-		#print('update_ICU(): Total entering ICU calculated from group {} is:{}'.format(self.name,summ_entering_icu))
+		# print('update_ICU(): Total entering ICU calculated from group {} is:{}'.format(self.name,summ_entering_icu))
 
 		if B_ICU_perc is not False:
 			B_ICU = B_ICU_perc*((summ_entering_icu-icu_cap+summ_staying_icu) if summ_entering_icu-icu_cap+summ_staying_icu>0 else 0)
@@ -795,7 +796,7 @@ class SEIR_group:
 
 		)
 		self.ICU += [self.ICU[self.parent.t]+delta_ICU*self.dt - B_ICU]
-		#print("update_ICU(): ICU occupancy at end of period t={} for group {} IS {}".format(time_of_flow, self.name,self.ICU[-1]))
+		# print("update_ICU(): ICU occupancy at end of period t={} for group {} IS {}".format(self.parent.t, self.name,self.ICU[-1]))
 		
 		assert self.ICU[-1] >= 0, (f"Number of ICUs is negative for t={self.parent.t+1}: {self.ICU[-1]} \n B_ICU = {B_ICU} \n Delta ICU = {delta_ICU}")
 

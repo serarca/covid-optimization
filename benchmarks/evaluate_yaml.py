@@ -208,15 +208,18 @@ def plot_benchmark(dynModel, result):
 
 
 
-heuristics = ["real","full_open","full_lockdown","constant_gradient","time_gradient","age_group_gradient","linearization_heuristic", "linearization_heuristic_Prop_Bouncing"]
-#heuristics = ["real","full_open","full_lockdown"]
+heuristics = ["dynamic_gradient","linearization_heuristic_optBouncing=False_initial_uhat=full_lockdown", "linearization_heuristic_optBouncing=False_initial_uhat=full_open","real","full_open","full_lockdown","constant_gradient","time_gradient"]
+# heuristics = ["real","full_open","full_lockdown","constant_gradient","time_gradient","age_group_gradient","dynamic_gradient"]
+# heuristics = ["real","full_open","full_lockdown","constant_gradient","time_gradient"]
+#heuristics = ["dynamic_gradient"]
+groups = "all"
 
 
 all_data = []
 
 for h in heuristics:
 	for n in os.listdir("results/%s/"%h):
-		if n[0:2] == "xi" and (".pdf" not in n):
+		if n[0:2] == "xi" and (".pdf" not in n) and (groups in n):
 
 			print(h,n)
 			with open("results/%s/%s"%(h,n)) as file:
@@ -277,7 +280,7 @@ for h in heuristics:
 			}
 			death_prob = death_prob_all if (result["groups"]=="all") else death_prob_one
 
-			plot_benchmark(dynModel, result)
+			# plot_benchmark(dynModel, result)
 
 			data = {
 				"groups": result["groups"],
@@ -303,5 +306,5 @@ for h in heuristics:
 			
 			all_data.append(data)
 
-pd.DataFrame(all_data).to_excel("results/results.xlsx")
+pd.DataFrame(all_data).to_excel(f"results/results-groups={groups}.xlsx")
 

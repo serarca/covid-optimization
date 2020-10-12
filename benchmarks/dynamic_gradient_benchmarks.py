@@ -26,9 +26,31 @@ from aux import *
 from scipy.optimize import Bounds,minimize,LinearConstraint
 
 
-# Parameters to try
-with open("../parameters/run_params.yaml") as file:
-	run_params = yaml.load(file, Loader=yaml.FullLoader)
+parser = argparse.ArgumentParser(description='Arguments')
+parser.add_argument('--delta', action="store", dest='delta', type=float)
+parser.add_argument('--icus', action="store", dest='icus', type=int)
+parser.add_argument('--eta', action="store", dest='eta', type=float)
+parser.add_argument('--groups', action="store", dest='groups', type=str)
+parser.add_argument('--xi', action="store", dest='xi', type=float)
+parser.add_argument('--a_tests', action="store", dest='a_tests', type=int)
+parser.add_argument('--m_tests', action="store", dest='m_tests', type=int)
+
+
+args = parser.parse_args()
+
+run_params = {
+	"groups":args.groups,
+	"params_to_try":{
+		"delta_schooling":[args.delta],
+		"icus":[args.icus],
+		"eta":[args.eta],
+		"tests":[[args.m_tests, args.a_tests]],
+		"xi":[args.xi],
+		"testing":["homogeneous"]
+	}
+}
+
+print(run_params)
 
 params_to_try = run_params["params_to_try"]
 groups = run_params["groups"]
@@ -134,7 +156,7 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
 			"n_m_tests":experiment_params["tests"][0],
 			"start_day":start_day,
 			"T":simulation_params['time_periods'],
-			"eta":econ_params["employment_params"]["eta"],
+			"eta":experiment_params["eta"],
 			"test_freq":simulation_params["days"],
 			"policy_freq":quar_freq,
 			"end_days":14,			
@@ -152,7 +174,7 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
 		result["experiment_params"]["start_day"],
 		result["groups"],
 		result["experiment_params"]["delta_schooling"],
-		result["experiment_params"]["eta"],
+		experiment_params["eta"],
 		result["experiment_params"]["test_freq"],
 		result["experiment_params"]["policy_freq"],
 	)
@@ -169,7 +191,7 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
 		result["experiment_params"]["start_day"],
 		result["groups"],
 		result["experiment_params"]["delta_schooling"],
-		result["experiment_params"]["eta"],
+		experiment_params["eta"],
 		90,
 		90,
 	)
@@ -265,7 +287,7 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
 		np.zeros(len(intervention_times)*len(age_groups)*len(rel_activities)) + 1.0
 	)
 
-	result_lockdown = minimize(simulate, x0, method='L-BFGS-B',bounds=full_bounds,options={'eps':1e-1,'maxfun':700000})
+	result_lockdown = minimize(simulate, x0, method='L-BFGS-B',bounds=full_bounds,options={'eps':1e-1,'maxiter':200})
 
 	x_lockdown = np.reshape(
 		result_lockdown.x,

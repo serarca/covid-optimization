@@ -1,7 +1,7 @@
 days_before_gamma: 61.0319243
 global-parameters:
   C_H: 20000000.0
-  C_ICU: 2500.0
+  C_ICU: 3000.0
 mixing:
   name: mult
   param_alpha: 0.236561708
@@ -77,6 +77,7 @@ seir-groups:
       work_value: 0.0
     name: age_group_0_9
     parameters:
+      R_0: 2.9
       beta:
       - 0.08960730157294271
       - 0.08960730157294271
@@ -815,10 +816,13 @@ seir-groups:
       mu: 0.25
       p_H: 0.001556
       p_ICU: 0.000444
+      p_ICU_cond_ss: 0.222
       p_Ia: 0.499
       p_Ims: 0.2495
       p_Ips: 0.2495
       p_Iss: 0.002
+      p_death_cond_ss: 0.006
+      p_ss: 0.002
       sigma: 0.25
   age_group_10_19:
     contacts:
@@ -882,12 +886,10 @@ seir-groups:
         age_group_60_69: 0.00221920938158371
         age_group_70_79: 0.0248286848859295
         age_group_80_plus: 0.0
-    economics:
-      death_value: 1000000.0
-      lockdown_fraction: 0.5
-      work_value: 0.0
+
     name: age_group_10_19
     parameters:
+      R_0: 2.9
       beta:
       - 0.08960730157294271
       - 0.08960730157294271
@@ -1626,10 +1628,13 @@ seir-groups:
       mu: 0.25
       p_H: 0.001556
       p_ICU: 0.000444
+      p_ICU_cond_ss: 0.222
       p_Ia: 0.499
       p_Ims: 0.2495
       p_Ips: 0.2495
       p_Iss: 0.002
+      p_death_cond_ss: 0.006
+      p_ss: 0.002
       sigma: 0.25
   age_group_20_29:
     contacts:
@@ -1699,6 +1704,7 @@ seir-groups:
       work_value: 38.961495895150684
     name: age_group_20_29
     parameters:
+      R_0: 2.9
       beta:
       - 0.08960730157294271
       - 0.08960730157294271
@@ -2437,10 +2443,13 @@ seir-groups:
       mu: 0.25
       p_H: 0.0053100000000000005
       p_ICU: 0.0006900000000000001
+      p_ICU_cond_ss: 0.115
       p_Ia: 0.497
       p_Ims: 0.2485
       p_Ips: 0.2485
       p_Iss: 0.006
+      p_death_cond_ss: 0.011
+      p_ss: 0.006
       sigma: 0.25
   age_group_30_39:
     contacts:
@@ -2510,6 +2519,7 @@ seir-groups:
       work_value: 85.28878053728769
     name: age_group_30_39
     parameters:
+      R_0: 2.9
       beta:
       - 0.08960730157294271
       - 0.08960730157294271
@@ -3248,10 +3258,13 @@ seir-groups:
       mu: 0.25
       p_H: 0.010933000000000002
       p_ICU: 0.0020670000000000003
+      p_ICU_cond_ss: 0.159
       p_Ia: 0.4935
       p_Ims: 0.24675
       p_Ips: 0.24675
       p_Iss: 0.013000000000000001
+      p_death_cond_ss: 0.019
+      p_ss: 0.013000000000000001
       sigma: 0.25
   age_group_40_49:
     contacts:
@@ -3321,6 +3334,7 @@ seir-groups:
       work_value: 109.06185238356166
     name: age_group_40_49
     parameters:
+      R_0: 2.9
       beta:
       - 0.08960730157294271
       - 0.08960730157294271
@@ -4059,10 +4073,13 @@ seir-groups:
       mu: 0.25
       p_H: 0.013226000000000002
       p_ICU: 0.0037740000000000004
+      p_ICU_cond_ss: 0.222
       p_Ia: 0.4915
       p_Ims: 0.24575
       p_Ips: 0.24575
       p_Iss: 0.017
+      p_death_cond_ss: 0.033
+      p_ss: 0.017
       sigma: 0.25
   age_group_50_59:
     contacts:
@@ -4132,6 +4149,7 @@ seir-groups:
       work_value: 90.93383013698627
     name: age_group_50_59
     parameters:
+      R_0: 2.9
       beta:
       - 0.08960730157294271
       - 0.08960730157294271
@@ -4870,10 +4888,13 @@ seir-groups:
       mu: 0.25
       p_H: 0.02534
       p_ICU: 0.009660000000000002
+      p_ICU_cond_ss: 0.276
       p_Ia: 0.4825
       p_Ims: 0.24125
       p_Ips: 0.24125
       p_Iss: 0.035
+      p_death_cond_ss: 0.065
+      p_ss: 0.035
       sigma: 0.25
   age_group_60_69:
     contacts:
@@ -4943,6 +4964,7 @@ seir-groups:
       work_value: 22.733457534246575
     name: age_group_60_69
     parameters:
+      R_0: 2.9
       beta:
       - 0.08960730157294271
       - 0.08960730157294271
@@ -5681,10 +5703,13 @@ seir-groups:
       mu: 0.25
       p_H: 0.049131999999999995
       p_ICU: 0.021868
+      p_ICU_cond_ss: 0.308
       p_Ia: 0.4645
       p_Ims: 0.23225
       p_Ips: 0.23225
       p_Iss: 0.071
+      p_death_cond_ss: 0.126
+      p_ss: 0.071
       sigma: 0.25
   age_group_70_79:
     contacts:
@@ -5754,6 +5779,7 @@ seir-groups:
       work_value: 0.0
     name: age_group_70_79
     parameters:
+      R_0: 2.9
       beta:
       - 0.08960730157294271
       - 0.08960730157294271
@@ -6492,10 +6518,13 @@ seir-groups:
       mu: 0.25
       p_H: 0.084863
       p_ICU: 0.028137000000000002
+      p_ICU_cond_ss: 0.249
       p_Ia: 0.4435
       p_Ims: 0.22175
       p_Ips: 0.22175
       p_Iss: 0.113
+      p_death_cond_ss: 0.21
+      p_ss: 0.113
       sigma: 0.25
   age_group_80_plus:
     contacts:
@@ -6565,6 +6594,7 @@ seir-groups:
       work_value: 0.0
     name: age_group_80_plus
     parameters:
+      R_0: 2.9
       beta:
       - 0.08960730157294271
       - 0.08960730157294271
@@ -7303,10 +7333,13 @@ seir-groups:
       mu: 0.25
       p_H: 0.30208
       p_ICU: 0.017920000000000002
+      p_ICU_cond_ss: 0.056
       p_Ia: 0.33999999999999997
       p_Ims: 0.16999999999999998
       p_Ips: 0.16999999999999998
       p_Iss: 0.32
+      p_death_cond_ss: 0.316
+      p_ss: 0.32
       sigma: 0.25
 upper_bounds:
   home: 1.0

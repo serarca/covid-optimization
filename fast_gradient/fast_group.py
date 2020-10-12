@@ -345,10 +345,8 @@ class FastDynamicalModel:
 			self.alphas[:,activities.index('transport')]+
 			self.alphas[:,activities.index('leisure')]+
 			self.alphas[:,activities.index('other')]
-		)
+		)/3.0
 
-
-		l_mean_upper = np.mean([self.econ_params['upper_bounds'][act] for act in eta_activities])
 
 		v_employment = (
 			self.v_g*(self.econ_params["employment_params"]["nu"]*work_alpha+
