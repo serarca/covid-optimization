@@ -45,8 +45,13 @@ def main():
     testing_values = [0, 30000, 60000, 120000]
     icu_values = [2000, 2300, 2600, 2900, 3200]
 
+    # xi_mult_values = [0, 30]
+    # testing_values = [30000]
+    # icu_values = [3000]
+
     params_to_try = {
         "delta_schooling":[0.5, 1, 5],
+        # "delta_schooling":[0.5],
         "xi":[mult * 37199.03 * scaling / money_scaling for mult in xi_mult_values],
         "icus":[ic / scaling for ic in icu_values],
         "mtests":[test_cap / scaling for test_cap in testing_values],
@@ -56,9 +61,13 @@ def main():
         "econ": ["econ-scaled"],
         "init": ["60days-scaled"],
         "eta":[0, 0.1, 0.2],
+        # "eta":[0, 0.1],
         "trust_region_radius":[0.05],
+        # "trust_region_radius":[0.1],
         "max_inner_iterations_mult":[2],
+        # "max_inner_iterations_mult":[1],
         "initial_uhat":["dynamic_gradient"]
+        # "initial_uhat":["full_lockdown"]
         # "full_lockdown", "full_open","dynamic_gradient",
     }
 
@@ -97,6 +106,9 @@ def main():
     # For names of regions see the "parameters" folder
     # region = 'fitted'
 
+    # for instance_index in range(len(all_instances)):
+    #     if instance_index != 0:
+    #         break
     delta = all_instances[instance_index][0]
     xi = all_instances[instance_index][1]
     icus = all_instances[instance_index][2]
@@ -115,7 +127,6 @@ def main():
     max_inner_iterations_mult = all_instances[instance_index][10]
     initial_uhat = all_instances[instance_index][11]
     
-
     run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling)
     
     
@@ -186,7 +197,10 @@ def run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, 
     result["filename"] = f"{result['lockdown_heuristic']}/xi-{result['experiment_params']['xi']}_icus-{result['experiment_params']['icus']}_testing-{result['testing_heuristic']}_natests-{result['experiment_params']['n_a_tests']}_nmtests-{result['experiment_params']['n_m_tests']}_T-{result['experiment_params']['T']}_startday-{result['experiment_params']['start_day']}_groups-{result['groups']}_dschool-{result['experiment_params']['delta_schooling']}_eta-{result['experiment_params']['eta']}_lockdownFreq-{result['experiment_params']['lockdown_freq']}_testingFreq-{result['experiment_params']['test_freq']}"
 
     fn =  f"benchmarks/results/{result['filename']}.yaml"
-    
+    # fn = f"scripts/results/experiments/{result['filename']}.yaml"
+    # dirname = os.path.dirname(fn)
+    # os.makedirs(dirname, exist_ok=True) 
+
     with open(fn, 'w') as file:
         yaml.dump(result, file)
 
@@ -397,6 +411,7 @@ def load_pickle_and_create_yaml(delta, xi, icus, tests, n_days, region, test_fre
     result["filename"] = f"{result['lockdown_heuristic']}/xi-{result['experiment_params']['xi']}_icus-{result['experiment_params']['icus']}_testing-{result['testing_heuristic']}_natests-{result['experiment_params']['n_a_tests']}_nmtests-{result['experiment_params']['n_m_tests']}_T-{result['experiment_params']['T']}_startday-{result['experiment_params']['start_day']}_groups-{result['groups']}_dschool-{result['experiment_params']['delta_schooling']}_eta-{result['experiment_params']['eta']}_lockdownFreq-{result['experiment_params']['lockdown_freq']}_testingFreq-{result['experiment_params']['test_freq']}"
 
     fn =  f"benchmarks/results/{result['filename']}.yaml"
+    # fn =  f"scripts/results/experiments/{result['filename']}.yaml"
     
     with open(fn, 'w') as file:
         yaml.dump(result, file)
@@ -447,6 +462,7 @@ def load_pickles_and_create_yaml(n_days, params_to_try, final_time_step, groups,
                                 result["filename"] = f"{result['lockdown_heuristic']}/xi-{result['experiment_params']['xi']}_icus-{result['experiment_params']['icus']}_testing-{result['testing_heuristic']}_natests-{result['experiment_params']['n_a_tests']}_nmtests-{result['experiment_params']['n_m_tests']}_T-{result['experiment_params']['T']}_startday-{result['experiment_params']['start_day']}_groups-{result['groups']}_dschool-{result['experiment_params']['delta_schooling']}_eta-{result['experiment_params']['eta']}_lockdownFreq-{result['experiment_params']['lockdown_freq']}_testingFreq-{result['experiment_params']['test_freq']}"
 
                                 fn =  f"benchmarks/results/{result['filename']}.yaml"
+                                # fn =  f"scripts/results/experiments/{result['filename']}.yaml"
                                 
                                 with open(fn, 'w') as file:
                                     yaml.dump(result, file)
