@@ -27,7 +27,9 @@ sys.path.insert(0, parent_dir)
 from group import *
 from simple_heuristics import no_tests
 
-# import torch
+use_gpu = False
+if use_gpu:
+    import torch
 
 ############### PROFILING CODE ##################
 
@@ -1294,14 +1296,13 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
     # Calculate matrices A and B, and vector c, at given Xhat_seq and uhat_seq, across all the necessary time indices
     # Hold these as dictionaries, where the key is the time t.
     
-    # start51 = time()
     At = np.zeros((T-k, Xt_dim, Xt_dim))
     Bt = np.zeros((T-k, Xt_dim, ut_dim))
     ct = np.zeros((T-k, Xt_dim))
 
     jacob_Xs = np.zeros((T-k, Xt_dim, Xt_dim))
     jacob_us = np.zeros((T-k, Xt_dim, ut_dim))
-    # start51 = time()
+
     #for t in range(k,T+1):
     for t in range(k,T):
         # print("calculate_all_coefs for loop, t = ", t)
@@ -1358,6 +1359,190 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
             # if (abs(ct[t][ICUg_idx]) > tol):
             #    print("ct[t][ICU] is not zero and equal to", ct[t][ICUg_idx])
 
+    # All constraint coefficients are stored in dictionary u_constr_coeffs: u_constr_coeffs has a key for each
+    # period t in {k,k+1,...,T-1}. The value for key t stores, in turn, another dictionary, which holds the constraint coefficients
+    # of the constraints indexed with t.
+    # In that dictionary, the key is the index of a constraint "type", and the value is a 2D numpy array with
+    # (ut_dim) rows, and T-k columns (one for every time period k, k+1, ..., T-1). These are the coefficients for
+    # all the controls u(k),...,u(T-1) appearing in the expression a*X(t) + b*u(t).
+    # u_constr_coeffs = {}
+    u_constr_coeffs = np.zeros((T-k, num_constraints, ut_dim, T-k), dtype=numpyArrayDatatype)
+
+    # The linear expression for a constraint also has constants, which we store in a separate dictionary: constr_constants.
+    # The constr_constants dictionary has a key for each period in {k,k+1,...,T-1}. The value for key t stores, in turn, another dictionary,
+    # which holds the constants of the constraints indexed with t.
+    # In that dictionary, the key is the index of a constraint "type", and the value is the constant corresponding to the specific
+    # constraint type index and time period.
+    # constr_constants = {}
+    constr_constants = np.zeros((T-k, num_constraints), dtype=numpyArrayDatatype)
+
+    # Initialize with zeros. (May want to try using sparse matrices here!)
+    # for t in np.arange(k,T):
+    #     u_constr_coeffs[t] = {}
+    #     constr_constants[t] = {}
+    #     for constr_index in range(num_constraints):
+    #         u_constr_coeffs[t][constr_index] = np.zeros((ut_dim,T-k), dtype=numpyArrayDatatype)
+
+    # All objective coefficients are stored in a 2D numpy array with (ut_dim) rows, and (T-k) columns
+    # (one for every time period k, k+1, ..., T-1). Column with index t stores the coefficients in the objective for decision u_{k+t}, which
+    # is of dimension (ut_dim). Note that for the objective we do not keep track of constant terms.
+    u_obj_coeffs = np.zeros((ut_dim, T-k), dtype=numpyArrayDatatype)
+
+    # We keep track of certain partial products of matrices / vectors that are useful
+    # NOTE. When comparing this with Overleaf, note that we are only keeping track of
+    # the relevant matrices for the current period t (i.e, ignoring t-1,t-2,etc.)
+    # At_bar_dict = {}
+    At_bar = np.zeros((T-k+1, Xt_dim, Xt_dim))
+    Xt_bar = Xhat_seq[:,0]      # initialize with X(k)=Xhat(k)
+
+    # print("Computing constants for all periods.")
+    
+    if GPU: 
+        assert(torch.cuda.is_available())
+        At_tensor = torch.from_numpy(At).cuda()
+        Bt_tensor = torch.from_numpy(Bt).cuda()
+        ct_tensor = torch.from_numpy(ct).cuda()
+        At_bar_tensor = torch.from_numpy(At_bar).cuda()
+        Gamma_x_tensor = torch.from_numpy(Gamma_x).cuda()
+        Xt_bar_tensor = torch.from_numpy(Xt_bar).cuda()
+        d_matrix_tensor = torch.from_numpy(d_matrix).cuda()
+
+    for t in range(k,T): # loop over times k, k+1, ..., T - 1 to model constraints indexed with t
+        # Calculate constants for period t
+        for constr_index in range(num_constraints):
+            if GPU:
+                constr_constants[t-k][constr_index] = torch.matmul(Gamma_x_tensor[constr_index,:], Xt_bar_tensor).cpu().numpy()
+            else:
+                constr_constants[t-k][constr_index] = Gamma_x[constr_index,:] @ Xt_bar
+            
+        # print("Calculated constants for time {}".format(t))
+        # Update auxiliary vector Xt_bar
+        if GPU:
+            Xt_bar_tensor = torch.matmul(At_tensor[t-k], Xt_bar_tensor) + ct_tensor[t-k]
+        else:
+            Xt_bar = At[t-k] @ Xt_bar + ct[t-k]
+
+
+        # Calculate coefficients for all controls appearing in the constraint for period t
+        # NOTE: The coefficients for control u(tau) are stored on column indexed (tau-k) of the 2D array
+
+        for constr_index in range(num_constraints):
+            # coefs for u[t]
+            u_constr_coeffs[t-k][constr_index][:,t-k] = Gamma_u[constr_index,:]
+
+
+        # Calculate coefficients for objective coefficient for u_t. Note that this is not the final coefficient of u_t.
+        # Since the objective adds linear terms over all k, k+1..., T-1, u_t will receive additional contributions to its coefficient
+        u_obj_coeffs[:,t-k] += e_matrix[:,t-k]
+
+        # Initialize At_bar for tau=t-1
+        if GPU:
+            At_bar_tensor[t-k] = torch.eye(Xt_dim,Xt_dim).cuda()
+        else:
+            At_bar[t-k] = np.eye(Xt_dim,Xt_dim)
+
+        for tau in range(t-1,k-1,-1):
+            if GPU:
+                At_bar_times_Bt_tensor = torch.matmul(At_bar_tensor[tau-k+1], Bt_tensor[tau-k])
+                all_constraint_coefs_matrix = torch.matmul(Gamma_x_tensor, At_bar_times_Bt_tensor).cpu().numpy()
+            else:
+                At_bar_times_Bt = At_bar[tau-k+1] @ Bt[tau-k]
+                all_constraint_coefs_matrix = Gamma_x @ At_bar_times_Bt
+
+            for constr_index in range(num_constraints):
+                # coefs for u[t-1], u[t-2], ..., u[k] in the constraints
+                u_constr_coeffs[t-k][constr_index][:,tau-k] = all_constraint_coefs_matrix[constr_index, :]
+            
+            # coefs for u[t-1], u[t-2], ..., u[k] in the objective
+            if GPU:
+                u_obj_coeffs[:,tau-k] += torch.matmul(d_matrix_tensor[:,t-k], At_bar_times_Bt_tensor).cpu().numpy()
+            else:
+                u_obj_coeffs[:,tau-k] += d_matrix[:,t-k] @ At_bar_times_Bt
+
+            # Update At_bar for next round
+            if GPU:
+                At_bar_tensor[tau-k] = torch.matmul(At_bar_tensor[tau-k+1], At_tensor[tau-k])
+            else:
+                At_bar[tau-k] = At_bar[tau-k+1] @ At[tau-k]
+
+        # print("Computed constraint and obj coeff for time {}".format(t))
+
+    # Now we handle the case of t=T
+    if GPU:
+        At_bar_tensor[T-k] = torch.eye(Xt_dim, Xt_dim).cuda()
+    else:
+        At_bar[T-k] = np.eye(Xt_dim,Xt_dim)
+
+    # Add up the contribution of eta * X_T in the coefficients of decision u_t, t = k, ..., T-1
+    for tau in range(T-1,k-1,-1):
+        if GPU:
+            # st1 = time()
+            u_obj_coeffs[:,tau-k] += torch.matmul(torch.matmul(d_matrix_tensor[:,T-k], At_bar_tensor[tau-k+1]), Bt_tensor[tau-k]).cpu().numpy()
+            At_bar_tensor[tau-k] = torch.matmul(At_bar_tensor[tau-k+1], At_tensor[tau-k])
+            # en1 = time()
+            # print("GPU: {}".format(int((en1 - st1) * 10**8) / 10**8))
+        else:
+            # st2 = time()
+            u_obj_coeffs[:,tau-k] += d_matrix[:,T-k] @ At_bar[tau-k+1] @ Bt[tau-k]
+            At_bar[tau-k] = At_bar[tau-k+1] @ At[tau-k]
+            # en2 = time()
+            # print("CPU: {}".format(int((en2 - st2) * 10**8) / 10**8))
+
+    return u_constr_coeffs, constr_constants, u_obj_coeffs
+
+def calculate_all_coefs_opt_cpu(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_matrix, e_matrix):
+    """Get coefficients for decisions appearing in a generic linear constraint in each period k,k+1,...
+    Gamma_x and Gamma_u are matrices, for now. Can change to dictionaries later.
+    Gamma_x: rows = number of "types" of constraints, columns = num_compartments * num_age_groups
+    Gamma_u: rows = number of "types" of constraints, columns = num_controls * num_age_groups"""
+
+    # shorthand for a few useful parameters
+    T = dynModel.time_steps
+    Xt_dim = num_compartments * num_age_groups
+    ut_dim = num_controls * num_age_groups
+    num_constraints = Gamma_x.shape[0]
+
+    assert( Xhat_seq.shape==(Xt_dim, T-k+1) )
+    assert( uhat_seq.shape==(ut_dim, T-k) )
+    assert(Gamma_x.shape ==(num_constraints,Xt_dim))
+    assert(Gamma_u.shape ==(num_constraints,ut_dim))
+    assert(d_matrix.shape ==(Xt_dim, T-k+1))
+    assert(e_matrix.shape ==(ut_dim, T-k+1))
+
+    # Some pre-processing:
+    # Calculate matrices A and B, and vector c, at given Xhat_seq and uhat_seq, across all the necessary time indices
+    # Hold these as dictionaries, where the key is the time t.
+    At = np.zeros((T-k, Xt_dim, Xt_dim))
+    Bt = np.zeros((T-k, Xt_dim, ut_dim))
+    ct = np.zeros((T-k, Xt_dim))
+    jacob_Xs = np.zeros((T-k, Xt_dim, Xt_dim))
+    jacob_us = np.zeros((T-k, Xt_dim, ut_dim))
+    gf_vecs = np.zeros((T-k, Xt_dim))
+    # start51 = time()
+    #for t in range(k,T+1):
+    for t in range(k,T):
+        # print("calculate_all_coefs for loop, t = ", t)
+        # get Xhat(t) and uhat(t)
+        Xhat_t = Xhat_seq[:,t-k]
+        uhat_t = uhat_seq[:,t-k]
+        #print("uhat_t is", uhat_t)
+
+        jacob_X = get_Jacobian_X_optimized(dynModel, Xhat_t, uhat_t, dynModel.mixing_method, t)
+        jacob_u = get_Jacobian_u(dynModel, Xhat_t, uhat_t, dynModel.mixing_method, t)
+ 
+        jacob_Xs[t-k] = jacob_X
+        jacob_us[t-k] = jacob_u
+        gf_vec = get_F(dynModel, Xhat_t, uhat_t, t)
+        gf_vecs[t-k] = gf_vec
+
+    ICUg_idx = list(range(SEIR_groups.index('ICU_g'), num_age_groups * num_compartments, num_compartments))
+
+    At = np.tile(np.expand_dims(np.eye(Xt_dim), axis=0), (T-k, 1, 1)) + dynModel.dt * jacob_Xs
+    Bt = dynModel.dt * jacob_us
+    ct = dynModel.dt * (gf_vecs - np.squeeze(np.matmul(jacob_Xs, np.expand_dims(Xhat_seq.T[:-1], -1)), -1)) - np.squeeze(np.matmul(jacob_us, np.expand_dims(uhat_seq.T, -1)), -1)
+    
+    assert(abs(ct[:,ICUg_idx]) < 0.0001).all()
+
     # end51 = time()
     # print("5.1. [While]: Preprocessing {}".format(int((end51 - start51) * 10**5) / 10**5))
 
@@ -1403,119 +1588,62 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
     # print("5.2. [While]: Initialization {}".format(int((end52 - start52) * 10**5) / 10**5))
 
     # start53 = time()
-    # start531 = time()
-    
-    if GPU: 
-        assert(torch.cuda.is_available())
-        At_tensor = torch.from_numpy(At).cuda()
-        Bt_tensor = torch.from_numpy(Bt).cuda()
-        ct_tensor = torch.from_numpy(ct).cuda()
-        At_bar_tensor = torch.from_numpy(At_bar).cuda()
-        Gamma_x_tensor = torch.from_numpy(Gamma_x).cuda()
-        Xt_bar_tensor = torch.from_numpy(Xt_bar).cuda()
-        d_matrix_tensor = torch.from_numpy(d_matrix).cuda()
-    
-    # end531 = time()
-    # print("5.3.1 [While]: From numpy to torch {}".format(int((end531 - start531) * 10**5) / 10**5))
-
-    # start532 = time()
     for t in range(k,T): # loop over times k, k+1, ..., T - 1 to model constraints indexed with t
         # Calculate constants for period t
-        for constr_index in range(num_constraints):
-            if GPU:
-                constr_constants[t-k][constr_index] = torch.matmul(Gamma_x_tensor[constr_index,:], Xt_bar_tensor).cpu().numpy()
-            else:
-                constr_constants[t-k][constr_index] = Gamma_x[constr_index,:] @ Xt_bar
+        constr_constants[t-k] = Gamma_x @ Xt_bar
             
-        # print("Calculated constants for time {}".format(t))
         # Update auxiliary vector Xt_bar
-        if GPU:
-            Xt_bar_tensor = torch.matmul(At_tensor[t-k], Xt_bar_tensor) + ct_tensor[t-k]
-        else:
-            Xt_bar = At[t-k] @ Xt_bar + ct[t-k]
-
+        Xt_bar = At[t-k] @ Xt_bar + ct[t-k]
 
         # Calculate coefficients for all controls appearing in the constraint for period t
         # NOTE: The coefficients for control u(tau) are stored on column indexed (tau-k) of the 2D array
 
-        for constr_index in range(num_constraints):
-            # coefs for u[t]
-            u_constr_coeffs[t-k][constr_index][:,t-k] = Gamma_u[constr_index,:]
-
+        u_constr_coeffs[t-k,:,:,t-k] = Gamma_u
 
         # Calculate coefficients for objective coefficient for u_t. Note that this is not the final coefficient of u_t.
         # Since the objective adds linear terms over all k, k+1..., T-1, u_t will receive additional contributions to its coefficient
         u_obj_coeffs[:,t-k] += e_matrix[:,t-k]
 
         # Initialize At_bar for tau=t-1
-        if GPU:
-            At_bar_tensor[t-k] = torch.eye(Xt_dim,Xt_dim).cuda()
-        else:
-            At_bar[t-k] = np.eye(Xt_dim,Xt_dim)
+        At_bar[t-k] = np.eye(Xt_dim,Xt_dim)
 
         for tau in range(t-1,k-1,-1):
-            if GPU:
-                At_bar_times_Bt_tensor = torch.matmul(At_bar_tensor[tau-k+1], Bt_tensor[tau-k])
-                all_constraint_coefs_matrix = torch.matmul(Gamma_x_tensor, At_bar_times_Bt_tensor).cpu().numpy()
-            else:
-                At_bar_times_Bt = At_bar[tau-k+1] @ Bt[tau-k]
-                all_constraint_coefs_matrix = Gamma_x @ At_bar_times_Bt
+            At_bar_times_Bt = At_bar[tau-k+1] @ Bt[tau-k]
+            all_constraint_coefs_matrix = Gamma_x @ At_bar_times_Bt
 
-            for constr_index in range(num_constraints):
-                # coefs for u[t-1], u[t-2], ..., u[k] in the constraints
-                u_constr_coeffs[t-k][constr_index][:,tau-k] = all_constraint_coefs_matrix[constr_index, :]
+            u_constr_coeffs[t-k,:,:,tau-k] = all_constraint_coefs_matrix
             
             # coefs for u[t-1], u[t-2], ..., u[k] in the objective
-            if GPU:
-                u_obj_coeffs[:,tau-k] += torch.matmul(d_matrix_tensor[:,t-k], At_bar_times_Bt_tensor).cpu().numpy()
-            else:
-                u_obj_coeffs[:,tau-k] += d_matrix[:,t-k] @ At_bar_times_Bt
+            u_obj_coeffs[:,tau-k] += d_matrix[:,t-k] @ At_bar_times_Bt
 
             # Update At_bar for next round
-            if GPU:
-                At_bar_tensor[tau-k] = torch.matmul(At_bar_tensor[tau-k+1], At_tensor[tau-k])
-            else:
-                At_bar[tau-k] = At_bar[tau-k+1] @ At[tau-k]
+            At_bar[tau-k] = At_bar[tau-k+1] @ At[tau-k]
 
-        # print("Computed constraint and obj coeff for time {}".format(t))
-
-    # end532 = time()
-    # print("5.3.2 [While]: GPU matrix multiplication and from torch to numpy {}".format(int((end532 - start532) * 10**5) / 10**5))
-
+    # print("Computed constraint and obj coeff for time {}".format(t))
     # end53 = time()
     # print("5.3. [While]: Compute recursive X and coefficients {}".format(int((end53 - start53) * 10**5) / 10**5))
 
     # start54 = time()
     # Now we handle the case of t=T
-    if GPU:
-        At_bar_tensor[T-k] = torch.eye(Xt_dim, Xt_dim).cuda()
-    else:
-        At_bar[T-k] = np.eye(Xt_dim,Xt_dim)
 
-    # Add up the contribution of eta * X_T in the coefficients of decision u_t, t = k, ..., T-1
+    At_bar[T-k] = np.eye(Xt_dim,Xt_dim)
+
+    # # Add up the contribution of eta * X_T in the coefficients of decision u_t, t = k, ..., T-1
     for tau in range(T-1,k-1,-1):
-        if GPU:
-            # st1 = time()
-            u_obj_coeffs[:,tau-k] += torch.matmul(torch.matmul(d_matrix_tensor[:,T-k], At_bar_tensor[tau-k+1]), Bt_tensor[tau-k]).cpu().numpy()
-            At_bar_tensor[tau-k] = torch.matmul(At_bar_tensor[tau-k+1], At_tensor[tau-k])
-            # en1 = time()
-            # print("GPU: {}".format(int((en1 - st1) * 10**8) / 10**8))
-        else:
-            # st2 = time()
-            u_obj_coeffs[:,tau-k] += d_matrix[:,T-k] @ At_bar[tau-k+1] @ Bt[tau-k]
-            At_bar[tau-k] = At_bar[tau-k+1] @ At[tau-k]
-            # en2 = time()
-            # print("CPU: {}".format(int((en2 - st2) * 10**8) / 10**8))
+        u_obj_coeffs[:,tau-k] += d_matrix[:,T-k] @ At_bar[tau-k+1] @ Bt[tau-k]
+        At_bar[tau-k] = At_bar[tau-k+1] @ At[tau-k]
     # end54 = time()
     # print("5.4. [While]: Compute time step T {}".format(int((end54 - start54) * 10**5) / 10**5))
 
     return u_constr_coeffs, constr_constants, u_obj_coeffs
 
-def calculate_all_coefs_opt(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_matrix, e_matrix, GPU=False):
+
+def calculate_all_coefs_opt_gpu(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_matrix, e_matrix):
     """Get coefficients for decisions appearing in a generic linear constraint in each period k,k+1,...
     Gamma_x and Gamma_u are matrices, for now. Can change to dictionaries later.
     Gamma_x: rows = number of "types" of constraints, columns = num_compartments * num_age_groups
     Gamma_u: rows = number of "types" of constraints, columns = num_controls * num_age_groups"""
+    assert(torch.cuda.is_available())
     device = torch.device("cuda")
 
     # shorthand for a few useful parameters
@@ -1534,23 +1662,11 @@ def calculate_all_coefs_opt(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d
     # Some pre-processing:
     # Calculate matrices A and B, and vector c, at given Xhat_seq and uhat_seq, across all the necessary time indices
     # Hold these as dictionaries, where the key is the time t.
-    if GPU:
-        At_tensor = torch.cuda.FloatTensor(T-k, Xt_dim, Xt_dim).fill_(0)
-        Bt_tensor = torch.cuda.FloatTensor(T-k, Xt_dim, ut_dim).fill_(0)
-        ct_tensor = torch.cuda.FloatTensor(T-k, Xt_dim).fill_(0)
-    else:
-        At = np.zeros((T-k, Xt_dim, Xt_dim))
-        Bt = np.zeros((T-k, Xt_dim, ut_dim))
-        ct = np.zeros((T-k, Xt_dim))
-
-    # At_seq = {}
-    # jacob_Xs = {}
-    # jacob_us = {}
     jacob_Xs = np.zeros((T-k, Xt_dim, Xt_dim))
     jacob_us = np.zeros((T-k, Xt_dim, ut_dim))
     gf_vecs = np.zeros((T-k, Xt_dim))
-    start51 = time()
-    # start511 = time()
+    
+    # start51 = time()
     #for t in range(k,T+1):
     for t in range(k,T):
         # print("calculate_all_coefs for loop, t = ", t)
@@ -1567,38 +1683,24 @@ def calculate_all_coefs_opt(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d
         gf_vec = get_F(dynModel, Xhat_t, uhat_t, t)
         gf_vecs[t-k] = gf_vec
 
-    # end511 = time()
-    # print("5.1.1. [While]: Compute jacobians {}".format(int((end511 - start511) * 10**5) / 10**5))
-
-    # start512 = time()
     ICUg_idx = list(range(SEIR_groups.index('ICU_g'), num_age_groups * num_compartments, num_compartments))
-    if GPU:
-        jacob_Xs_tensor = torch.from_numpy(jacob_Xs).cuda()
-        jacob_us_tensor = torch.from_numpy(jacob_us).cuda()
-        gf_vecs_tensor = torch.from_numpy(gf_vecs).cuda()
-        Xhat_seq_tensor = torch.from_numpy(Xhat_seq).cuda().T
-        uhat_seq_tensor = torch.from_numpy(uhat_seq).cuda().T
 
-        At_tensor = torch.eye(Xt_dim, device=device).unsqueeze(0).repeat(T-k, 1, 1) + dynModel.dt * jacob_Xs_tensor
-        Bt_tensor = dynModel.dt * jacob_us_tensor
-        ct_tensor = dynModel.dt * (gf_vecs_tensor - torch.matmul(jacob_Xs_tensor, Xhat_seq_tensor.unsqueeze(-1)).squeeze(-1)) - torch.matmul(jacob_us_tensor, uhat_seq_tensor.unsqueeze(-1))
+    jacob_Xs_tensor = torch.from_numpy(jacob_Xs).cuda()
+    jacob_us_tensor = torch.from_numpy(jacob_us).cuda()
+    gf_vecs_tensor = torch.from_numpy(gf_vecs).cuda()
+    Xhat_seq_tensor = torch.from_numpy(Xhat_seq[:, :-1]).cuda().T
+    uhat_seq_tensor = torch.from_numpy(uhat_seq).cuda().T
 
-        assert(abs(ct_tensor[:,ICUg_idx]) < 0.0001).all()
-    else:
-        At = np.tile(np.expand_dims(np.eye(Xt_dim), axis=0), (T-k, 1, 1)) + dynModel.dt * jacob_Xs
-        Bt = dynModel.dt * jacob_us
-        ct = dynModel.dt * (gf_vecs - np.squeeze(np.matmul(jacob_Xs, np.expand_dims(Xhat_seq.T[:-1], -1)), -1)) - np.squeeze(np.matmul(jacob_us, np.expand_dims(uhat_seq.T, -1)), -1)
-        
-        assert(abs(ct[:,ICUg_idx]) < 0.0001).all()
+    At = torch.eye(Xt_dim, device=device).unsqueeze(0).repeat(T-k, 1, 1) + dynModel.dt * jacob_Xs_tensor
+    Bt = dynModel.dt * jacob_us_tensor
+    ct = dynModel.dt * (gf_vecs_tensor - torch.matmul(jacob_Xs_tensor, Xhat_seq_tensor.unsqueeze(-1)).squeeze(-1)) - torch.matmul(jacob_us_tensor, uhat_seq_tensor.unsqueeze(-1)).squeeze(-1)
 
+    assert(abs(ct[:,ICUg_idx]) < 0.0001).all()
 
-    # end512 = time()
-    # print("5.1.2. [While]: Compute A,B,c {}".format(int((end512 - start512) * 10**5) / 10**5))
+    # end51 = time()
+    # print("5.1. [While]: Preprocessing {}".format(int((end51 - start51) * 10**5) / 10**5))
 
-    end51 = time()
-    print("5.1. [While]: Preprocessing {}".format(int((end51 - start51) * 10**5) / 10**5))
-
-    start52 = time()
+    # start52 = time()
     # All constraint coefficients are stored in dictionary u_constr_coeffs: u_constr_coeffs has a key for each
     # period t in {k,k+1,...,T-1}. The value for key t stores, in turn, another dictionary, which holds the constraint coefficients
     # of the constraints indexed with t.
@@ -1607,14 +1709,13 @@ def calculate_all_coefs_opt(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d
     # all the controls u(k),...,u(T-1) appearing in the expression a*X(t) + b*u(t).
     # u_constr_coeffs = {}
     u_constr_coeffs = np.zeros((T-k, num_constraints, ut_dim, T-k), dtype=numpyArrayDatatype)
+    u_constr_coeffs_star = np.zeros((T-k, num_constraints, ut_dim, T-k), dtype=numpyArrayDatatype)
 
     # The linear expression for a constraint also has constants, which we store in a separate dictionary: constr_constants.
     # The constr_constants dictionary has a key for each period in {k,k+1,...,T-1}. The value for key t stores, in turn, another dictionary,
     # which holds the constants of the constraints indexed with t.
     # In that dictionary, the key is the index of a constraint "type", and the value is the constant corresponding to the specific
     # constraint type index and time period.
-    # constr_constants = {}
-    constr_constants = np.zeros((T-k, num_constraints), dtype=numpyArrayDatatype)
 
     # Initialize with zeros. (May want to try using sparse matrices here!)
     # for t in np.arange(k,T):
@@ -1626,126 +1727,49 @@ def calculate_all_coefs_opt(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d
     # All objective coefficients are stored in a 2D numpy array with (ut_dim) rows, and (T-k) columns
     # (one for every time period k, k+1, ..., T-1). Column with index t stores the coefficients in the objective for decision u_{k+t}, which
     # is of dimension (ut_dim). Note that for the objective we do not keep track of constant terms.
-    u_obj_coeffs = np.zeros((ut_dim, T-k), dtype=numpyArrayDatatype)
+    u_obj_coeffs_star = np.zeros((ut_dim, T-k), dtype=numpyArrayDatatype)
 
     # We keep track of certain partial products of matrices / vectors that are useful
     # NOTE. When comparing this with Overleaf, note that we are only keeping track of
     # the relevant matrices for the current period t (i.e, ignoring t-1,t-2,etc.)
     # At_bar_dict = {}
-    At_bar = np.zeros((T-k+1, Xt_dim, Xt_dim))
-    Xt_bar = Xhat_seq[:,0]      # initialize with X(k)=Xhat(k)
+    At_star = torch.cuda.DoubleTensor(T-k+1, T-k+1, Xt_dim, Xt_dim).fill_(0)
+    Xt_star = torch.cuda.DoubleTensor(T-k, Xt_dim).fill_(0)
+    Xt_star[0] = torch.from_numpy(Xhat_seq[:,0]).cuda()
+    Gamma_x_tensor = torch.from_numpy(Gamma_x).cuda()
+    d_matrix_tensor = torch.from_numpy(d_matrix).cuda()
 
     # print("Computing constants for all periods.")
-    end52 = time()
-    print("5.2. [While]: Initialization {}".format(int((end52 - start52) * 10**5) / 10**5))
+    # end52 = time()
+    # print("5.2. [While]: Initialization {}".format(int((end52 - start52) * 10**5) / 10**5))
 
-    start53 = time()
-    start531 = time()
-    
-    if GPU: 
-        assert(torch.cuda.is_available())
-        At_tensor = torch.from_numpy(At).cuda()
-        Bt_tensor = torch.from_numpy(Bt).cuda()
-        ct_tensor = torch.from_numpy(ct).cuda()
-        At_bar_tensor = torch.from_numpy(At_bar).cuda()
-        Gamma_x_tensor = torch.from_numpy(Gamma_x).cuda()
-        Xt_bar_tensor = torch.from_numpy(Xt_bar).cuda()
-        d_matrix_tensor = torch.from_numpy(d_matrix).cuda()
-    
-    end531 = time()
-    print("5.3.1 [While]: From numpy to torch {}".format(int((end531 - start531) * 10**5) / 10**5))
-
-    start532 = time()
-    for t in range(k,T): # loop over times k, k+1, ..., T - 1 to model constraints indexed with t
-        # Calculate constants for period t
-        for constr_index in range(num_constraints):
-            if GPU:
-                constr_constants[t-k][constr_index] = torch.matmul(Gamma_x_tensor[constr_index,:], Xt_bar_tensor).cpu().numpy()
-            else:
-                constr_constants[t-k][constr_index] = Gamma_x[constr_index,:] @ Xt_bar
-            
-        # print("Calculated constants for time {}".format(t))
-        # Update auxiliary vector Xt_bar
-        if GPU:
-            Xt_bar_tensor = torch.matmul(At_tensor[t-k], Xt_bar_tensor) + ct_tensor[t-k]
-        else:
-            Xt_bar = At[t-k] @ Xt_bar + ct[t-k]
-
-        # Calculate coefficients for all controls appearing in the constraint for period t
-        # NOTE: The coefficients for control u(tau) are stored on column indexed (tau-k) of the 2D array
-
-        for constr_index in range(num_constraints):
-            # coefs for u[t]
-            u_constr_coeffs[t-k][constr_index][:,t-k] = Gamma_u[constr_index,:]
-
-
-        # Calculate coefficients for objective coefficient for u_t. Note that this is not the final coefficient of u_t.
-        # Since the objective adds linear terms over all k, k+1..., T-1, u_t will receive additional contributions to its coefficient
-        u_obj_coeffs[:,t-k] += e_matrix[:,t-k]
-
+    # start53 = time()
+    # Compute At_bar before everything else
+    for t in range(k, T+1):
         # Initialize At_bar for tau=t-1
-        if GPU:
-            At_bar_tensor[t-k] = torch.eye(Xt_dim,Xt_dim).cuda()
-        else:
-            At_bar[t-k] = np.eye(Xt_dim,Xt_dim)
+        At_star[t-k, t-k] = torch.eye(Xt_dim, device=device)
+    for t in range(T-1, k-1, -1):
+        At_star[t-k+1:T-k+1, t-k] = torch.tensordot(At_star[t-k+1:T-k+1, t-k+1], At[t-k], dims=([-1], [0]))
 
-        for tau in range(t-1,k-1,-1):
-            if GPU:
-                At_bar_times_Bt_tensor = torch.matmul(At_bar_tensor[tau-k+1], Bt_tensor[tau-k])
-                all_constraint_coefs_matrix = torch.matmul(Gamma_x_tensor, At_bar_times_Bt_tensor).cpu().numpy()
-            else:
-                At_bar_times_Bt = At_bar[tau-k+1] @ Bt[tau-k]
-                all_constraint_coefs_matrix = Gamma_x @ At_bar_times_Bt
+    # # Compute Xt_bar
+    for t in range(k, T-1):
+        Xt_star[t-k+1] = torch.matmul(At[t-k], Xt_star[t-k]) + ct[t-k]
 
-            for constr_index in range(num_constraints):
-                # coefs for u[t-1], u[t-2], ..., u[k] in the constraints
-                u_constr_coeffs[t-k][constr_index][:,tau-k] = all_constraint_coefs_matrix[constr_index, :]
-            
-            # coefs for u[t-1], u[t-2], ..., u[k] in the objective
-            if GPU:
-                u_obj_coeffs[:,tau-k] += torch.matmul(d_matrix_tensor[:,t-k], At_bar_times_Bt_tensor).cpu().numpy()
-            else:
-                u_obj_coeffs[:,tau-k] += d_matrix[:,t-k] @ At_bar_times_Bt
+    constr_constants_star = torch.matmul(Gamma_x_tensor, Xt_star.T).T.cpu().numpy()
+    for t in range(k, T):
+        u_constr_coeffs_star[t-k,:,:,t-k] = Gamma_u
+        u_obj_coeffs_star[:,t-k] += e_matrix[:,t-k]
+        # Replaced tau for loop
+        if t-k > 0:
+            At_star_times_Bt = torch.matmul(At_star[t-k, 1:t-k+1], Bt[:t-k]).permute(1,2,0)
+            all_constraint_coefs_matrix_star = torch.tensordot(Gamma_x_tensor, At_star_times_Bt, dims=([-1], [0]))
+            u_constr_coeffs_star[t-k,:,:,:t-k] = all_constraint_coefs_matrix_star.cpu().numpy()
+            u_obj_coeffs_star[:, :t-k] += torch.tensordot(d_matrix_tensor[:,t-k], At_star_times_Bt, dims=([-1], [0])).cpu().numpy()
+    At_star_times_Bt = torch.matmul(At_star[T-k, 1:T-k+1], Bt[:T-k]).permute(1,2,0)
+    u_obj_coeffs_star[:,:T-k] += torch.tensordot(d_matrix_tensor[:,T-k], At_star_times_Bt, dims=([-1], [0])).cpu().numpy()
 
-            # Update At_bar for next round
-            if GPU:
-                At_bar_tensor[tau-k] = torch.matmul(At_bar_tensor[tau-k+1], At_tensor[tau-k])
-            else:
-                At_bar[tau-k] = At_bar[tau-k+1] @ At[tau-k]
+    return u_constr_coeffs_star, constr_constants_star, u_obj_coeffs_star
 
-        # print("Computed constraint and obj coeff for time {}".format(t))
-
-    end532 = time()
-    print("5.3.2 [While]: GPU matrix multiplication and from torch to numpy {}".format(int((end532 - start532) * 10**5) / 10**5))
-
-    end53 = time()
-    print("5.3. [While]: Compute recursive X and coefficients {}".format(int((end53 - start53) * 10**5) / 10**5))
-
-    start54 = time()
-    # Now we handle the case of t=T
-    if GPU:
-        At_bar_tensor[T-k] = torch.eye(Xt_dim, Xt_dim).cuda()
-    else:
-        At_bar[T-k] = np.eye(Xt_dim,Xt_dim)
-
-    # Add up the contribution of eta * X_T in the coefficients of decision u_t, t = k, ..., T-1
-    for tau in range(T-1,k-1,-1):
-        if GPU:
-            # st1 = time()
-            u_obj_coeffs[:,tau-k] += torch.matmul(torch.matmul(d_matrix_tensor[:,T-k], At_bar_tensor[tau-k+1]), Bt_tensor[tau-k]).cpu().numpy()
-            At_bar_tensor[tau-k] = torch.matmul(At_bar_tensor[tau-k+1], At_tensor[tau-k])
-            # en1 = time()
-            # print("GPU: {}".format(int((en1 - st1) * 10**8) / 10**8))
-        else:
-            # st2 = time()
-            u_obj_coeffs[:,tau-k] += d_matrix[:,T-k] @ At_bar[tau-k+1] @ Bt[tau-k]
-            At_bar[tau-k] = At_bar[tau-k+1] @ At[tau-k]
-            # en2 = time()
-            # print("CPU: {}".format(int((en2 - st2) * 10**8) / 10**8))
-    end54 = time()
-    print("5.4. [While]: Compute time step T {}".format(int((end54 - start54) * 10**5) / 10**5))
-
-    return u_constr_coeffs, constr_constants, u_obj_coeffs
 
 
 ####################################
@@ -1919,7 +1943,7 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
 
     # end1 = time()
     # if debugging:
-    # 	print("1. [Outside]: Initialization takes {} seconds".format(int((end1 - start1) * 10**5) / 10**5))
+        # print("1. [Outside]: Initialization takes {} seconds".format(int((end1 - start1) * 10**5) / 10**5))
 
     dynModel.shadowPrices = {}
 
@@ -1992,7 +2016,10 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
             # start5 = time()
 
             # get coefficients for decisions in all constraints and objective
-            constr_coefs, constr_consts, obj_coefs = calculate_all_coefs(dynModel,k,Xhat_seq,uhat_seq,Gamma_x,Gamma_u,D,E)
+            if use_gpu:
+                constr_coefs, constr_consts, obj_coefs = calculate_all_coefs_opt_gpu(dynModel,k,Xhat_seq,uhat_seq,Gamma_x,Gamma_u,D,E)
+            else:
+                constr_coefs, constr_consts, obj_coefs = calculate_all_coefs_opt_cpu(dynModel,k,Xhat_seq,uhat_seq,Gamma_x,Gamma_u,D,E)
             
             # end5 = time()
             # print("5. [While]: Compute coefficients and constraints takes {}".format(int((end5 - start5) * 10**5) / 10**5))
@@ -2290,7 +2317,7 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
                 assert(False)
 
             # mod.write(f"LP_lineariz_k={k}.lp")
-            
+            # if not debugging:
             print(f"Objective value for Line heur k = {k}, it = {inner_iterations}: {mod.objVal}")
 
             negative_controls = (u_vars_vec.X<-1e-6)
