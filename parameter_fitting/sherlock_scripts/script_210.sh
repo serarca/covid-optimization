@@ -8,4 +8,4 @@
 #SBATCH --mem-per-cpu=1G
 
 ml python/3.6.1
-python3 ParameterFittingRandomToPython.py --days 72 --alpha 1.400000
+python3 ParameterFittingRandomToPython.py --days 92 --alpha 2.000000

@@ -814,8 +814,8 @@ result = minimize(error_grad, grad_0, bounds = bounds, options = {"maxiter":maxi
 result_v = [float(x) for x in result.x]
 
 yaml_dict = {
-    "days_ahead":78,
-    "alpha":1.5,
+    "days_ahead":days_ahead_opt,
+    "alpha":alpha_opt,
     "n_samples":1,
     "result": result_v,
     "value": float(result.fun),

@@ -28,7 +28,7 @@ from copy import deepcopy
 from os import path
 
 days_to_try = [d*2 for d in range(25,50)]
-alphas_to_try = [a*0.1 for a in range(2,20)]
+alphas_to_try = [a*0.1 for a in range(20,30)]
 
 open('sherlock_master.sh', 'w').close()
 counter = 0
