@@ -7,7 +7,6 @@
 import pandas as pd
 from datetime import datetime, timedelta
 import numpy
-from gurobipy import *
 
 
 # In[2]:
