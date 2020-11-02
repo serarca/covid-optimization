@@ -34,7 +34,7 @@ args = parser.parse_args()
 days_ahead_opt = args.days
 alpha_opt = args.alpha
 n_samples = 1
-maxiter = 20
+maxiter = 50
 
 
 # In[4]:
