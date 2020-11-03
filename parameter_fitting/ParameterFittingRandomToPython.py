@@ -22,6 +22,7 @@ import argparse
 parser = argparse.ArgumentParser(description='Arguments')
 parser.add_argument('--alpha', action="store", dest='alpha', type=float)
 parser.add_argument('--days', action="store", dest='days', type=int)
+parser.add_argument('--scenario', action="store", dest='scenario', type=int)
 
 args = parser.parse_args()
 
@@ -33,9 +34,14 @@ args = parser.parse_args()
 
 days_ahead_opt = args.days
 alpha_opt = args.alpha
-n_samples = 1
+n_samples = 50
 maxiter = 50
-
+if args.scenario == 0:
+    mix_1_opt = 0
+    mix_2_opt = 0
+elif args.scenario == 1:
+    mix_1_opt = 0.3333
+    mix_2_opt = 0
 
 # In[4]:
 
@@ -374,224 +380,308 @@ best_error = float('inf')
 validation_date = datetime.strptime("2020-10-21", '%Y-%m-%d')
 
 
-def error_grad(v):
+def error_function(v,n_sample):
+    days_ahead = days_ahead_opt
+    alpha_mixing_home = alpha_opt
+    alpha_mixing_work = alpha_opt
+    alpha_mixing_transport = alpha_opt
+    alpha_mixing_school = alpha_opt
+    alpha_mixing_other = alpha_opt
+    alpha_mixing_leisure = alpha_opt
     
-    vector_upper_model_data = []
-    vector_errors = []
+    mix_1 = mix_1_opt
+    mix_2 = mix_2_opt
     
-    for n_sample in range(n_samples):
-        days_ahead = days_ahead_opt
-        alpha_mixing_home = alpha_opt
-        alpha_mixing_work = alpha_opt
-        alpha_mixing_transport = alpha_opt
-        alpha_mixing_school = alpha_opt
-        alpha_mixing_other = alpha_opt
-        alpha_mixing_leisure = alpha_opt
-        
-        mix_1 = v[1]
-        mix_2 = v[2]
-        
-        alphas_d = {
-            'work':alpha_mixing_work,
-            'transport':alpha_mixing_transport,
-            'school':alpha_mixing_school,
-            'other':alpha_mixing_other,
-            'leisure':alpha_mixing_leisure,
-            'home':alpha_mixing_home,
-        }
+    alphas_d = {
+        'work':alpha_mixing_work,
+        'transport':alpha_mixing_transport,
+        'school':alpha_mixing_school,
+        'other':alpha_mixing_other,
+        'leisure':alpha_mixing_leisure,
+        'home':alpha_mixing_home,
+    }
 
-        gamma_mixing_before = 1.0
-        gamma_mixing_after = 1.0
+    gamma_mixing_before = 1.0
+    gamma_mixing_after = 1.0
 
 
-        upper_bound_home = 1.0
-        upper_bound_leisure = 1.0
-        upper_bound_other = 1.0
-        upper_bound_school = 1.0
-        upper_bound_work = 1.0
-        upper_bound_transport = 1.0
+    upper_bound_home = 1.0
+    upper_bound_leisure = 1.0
+    upper_bound_other = 1.0
+    upper_bound_school = 1.0
+    upper_bound_work = 1.0
+    upper_bound_transport = 1.0
 
-        school_lockdown = v[3]
-        school_may = v[4]
-        school_jun_jul_aug = v[5]
-        school_sep_oct = v[6]
+    school_lockdown = v[1]
+    school_may = v[2]
+    school_jun_jul_aug = v[3]
+    school_sep_oct = v[4]
 
-        beta_normal = original_beta
-        beta_vacation = beta_normal*v[0]
+    beta_normal = original_beta
+    beta_vacation = beta_normal*v[0]
 
-        days_change_model = 0
-
-
-        google['other'] = mix_1*(google["retail_and_recreation_percent_change_from_baseline"]+100)/100+(1-mix_1)*(google["grocery_and_pharmacy_percent_change_from_baseline"]+100)/100
-        google['leisure'] = mix_2*(google["parks_percent_change_from_baseline"]+100)/100+(1-mix_2)*(google["retail_and_recreation_percent_change_from_baseline"]+100)/100
+    days_change_model = 0
 
 
-        # Number of days
-        days_before_date_1 = int(days_ahead)
-        days_between_dates_1_2 = (date_2-date_1).days
-        days_between_dates_2_3 = (date_3-date_2).days
-        days_between_dates_3_4 = (date_4-date_3).days
-        days_between_dates_4_5 = (date_5-date_4).days
-        days_after_date_5 = (final_date-date_5).days
-        total_days = days_before_date_1 + days_between_dates_1_2 + days_between_dates_2_3 + days_between_dates_3_4 + days_between_dates_4_5+ days_after_date_5
-        days_denom = days_between_dates_1_2+days_between_dates_2_3+days_between_dates_3_4+days_between_dates_4_5
+    google['other'] = mix_1*(google["retail_and_recreation_percent_change_from_baseline"]+100)/100+(1-mix_1)*(google["grocery_and_pharmacy_percent_change_from_baseline"]+100)/100
+    google['leisure'] = mix_2*(google["parks_percent_change_from_baseline"]+100)/100+(1-mix_2)*(google["retail_and_recreation_percent_change_from_baseline"]+100)/100
 
 
-        # Some additional calculations
-        validation_days = days_before_date_1 + (validation_date-date_1).days
-        vacation_start_days = days_before_date_1 + (vacation_start-date_1).days
-        vacation_end_days = days_before_date_1 + (vacation_end-date_1).days
+    # Number of days
+    days_before_date_1 = int(days_ahead)
+    days_between_dates_1_2 = (date_2-date_1).days
+    days_between_dates_2_3 = (date_3-date_2).days
+    days_between_dates_3_4 = (date_4-date_3).days
+    days_between_dates_4_5 = (date_5-date_4).days
+    days_after_date_5 = (final_date-date_5).days
+    total_days = days_before_date_1 + days_between_dates_1_2 + days_between_dates_2_3 + days_between_dates_3_4 + days_between_dates_4_5+ days_after_date_5
+    days_denom = days_between_dates_1_2+days_between_dates_2_3+days_between_dates_3_4+days_between_dates_4_5
 
 
-        # Construct initialization
-        initialization = copy.deepcopy(original_initialization)
-        for i,group in enumerate(age_groups):
-            if group == "age_group_40_49":
-                initialization[group]["I"] = initialization[group]["I"] + 1
-                initialization[group]["S"] = initialization[group]["S"] - 1
-            initialization[group]["N"] = initialization[group]["S"] + initialization[group]["E"] + initialization[group]["I"] + initialization[group]["R"]
+    # Some additional calculations
+    validation_days = days_before_date_1 + (validation_date-date_1).days
+    vacation_start_days = days_before_date_1 + (vacation_start-date_1).days
+    vacation_end_days = days_before_date_1 + (vacation_end-date_1).days
 
 
-        # Alphas
-        a_before_google = {
-            'home':upper_bound_home,
-            'leisure':upper_bound_leisure,
-            'other':upper_bound_other,
-            'school':upper_bound_school,
-            'transport':upper_bound_transport,
-            'work':upper_bound_work
-        }
+    # Construct initialization
+    initialization = copy.deepcopy(original_initialization)
+    for i,group in enumerate(age_groups):
+        if group == "age_group_40_49":
+            initialization[group]["I"] = initialization[group]["I"] + 1
+            initialization[group]["S"] = initialization[group]["S"] - 1
+        initialization[group]["N"] = initialization[group]["S"] + initialization[group]["E"] + initialization[group]["I"] + initialization[group]["R"]
+
+
+    # Alphas
+    a_before_google = {
+        'home':upper_bound_home,
+        'leisure':upper_bound_leisure,
+        'other':upper_bound_other,
+        'school':upper_bound_school,
+        'transport':upper_bound_transport,
+        'work':upper_bound_work
+    }
 
 
 
-        # Determine mixing method
-        #     mixing_method_before = {
-        #         "name":"mult",
-        #         "param_alpha":alpha_mixing_before,
-        #         "param_beta":alpha_mixing_before,
-        #     }
+    # Determine mixing method
+    #     mixing_method_before = {
+    #         "name":"mult",
+    #         "param_alpha":alpha_mixing_before,
+    #         "param_beta":alpha_mixing_before,
+    #     }
 
-        #     # Determine mixing method
-        #     mixing_method_after = {
-        #         "name":"mult",
-        #         "param_alpha":alpha_mixing_after,
-        #         "param_beta":alpha_mixing_after,
-        #     }
-        #dynModel.mixing_method = mixing_method_after
+    #     # Determine mixing method
+    #     mixing_method_after = {
+    #         "name":"mult",
+    #         "param_alpha":alpha_mixing_after,
+    #         "param_beta":alpha_mixing_after,
+    #     }
+    #dynModel.mixing_method = mixing_method_after
 
 
 
 
-        # Calculate alphas
-        alphas_vec = []
-        for t in range(days_before_date_1-days_between_google):
-            alphas = {}
-            for age_group in age_groups:
-                alphas[age_group] = a_before_google
-            alphas_vec.append(alphas)
+    # Calculate alphas
+    alphas_vec = []
+    for t in range(days_before_date_1-days_between_google):
+        alphas = {}
+        for age_group in age_groups:
+            alphas[age_group] = a_before_google
+        alphas_vec.append(alphas)
 
-        counter = 0
-        for t in range(days_between_google):
-            alphas = {}
-            for age_group in age_groups:
-                alphas[age_group] = {
-                    'home':1.0,
-                    'leisure':google['leisure'][counter]*samples[n_sample,counter,0],
-                    'other':google['other'][counter]*samples[n_sample,counter,1],
-                    'school':1.0,
-                    'transport':google['transport'][counter]*samples[n_sample,counter,3],
-                    'work':google['work'][counter]*samples[n_sample,counter,4],
-                }
-            alphas_vec.append(alphas)   
-            counter += 1
-        for t in range(days_between_dates_1_2):
-            alphas = {}
-            for age_group in age_groups:
-                alphas[age_group] = {
-                    'home':1.0,
-                    'leisure':google['leisure'][counter]*samples[n_sample,counter,0],
-                    'other':google['other'][counter]*samples[n_sample,counter,1],
-                    'school':school_lockdown*samples[n_sample,counter,2],
-                    'transport':google['transport'][counter]*samples[n_sample,counter,3],
-                    'work':google['work'][counter]*samples[n_sample,counter,4],
-                }
-            alphas_vec.append(alphas)   
-            counter += 1
-        for t in range(days_between_dates_2_3):
-            alphas = {}
-            for age_group in age_groups:
-                alphas[age_group] = {
-                    'home':1.0,
-                    'leisure':google['leisure'][counter]*samples[n_sample,counter,0],
-                    'other':google['other'][counter]*samples[n_sample,counter,1],
-                    'school':school_may*samples[n_sample,counter,2],
-                    'transport':google['transport'][counter]*samples[n_sample,counter,3],
-                    'work':google['work'][counter]*samples[n_sample,counter,4],
-                }
-            alphas_vec.append(alphas)   
-            counter += 1
-        for t in range(days_between_dates_3_4):
-            alphas = {}
-            for age_group in age_groups:
-                alphas[age_group] = {
-                    'home':1.0,
-                    'leisure':google['leisure'][counter]*samples[n_sample,counter,0],
-                    'other':google['other'][counter]*samples[n_sample,counter,1],
-                    'school':school_may*samples[n_sample,counter,2],
-                    'transport':google['transport'][counter]*samples[n_sample,counter,3],
-                    'work':google['work'][counter]*samples[n_sample,counter,4],
-                }
-            alphas_vec.append(alphas)   
-            counter += 1
-        for t in range(days_between_dates_4_5):
-            alphas = {}
-            for age_group in age_groups:
-                alphas[age_group] = {
-                    'home':1.0,
-                    'leisure':google['leisure'][counter]*samples[n_sample,counter,0],
-                    'other':google['other'][counter]*samples[n_sample,counter,1],
-                    'school':school_jun_jul_aug*samples[n_sample,counter,2],
-                    'transport':google['transport'][counter]*samples[n_sample,counter,3],
-                    'work':google['work'][counter]*samples[n_sample,counter,4],
-                }
-            alphas_vec.append(alphas)   
-            counter += 1
-        for t in range(days_after_date_5):
-            alphas = {}
-            for age_group in age_groups:
-                alphas[age_group] = {
-                    'home':1.0,
-                    'leisure':google['leisure'][counter]*samples[n_sample,counter,0],
-                    'other':google['other'][counter]*samples[n_sample,counter,1],
-                    'school':school_sep_oct*samples[n_sample,counter,2],
-                    'transport':google['transport'][counter]*samples[n_sample,counter,3],
-                    'work':google['work'][counter]*samples[n_sample,counter,4],
-                }
-            alphas_vec.append(alphas)
-            counter += 1
-
-
-
-
-        #     mixing_vec = []
-        #     for t in range(int(vacation_start_days+days_change_model)):
-        #         mixing_vec.append(mixing_method_before)
-        #     for t in range(int(vacation_start_days+days_change_model),total_days):
-        #         mixing_vec.append(mixing_method_after)
+    counter = 0
+    for t in range(days_between_google):
+        alphas = {}
+        for age_group in age_groups:
+            alphas[age_group] = {
+                'home':1.0,
+                'leisure':google['leisure'][counter]*samples[n_sample,counter,0],
+                'other':google['other'][counter]*samples[n_sample,counter,1],
+                'school':1.0,
+                'transport':google['transport'][counter]*samples[n_sample,counter,3],
+                'work':google['work'][counter]*samples[n_sample,counter,4],
+            }
+        alphas_vec.append(alphas)   
+        counter += 1
+    for t in range(days_between_dates_1_2):
+        alphas = {}
+        for age_group in age_groups:
+            alphas[age_group] = {
+                'home':1.0,
+                'leisure':google['leisure'][counter]*samples[n_sample,counter,0],
+                'other':google['other'][counter]*samples[n_sample,counter,1],
+                'school':school_lockdown*samples[n_sample,counter,2],
+                'transport':google['transport'][counter]*samples[n_sample,counter,3],
+                'work':google['work'][counter]*samples[n_sample,counter,4],
+            }
+        alphas_vec.append(alphas)   
+        counter += 1
+    for t in range(days_between_dates_2_3):
+        alphas = {}
+        for age_group in age_groups:
+            alphas[age_group] = {
+                'home':1.0,
+                'leisure':google['leisure'][counter]*samples[n_sample,counter,0],
+                'other':google['other'][counter]*samples[n_sample,counter,1],
+                'school':school_may*samples[n_sample,counter,2],
+                'transport':google['transport'][counter]*samples[n_sample,counter,3],
+                'work':google['work'][counter]*samples[n_sample,counter,4],
+            }
+        alphas_vec.append(alphas)   
+        counter += 1
+    for t in range(days_between_dates_3_4):
+        alphas = {}
+        for age_group in age_groups:
+            alphas[age_group] = {
+                'home':1.0,
+                'leisure':google['leisure'][counter]*samples[n_sample,counter,0],
+                'other':google['other'][counter]*samples[n_sample,counter,1],
+                'school':school_may*samples[n_sample,counter,2],
+                'transport':google['transport'][counter]*samples[n_sample,counter,3],
+                'work':google['work'][counter]*samples[n_sample,counter,4],
+            }
+        alphas_vec.append(alphas)   
+        counter += 1
+    for t in range(days_between_dates_4_5):
+        alphas = {}
+        for age_group in age_groups:
+            alphas[age_group] = {
+                'home':1.0,
+                'leisure':google['leisure'][counter]*samples[n_sample,counter,0],
+                'other':google['other'][counter]*samples[n_sample,counter,1],
+                'school':school_jun_jul_aug*samples[n_sample,counter,2],
+                'transport':google['transport'][counter]*samples[n_sample,counter,3],
+                'work':google['work'][counter]*samples[n_sample,counter,4],
+            }
+        alphas_vec.append(alphas)   
+        counter += 1
+    for t in range(days_after_date_5):
+        alphas = {}
+        for age_group in age_groups:
+            alphas[age_group] = {
+                'home':1.0,
+                'leisure':google['leisure'][counter]*samples[n_sample,counter,0],
+                'other':google['other'][counter]*samples[n_sample,counter,1],
+                'school':school_sep_oct*samples[n_sample,counter,2],
+                'transport':google['transport'][counter]*samples[n_sample,counter,3],
+                'work':google['work'][counter]*samples[n_sample,counter,4],
+            }
+        alphas_vec.append(alphas)
+        counter += 1
 
 
 
 
-        # Calculate tests
-        tests = np.zeros(len(age_groups))
+    #     mixing_vec = []
+    #     for t in range(int(vacation_start_days+days_change_model)):
+    #         mixing_vec.append(mixing_method_before)
+    #     for t in range(int(vacation_start_days+days_change_model),total_days):
+    #         mixing_vec.append(mixing_method_after)
 
 
-        # Run model
-        model_data_beds = {ag:[] for ag in age_groups+["total"]}
-        model_data_icus = {ag:[] for ag in age_groups+["total"]}
-        model_data_deaths = {ag:[] for ag in age_groups+["total"]}
 
-        state = state_to_matrix(initialization)
+
+    # Calculate tests
+    tests = np.zeros(len(age_groups))
+
+
+    # Run model
+    model_data_beds = {ag:[] for ag in age_groups+["total"]}
+    model_data_icus = {ag:[] for ag in age_groups+["total"]}
+    model_data_deaths = {ag:[] for ag in age_groups+["total"]}
+
+    state = state_to_matrix(initialization)
+    t_beds = 0
+    t_icus = 0
+    t_deaths = 0
+    for i,ag in enumerate(age_groups):
+        state_H = state[i,cont.index("H")]
+        state_ICU = state[i,cont.index("ICU")]
+        state_D = state[i,cont.index("D")]
+        model_data_beds[ag].append(state_H)
+        model_data_icus[ag].append(state_ICU)
+        model_data_deaths[ag].append(state_D)
+        t_beds+= state_H
+        t_icus+= state_ICU
+        t_deaths+= state_D
+    model_data_beds["total"].append(t_beds)
+    model_data_icus["total"].append(t_icus)
+    model_data_deaths["total"].append(t_deaths)
+
+    recalc_days = [0,
+                 days_before_date_1,
+                 days_before_date_1+days_between_dates_1_2,
+                 days_before_date_1+days_between_dates_1_2+days_between_dates_2_3,
+                 days_before_date_1+days_between_dates_1_2+days_between_dates_2_3+days_between_dates_3_4,
+                 days_before_date_1+days_between_dates_1_2+days_between_dates_2_3+days_between_dates_3_4+days_between_dates_4_5,
+                int(vacation_start_days)
+                ]
+
+    dynModel.beta = np.zeros((len(age_groups),len(dynModel.groups[age_groups[0]].parameters["beta"])))
+    for i in range(len(age_groups)):
+        for j in range(len(dynModel.groups[age_groups[0]].parameters["beta"])):
+            if j < int(vacation_start_days+days_change_model):
+                dynModel.beta[i,j] = beta_normal
+            else:
+                dynModel.beta[i,j] = beta_vacation
+
+    for t in range(total_days):
+        current_date = date_1+timedelta(days=t-days_before_date_1)
+        day_of_week = current_date.weekday()
+
+        if t in recalc_days:
+            update_contacts = True
+        else:
+            update_contacts = False
+
+        if day_of_week <= 4:
+            season = "old"
+            dynModel.mixing_method = {
+                "name":"mult",
+                "param_alpha":{
+                    'work':alpha_mixing_work,
+                    'transport':alpha_mixing_transport,
+                    'school':alpha_mixing_school,
+                    'other':alpha_mixing_other,
+                    'leisure':alpha_mixing_leisure,
+                    'home':alpha_mixing_home,
+                },
+                "param_beta":{
+                    'work':alpha_mixing_work,
+                    'transport':alpha_mixing_transport,
+                    'school':alpha_mixing_school,
+                    'other':alpha_mixing_other,
+                    'leisure':alpha_mixing_leisure,
+                    'home':alpha_mixing_home,
+                },
+            }
+        else:
+            season = "old"
+            dynModel.mixing_method = {
+                "name":"mult",
+                "param_alpha":{
+                    'work':alpha_mixing_work,
+                    'transport':alpha_mixing_transport,
+                    'school':alpha_mixing_school,
+                    'other':alpha_mixing_other,
+                    'leisure':alpha_mixing_leisure,
+                    'home':alpha_mixing_home,
+                },
+                "param_beta":{
+                    'work':alpha_mixing_work,
+                    'transport':alpha_mixing_transport,
+                    'school':alpha_mixing_school,
+                    'other':alpha_mixing_other,
+                    'leisure':alpha_mixing_leisure,
+                    'home':alpha_mixing_home,
+                },
+            }
+
+        #dynModel.mixing_method = mixing_vec[t]
+
+        state,_ = dynModel.take_time_step(state, tests, tests, alphas_to_matrix(alphas_vec[t]), t, season, update_contacts=update_contacts)
         t_beds = 0
         t_icus = 0
         t_deaths = 0
@@ -605,162 +695,77 @@ def error_grad(v):
             t_beds+= state_H
             t_icus+= state_ICU
             t_deaths+= state_D
+        #print(t_beds)
         model_data_beds["total"].append(t_beds)
         model_data_icus["total"].append(t_icus)
         model_data_deaths["total"].append(t_deaths)
 
-        recalc_days = [0,
-                     days_before_date_1,
-                     days_before_date_1+days_between_dates_1_2,
-                     days_before_date_1+days_between_dates_1_2+days_between_dates_2_3,
-                     days_before_date_1+days_between_dates_1_2+days_between_dates_2_3+days_between_dates_3_4,
-                     days_before_date_1+days_between_dates_1_2+days_between_dates_2_3+days_between_dates_3_4+days_between_dates_4_5,
-                    int(vacation_start_days)
-                    ]
 
-        dynModel.beta = np.zeros((len(age_groups),len(dynModel.groups[age_groups[0]].parameters["beta"])))
-        for i in range(len(age_groups)):
-            for j in range(len(dynModel.groups[age_groups[0]].parameters["beta"])):
-                if j < int(vacation_start_days+days_change_model):
-                    dynModel.beta[i,j] = beta_normal
-                else:
-                    dynModel.beta[i,j] = beta_vacation
+    initial_date = date_1-timedelta(days=days_before_date_1)
 
-        for t in range(total_days):
-            current_date = date_1+timedelta(days=t-days_before_date_1)
-            day_of_week = current_date.weekday()
+    # Calculate the days of the model
+    days_model = [initial_date+timedelta(days = t) for t in range(total_days + 1)]
 
-            if t in recalc_days:
-                update_contacts = True
-            else:
-                update_contacts = False
+    # Indices where to put the real data
+    indices = [(datetime.strptime(d, '%Y-%m-%d') - initial_date).days for d in days]
 
-            if day_of_week <= 4:
-                season = "old"
-                dynModel.mixing_method = {
-                    "name":"mult",
-                    "param_alpha":{
-                        'work':alpha_mixing_work,
-                        'transport':alpha_mixing_transport,
-                        'school':alpha_mixing_school,
-                        'other':alpha_mixing_other,
-                        'leisure':alpha_mixing_leisure,
-                        'home':alpha_mixing_home,
-                    },
-                    "param_beta":{
-                        'work':alpha_mixing_work,
-                        'transport':alpha_mixing_transport,
-                        'school':alpha_mixing_school,
-                        'other':alpha_mixing_other,
-                        'leisure':alpha_mixing_leisure,
-                        'home':alpha_mixing_home,
-                    },
-                }
-            else:
-                season = "old"
-                dynModel.mixing_method = {
-                    "name":"mult",
-                    "param_alpha":{
-                        'work':alpha_mixing_work,
-                        'transport':alpha_mixing_transport,
-                        'school':alpha_mixing_school,
-                        'other':alpha_mixing_other,
-                        'leisure':alpha_mixing_leisure,
-                        'home':alpha_mixing_home,
-                    },
-                    "param_beta":{
-                        'work':alpha_mixing_work,
-                        'transport':alpha_mixing_transport,
-                        'school':alpha_mixing_school,
-                        'other':alpha_mixing_other,
-                        'leisure':alpha_mixing_leisure,
-                        'home':alpha_mixing_home,
-                    },
-                }
+    # Real data
+    real_data_beds = {ag:[float('nan')]*len(days_model) for ag in age_groups+["total"]}
+    real_data_icus = {ag:[float('nan')]*len(days_model) for ag in age_groups+["total"]}
+    real_data_deaths = {ag:[float('nan')]*len(days_model) for ag in age_groups+["total"]}
 
-            #dynModel.mixing_method = mixing_vec[t]
-
-            state,_ = dynModel.take_time_step(state, tests, tests, alphas_to_matrix(alphas_vec[t]), t, season, update_contacts=update_contacts)
-            t_beds = 0
-            t_icus = 0
-            t_deaths = 0
-            for i,ag in enumerate(age_groups):
-                state_H = state[i,cont.index("H")]
-                state_ICU = state[i,cont.index("ICU")]
-                state_D = state[i,cont.index("D")]
-                model_data_beds[ag].append(state_H)
-                model_data_icus[ag].append(state_ICU)
-                model_data_deaths[ag].append(state_D)
-                t_beds+= state_H
-                t_icus+= state_ICU
-                t_deaths+= state_D
-            #print(t_beds)
-            model_data_beds["total"].append(t_beds)
-            model_data_icus["total"].append(t_icus)
-            model_data_deaths["total"].append(t_deaths)
+    for k,ind in enumerate(indices):
+        for ag in age_groups+["total"]:
+            real_data_beds[ag][ind] = beds_real[ag][k]
+            real_data_icus[ag][ind] = icus_real[ag][k]
+            real_data_deaths[ag][ind] = deaths_real[ag][k]
 
 
-        initial_date = date_1-timedelta(days=days_before_date_1)
-
-        # Calculate the days of the model
-        days_model = [initial_date+timedelta(days = t) for t in range(total_days + 1)]
-
-        # Indices where to put the real data
-        indices = [(datetime.strptime(d, '%Y-%m-%d') - initial_date).days for d in days]
-
-        # Real data
-        real_data_beds = {ag:[float('nan')]*len(days_model) for ag in age_groups+["total"]}
-        real_data_icus = {ag:[float('nan')]*len(days_model) for ag in age_groups+["total"]}
-        real_data_deaths = {ag:[float('nan')]*len(days_model) for ag in age_groups+["total"]}
-
-        for k,ind in enumerate(indices):
-            for ag in age_groups+["total"]:
-                real_data_beds[ag][ind] = beds_real[ag][k]
-                real_data_icus[ag][ind] = icus_real[ag][k]
-                real_data_deaths[ag][ind] = deaths_real[ag][k]
-
-
-        error_constant = 1.0
-        error_beds = 0
-        error_icus = 0
-        error_deaths = 0
-        error_beds_total = 0
-        for ag in old_age_groups:
-            error_beds += np.nanmean((np.abs(np.array(model_data_beds[ag])-np.array(real_data_beds[ag]))/np.array(real_data_beds[ag]))[0:validation_days-1])
-            #error_beds += error_constant*np.nanmean((np.abs(np.array(model_data_beds[ag])-np.array(real_data_beds[ag]))/np.array(real_data_beds[ag]))[validation_days-1:validation_days])
-            #error_icus += np.nanmean(np.abs(np.array(model_data_icus[ag])-np.array(real_data_icus[ag])))
-            #error_deaths += np.nanmean(np.abs(np.array(model_data_deaths[ag])-np.array(real_data_deaths[ag])))
-        error_beds_total += np.nanmean((np.abs(np.array(model_data_beds["total"])-np.array(real_data_beds["total"]))/np.array(real_data_beds["total"]))[0:validation_days-1])
-        error_beds_total += error_constant*np.nanmean((np.abs(np.array(model_data_beds["total"])-np.array(real_data_beds["total"]))/np.array(real_data_beds["total"]))[validation_days-1:validation_days])
-        #error_icus_total = np.nanmean(np.abs(np.array(model_data_icus["total"])-np.array(real_data_icus["total"])))
-        #error_deaths_total = np.nanmean(np.abs(np.array(model_data_deaths["total"])-np.array(real_data_deaths["total"])))
+    error_constant = 1.0
+    error_beds = 0
+    error_icus = 0
+    error_deaths = 0
+    error_beds_total = 0
+    for ag in old_age_groups:
+        error_beds += np.nanmean((np.abs(np.array(model_data_beds[ag])-np.array(real_data_beds[ag]))/np.array(real_data_beds[ag]))[0:validation_days-1])
+        #error_beds += error_constant*np.nanmean((np.abs(np.array(model_data_beds[ag])-np.array(real_data_beds[ag]))/np.array(real_data_beds[ag]))[validation_days-1:validation_days])
+        #error_icus += np.nanmean(np.abs(np.array(model_data_icus[ag])-np.array(real_data_icus[ag])))
+        #error_deaths += np.nanmean(np.abs(np.array(model_data_deaths[ag])-np.array(real_data_deaths[ag])))
+    error_beds_total += np.nanmean((np.abs(np.array(model_data_beds["total"])-np.array(real_data_beds["total"]))/np.array(real_data_beds["total"]))[0:validation_days-1])
+    error_beds_total += error_constant*np.nanmean((np.abs(np.array(model_data_beds["total"])-np.array(real_data_beds["total"]))/np.array(real_data_beds["total"]))[validation_days-1:validation_days])
+    #error_icus_total = np.nanmean(np.abs(np.array(model_data_icus["total"])-np.array(real_data_icus["total"])))
+    #error_deaths_total = np.nanmean(np.abs(np.array(model_data_deaths["total"])-np.array(real_data_deaths["total"])))
 
 
 
 
-        #diff = np.array(model_data_beds["total"])-np.array(real_data_beds["total"])
-        #error_beds_above = np.nanmean([max(d,0) for d in diff])
-        #error_beds_below = -np.nanmean([min(d,0) for d in diff])
+    #diff = np.array(model_data_beds["total"])-np.array(real_data_beds["total"])
+    #error_beds_above = np.nanmean([max(d,0) for d in diff])
+    #error_beds_below = -np.nanmean([min(d,0) for d in diff])
 
-        #cumm_beds_model = [sum([model_data_beds["total"][k] for k in range(i+1) if not math.isnan(real_data_beds["total"][k])]) for i in range(len(model_data_beds["total"]))]
-        #cumm_beds_real = [sum([real_data_beds["total"][k] for k in range(i+1) if not math.isnan(real_data_beds["total"][k])]) for i in range(len(real_data_beds["total"]))]
-        #diff_cumm = np.array(cumm_beds_model)-np.array(cumm_beds_real)
-        #error_cumm_above = np.nanmean([max(d,0) for d in diff_cumm])
-        #error_cumm_below = -np.nanmean([min(d,0) for d in diff_cumm])
+    #cumm_beds_model = [sum([model_data_beds["total"][k] for k in range(i+1) if not math.isnan(real_data_beds["total"][k])]) for i in range(len(model_data_beds["total"]))]
+    #cumm_beds_real = [sum([real_data_beds["total"][k] for k in range(i+1) if not math.isnan(real_data_beds["total"][k])]) for i in range(len(real_data_beds["total"]))]
+    #diff_cumm = np.array(cumm_beds_model)-np.array(cumm_beds_real)
+    #error_cumm_above = np.nanmean([max(d,0) for d in diff_cumm])
+    #error_cumm_below = -np.nanmean([min(d,0) for d in diff_cumm])
 
 
 
-        #     error = error_beds_total
-        #     error = mult_icus*error_icus_total
-        #     error = mult_deaths*error_deaths_total
-        upper_model_data = model_data_beds["total"]
-        upper_days_model = days_model
-        upper_real_data = real_data_beds["total"]
-        error = error_beds+5*error_beds_total
+    #     error = error_beds_total
+    #     error = mult_icus*error_icus_total
+    #     error = mult_deaths*error_deaths_total
+    upper_model_data = model_data_beds["total"]
+    upper_days_model = days_model
+    upper_real_data = real_data_beds["total"]
+    error = error_beds+5*error_beds_total
 
-        vector_errors.append(error)
-        vector_upper_model_data.append(upper_model_data)
-        
+    return error
+
+
+
+def error_grad(v):
+    
+    vector_errors = [error_function(v,n_sample) for n_sample in range(n_samples)]
 
     error = np.mean(vector_errors)
 
@@ -789,10 +794,10 @@ def error_grad(v):
 # In[48]:
 
 
-grad_0 = [0.5, 0.5, 0.5, 0.05, 0.5, 0.1, 0.75]
+grad_0 = [0.5, 0.05, 0.5, 0.1, 0.75]
 
-lb= [0,0,0,0,0,0,0.5]
-ub = [1,1,1,0.1,1,0.2,1.0]
+lb= [0,0,0,0,0.5]
+ub = [1,0.1,1,0.2,1.0]
 for i in range(len(grad_0)):
     assert(grad_0[i]>=lb[i])
     assert(ub[i]>=grad_0[i])
@@ -816,13 +821,14 @@ result_v = [float(x) for x in result.x]
 yaml_dict = {
     "days_ahead":days_ahead_opt,
     "alpha":alpha_opt,
-    "n_samples":1,
+    "n_samples":n_samples,
     "result": result_v,
     "value": float(result.fun),
     "iterations": maxiter,
+    "scenario":args.scenario,
 }
 
-with open('./fittings/fit_%d_%f.yaml'%(days_ahead_opt,alpha_opt), 'w') as file:
+with open('./fittings/fit_%d_%f_%d_%d.yaml'%(days_ahead_opt,alpha_opt,n_samples,args.scenario), 'w') as file:
     yaml.dump(yaml_dict, file)
 
 

@@ -27,31 +27,60 @@ from scipy.optimize import Bounds,minimize,LinearConstraint
 from copy import deepcopy
 from os import path
 
-days_to_try = [d*2 for d in range(25,50)]
-alphas_to_try = [a*0.1 for a in range(20,30)]
+days_to_try = [d*2 for d in range(30,50)]
+alphas_to_try = [(a+1)*0.15 for a in range(0,25)]
 
-open('sherlock_master.sh', 'w').close()
+open('sherlock_master_0.sh', 'w').close()
 counter = 0
 for days in days_to_try:
 	for alphas in alphas_to_try:
-		open('sherlock_scripts/script_%d.sh'%counter, 'w').close()
-		with open('sherlock_scripts/script_%d.sh'%counter, 'a') as the_file:
+		open('sherlock_scripts_0/script_%d.sh'%counter, 'w').close()
+		with open('sherlock_scripts_0/script_%d.sh'%counter, 'a') as the_file:
 			the_file.write(
 		 		"""#!/bin/bash
 #
 #SBATCH --job-name=test
 #
-#SBATCH --time=20:00
+#SBATCH --time=1:00:00
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=1
+#SBATCH --cpus-per-task=10
 #SBATCH --mem-per-cpu=1G
 
 ml python/3.6.1
-python3 ParameterFittingRandomToPython.py --days %d --alpha %f
+python3 ParameterFittingRandomToPython.py --days %d --alpha %f --scenario 0
 """%(days,alphas
 								)
 							)
 
-		with open('sherlock_master.sh', 'a') as the_file:
-			the_file.write("sbatch sherlock_scripts/script_%d.sh\n"%counter)
+		with open('sherlock_master_0.sh', 'a') as the_file:
+			the_file.write("sbatch sherlock_scripts_0/script_%d.sh\n"%counter)
+		counter += 1
+
+
+
+
+open('sherlock_master_1.sh', 'w').close()
+counter = 0
+for days in days_to_try:
+	for alphas in alphas_to_try:
+		open('sherlock_scripts_1/script_%d.sh'%counter, 'w').close()
+		with open('sherlock_scripts_1/script_%d.sh'%counter, 'a') as the_file:
+			the_file.write(
+		 		"""#!/bin/bash
+#
+#SBATCH --job-name=test
+#
+#SBATCH --time=1:00:00
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=10
+#SBATCH --mem-per-cpu=1G
+
+ml python/3.6.1
+python3 ParameterFittingRandomToPython.py --days %d --alpha %f --scenario 1
+"""%(days,alphas
+								)
+							)
+
+		with open('sherlock_master_1.sh', 'a') as the_file:
+			the_file.write("sbatch sherlock_scripts_1/script_%d.sh\n"%counter)
 		counter += 1
