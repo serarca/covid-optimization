@@ -34,7 +34,7 @@ args = parser.parse_args()
 
 days_ahead_opt = args.days
 alpha_opt = args.alpha
-n_samples = 10
+n_samples = 50
 maxiter = 50
 if args.scenario == 0:
     mix_1_opt = 0
@@ -828,7 +828,7 @@ yaml_dict = {
     "scenario":args.scenario,
 }
 
-with open('./fittings/fit_%d_%f_%d_%d.yaml'%(days_ahead_opt,alpha_opt,n_samples,args.scenario), 'w') as file:
+with open('./fittings_50/fit_%d_%f_%d_%d.yaml'%(days_ahead_opt,alpha_opt,n_samples,args.scenario), 'w') as file:
     yaml.dump(yaml_dict, file)
 
 
