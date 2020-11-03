@@ -34,7 +34,7 @@ args = parser.parse_args()
 
 days_ahead_opt = args.days
 alpha_opt = args.alpha
-n_samples = 50
+n_samples = 10
 maxiter = 50
 if args.scenario == 0:
     mix_1_opt = 0
