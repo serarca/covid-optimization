@@ -757,7 +757,7 @@ def error_function(v,n_sample):
     upper_model_data = model_data_beds["total"]
     upper_days_model = days_model
     upper_real_data = real_data_beds["total"]
-    error = error_beds+5*error_beds_total
+    error = error_beds+4*error_beds_total
 
     return error
 
