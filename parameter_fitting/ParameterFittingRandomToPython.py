@@ -32,7 +32,7 @@ args = parser.parse_args()
 
 
 days_ahead_opt = args.days
-n_samples = 1
+n_samples = 10
 maxiter = 50
 mix_1_opt = args.mix_1
 mix_2_opt = 0
