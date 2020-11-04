@@ -20,9 +20,8 @@ import pandas as pd
 import argparse
 
 parser = argparse.ArgumentParser(description='Arguments')
-parser.add_argument('--alpha', action="store", dest='alpha', type=float)
+parser.add_argument('--mix_1', action="store", dest='mix_1', type=float)
 parser.add_argument('--days', action="store", dest='days', type=int)
-parser.add_argument('--scenario', action="store", dest='scenario', type=int)
 
 args = parser.parse_args()
 
@@ -33,15 +32,11 @@ args = parser.parse_args()
 
 
 days_ahead_opt = args.days
-alpha_opt = args.alpha
-n_samples = 50
+n_samples = 1
 maxiter = 50
-if args.scenario == 0:
-    mix_1_opt = 0
-    mix_2_opt = 0
-elif args.scenario == 1:
-    mix_1_opt = 0.3333
-    mix_2_opt = 0
+mix_1_opt = args.mix_1
+mix_2_opt = 0
+
 
 # In[4]:
 
@@ -382,12 +377,13 @@ validation_date = datetime.strptime("2020-10-21", '%Y-%m-%d')
 
 def error_function(v,n_sample):
     days_ahead = days_ahead_opt
-    alpha_mixing_home = alpha_opt
-    alpha_mixing_work = alpha_opt
-    alpha_mixing_transport = alpha_opt
-    alpha_mixing_school = alpha_opt
-    alpha_mixing_other = alpha_opt
-    alpha_mixing_leisure = alpha_opt
+
+    alpha_mixing_home = v[0]
+    alpha_mixing_work = v[0]
+    alpha_mixing_transport = v[0]
+    alpha_mixing_school = v[0]
+    alpha_mixing_other = v[0]
+    alpha_mixing_leisure = v[0]
     
     mix_1 = mix_1_opt
     mix_2 = mix_2_opt
@@ -412,13 +408,13 @@ def error_function(v,n_sample):
     upper_bound_work = 1.0
     upper_bound_transport = 1.0
 
-    school_lockdown = v[1]
-    school_may = v[2]
-    school_jun_jul_aug = v[3]
-    school_sep_oct = v[4]
+    school_lockdown = v[2]
+    school_may = v[3]
+    school_jun_jul_aug = v[4]
+    school_sep_oct = v[5]
 
     beta_normal = original_beta
-    beta_vacation = beta_normal*v[0]
+    beta_vacation = beta_normal*v[1]
 
     days_change_model = 0
 
@@ -794,10 +790,10 @@ def error_grad(v):
 # In[48]:
 
 
-grad_0 = [0.5, 0.05, 0.5, 0.1, 0.75]
+grad_0 = [2.0, 0.5, 0.05, 0.5, 0.1, 0.75]
 
-lb= [0,0,0,0,0.5]
-ub = [1,0.1,1,0.2,1.0]
+lb= [0.1,0,0,0.1,0,0.5]
+ub = [4.0,1,0.1,0.75,0.2,1.0]
 for i in range(len(grad_0)):
     assert(grad_0[i]>=lb[i])
     assert(ub[i]>=grad_0[i])
@@ -820,15 +816,14 @@ result_v = [float(x) for x in result.x]
 
 yaml_dict = {
     "days_ahead":days_ahead_opt,
-    "alpha":alpha_opt,
+    "mix_1":args.mix_1,
     "n_samples":n_samples,
     "result": result_v,
     "value": float(result.fun),
     "iterations": maxiter,
-    "scenario":args.scenario,
 }
 
-with open('./fittings_50/fit_%d_%f_%d_%d.yaml'%(days_ahead_opt,alpha_opt,n_samples,args.scenario), 'w') as file:
+with open('./fittings_%d/fit_%d_%f_%d.yaml'%(n_samples,days_ahead_opt,args.mix_1,n_samples), 'w') as file:
     yaml.dump(yaml_dict, file)
 
 
