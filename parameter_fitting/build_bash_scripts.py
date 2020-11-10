@@ -28,7 +28,7 @@ from copy import deepcopy
 from os import path
 
 days_to_try = [d*2 for d in range(30,50)]
-mixes_to_try = [a*0.1 for a in range(0,11)]
+mixes_to_try = [a*5 for a in range(0,20)]
 
 open('sherlock_master.sh', 'w').close()
 counter = 0
@@ -41,13 +41,13 @@ for days in days_to_try:
 #
 #SBATCH --job-name=test
 #
-#SBATCH --time=12:00:00
+#SBATCH --time=2:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=1G
 
 ml python/3.6.1
-python3 ParameterFittingRandomToPython.py --days %d --mix_1 %f
+python3 ParameterFittingRandomToPython.py --days_ahead %d --days_switch %d
 """%(days,mix
 								)
 							)

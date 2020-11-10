@@ -20,8 +20,8 @@ import pandas as pd
 import argparse
 
 parser = argparse.ArgumentParser(description='Arguments')
-parser.add_argument('--mix_1', action="store", dest='mix_1', type=float)
-parser.add_argument('--days', action="store", dest='days', type=int)
+parser.add_argument('--days_ahead', action="store", dest='days_ahead', type=int)
+parser.add_argument('--days_switch', action="store", dest='days_switch', type=int)
 
 args = parser.parse_args()
 
@@ -31,11 +31,13 @@ args = parser.parse_args()
 # In[57]:
 
 
-days_ahead_opt = args.days
-n_samples = 10
+days_ahead_opt = args.days_ahead
+days_switch_opt = args.days_switch
+print("days_ahead",days_ahead_opt)
+print("days_switch",days_switch_opt)
+n_samples = 1
 maxiter = 50
-mix_1_opt = args.mix_1
-mix_2_opt = 0
+icu_bound = 2950
 
 
 # In[4]:
@@ -251,7 +253,7 @@ date_4 = datetime.strptime("2020-07-01", '%Y-%m-%d')
 date_5 = datetime.strptime("2020-09-01", '%Y-%m-%d')
 final_date = datetime.strptime("2020-10-21", '%Y-%m-%d')
 
-vacation_start = date_4
+vacation_start = datetime.strptime("2020-04-01", '%Y-%m-%d')
 vacation_end = date_5
 days_vacation_start = (vacation_start - date_1).days
 days_vacation_end = (vacation_end - date_1).days
@@ -306,7 +308,12 @@ initial_params = {
     "lambda_H_R":params['lambda_HR'].values,
     "lambda_H_D":params['lambda_HD'].values,
     "lambda_ICU_R":params['lambda_ICUR'].values,
-    "lambda_ICU_D":params['lambda_ICUD'].values
+    "lambda_ICU_D":params['lambda_ICUD'].values,
+    "lambda_ICU":params['lambda_ICU'].values,
+    "lambda_H":params['lambda_H'].values,
+    "p_death":params['p_death_cond_ss'].values,
+    "p_recov":params['p_recov_cond_ss'].values,
+    
 }
 
 params = pd.read_excel("./ile-de-france_data_master.xlsx",sheet_name="SEIR_params_conf_range_lower", index_col = 0)
@@ -338,15 +345,10 @@ upper_params = {
 
 
 # Construct the windows for the parameters to move
+
 windows = {}
-for p in initial_params:
-    windows[p] = (
-        np.min(upper_params[p]/initial_params[p]),
-        np.max(lower_params[p]/initial_params[p]),
-    )
-    
 windows['beta_mixing'] = (0.1,2.0)
-windows['alpha_mixing'] = (0.1,2.0)
+windows['alpha_mixing'] = (0.1,4.0)
 windows['gamma_mixing'] = (0.5,2.0)
 windows['work_l'] = (0.2,0.3)
 windows['other_l'] = (0,0.1)
@@ -377,7 +379,6 @@ validation_date = datetime.strptime("2020-10-21", '%Y-%m-%d')
 
 def error_function(v,n_sample):
     days_ahead = days_ahead_opt
-
     alpha_mixing_home = v[0]
     alpha_mixing_work = v[0]
     alpha_mixing_transport = v[0]
@@ -385,8 +386,8 @@ def error_function(v,n_sample):
     alpha_mixing_other = v[0]
     alpha_mixing_leisure = v[0]
     
-    mix_1 = mix_1_opt
-    mix_2 = mix_2_opt
+    mix_1 = v[2]
+    mix_2 = v[3]
     
     alphas_d = {
         'work':alpha_mixing_work,
@@ -408,15 +409,37 @@ def error_function(v,n_sample):
     upper_bound_work = 1.0
     upper_bound_transport = 1.0
 
-    school_lockdown = v[2]
-    school_may = v[3]
-    school_jun_jul_aug = v[4]
-    school_sep_oct = v[5]
+    school_lockdown = v[4]
+    school_may = v[5]
+    school_jun_jul_aug = v[6]
+    school_sep_oct = v[7]
 
     beta_normal = original_beta
     beta_vacation = beta_normal*v[1]
 
     days_change_model = 0
+
+    #         split_H_ICU_bef = v[9]
+    #         change_lambda_H_bef = v[10]
+    #         change_lambda_ICU_bef = v[11]
+    #         change_p_death_bef = v[12]
+    
+    fraction_p_ICU = v[8]
+    change_lambda_H_aft = v[9]
+    change_lambda_ICU_aft = v[10]
+    change_p_death_aft = v[11]
+    
+
+    
+    days_change_rates = days_switch_opt
+    
+    #         dynModel.sigma = initial_params["sigma"]*v[10]
+
+    #         dynModel.lambda_H_R = initial_params["lambda_H_R"]*v[13]
+    
+    #         dynModel.lambda_ICU_R = initial_params["lambda_ICU_R"]*v[15]
+
+
 
 
     google['other'] = mix_1*(google["retail_and_recreation_percent_change_from_baseline"]+100)/100+(1-mix_1)*(google["grocery_and_pharmacy_percent_change_from_baseline"]+100)/100
@@ -631,9 +654,41 @@ def error_function(v,n_sample):
             update_contacts = True
         else:
             update_contacts = False
+            
+        if t<int(vacation_start_days+days_change_rates):
+            dynModel.p_H = initial_params["p_H"]
+            dynModel.p_ICU = initial_params["p_ICU"]
+
+            lambda_H = initial_params["lambda_H"]
+            lambda_ICU = initial_params["lambda_ICU"]
+            p_death = initial_params["p_death"]
+            
+            dynModel.lambda_H_D = p_death*lambda_H
+            dynModel.lambda_H_R = (1-p_death)*lambda_H
+            dynModel.lambda_ICU_D = p_death*lambda_ICU
+            dynModel.lambda_ICU_R = (1-p_death)*lambda_ICU
+
+        else:
+            trans_days = 30.0
+            d_after = t-int(vacation_start_days+days_change_rates)
+            d_portion = max(trans_days-d_after,0)/trans_days
+            
+            dynModel.p_ICU = initial_params["p_H"]*d_portion+initial_params["p_ICU"]*fraction_p_ICU*(1-d_portion)
+            dynModel.p_H = initial_params["p_ICU"]*d_portion+(initial_params["p_H"]+initial_params["p_ICU"])-initial_params["p_ICU"]*fraction_p_ICU*(1-d_portion)
+            
+
+            lambda_H = initial_params["lambda_H"]*d_portion+initial_params["lambda_H"]*change_lambda_H_aft*(1-d_portion)
+            lambda_ICU = initial_params["lambda_ICU"]*d_portion+ initial_params["lambda_ICU"]*change_lambda_ICU_aft*(1-d_portion)
+            p_death = initial_params["p_death"]*d_portion+initial_params["p_death"]*change_p_death_aft*(1-d_portion)
+            
+            dynModel.lambda_H_D = p_death*lambda_H
+            dynModel.lambda_H_R = (1-p_death)*lambda_H
+            dynModel.lambda_ICU_D = p_death*lambda_ICU
+            dynModel.lambda_ICU_R = (1-p_death)*lambda_ICU
+        
 
         if day_of_week <= 4:
-            season = "old"
+            season = "new"
             dynModel.mixing_method = {
                 "name":"mult",
                 "param_alpha":{
@@ -654,7 +709,7 @@ def error_function(v,n_sample):
                 },
             }
         else:
-            season = "old"
+            season = "new"
             dynModel.mixing_method = {
                 "name":"mult",
                 "param_alpha":{
@@ -712,26 +767,43 @@ def error_function(v,n_sample):
 
     for k,ind in enumerate(indices):
         for ag in age_groups+["total"]:
-            real_data_beds[ag][ind] = beds_real[ag][k]
-            real_data_icus[ag][ind] = icus_real[ag][k]
-            real_data_deaths[ag][ind] = deaths_real[ag][k]
+            real_data_beds[ag][ind] = beds_real[ag][k] if beds_real[ag][k]!=0 else float('nan')
+            real_data_icus[ag][ind] = icus_real[ag][k] if icus_real[ag][k]!=0 else float('nan')
+            real_data_deaths[ag][ind] = deaths_real[ag][k] if deaths_real[ag][k]!=0 else float('nan')
 
 
-    error_constant = 1.0
+    error_constant = 0.25
     error_beds = 0
     error_icus = 0
     error_deaths = 0
     error_beds_total = 0
+    error_icus_total = 0
+    error_deaths_total = 0
+    
+    peak_beds = np.nanargmax(np.array(real_data_beds["total"]))
+    peak_icus = np.nanargmax(np.array(real_data_icus["total"]))
+    peak_deaths = peak_beds+30
+    
     for ag in old_age_groups:
         error_beds += np.nanmean((np.abs(np.array(model_data_beds[ag])-np.array(real_data_beds[ag]))/np.array(real_data_beds[ag]))[0:validation_days-1])
-        #error_beds += error_constant*np.nanmean((np.abs(np.array(model_data_beds[ag])-np.array(real_data_beds[ag]))/np.array(real_data_beds[ag]))[validation_days-1:validation_days])
-        #error_icus += np.nanmean(np.abs(np.array(model_data_icus[ag])-np.array(real_data_icus[ag])))
-        #error_deaths += np.nanmean(np.abs(np.array(model_data_deaths[ag])-np.array(real_data_deaths[ag])))
+        error_icus += np.nanmean((np.abs(np.array(model_data_icus[ag])-np.array(real_data_icus[ag]))/np.array(real_data_icus[ag]))[0:validation_days-1])
+        error_deaths += np.nanmean((np.abs(np.array(model_data_deaths[ag])-np.array(real_data_deaths[ag]))/np.array(real_data_deaths[ag]))[0:validation_days-1])
     error_beds_total += np.nanmean((np.abs(np.array(model_data_beds["total"])-np.array(real_data_beds["total"]))/np.array(real_data_beds["total"]))[0:validation_days-1])
     error_beds_total += error_constant*np.nanmean((np.abs(np.array(model_data_beds["total"])-np.array(real_data_beds["total"]))/np.array(real_data_beds["total"]))[validation_days-1:validation_days])
-    #error_icus_total = np.nanmean(np.abs(np.array(model_data_icus["total"])-np.array(real_data_icus["total"])))
-    #error_deaths_total = np.nanmean(np.abs(np.array(model_data_deaths["total"])-np.array(real_data_deaths["total"])))
+    error_beds_total += error_constant*np.nanmean((np.abs(np.array(model_data_beds["total"])-np.array(real_data_beds["total"]))/np.array(real_data_beds["total"]))[peak_beds:peak_beds+1])
+                          
+    error_icus_total += np.nanmean((np.abs(np.array(model_data_icus["total"])-np.array(real_data_icus["total"]))/np.array(real_data_icus["total"]))[0:validation_days-1])
+    error_icus_total += error_constant*np.nanmean((np.abs(np.array(model_data_icus["total"])-np.array(real_data_icus["total"]))/np.array(real_data_icus["total"]))[validation_days-1:validation_days])
+    error_icus_total += error_constant*np.nanmean((np.abs(np.array(model_data_icus["total"])-np.array(real_data_icus["total"]))/np.array(real_data_icus["total"]))[peak_icus:peak_icus+1])
 
+                          
+    error_deaths_total += np.nanmean((np.abs(np.array(model_data_deaths["total"])-np.array(real_data_deaths["total"]))/np.array(real_data_deaths["total"]))[0:validation_days-1])
+    error_deaths_total += error_constant*np.nanmean((np.abs(np.array(model_data_deaths["total"])-np.array(real_data_deaths["total"]))/np.array(real_data_deaths["total"]))[validation_days-1:validation_days])
+    error_deaths_total += error_constant/2.0*np.nanmean((np.abs(np.array(model_data_deaths["total"])-np.array(real_data_deaths["total"]))/np.array(real_data_deaths["total"]))[peak_deaths:peak_deaths+1])
+    error_deaths_total += error_constant/2.0*np.nanmean((np.abs(np.array(model_data_deaths["total"])-np.array(real_data_deaths["total"]))/np.array(real_data_deaths["total"]))[peak_beds:peak_beds+1])
+
+    overflow = np.array(model_data_icus["total"]) - icu_bound
+    overflow_error = np.nanmean([max(overflow[i],0) for i in range(len(overflow))])
 
 
 
@@ -750,10 +822,9 @@ def error_function(v,n_sample):
     #     error = error_beds_total
     #     error = mult_icus*error_icus_total
     #     error = mult_deaths*error_deaths_total
-    upper_model_data = model_data_beds["total"]
     upper_days_model = days_model
-    upper_real_data = real_data_beds["total"]
-    error = error_beds+4*error_beds_total
+    
+    error = 0.25*error_beds+4*error_beds_total+0.25*error_icus+4*error_icus_total+0.25*error_deaths+4*error_deaths_total+overflow_error
 
     return error
 
@@ -773,7 +844,7 @@ def error_grad(v):
         print("best_error:",best_error)
         # print("vector:",vector_errors)
         best_v = v
-        # print(v)
+        #print(v)
 
         # plt.figure(1)
         # for n_sample in range(n_samples):
@@ -790,10 +861,13 @@ def error_grad(v):
 # In[48]:
 
 
-grad_0 = [2.0, 0.5, 0.05, 0.5, 0.1, 0.75]
+bounds = [windows['alpha_mixing'],windows['transmission']]+[[0,1]]*2+[windows['school_l'],[0,1],[0,0.2],[0.5,1]]+[[0.50,2.0]]*4
 
-lb= [0.1,0,0,0.1,0,0.5]
-ub = [4.0,1,0.1,0.75,0.2,1.0]
+
+grad_0 = [(b[0]+b[1])/2.0 for b in bounds]
+
+lb= [b[0] for b in bounds]
+ub = [b[1] for b in bounds]
 for i in range(len(grad_0)):
     assert(grad_0[i]>=lb[i])
     assert(ub[i]>=grad_0[i])
@@ -816,14 +890,14 @@ result_v = [float(x) for x in result.x]
 
 yaml_dict = {
     "days_ahead":days_ahead_opt,
-    "mix_1":args.mix_1,
+    "days_switch":days_switch_opt,
     "n_samples":n_samples,
     "result": result_v,
     "value": float(result.fun),
     "iterations": maxiter,
 }
 
-with open('./fittings_%d/fit_%d_%f_%d.yaml'%(n_samples,days_ahead_opt,args.mix_1,n_samples), 'w') as file:
+with open('./fittings_switch_%d/fit_%d_%d.yaml'%(n_samples,days_ahead_opt,days_switch_opt), 'w') as file:
     yaml.dump(yaml_dict, file)
 
 
