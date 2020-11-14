@@ -1,22 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
-import pandas as pd
-from datetime import datetime, timedelta
-import numpy
-
-
-# In[2]:
-
-
-import numpy as np
-import pandas as pd
-
-
-
 import argparse
 
 parser = argparse.ArgumentParser(description='Arguments')
@@ -26,28 +7,49 @@ parser.add_argument('--days_switch', action="store", dest='days_switch', type=in
 args = parser.parse_args()
 
 
-
-
-# In[57]:
-
-
 days_ahead_opt = args.days_ahead
 days_switch_opt = args.days_switch
 print("days_ahead",days_ahead_opt)
 print("days_switch",days_switch_opt)
 n_samples = 1
-maxiter = 50
-icu_bound = 2950
+maxiter = 100
 
 
-# In[4]:
+import pandas as pd
+from datetime import datetime, timedelta
+import numpy
+from gurobipy import *
+import numpy as np
+import pandas as pd
 
 
-lower_data = pd.read_excel("./ile-de-france_data_master.xlsx",sheet_name="SEIR_params_conf_range_lower")
-upper_data = pd.read_excel("./ile-de-france_data_master.xlsx",sheet_name="SEIR_params_conf_range_upper")
+import yaml
+from inspect import getsourcefile
+import os.path
+import sys
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import argparse
+current_path = os.path.abspath(getsourcefile(lambda:0))
+current_dir = os.path.dirname(current_path)
+parentdir = os.path.dirname(current_dir)
+sys.path.insert(0,parentdir) 
+sys.path.insert(0, parentdir+"/heuristics")
+sys.path.insert(0, parentdir+"/heuristics/LP-Models")
+sys.path.insert(0, parentdir+"/fast_gradient")
 
 
-# In[5]:
+from fast_group import FastDynamicalModel
+from aux import *
+
+from copy import deepcopy
+import copy
+import math
+import matplotlib.dates as mdates
+
+
+# In[2]:
 
 
 age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29','age_group_30_39', 'age_group_40_49', 'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
@@ -56,24 +58,26 @@ econ_activities = ['transport', 'leisure', 'other']
 cont = [ 'S', 'E', 'I', 'R', 'N', 'Ia', 'Ips',            'Ims', 'Iss', 'Rq', 'H', 'ICU', 'D' ]
 
 
-# In[6]:
+# In[3]:
 
 
 data = pd.read_csv("donnees-hospitalieres-classe-age-covid19-2020-10-28-19h00.csv", sep=";")
 data.head()
 
 
-# In[7]:
+# In[4]:
 
 
+# Load the data
 google = pd.read_csv("2020_FR_Region_Mobility_Report.csv")
 google = google[google['sub_region_1']=="Île-de-France"]
 google = google[pd.isnull(google['sub_region_2'])]
 
 
-# In[8]:
+# In[5]:
 
 
+# Apply an smoothing to the data
 initial_work = ((google["workplaces_percent_change_from_baseline"]+100)/100).values
 google_days = [datetime.strptime(google["date"].values[i], '%Y-%m-%d').weekday() for i in range(len(google["date"]))]
 new_work = []
@@ -100,9 +104,10 @@ for i in range(len(initial_work)):
         new_work.append(np.mean(numbers_for_mean))
 
 
-# In[9]:
+# In[6]:
 
 
+# Assign data
 google['work'] = new_work
 google['transport'] = (google["transit_stations_percent_change_from_baseline"]+100)/100
 google['other'] = 0.33*(google["retail_and_recreation_percent_change_from_baseline"]+100)/100+0.67*(google["grocery_and_pharmacy_percent_change_from_baseline"]+100)/100
@@ -111,35 +116,18 @@ google = google.reset_index()
 google.to_csv('smoothed.csv')
 
 
-# In[10]:
+# In[7]:
 
 
 # Extract days 
 data = data[data['jour']<='2020-10-21']
-days = data[data['reg']==11][data['cl_age90']==0].jour.values
+french_days = data[data['reg']==11][data['cl_age90']==0].jour.values
 
 
-# In[11]:
+# In[8]:
 
 
-data
-
-
-# In[12]:
-
-
-beds_real = {
-    age_groups[i]:data[data['reg']==11][data['cl_age90']==10*i+9].hosp.values for i in range(0,9)
-}
-beds_real['age_group_80_plus']+=data[data['reg']==11][data['cl_age90']==90].hosp.values
-beds_real['total']=data[data['reg']==11][data['cl_age90']==0].hosp.values
-
-icus_real = {
-    age_groups[i]:data[data['reg']==11][data['cl_age90']==10*i+9].rea.values for i in range(0,9)
-}
-icus_real['age_group_80_plus']+=data[data['reg']==11][data['cl_age90']==90].rea.values
-icus_real['total']=data[data['reg']==11][data['cl_age90']==0].rea.values
-
+# Extract data from french dataset
 deaths_real = {
     age_groups[i]:data[data['reg']==11][data['cl_age90']==10*i+9].dc.values for i in range(0,9)
 }
@@ -147,45 +135,57 @@ deaths_real['age_group_80_plus']+=data[data['reg']==11][data['cl_age90']==90].dc
 deaths_real['total']=data[data['reg']==11][data['cl_age90']==0].dc.values
 
 
-# In[13]:
+icus_real = {
+    age_groups[i]:data[data['reg']==11][data['cl_age90']==10*i+9].rea.values for i in range(0,9)
+}
+icus_real['age_group_80_plus']+=data[data['reg']==11][data['cl_age90']==90].rea.values
+icus_real['total']=data[data['reg']==11][data['cl_age90']==0].rea.values
 
 
-import yaml
-from inspect import getsourcefile
-import os.path
-import sys
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import argparse
-current_path = os.path.abspath(getsourcefile(lambda:0))
-current_dir = os.path.dirname(current_path)
-parentdir = os.path.dirname(current_dir)
-sys.path.insert(0,parentdir) 
-sys.path.insert(0, parentdir+"/heuristics")
-sys.path.insert(0, parentdir+"/heuristics/LP-Models")
-sys.path.insert(0, parentdir+"/fast_gradient")
+beds_real = {
+    age_groups[i]:data[data['reg']==11][data['cl_age90']==10*i+9].hosp.values-data[data['reg']==11][data['cl_age90']==10*i+9].rea.values for i in range(0,9)
+}
+beds_real['age_group_80_plus']+=data[data['reg']==11][data['cl_age90']==90].hosp.values - data[data['reg']==11][data['cl_age90']==90].rea.values
+beds_real['total']=data[data['reg']==11][data['cl_age90']==0].hosp.values - data[data['reg']==11][data['cl_age90']==0].rea.values
 
 
-from fast_group import FastDynamicalModel
-from aux import *
+# In[9]:
 
 
+# Load the original SEIR parameters
+params = pd.read_excel("./ile-de-france_data_master.xlsx",sheet_name="SEIR_params", index_col = 0)
+initial_params = {
+    "mu":params['mu'].values,
+    "sigma":params['sigma'].values,
+    "p_ICU":params['p_ICU'].values,
+    "p_H":params['p_H'].values,
+    "lambda_H_R":params['lambda_HR'].values,
+    "lambda_H_D":params['lambda_HD'].values,
+    "lambda_ICU_R":params['lambda_ICUR'].values,
+    "lambda_ICU_D":params['lambda_ICUD'].values,
+    "lambda_ICU":params['lambda_ICU'].values,
+    "lambda_H":params['lambda_H'].values,
+    "p_death":params['p_death_cond_ss'].values,
+    "p_recov":params['p_recov_cond_ss'].values,
+    
+}
 
-# In[14]:
+
+# In[10]:
 
 
+# Smooth the french data
 start_smooth = datetime.strptime("2020-09-01", '%Y-%m-%d')
 end_smooth = datetime.strptime("2020-10-01", '%Y-%m-%d')
 for ag in beds_real:
     new_series = []
     for i in range(len(beds_real[ag])):
-        day = datetime.strptime(days[i], '%Y-%m-%d')
+        day = datetime.strptime(french_days[i], '%Y-%m-%d')
         lower = (day-start_smooth).days
         upper = (end_smooth-day).days
         if lower>=0 and upper>=0:
-            n_days_before = min(lower,3)
-            n_days_after = min(upper,3)
+            n_days_before = min(lower,7)
+            n_days_after = min(upper,7)
             avg_value = np.mean(beds_real[ag][(i-n_days_before):(i+1+n_days_after)])
             new_series.append(avg_value)
         else:
@@ -193,32 +193,14 @@ for ag in beds_real:
     beds_real[ag] = np.array(new_series)
         
 
-
-# In[15]:
-
-
-
 plt.figure(1)
-plt.plot([datetime.strptime(d, '%Y-%m-%d') for d in days],beds_real["total"])
+plt.plot([datetime.strptime(d, '%Y-%m-%d') for d in french_days],beds_real["total"])
 
 
-# In[16]:
-
-
-mult_deaths = np.sum(data[data['reg']==11][data['cl_age90']==0].hosp.values)/np.sum(data[data['reg']==11][data['cl_age90']==0].dc.values)
-print(mult_deaths)
-mult_icus = np.sum(data[data['reg']==11][data['cl_age90']==0].hosp.values)/np.sum(data[data['reg']==11][data['cl_age90']==0].rea.values)
-print(mult_icus)
-
-
-# In[17]:
+# In[11]:
 
 
 region = "Ile-de-France"
-
-
-# In[18]:
-
 
 # Read group parameters
 with open("../parameters/"+region+".yaml") as file:
@@ -239,56 +221,40 @@ with open("../parameters/econ.yaml") as file:
 experiment_params = {
     'delta_schooling':0.5,
     'xi':0,
-    'icus':3000,
+    'icus':4000,
 }
 
 
-# In[19]:
+# In[12]:
 
 
+# Create relevant dates
 date_1 = datetime.strptime("2020-03-17", '%Y-%m-%d')
 date_2 = datetime.strptime("2020-05-11", '%Y-%m-%d')
-date_3 = datetime.strptime("2020-06-01", '%Y-%m-%d')
-date_4 = datetime.strptime("2020-07-01", '%Y-%m-%d')
-date_5 = datetime.strptime("2020-09-01", '%Y-%m-%d')
+date_3 = datetime.strptime("2020-07-01", '%Y-%m-%d')
+date_4 = datetime.strptime("2020-09-01", '%Y-%m-%d')
 final_date = datetime.strptime("2020-10-21", '%Y-%m-%d')
 
-vacation_start = datetime.strptime("2020-04-01", '%Y-%m-%d')
-vacation_end = date_5
-days_vacation_start = (vacation_start - date_1).days
-days_vacation_end = (vacation_end - date_1).days
+rates_date = datetime.strptime("2020-03-01", '%Y-%m-%d')
 
 first_day_google = datetime.strptime("2020-02-15", '%Y-%m-%d')
 days_between_google = (date_1-first_day_google).days
 
 
-# In[20]:
+# In[13]:
 
 
-(final_date-date_1).days+140
-
-
-# In[21]:
-
-
-from copy import deepcopy
-
-
-# In[22]:
-
-
+# Fill up the original parameters
 original_beta = universe_params['seir-groups']["age_group_0_9"]["parameters"]["beta"]
-original_beta_vacation = original_beta
-#original_beta_vacation = universe_params['seir-groups']["age_group_0_9"]["parameters"]["beta_vacation"]
 t_days_beta = 730
 
 for ag in universe_params['seir-groups']:
     universe_params['seir-groups'][ag]["parameters"]["beta"] = (
-        [(original_beta if (t<days_vacation_start or t>= days_vacation_end) else original_beta_vacation) for t in range(t_days_beta) ]
+        [original_beta for t in range(t_days_beta) ]
     )
 
 
-# In[23]:
+# In[14]:
 
 
 # Create model
@@ -296,150 +262,60 @@ mixing_method = {}
 dynModel = FastDynamicalModel(universe_params, econ_params, experiment_params, 1, mixing_method, 1e9, 0, 0)
 
 
-# In[24]:
-
-
-params = pd.read_excel("./ile-de-france_data_master.xlsx",sheet_name="SEIR_params", index_col = 0)
-initial_params = {
-    "mu":params['mu'].values,
-    "sigma":params['sigma'].values,
-    "p_ICU":params['p_ICU'].values,
-    "p_H":params['p_H'].values,
-    "lambda_H_R":params['lambda_HR'].values,
-    "lambda_H_D":params['lambda_HD'].values,
-    "lambda_ICU_R":params['lambda_ICUR'].values,
-    "lambda_ICU_D":params['lambda_ICUD'].values,
-    "lambda_ICU":params['lambda_ICU'].values,
-    "lambda_H":params['lambda_H'].values,
-    "p_death":params['p_death_cond_ss'].values,
-    "p_recov":params['p_recov_cond_ss'].values,
-    
-}
-
-params = pd.read_excel("./ile-de-france_data_master.xlsx",sheet_name="SEIR_params_conf_range_lower", index_col = 0)
-lower_params = {
-    "mu":params['mu'].values,
-    "sigma":params['sigma'].values,
-    "p_ICU":params['p_ICU'].values,
-    "p_H":params['p_H'].values,
-    "lambda_H_R":params['lambda_HR'].values,
-    "lambda_H_D":params['lambda_HD'].values,
-    "lambda_ICU_R":params['lambda_ICUR'].values,
-    "lambda_ICU_D":params['lambda_ICUD'].values
-}
-
-params = pd.read_excel("./ile-de-france_data_master.xlsx",sheet_name="SEIR_params_conf_range_upper", index_col = 0)
-upper_params = {
-    "mu":params['mu'].values,
-    "sigma":params['sigma'].values,
-    "p_ICU":params['p_ICU'].values,
-    "p_H":params['p_H'].values,
-    "lambda_H_R":params['lambda_HR'].values,
-    "lambda_H_D":params['lambda_HD'].values,
-    "lambda_ICU_R":params['lambda_ICUR'].values,
-    "lambda_ICU_D":params['lambda_ICUD'].values
-}
-
-
-# In[25]:
-
-
-# Construct the windows for the parameters to move
-
-windows = {}
-windows['beta_mixing'] = (0.1,2.0)
-windows['alpha_mixing'] = (0.1,4.0)
-windows['gamma_mixing'] = (0.5,2.0)
-windows['work_l'] = (0.2,0.3)
-windows['other_l'] = (0,0.1)
-windows['school_l'] = (0,0.1)
-windows['leisure_l'] = (0,0.1)
-windows['transport_l'] = (0.2,0.3)
-windows['transmission'] = (0.5,2.0)
-
-
-# In[26]:
+# In[15]:
 
 
 # Generate samples
 np.random.seed(0)
+n_samples = 1
 samples = 1+np.random.randn(n_samples,(final_date-date_1).days+150, 5)*0.05/2/np.sqrt(3)
 
 
-# In[47]:
+# In[16]:
 
 
-import copy
-import math
-import matplotlib.dates as mdates
 best_v = 0
 best_error = float('inf')
 validation_date = datetime.strptime("2020-10-21", '%Y-%m-%d')
+# This is the smoothening
+trans_days = 15
+
+
 
 
 def error_function(v,n_sample):
     days_ahead = days_ahead_opt
-    alpha_mixing_home = v[0]
-    alpha_mixing_work = v[0]
-    alpha_mixing_transport = v[0]
-    alpha_mixing_school = v[0]
-    alpha_mixing_other = v[0]
-    alpha_mixing_leisure = v[0]
+    alpha_mixing = v[0]
+    
+    beta_normal = original_beta
+    beta_masks = beta_normal*v[1]
     
     mix_1 = v[2]
-    mix_2 = v[3]
+    mix_2 = 0
     
     alphas_d = {
-        'work':alpha_mixing_work,
-        'transport':alpha_mixing_transport,
-        'school':alpha_mixing_school,
-        'other':alpha_mixing_other,
-        'leisure':alpha_mixing_leisure,
-        'home':alpha_mixing_home,
+        'work':alpha_mixing,
+        'transport':alpha_mixing,
+        'school':alpha_mixing,
+        'other':alpha_mixing,
+        'leisure':alpha_mixing,
+        'home':alpha_mixing,
     }
 
-    gamma_mixing_before = 1.0
-    gamma_mixing_after = 1.0
+    # School lockdowns
+    school_lockdown = v[3]
+    school_may_jun = v[4]
+    school_jul_aug = v[5]
+    school_sep_oct = v[6]
 
-
-    upper_bound_home = 1.0
-    upper_bound_leisure = 1.0
-    upper_bound_other = 1.0
-    upper_bound_school = 1.0
-    upper_bound_work = 1.0
-    upper_bound_transport = 1.0
-
-    school_lockdown = v[4]
-    school_may = v[5]
-    school_jun_jul_aug = v[6]
-    school_sep_oct = v[7]
-
-    beta_normal = original_beta
-    beta_vacation = beta_normal*v[1]
-
-    days_change_model = 0
-
-    #         split_H_ICU_bef = v[9]
-    #         change_lambda_H_bef = v[10]
-    #         change_lambda_ICU_bef = v[11]
-    #         change_p_death_bef = v[12]
+    # Changes to SEIR rates
+    fraction_p_ICU = v[7]
+    change_lambda_H_aft = v[8]
+    change_lambda_ICU_aft = v[9]
+    change_p_death_aft = v[10]
     
-    fraction_p_ICU = v[8]
-    change_lambda_H_aft = v[9]
-    change_lambda_ICU_aft = v[10]
-    change_p_death_aft = v[11]
-    
-
-    
+    # Date that a change occurs
     days_change_rates = days_switch_opt
-    
-    #         dynModel.sigma = initial_params["sigma"]*v[10]
-
-    #         dynModel.lambda_H_R = initial_params["lambda_H_R"]*v[13]
-    
-    #         dynModel.lambda_ICU_R = initial_params["lambda_ICU_R"]*v[15]
-
-
 
 
     google['other'] = mix_1*(google["retail_and_recreation_percent_change_from_baseline"]+100)/100+(1-mix_1)*(google["grocery_and_pharmacy_percent_change_from_baseline"]+100)/100
@@ -451,20 +327,15 @@ def error_function(v,n_sample):
     days_between_dates_1_2 = (date_2-date_1).days
     days_between_dates_2_3 = (date_3-date_2).days
     days_between_dates_3_4 = (date_4-date_3).days
-    days_between_dates_4_5 = (date_5-date_4).days
-    days_after_date_5 = (final_date-date_5).days
-    total_days = days_before_date_1 + days_between_dates_1_2 + days_between_dates_2_3 + days_between_dates_3_4 + days_between_dates_4_5+ days_after_date_5
-    days_denom = days_between_dates_1_2+days_between_dates_2_3+days_between_dates_3_4+days_between_dates_4_5
-
-
+    days_after_date_4 = (final_date-date_4).days
+    total_days = days_before_date_1 + days_between_dates_1_2 + days_between_dates_2_3 + days_between_dates_3_4 + days_after_date_4
+    validation_days = days_before_date_1 + (final_date-date_1).days
+    
     # Some additional calculations
-    validation_days = days_before_date_1 + (validation_date-date_1).days
-    vacation_start_days = days_before_date_1 + (vacation_start-date_1).days
-    vacation_end_days = days_before_date_1 + (vacation_end-date_1).days
-
+    days_rates_start = (rates_date - date_1).days + days_ahead
 
     # Construct initialization
-    initialization = copy.deepcopy(original_initialization)
+    initialization = deepcopy(original_initialization)
     for i,group in enumerate(age_groups):
         if group == "age_group_40_49":
             initialization[group]["I"] = initialization[group]["I"] + 1
@@ -474,31 +345,13 @@ def error_function(v,n_sample):
 
     # Alphas
     a_before_google = {
-        'home':upper_bound_home,
-        'leisure':upper_bound_leisure,
-        'other':upper_bound_other,
-        'school':upper_bound_school,
-        'transport':upper_bound_transport,
-        'work':upper_bound_work
+        'home':1.0,
+        'leisure':1.0,
+        'other':1.0,
+        'school':1.0,
+        'transport':1.0,
+        'work':1.0
     }
-
-
-
-    # Determine mixing method
-    #     mixing_method_before = {
-    #         "name":"mult",
-    #         "param_alpha":alpha_mixing_before,
-    #         "param_beta":alpha_mixing_before,
-    #     }
-
-    #     # Determine mixing method
-    #     mixing_method_after = {
-    #         "name":"mult",
-    #         "param_alpha":alpha_mixing_after,
-    #         "param_beta":alpha_mixing_after,
-    #     }
-    #dynModel.mixing_method = mixing_method_after
-
 
 
 
@@ -524,6 +377,7 @@ def error_function(v,n_sample):
             }
         alphas_vec.append(alphas)   
         counter += 1
+        
     for t in range(days_between_dates_1_2):
         alphas = {}
         for age_group in age_groups:
@@ -537,6 +391,7 @@ def error_function(v,n_sample):
             }
         alphas_vec.append(alphas)   
         counter += 1
+        
     for t in range(days_between_dates_2_3):
         alphas = {}
         for age_group in age_groups:
@@ -544,12 +399,13 @@ def error_function(v,n_sample):
                 'home':1.0,
                 'leisure':google['leisure'][counter]*samples[n_sample,counter,0],
                 'other':google['other'][counter]*samples[n_sample,counter,1],
-                'school':school_may*samples[n_sample,counter,2],
+                'school':school_may_jun*samples[n_sample,counter,2],
                 'transport':google['transport'][counter]*samples[n_sample,counter,3],
                 'work':google['work'][counter]*samples[n_sample,counter,4],
             }
         alphas_vec.append(alphas)   
         counter += 1
+
     for t in range(days_between_dates_3_4):
         alphas = {}
         for age_group in age_groups:
@@ -557,26 +413,14 @@ def error_function(v,n_sample):
                 'home':1.0,
                 'leisure':google['leisure'][counter]*samples[n_sample,counter,0],
                 'other':google['other'][counter]*samples[n_sample,counter,1],
-                'school':school_may*samples[n_sample,counter,2],
+                'school':school_jul_aug*samples[n_sample,counter,2],
                 'transport':google['transport'][counter]*samples[n_sample,counter,3],
                 'work':google['work'][counter]*samples[n_sample,counter,4],
             }
         alphas_vec.append(alphas)   
         counter += 1
-    for t in range(days_between_dates_4_5):
-        alphas = {}
-        for age_group in age_groups:
-            alphas[age_group] = {
-                'home':1.0,
-                'leisure':google['leisure'][counter]*samples[n_sample,counter,0],
-                'other':google['other'][counter]*samples[n_sample,counter,1],
-                'school':school_jun_jul_aug*samples[n_sample,counter,2],
-                'transport':google['transport'][counter]*samples[n_sample,counter,3],
-                'work':google['work'][counter]*samples[n_sample,counter,4],
-            }
-        alphas_vec.append(alphas)   
-        counter += 1
-    for t in range(days_after_date_5):
+        
+    for t in range(days_after_date_4):
         alphas = {}
         for age_group in age_groups:
             alphas[age_group] = {
@@ -589,18 +433,6 @@ def error_function(v,n_sample):
             }
         alphas_vec.append(alphas)
         counter += 1
-
-
-
-
-    #     mixing_vec = []
-    #     for t in range(int(vacation_start_days+days_change_model)):
-    #         mixing_vec.append(mixing_method_before)
-    #     for t in range(int(vacation_start_days+days_change_model),total_days):
-    #         mixing_vec.append(mixing_method_after)
-
-
-
 
     # Calculate tests
     tests = np.zeros(len(age_groups))
@@ -629,33 +461,24 @@ def error_function(v,n_sample):
     model_data_icus["total"].append(t_icus)
     model_data_deaths["total"].append(t_deaths)
 
-    recalc_days = [0,
-                 days_before_date_1,
-                 days_before_date_1+days_between_dates_1_2,
-                 days_before_date_1+days_between_dates_1_2+days_between_dates_2_3,
-                 days_before_date_1+days_between_dates_1_2+days_between_dates_2_3+days_between_dates_3_4,
-                 days_before_date_1+days_between_dates_1_2+days_between_dates_2_3+days_between_dates_3_4+days_between_dates_4_5,
-                int(vacation_start_days)
-                ]
 
     dynModel.beta = np.zeros((len(age_groups),len(dynModel.groups[age_groups[0]].parameters["beta"])))
     for i in range(len(age_groups)):
         for j in range(len(dynModel.groups[age_groups[0]].parameters["beta"])):
-            if j < int(vacation_start_days+days_change_model):
+            if j < int(days_rates_start+days_change_rates):
                 dynModel.beta[i,j] = beta_normal
             else:
-                dynModel.beta[i,j] = beta_vacation
+                d_after = j-int(days_rates_start+days_change_rates)
+                d_portion = max(trans_days-d_after,0)/trans_days
+                dynModel.beta[i,j] = beta_normal*d_portion+beta_masks*(1-d_portion)
 
     for t in range(total_days):
         current_date = date_1+timedelta(days=t-days_before_date_1)
         day_of_week = current_date.weekday()
 
-        if t in recalc_days:
-            update_contacts = True
-        else:
-            update_contacts = False
+        update_contacts = True
             
-        if t<int(vacation_start_days+days_change_rates):
+        if t<int(days_rates_start+days_change_rates):
             dynModel.p_H = initial_params["p_H"]
             dynModel.p_ICU = initial_params["p_ICU"]
 
@@ -669,13 +492,11 @@ def error_function(v,n_sample):
             dynModel.lambda_ICU_R = (1-p_death)*lambda_ICU
 
         else:
-            trans_days = 30.0
-            d_after = t-int(vacation_start_days+days_change_rates)
+            d_after = t-int(days_rates_start+days_change_rates)
             d_portion = max(trans_days-d_after,0)/trans_days
             
-            dynModel.p_ICU = initial_params["p_H"]*d_portion+initial_params["p_ICU"]*fraction_p_ICU*(1-d_portion)
-            dynModel.p_H = initial_params["p_ICU"]*d_portion+(initial_params["p_H"]+initial_params["p_ICU"])-initial_params["p_ICU"]*fraction_p_ICU*(1-d_portion)
-            
+            dynModel.p_ICU = initial_params["p_ICU"]*d_portion+initial_params["p_ICU"]*fraction_p_ICU*(1-d_portion)
+            dynModel.p_H = (initial_params["p_H"]+initial_params["p_ICU"])-(initial_params["p_ICU"]*d_portion+initial_params["p_ICU"]*fraction_p_ICU*(1-d_portion))
 
             lambda_H = initial_params["lambda_H"]*d_portion+initial_params["lambda_H"]*change_lambda_H_aft*(1-d_portion)
             lambda_ICU = initial_params["lambda_ICU"]*d_portion+ initial_params["lambda_ICU"]*change_lambda_ICU_aft*(1-d_portion)
@@ -685,53 +506,17 @@ def error_function(v,n_sample):
             dynModel.lambda_H_R = (1-p_death)*lambda_H
             dynModel.lambda_ICU_D = p_death*lambda_ICU
             dynModel.lambda_ICU_R = (1-p_death)*lambda_ICU
+            
+            
         
 
-        if day_of_week <= 4:
-            season = "new"
-            dynModel.mixing_method = {
+        season = "spc"
+        dynModel.mixing_method = {
                 "name":"mult",
-                "param_alpha":{
-                    'work':alpha_mixing_work,
-                    'transport':alpha_mixing_transport,
-                    'school':alpha_mixing_school,
-                    'other':alpha_mixing_other,
-                    'leisure':alpha_mixing_leisure,
-                    'home':alpha_mixing_home,
-                },
-                "param_beta":{
-                    'work':alpha_mixing_work,
-                    'transport':alpha_mixing_transport,
-                    'school':alpha_mixing_school,
-                    'other':alpha_mixing_other,
-                    'leisure':alpha_mixing_leisure,
-                    'home':alpha_mixing_home,
-                },
+                "param_alpha":alphas_d,
+                "param_beta":alphas_d,
             }
-        else:
-            season = "new"
-            dynModel.mixing_method = {
-                "name":"mult",
-                "param_alpha":{
-                    'work':alpha_mixing_work,
-                    'transport':alpha_mixing_transport,
-                    'school':alpha_mixing_school,
-                    'other':alpha_mixing_other,
-                    'leisure':alpha_mixing_leisure,
-                    'home':alpha_mixing_home,
-                },
-                "param_beta":{
-                    'work':alpha_mixing_work,
-                    'transport':alpha_mixing_transport,
-                    'school':alpha_mixing_school,
-                    'other':alpha_mixing_other,
-                    'leisure':alpha_mixing_leisure,
-                    'home':alpha_mixing_home,
-                },
-            }
-
-        #dynModel.mixing_method = mixing_vec[t]
-
+        
         state,_ = dynModel.take_time_step(state, tests, tests, alphas_to_matrix(alphas_vec[t]), t, season, update_contacts=update_contacts)
         t_beds = 0
         t_icus = 0
@@ -758,7 +543,7 @@ def error_function(v,n_sample):
     days_model = [initial_date+timedelta(days = t) for t in range(total_days + 1)]
 
     # Indices where to put the real data
-    indices = [(datetime.strptime(d, '%Y-%m-%d') - initial_date).days for d in days]
+    indices = [(datetime.strptime(d, '%Y-%m-%d') - initial_date).days for d in french_days]
 
     # Real data
     real_data_beds = {ag:[float('nan')]*len(days_model) for ag in age_groups+["total"]}
@@ -772,59 +557,41 @@ def error_function(v,n_sample):
             real_data_deaths[ag][ind] = deaths_real[ag][k] if deaths_real[ag][k]!=0 else float('nan')
 
 
-    error_constant = 0.25
+    tail_constant = 0.5
+    peak_constant = 0.25
     error_beds = 0
     error_icus = 0
     error_deaths = 0
-    error_beds_total = 0
-    error_icus_total = 0
-    error_deaths_total = 0
     
     peak_beds = np.nanargmax(np.array(real_data_beds["total"]))
     peak_icus = np.nanargmax(np.array(real_data_icus["total"]))
     peak_deaths = peak_beds+30
     
-    for ag in old_age_groups:
-        error_beds += np.nanmean((np.abs(np.array(model_data_beds[ag])-np.array(real_data_beds[ag]))/np.array(real_data_beds[ag]))[0:validation_days-1])
-        error_icus += np.nanmean((np.abs(np.array(model_data_icus[ag])-np.array(real_data_icus[ag]))/np.array(real_data_icus[ag]))[0:validation_days-1])
-        error_deaths += np.nanmean((np.abs(np.array(model_data_deaths[ag])-np.array(real_data_deaths[ag]))/np.array(real_data_deaths[ag]))[0:validation_days-1])
-    error_beds_total += np.nanmean((np.abs(np.array(model_data_beds["total"])-np.array(real_data_beds["total"]))/np.array(real_data_beds["total"]))[0:validation_days-1])
-    error_beds_total += error_constant*np.nanmean((np.abs(np.array(model_data_beds["total"])-np.array(real_data_beds["total"]))/np.array(real_data_beds["total"]))[validation_days-1:validation_days])
-    error_beds_total += error_constant*np.nanmean((np.abs(np.array(model_data_beds["total"])-np.array(real_data_beds["total"]))/np.array(real_data_beds["total"]))[peak_beds:peak_beds+1])
+    #         for ag in old_age_groups:
+    #             error_beds += np.nanmean((np.abs(np.array(model_data_beds[ag])-np.array(real_data_beds[ag]))/np.array(real_data_beds[ag]))[0:validation_days-1])
+    #             error_icus += np.nanmean((np.abs(np.array(model_data_icus[ag])-np.array(real_data_icus[ag]))/np.array(real_data_icus[ag]))[0:validation_days-1])
+    #             error_deaths += np.nanmean((np.abs(np.array(model_data_deaths[ag])-np.array(real_data_deaths[ag]))/np.array(real_data_deaths[ag]))[0:validation_days-1])
+    error_beds_total = np.nanmean((np.abs(np.array(model_data_beds["total"])-np.array(real_data_beds["total"]))/np.array(real_data_beds["total"]))[0:validation_days-14])
+    error_beds_tail = tail_constant*np.nanmean((np.abs(np.array(model_data_beds["total"])-np.array(real_data_beds["total"]))/np.array(real_data_beds["total"]))[validation_days-14:validation_days])
+    error_beds_peak = peak_constant*np.nanmean((np.abs(np.array(model_data_beds["total"])-np.array(real_data_beds["total"]))/np.array(real_data_beds["total"]))[peak_beds:peak_beds+1])
                           
-    error_icus_total += np.nanmean((np.abs(np.array(model_data_icus["total"])-np.array(real_data_icus["total"]))/np.array(real_data_icus["total"]))[0:validation_days-1])
-    error_icus_total += error_constant*np.nanmean((np.abs(np.array(model_data_icus["total"])-np.array(real_data_icus["total"]))/np.array(real_data_icus["total"]))[validation_days-1:validation_days])
-    error_icus_total += error_constant*np.nanmean((np.abs(np.array(model_data_icus["total"])-np.array(real_data_icus["total"]))/np.array(real_data_icus["total"]))[peak_icus:peak_icus+1])
+    error_icus_total = 0.5*np.nanmean((np.abs(np.array(model_data_icus["total"])-np.array(real_data_icus["total"]))/np.array(real_data_icus["total"]))[0:validation_days-14])
+    error_icus_tail = 2*tail_constant*np.nanmean((np.abs(np.array(model_data_icus["total"])-np.array(real_data_icus["total"]))/np.array(real_data_icus["total"]))[validation_days-14:validation_days])
+    error_icus_peak = 0.5*peak_constant*np.nanmean((np.abs(np.array(model_data_icus["total"])-np.array(real_data_icus["total"]))/np.array(real_data_icus["total"]))[peak_icus:peak_icus+1])
 
                           
-    error_deaths_total += np.nanmean((np.abs(np.array(model_data_deaths["total"])-np.array(real_data_deaths["total"]))/np.array(real_data_deaths["total"]))[0:validation_days-1])
-    error_deaths_total += error_constant*np.nanmean((np.abs(np.array(model_data_deaths["total"])-np.array(real_data_deaths["total"]))/np.array(real_data_deaths["total"]))[validation_days-1:validation_days])
-    error_deaths_total += error_constant/2.0*np.nanmean((np.abs(np.array(model_data_deaths["total"])-np.array(real_data_deaths["total"]))/np.array(real_data_deaths["total"]))[peak_deaths:peak_deaths+1])
-    error_deaths_total += error_constant/2.0*np.nanmean((np.abs(np.array(model_data_deaths["total"])-np.array(real_data_deaths["total"]))/np.array(real_data_deaths["total"]))[peak_beds:peak_beds+1])
+    error_deaths_total = np.nanmean((np.abs(np.array(model_data_deaths["total"])-np.array(real_data_deaths["total"]))/np.array(real_data_deaths["total"]))[0:validation_days-14])
+    error_deaths_tail = tail_constant*np.nanmean((np.abs(np.array(model_data_deaths["total"])-np.array(real_data_deaths["total"]))/np.array(real_data_deaths["total"]))[validation_days-14:validation_days])
+    error_deaths_peak = peak_constant*np.nanmean((np.abs(np.array(model_data_deaths["total"])-np.array(real_data_deaths["total"]))/np.array(real_data_deaths["total"]))[peak_deaths:peak_deaths+1])
+    #         error_deaths_total += error_constant/4.0*np.nanmean((np.abs(np.array(model_data_deaths["total"])-np.array(real_data_deaths["total"]))/np.array(real_data_deaths["total"]))[peak_beds:peak_beds+1])
 
-    overflow = np.array(model_data_icus["total"]) - icu_bound
-    overflow_error = np.nanmean([max(overflow[i],0) for i in range(len(overflow))])
-
-
-
-    #diff = np.array(model_data_beds["total"])-np.array(real_data_beds["total"])
-    #error_beds_above = np.nanmean([max(d,0) for d in diff])
-    #error_beds_below = -np.nanmean([min(d,0) for d in diff])
-
-    #cumm_beds_model = [sum([model_data_beds["total"][k] for k in range(i+1) if not math.isnan(real_data_beds["total"][k])]) for i in range(len(model_data_beds["total"]))]
-    #cumm_beds_real = [sum([real_data_beds["total"][k] for k in range(i+1) if not math.isnan(real_data_beds["total"][k])]) for i in range(len(real_data_beds["total"]))]
-    #diff_cumm = np.array(cumm_beds_model)-np.array(cumm_beds_real)
-    #error_cumm_above = np.nanmean([max(d,0) for d in diff_cumm])
-    #error_cumm_below = -np.nanmean([min(d,0) for d in diff_cumm])
+    #overflow = np.array(model_data_icus["total"]) - icu_bound
+    #overflow_error = np.nanmean([max(overflow[i],0) for i in range(len(overflow))])
 
 
-
-    #     error = error_beds_total
-    #     error = mult_icus*error_icus_total
-    #     error = mult_deaths*error_deaths_total
     upper_days_model = days_model
     
-    error = 0.25*error_beds+4*error_beds_total+0.25*error_icus+4*error_icus_total+0.25*error_deaths+4*error_deaths_total+overflow_error
+    error = error_beds_total+error_beds_tail+error_beds_peak+error_icus_total+error_icus_tail+error_icus_peak+error_deaths_total+error_deaths_tail+error_deaths_peak
 
     return error
 
@@ -860,8 +627,32 @@ def error_grad(v):
 
 # In[48]:
 
+# Construct the windows for the parameters to move
+windows = {}
+# for p in initial_params:
+#     windows[p] = (
+#         np.min(upper_params[p]/initial_params[p]),
+#         np.max(lower_params[p]/initial_params[p]),
+#     )
 
-bounds = [windows['alpha_mixing'],windows['transmission']]+[[0,1]]*2+[windows['school_l'],[0,1],[0,0.2],[0.5,1]]+[[0.50,2.0]]*4
+windows['days_ahead'] = (50,100)
+windows['alpha_mixing'] = (0.1,2.0)
+windows['beta_transmission'] = (0.5,2.0)
+windows['mix'] = (0.0,1.0)
+windows['school_lockdown'] = (0,0.1)
+windows['school_may_jun'] = (0,1)
+windows['school_jul_aug'] = (0,0.2)
+windows['school_sep_oct'] = (0.5,1.0)
+windows['change_rates'] = (0,60)
+windows['SEIR_changes'] = (0.5,2.0)
+
+
+
+
+bounds = ([windows['alpha_mixing'],windows['beta_transmission'],
+                                       windows['mix'],windows['school_lockdown'],windows['school_may_jun'],
+                                        windows['school_jul_aug'],windows['school_sep_oct']]+
+                                        [windows['SEIR_changes']]*4)
 
 
 grad_0 = [(b[0]+b[1])/2.0 for b in bounds]

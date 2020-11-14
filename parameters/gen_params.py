@@ -81,6 +81,11 @@ for group in data_dict['age_groups']:
 			activity:{
 				group2: float(data_dict['social_contact_matrices_old'][activity][group2][group]) for group2 in data_dict['age_groups']
 			} for activity in data_dict['activities']
+		},
+		"contacts_spc":{
+			activity:{
+				group2: float(data_dict['social_contact_matrices_spc'][activity][group2][group]) for group2 in data_dict['age_groups']
+			} for activity in data_dict['activities']
 		}
 	}
 

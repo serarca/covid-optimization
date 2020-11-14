@@ -106,6 +106,7 @@ class FastDynamicalModel:
 		self.M_weekends = np.zeros((len(age_groups),len(age_groups), len(activities)), order = "C")
 		self.M_new = np.zeros((len(age_groups),len(age_groups), len(activities)), order = "C")
 		self.M_old = np.zeros((len(age_groups),len(age_groups), len(activities)), order = "C")
+		self.M_spc = np.zeros((len(age_groups),len(age_groups), len(activities)), order = "C")
 		for g1 in range(len(age_groups)):
 			for g2 in range(len(age_groups)):
 				for act in range(len(activities)):
@@ -113,6 +114,7 @@ class FastDynamicalModel:
 					self.M_weekends[g1,g2,act] = self.groups[age_groups[g1]].contacts_weekends[activities[act]][age_groups[g2]]
 					self.M_new[g1,g2,act] = self.groups[age_groups[g1]].contacts_new[activities[act]][age_groups[g2]]
 					self.M_old[g1,g2,act] = self.groups[age_groups[g1]].contacts_old[activities[act]][age_groups[g2]]
+					self.M_spc[g1,g2,act] = self.groups[age_groups[g1]].contacts_spc[activities[act]][age_groups[g2]]
 
 	# Takes a step that is a full-open policy
 	def take_end_step(self, state):
@@ -255,6 +257,8 @@ class FastDynamicalModel:
 							self.contact_matrix[g1,g2] += self.M_new[g1,g2,act]*(self.alphas[g1,act]**self.mixing_method['param_alpha'][activities[act]])*(self.alphas[g2,act]**self.mixing_method['param_beta'][activities[act]])
 						elif season == "old":
 							self.contact_matrix[g1,g2] += self.M_old[g1,g2,act]*(self.alphas[g1,act]**self.mixing_method['param_alpha'][activities[act]])*(self.alphas[g2,act]**self.mixing_method['param_beta'][activities[act]])
+						elif season == "spc":
+							self.contact_matrix[g1,g2] += self.M_spc[g1,g2,act]*(self.alphas[g1,act]**self.mixing_method['param_alpha'][activities[act]])*(self.alphas[g2,act]**self.mixing_method['param_beta'][activities[act]])
 
 					else:
 						assert(False)
@@ -409,6 +413,7 @@ class SEIR_group:
 		self.contacts_weekends = group_parameters['contacts_weekends']
 		self.contacts_new = group_parameters['contacts_new']
 		self.contacts_old = group_parameters['contacts_old']
+		self.contacts_spc = group_parameters['contacts_spc']
 		self.mixing_method = mixing_method
 		self.parent = parent
 
