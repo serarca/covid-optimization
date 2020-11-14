@@ -18,7 +18,6 @@ maxiter = 100
 import pandas as pd
 from datetime import datetime, timedelta
 import numpy
-from gurobipy import *
 import numpy as np
 import pandas as pd
 
