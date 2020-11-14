@@ -11,7 +11,7 @@ days_ahead_opt = args.days_ahead
 days_switch_opt = args.days_switch
 print("days_ahead",days_ahead_opt)
 print("days_switch",days_switch_opt)
-n_samples = 1
+n_samples = 100
 maxiter = 100
 
 
@@ -267,7 +267,6 @@ dynModel = FastDynamicalModel(universe_params, econ_params, experiment_params, 1
 
 # Generate samples
 np.random.seed(0)
-n_samples = 1
 samples = 1+np.random.randn(n_samples,(final_date-date_1).days+150, 5)*0.05/2/np.sqrt(3)
 
 
@@ -611,6 +610,21 @@ def error_grad(v):
         print("best_error:",best_error)
         # print("vector:",vector_errors)
         best_v = v
+
+        result_v = [float(x) for x in best_v]
+
+        yaml_dict = {
+            "days_ahead":days_ahead_opt,
+            "days_switch":days_switch_opt,
+            "n_samples":n_samples,
+            "result": result_v,
+            "value": float(best_error),
+            "iterations": maxiter,
+        }
+
+        with open('./fittings_switch_%d/fit_%d_%d.yaml'%(n_samples,days_ahead_opt,days_switch_opt), 'w') as file:
+            yaml.dump(yaml_dict, file)
+
         #print(v)
 
         # plt.figure(1)
@@ -676,20 +690,6 @@ result = minimize(error_grad, grad_0, bounds = bounds, options = {"maxiter":maxi
 
 
 # In[59]:
-
-result_v = [float(x) for x in result.x]
-
-yaml_dict = {
-    "days_ahead":days_ahead_opt,
-    "days_switch":days_switch_opt,
-    "n_samples":n_samples,
-    "result": result_v,
-    "value": float(result.fun),
-    "iterations": maxiter,
-}
-
-with open('./fittings_switch_%d/fit_%d_%d.yaml'%(n_samples,days_ahead_opt,days_switch_opt), 'w') as file:
-    yaml.dump(yaml_dict, file)
 
 
 
