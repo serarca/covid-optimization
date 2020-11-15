@@ -62,9 +62,29 @@ for group in data_dict['age_groups']:
 			"lockdown_fraction": float(data_dict['lockdown_fraction']),
 			"death_value": float(data_dict['death_cost'][group]),
 		},
-		"contacts":{
+		"contacts_weekdays":{
 			activity:{
-				group2: float(data_dict['social_contact_matrices'][activity][group2][group]) for group2 in data_dict['age_groups']
+				group2: float(data_dict['social_contact_matrices_weekdays'][activity][group2][group]) for group2 in data_dict['age_groups']
+			} for activity in data_dict['activities']
+		},
+		"contacts_weekends":{
+			activity:{
+				group2: float(data_dict['social_contact_matrices_weekends'][activity][group2][group]) for group2 in data_dict['age_groups']
+			} for activity in data_dict['activities']
+		},
+		"contacts_new":{
+			activity:{
+				group2: float(data_dict['social_contact_matrices_new'][activity][group2][group]) for group2 in data_dict['age_groups']
+			} for activity in data_dict['activities']
+		},
+		"contacts_old":{
+			activity:{
+				group2: float(data_dict['social_contact_matrices_old'][activity][group2][group]) for group2 in data_dict['age_groups']
+			} for activity in data_dict['activities']
+		},
+		"contacts_spc":{
+			activity:{
+				group2: float(data_dict['social_contact_matrices_spc'][activity][group2][group]) for group2 in data_dict['age_groups']
 			} for activity in data_dict['activities']
 		}
 	}

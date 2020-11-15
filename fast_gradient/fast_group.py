@@ -83,6 +83,7 @@ class FastDynamicalModel:
 				else:
 					self.beta[i,j] = 0
 		self.last_beta = 0
+		self.last_season = ""
 
 
 		# Process econ data
@@ -101,11 +102,19 @@ class FastDynamicalModel:
 
 
 	def initialize_M(self):
-		self.M = np.zeros((len(age_groups),len(age_groups), len(activities)), order = "C")
+		self.M_weekdays = np.zeros((len(age_groups),len(age_groups), len(activities)), order = "C")
+		self.M_weekends = np.zeros((len(age_groups),len(age_groups), len(activities)), order = "C")
+		self.M_new = np.zeros((len(age_groups),len(age_groups), len(activities)), order = "C")
+		self.M_old = np.zeros((len(age_groups),len(age_groups), len(activities)), order = "C")
+		self.M_spc = np.zeros((len(age_groups),len(age_groups), len(activities)), order = "C")
 		for g1 in range(len(age_groups)):
 			for g2 in range(len(age_groups)):
 				for act in range(len(activities)):
-					self.M[g1,g2,act] = self.groups[age_groups[g1]].contacts[activities[act]][age_groups[g2]]
+					self.M_weekdays[g1,g2,act] = self.groups[age_groups[g1]].contacts_weekdays[activities[act]][age_groups[g2]]
+					self.M_weekends[g1,g2,act] = self.groups[age_groups[g1]].contacts_weekends[activities[act]][age_groups[g2]]
+					self.M_new[g1,g2,act] = self.groups[age_groups[g1]].contacts_new[activities[act]][age_groups[g2]]
+					self.M_old[g1,g2,act] = self.groups[age_groups[g1]].contacts_old[activities[act]][age_groups[g2]]
+					self.M_spc[g1,g2,act] = self.groups[age_groups[g1]].contacts_spc[activities[act]][age_groups[g2]]
 
 	# Takes a step that is a full-open policy
 	def take_end_step(self, state):
@@ -114,7 +123,7 @@ class FastDynamicalModel:
 
 
 
-	def take_time_step(self, state, m_tests, a_tests, alphas, t, update_contacts = True, B_H = False, B_ICU = False, B_H_perc = False, B_ICU_perc = False):
+	def take_time_step(self, state, m_tests, a_tests, alphas, t, season, update_contacts = True, B_H = False, B_ICU = False, B_H_perc = False, B_ICU_perc = False):
 
 		# Store variables
 		self.state = state
@@ -130,9 +139,10 @@ class FastDynamicalModel:
 		self.new_state = np.zeros((len(age_groups),len(cont)), order = "C")
 
 		# Update contact matric
-		if update_contacts or self.beta[0,t]!=self.last_beta:
-			self.update_contact_matrix()
+		if update_contacts or self.beta[0,t]!=self.last_beta or season!=self.last_season:
+			self.update_contact_matrix(season)
 			self.last_beta = self.beta[0,t]
+			self.last_season = season
 
 
 		# Update total contacts
@@ -226,7 +236,7 @@ class FastDynamicalModel:
 		# 	"reward": self.reward,
 		# }
 
-	def update_contact_matrix(self):
+	def update_contact_matrix(self, season):
 
 
 		for g1 in range(len(age_groups)):
@@ -239,15 +249,26 @@ class FastDynamicalModel:
 								/(math.exp(self.alphas[g1,act]*self.mixing_method['param'])+math.exp(self.alphas[g2,act]*self.mixing_method['param']))
 							)
 					elif self.mixing_method['name'] == "mult":
-						self.contact_matrix[g1,g2] += self.M[g1,g2,act]*(self.alphas[g1,act]**self.mixing_method['param_alpha'])*(self.alphas[g2,act]**self.mixing_method['param_beta'])
+						if season == "weekdays":
+							self.contact_matrix[g1,g2] += self.M_weekdays[g1,g2,act]*(self.alphas[g1,act]**self.mixing_method['param_alpha'][activities[act]])*(self.alphas[g2,act]**self.mixing_method['param_beta'][activities[act]])
+						elif season == "weekends":
+							self.contact_matrix[g1,g2] += self.M_weekends[g1,g2,act]*(self.alphas[g1,act]**self.mixing_method['param_alpha'][activities[act]])*(self.alphas[g2,act]**self.mixing_method['param_beta'][activities[act]])
+						elif season == "new":
+							self.contact_matrix[g1,g2] += self.M_new[g1,g2,act]*(self.alphas[g1,act]**self.mixing_method['param_alpha'][activities[act]])*(self.alphas[g2,act]**self.mixing_method['param_beta'][activities[act]])
+						elif season == "old":
+							self.contact_matrix[g1,g2] += self.M_old[g1,g2,act]*(self.alphas[g1,act]**self.mixing_method['param_alpha'][activities[act]])*(self.alphas[g2,act]**self.mixing_method['param_beta'][activities[act]])
+						elif season == "spc":
+							self.contact_matrix[g1,g2] += self.M_spc[g1,g2,act]*(self.alphas[g1,act]**self.mixing_method['param_alpha'][activities[act]])*(self.alphas[g2,act]**self.mixing_method['param_beta'][activities[act]])
+
 					else:
 						assert(False)
 
 	def get_flow_H(self):
 		denom = self.p_ICU + self.p_H
 		denom[denom == 0] = 1e-6
+		flow = self.mu*self.p_H*(self.state[:,cont.index("I")] + self.state[:,cont.index("Iss")]/denom)
 
-		return self.mu*self.p_H*(self.state[:,cont.index("I")] + self.state[:,cont.index("Iss")]/denom)
+		return flow
 
 
 	def get_flow_ICU(self):
@@ -276,6 +297,7 @@ class FastDynamicalModel:
 		self.new_state[:,cont.index("I")] = self.state[:,cont.index("I")]+(
 			self.sigma*self.state[:,cont.index("E")] - self.mu*self.state[:,cont.index("I")] - self.m_tests*self.state[:,cont.index("I")]/self.pop
 		)*self.dt
+
 
 	def update_R(self):
 		self.new_state[:,cont.index("R")] = self.state[:,cont.index("R")]+(
@@ -317,6 +339,8 @@ class FastDynamicalModel:
 			+(1-tol)*self.flow_H
 			-self.B_H
 		)*self.dt
+		if np.isnan(self.new_state[:,cont.index("H")]).any():
+			print("joker",self.state[:,cont.index("H")])
 
 	def update_ICU(self):
 		tol = 1e-7
@@ -385,7 +409,11 @@ class SEIR_group:
 		# Group name
 		self.name = group_parameters['name']
 		self.parameters = group_parameters['parameters']
-		self.contacts = group_parameters['contacts']
+		self.contacts_weekdays = group_parameters['contacts_weekdays']
+		self.contacts_weekends = group_parameters['contacts_weekends']
+		self.contacts_new = group_parameters['contacts_new']
+		self.contacts_old = group_parameters['contacts_old']
+		self.contacts_spc = group_parameters['contacts_spc']
 		self.mixing_method = mixing_method
 		self.parent = parent
 
