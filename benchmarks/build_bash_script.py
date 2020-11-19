@@ -96,7 +96,7 @@ for delta in params_to_try["delta_schooling"]:
 #
 #SBATCH --job-name=test
 #
-#SBATCH --time=2:00:00
+#SBATCH --time=12:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=1G
