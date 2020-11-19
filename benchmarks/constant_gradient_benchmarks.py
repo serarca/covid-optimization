@@ -219,6 +219,8 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 		print(total_reward, total_deaths, total_econ)
 		return -total_reward
 
+
+
 	lower_bounds_matrix = np.zeros((len(intervention_times),len(rel_activities)))
 	for i,act in enumerate(rel_activities):
 		lower_bounds_matrix[:,i] += lower_bounds[act]
@@ -232,6 +234,7 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 
 	result_lockdown = minimize(simulate, x0, method='L-BFGS-B',bounds=full_bounds,options={'eps':10e-2,'maxfun':700000})
 
+	print("value_fast_group",result_lockdown.fun)
 
 	x_aux = np.reshape(
 			result_lockdown.x,
@@ -297,6 +300,8 @@ def gradient_descent(experiment_params, quar_freq, plot = False):
 		"a_tests":a_tests_policy,
 		"m_tests":m_tests_policy,
 	}
+
+	print("value_group",float(dynModel.get_total_reward()))
 
 	result["filename"] = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d"%(
 		result["lockdown_heuristic"],

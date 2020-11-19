@@ -38,8 +38,8 @@ class FastDynamicalModel:
 		self.start_day = start_day
 
 		# Modify eta
-		econ_params["employment_params"]["eta"] = eta
-		econ_params["employment_params"]["nu"] = 1 - eta - econ_params["employment_params"]["gamma"]
+		self.econ_params["employment_params"]["eta"] = eta
+		self.econ_params["employment_params"]["nu"] = 1 - eta - self.econ_params["employment_params"]["gamma"]
 
 
 		# Create groups from parameters
@@ -392,7 +392,6 @@ class FastDynamicalModel:
 				self.new_state[:,cont.index("Rq")]
 			)*self.dt 
 		)
-
 		return np.sum(v_schooling+v_employment)
 
 	def get_deaths(self):
