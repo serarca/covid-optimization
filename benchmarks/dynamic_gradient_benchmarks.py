@@ -77,29 +77,29 @@ if groups == "all":
 	    universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
 	# Read initialization
-	with open("../initialization/60days.yaml") as file:
+	with open("../initialization/oct21.yaml") as file:
 		initialization = yaml.load(file, Loader=yaml.FullLoader)
-		start_day = 60
+		start_day = 0
 
 	# Read econ parameters
 	with open("../parameters/econ.yaml") as file:
 		econ_params = yaml.load(file, Loader=yaml.FullLoader)
 
-elif groups == "one":
-	age_groups = ["all_age_groups"]
+# elif groups == "one":
+# 	age_groups = ["all_age_groups"]
 
-	# Read group parameters
-	with open("../parameters/one_group_fitted.yaml") as file:
-	    universe_params = yaml.load(file, Loader=yaml.FullLoader)
+# 	# Read group parameters
+# 	with open("../parameters/one_group_fitted.yaml") as file:
+# 	    universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
-	# Read initialization
-	with open("../initialization/60days_one_group.yaml") as file:
-		initialization = yaml.load(file, Loader=yaml.FullLoader)
-		start_day = 60
+# 	# Read initialization
+# 	with open("../initialization/60days_one_group.yaml") as file:
+# 		initialization = yaml.load(file, Loader=yaml.FullLoader)
+# 		start_day = 60
 
-	# Read econ parameters
-	with open("../parameters/one_group_econ.yaml") as file:
-		econ_params = yaml.load(file, Loader=yaml.FullLoader)
+# 	# Read econ parameters
+# 	with open("../parameters/one_group_econ.yaml") as file:
+# 		econ_params = yaml.load(file, Loader=yaml.FullLoader)
 
 # Read lower bounds
 with open("../lower_bounds/fitted.yaml") as file:
@@ -124,18 +124,19 @@ simulation_params['time_periods'] = int(math.ceil(simulation_params["days"]/simu
 
 # Define mixing parameter
 mixing_method = universe_params["mixing"]
-
-# Load gov policy
-with open("../policies/fitted.yaml") as file:
-	gov_policy = yaml.load(file, Loader=yaml.FullLoader)
-for i,p in enumerate(gov_policy):
-	if p["days_from_lockdown"] == 0:
-		start_lockdown = i
-		break
-for i,p in enumerate(gov_policy):
-	del p['date']
-	del p['days_from_lockdown']
-
+alphas_d = {
+    'work':mixing_method['param_alpha'],
+    'transport':mixing_method['param_alpha'],
+    'school':mixing_method['param_alpha'],
+    'other':mixing_method['param_alpha'],
+    'leisure':mixing_method['param_alpha'],
+    'home':mixing_method['param_alpha'],
+}
+fast_mixing_method = {
+	"name":"mult",
+	"param_alpha":alphas_d,
+	"param_beta":alphas_d,
+}
 
 
 
@@ -213,7 +214,7 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
 
 
 	# Create dynamical model
-	fastModel = FastDynamicalModel(universe_params, econ_params, experiment_params, simulation_params['dt'], mixing_method, simulation_params['time_periods'], start_day, experiment_params["eta"])
+	fastModel = FastDynamicalModel(universe_params, econ_params, experiment_params, 1, fast_mixing_method, simulation_params['time_periods'], start_day, experiment_params["eta"])
 	initial_state = state_to_matrix(initialization)
 
 	if experiment_params["testing"] == "homogeneous":
@@ -252,6 +253,7 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
 				a_tests_vec,
 				x_lockdown_all,
 				t,
+				"spc",
 				update_contacts = update_contacts, 
 				B_H = False, 
 				B_ICU = False,
@@ -263,7 +265,7 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
 			total_econ += econs['economic_value']
 
 		for t in range(fastModel.END_DAYS):
-			state, econs = fastModel.take_end_step(state)
+			state, econs = fastModel.take_end_step(state,"spc")
 			total_reward += econs['reward']
 			total_deaths += econs['deaths']
 			total_econ += econs['economic_value']

@@ -117,9 +117,9 @@ class FastDynamicalModel:
 					self.M_spc[g1,g2,act] = self.groups[age_groups[g1]].contacts_spc[activities[act]][age_groups[g2]]
 
 	# Takes a step that is a full-open policy
-	def take_end_step(self, state):
+	def take_end_step(self, state, season):
 
-		return self.take_time_step(state, np.zeros(len(self.age_groups)), np.zeros(len(self.age_groups)), np.zeros((len(self.age_groups),len(activities)))+1.0, self.horizon+1)
+		return self.take_time_step(state, np.zeros(len(self.age_groups)), np.zeros(len(self.age_groups)), np.zeros((len(self.age_groups),len(activities)))+1.0, self.horizon+1, season)
 
 
 

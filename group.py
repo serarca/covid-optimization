@@ -509,7 +509,7 @@ class SEIR_group:
 		# Group name
 		self.name = group_parameters['name']
 		self.parameters = group_parameters['parameters']
-		self.contacts = group_parameters['contacts']
+		self.contacts = group_parameters['contacts_spc']
 		self.initial_conditions = group_initialization
 		self.mixing_method = mixing_method
 		self.time_steps = time_steps
