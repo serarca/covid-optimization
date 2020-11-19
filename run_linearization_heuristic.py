@@ -54,11 +54,11 @@ def main():
         "frequencies":[(7,14)],
         "region":["fitted-scaled"], 
         "econ": ["econ-scaled"],
-        "init": ["60days-scaled"],
+        "init": ["oct21-scaled"],
         "eta":[0, 0.1, 0.2],
         "trust_region_radius":[0.05],
         "max_inner_iterations_mult":[2],
-        "initial_uhat":["dynamic_gradient"]
+        "initial_uhat":["full_lockdown"]
         # "full_lockdown", "full_open","dynamic_gradient",
     }
 
@@ -86,9 +86,9 @@ def main():
     print(len(all_instances))
 
 
-    # scaling_econ_param(scaling, money_scaling)
-    # scaling_fitted(scaling, money_scaling)
-    # scaling_init(scaling)
+    scaling_econ_param(scaling, money_scaling, groups)
+    scaling_fitted(scaling, money_scaling, groups)
+    scaling_init(scaling, groups)
 
     # Final time step is used if we want to evaluate 
     # the hueristic at any time before the n_days
@@ -645,59 +645,7 @@ def scaling_econ_param(scaling, money_scaling):
     with open('parameters/econ-scaled.yaml', 'w') as file:
         yaml.dump(scaled_econ, file)
 
-def scaling_init(scaling):
-    # Import data
-    old_init = yaml.load(open( "initialization/60days.yaml", "rb" ), Loader=yaml.FullLoader)
-    # scaling = 1000.0
 
-    # Construct initialization
-    scaled_init_dict = {}
-    for group in old_init:
-        scaled_init_dict[group] = {
-                "S": old_init[group]["S"] / scaling,
-                "E": old_init[group]["E"] / scaling,
-                "I": old_init[group]["I"] / scaling,
-                "R": old_init[group]["R"] / scaling,
-                "Ia": old_init[group]["Ia"] / scaling,
-                "Ips": old_init[group]["Ips"] / scaling,
-                "Ims": old_init[group]["Ims"] / scaling,
-                "Iss": old_init[group]["Iss"] / scaling,
-                "Rq": old_init[group]["Rq"] / scaling,
-                "H": old_init[group]["H"] / scaling,
-                "ICU": old_init[group]["ICU"] / scaling,
-                "D": old_init[group]["D"] / scaling,
-        }
-
-    with open('initialization/60days-scaled.yaml', 'w') as file:
-        yaml.dump(scaled_init_dict, file)
-
-
-def scaling_fitted(scaling, money_scaling):
-    # Import data
-    old_fitted = yaml.load(open( "parameters/fitted.yaml", "rb" ), Loader=yaml.FullLoader)
-    scaling = 1000.0
-
-    scaled_fitted = dict(old_fitted)
-
-    # Scale global_param
-    scaled_fitted["global-parameters"]["C_H"] = scaled_fitted["global-parameters"]["C_H"] / scaling
-
-    scaled_fitted["global-parameters"]["C_ICU"] = scaled_fitted["global-parameters"]["C_ICU"] / scaling
-
-
-
-    # for group_h in scaled_fitted["seir-groups"]:
-        # # Scale contacts
-        # for act in scaled_fitted["seir-groups"][group_h]["contacts"]:
-        #     for group_g in scaled_fitted["seir-groups"][group_h]["contacts"][act]:
-        #         scaled_fitted["seir-groups"][group_h]["contacts"][act][group_g] = scaled_fitted["seir-groups"][group_h]["contacts"][act][group_g] * scaling
-        
-        # Scale econ death value
-        # scaled_fitted["seir-groups"][group_h]["economics"]["death_value"] = scaled_fitted["seir-groups"][group_h]["economics"]["death_value"] * scaling
-            
-
-    with open('parameters/fitted-scaled.yaml', 'w') as file:
-        yaml.dump(scaled_fitted, file)
 
 
 def scaling_econ_param(scaling, money_scaling, groups):
@@ -741,9 +689,9 @@ def scaling_econ_param(scaling, money_scaling, groups):
 def scaling_init(scaling, groups):
     # Import data
     if groups == "all":
-        old_init = yaml.load(open( "initialization/60days.yaml", "rb" ), Loader=yaml.FullLoader)
+        old_init = yaml.load(open( "initialization/oct21.yaml", "rb" ), Loader=yaml.FullLoader)
     elif groups == "one":
-        old_init = yaml.load(open( "initialization/60days_one_group.yaml", "rb" ), Loader=yaml.FullLoader)
+        old_init = yaml.load(open( "initialization/oct21_one_group.yaml", "rb" ), Loader=yaml.FullLoader)
 
     
     # scaling = 1000.0
@@ -767,10 +715,10 @@ def scaling_init(scaling, groups):
         }
 
     if groups == "all":
-        with open('initialization/60days-scaled.yaml', 'w') as file:
+        with open('initialization/oct21-scaled.yaml', 'w') as file:
             yaml.dump(scaled_init_dict, file)
     elif groups == "one":
-        with open('initialization/60days_one_group-scaled.yaml', 'w') as file:
+        with open('initialization/oct21_one_group-scaled.yaml', 'w') as file:
             yaml.dump(scaled_init_dict, file)
 
     

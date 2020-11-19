@@ -2,7 +2,7 @@ from collections import defaultdict
 import numpy as np
 import pandas as pd
 import math
-#import gurobipy as gb
+import gurobipy as gb
 from copy import deepcopy
 
 all_activities = ['home','leisure','other','school','transport','work']
