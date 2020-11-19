@@ -80,7 +80,7 @@ def main():
 
     n_days = 90
     groups = "all"
-    start_day = 60
+    start_day = 0
     optimize_bouncing = False
 
     print(len(all_instances))
