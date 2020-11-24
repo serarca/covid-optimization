@@ -58,7 +58,7 @@ def main():
         "eta":[0, 0.1, 0.2],
         "trust_region_radius":[0.05],
         "max_inner_iterations_mult":[2],
-        "initial_uhat":["full_lockdown"]
+        "initial_uhat":["dynamic_gradient"]
         # "full_lockdown", "full_open","dynamic_gradient",
     }
 
@@ -238,23 +238,44 @@ def run_linearization_heuristic(simulation_params, experiment_params, start_day,
 
 
     # Read group parameters
-    with open("parameters/"+simulation_params["region"]+".yaml") as file:
+    with open("parameters/"+simulation_params["region"]+".yaml","r") as file:
         # The FullLoader parameter handles the conversion from YAML
         # scalar values to Python the dictionary format
+        while file is None:
+            print("Failed reading fitted param")
+            file = open("parameters/"+simulation_params["region"]+".yaml","r")
+        
         universe_params = yaml.load(file, Loader=yaml.FullLoader)
+        
+        while universe_params is None:
+            print("Failed converting to yaml fitted param")
+            universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
         # Read initialization
-    with open(f"initialization/{simulation_params['init']}.yaml") as file:
+    with open(f"initialization/{simulation_params['init']}.yaml","r") as file:
         # The FullLoader parameter handles the conversion from YAML
         # scalar values to Python the dictionary format
+        while file is None:
+            print("Failed reading init param")
+            file = open(f"initialization/{simulation_params['init']}.yaml","r")
+
         initialization = yaml.load(file, Loader=yaml.FullLoader)
-        
+        while initialization is None:
+            print("Failed converting to yaml init param")
+            initialization = yaml.load(file, Loader=yaml.FullLoader)
     
     # Read econ parameters
-    with open(f"parameters/{simulation_params['econ']}.yaml") as file:
-        econ_params = yaml.load(file, Loader=yaml.FullLoader)
+    with open(f"parameters/{simulation_params['econ']}.yaml","r") as file:
+        while file is None:
+            print("Failed reading econ param")
+            file = open(f"initialization/{simulation_params['init']}.yaml","r")
 
+        econ_params = yaml.load(file, Loader=yaml.FullLoader)
+        while econ_params is None:
+            print("Failed converting to yaml econ param")
+            econ_params = yaml.load(file, Loader=yaml.FullLoader)
     
+    print(universe_params)
 
     # Define mixing method
     mixing_method = universe_params['mixing']
