@@ -90,6 +90,45 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method, t):
 
     u_hat_dict, alphas = buildAlphaDict(u_hat)
 
+    Sg_idx_opt = list(range(SEIR_groups.index('S_g'), num_age_groups * num_compartments, num_compartments))
+
+    # These are subarrays that only contain I_h, Rq_h, N_h out of X_hat
+    I_h_slice = X_hat[SEIR_groups.index('I_g'):: num_compartments]
+    Rq_h_slice = X_hat[SEIR_groups.index('Rq_g'):: num_compartments]
+    N_h_slice = X_hat[SEIR_groups.index('N_g'):: num_compartments]
+
+    infection_prob_arr = np.divide(I_h_slice, (N_h_slice + Rq_h_slice))
+    
+    c_gh_arr = np.zeros((num_age_groups,num_age_groups))
+
+    for ag in range(0, num_age_groups):
+        c_gh_arr[ag] = calcContacts(dynModel, alphas, mixing_method, ag)
+
+    contacts = np.dot(c_gh_arr, infection_prob_arr)
+
+    ########### f^Sg
+    # df^Sg/dSg
+    # jacob[Sg_idx,Sg_idx] = - dynModel.groups[age_groups[ag]].parameters['beta'][t] * contacts
+    for ag in range(0, num_age_groups):
+        # Get all the useful indices for the columns
+        Sg_idx_prime = ag*num_compartments + SEIR_groups.index('S_g')
+        jacob[Sg_idx_prime,Sg_idx_prime] = - dynModel.groups[age_groups[ag]].parameters['beta'][t] * contacts[ag]
+
+    # df^Sg/dNh all h
+    # for ah in range(0, num_age_groups):
+    #     jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('N_g')] = dynModel.groups[age_groups[ag]].parameters['beta'][t] * X_hat[Sg_idx] * c_gh_arr[ah] * I_h_slice[ah] / ((N_h_slice[ah] + Rq_h_slice[ah])**2)
+    jacob[Sg_idx_opt, SEIR_groups.index('N_g')::num_compartments] = np.multiply(np.multiply(np.array([dynModel.groups[age_groups[ag]].parameters['beta'][t] for ag in range(num_age_groups)]) * X_hat[Sg_idx_opt], c_gh_arr.T).T, I_h_slice / ((N_h_slice + Rq_h_slice)**2))
+
+    # df^Sg/dIh all h
+    # for ah in range(0, num_age_groups):
+    #     jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('I_g')] = - dynModel.groups[age_groups[ag]].parameters['beta'][t] * X_hat[Sg_idx] * c_gh_arr[ah] / (N_h_slice[ah] + Rq_h_slice[ah])
+    jacob[Sg_idx_opt, SEIR_groups.index('I_g')::num_compartments] = -np.multiply(np.multiply(np.array([dynModel.groups[age_groups[ag]].parameters['beta'][t] for ag in range(num_age_groups)]) * X_hat[Sg_idx_opt], c_gh_arr.T).T, 1 / (N_h_slice + Rq_h_slice))
+
+    # df^Sg/dRqh all h
+    # for ah in range(0, num_age_groups):
+    #     jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('Rq_g')] = dynModel.groups[age_groups[ag]].parameters['beta'][t] * X_hat[Sg_idx] * c_gh_arr[ah] * I_h_slice[ah] / ((N_h_slice[ah] + Rq_h_slice[ah])**2)
+    jacob[Sg_idx_opt,SEIR_groups.index('Rq_g')::num_compartments] = jacob[Sg_idx_opt, SEIR_groups.index('N_g')::num_compartments]
+    
     for ag in range(0, num_age_groups):
         # Get all the useful indices for the columns
         Sg_idx = ag*num_compartments + SEIR_groups.index('S_g')
@@ -107,62 +146,43 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method, t):
         Hg_idx = ag*num_compartments + SEIR_groups.index('H_g')
         ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
         Dg_idx = ag*num_compartments + SEIR_groups.index('D_g')
-
-        # These are subarrays that only contain I_h, Rq_h, N_h out of X_hat
-        I_h_slice = X_hat[SEIR_groups.index('I_g'): len(X_hat): num_compartments]
-        Rq_h_slice = X_hat[SEIR_groups.index('Rq_g'): len(X_hat): num_compartments]
-        N_h_slice = X_hat[SEIR_groups.index('N_g'): len(X_hat): num_compartments]
-
-        infection_prob_arr = np.divide(I_h_slice, (N_h_slice + Rq_h_slice))
-        c_gh_arr = calcContacts(dynModel, alphas, mixing_method, ag)
-
-        contacts = np.dot(c_gh_arr, infection_prob_arr)
-
-        ########### f^Sg
-        # df^Sg/dSg
-        jacob[Sg_idx,Sg_idx] = - dynModel.groups[age_groups[ag]].parameters['beta'][t] * contacts
-
-        # df^Sg/dNh all h
-        for ah in range(0, num_age_groups):
-            jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('N_g')] = dynModel.groups[age_groups[ag]].parameters['beta'][t] * X_hat[Sg_idx] * c_gh_arr[ah] * I_h_slice[ah] / ((N_h_slice[ah] + Rq_h_slice[ah])**2)
-
-        # df^Sg/dIh all h
-        for ah in range(0, num_age_groups):
-            jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('I_g')] = - dynModel.groups[age_groups[ag]].parameters['beta'][t] * X_hat[Sg_idx] * c_gh_arr[ah] / (N_h_slice[ah] + Rq_h_slice[ah])
-
-        # df^Sg/dRqh all h
-        for ah in range(0, num_age_groups):
-            jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('Rq_g')] = dynModel.groups[age_groups[ag]].parameters['beta'][t] * X_hat[Sg_idx] * c_gh_arr[ah] * I_h_slice[ah] / ((N_h_slice[ah] + Rq_h_slice[ah])**2)
-
+       
         ########### f^Eg
         # df^Eg/dSg
-        jacob[Eg_idx,Sg_idx] = - jacob[Sg_idx,Sg_idx]
+        jacob[Eg_idx, Sg_idx] = - jacob[Sg_idx, Sg_idx] 
 
         # df^Eg/dNh all h
-        for ah in range(num_age_groups):
-            jacob[Eg_idx,ah * num_compartments + SEIR_groups.index('N_g')] = - jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('N_g')]
+        # for ah in range(num_age_groups):
+        #     jacob[Eg_idx,ah * num_compartments + SEIR_groups.index('N_g')] = - jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('N_g')]
+        jacob[Eg_idx,SEIR_groups.index('N_g')::num_compartments] = - jacob[Sg_idx,SEIR_groups.index('N_g')::num_compartments]
 
         # df^Eg/dIh all h
-        for ah in range(num_age_groups):
-            jacob[Eg_idx,ah * num_compartments + SEIR_groups.index('I_g')] = - jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('I_g')]
+        # for ah in range(num_age_groups):
+        #     jacob[Eg_idx,ah * num_compartments + SEIR_groups.index('I_g')] = - jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('I_g')]
+        jacob[Eg_idx,SEIR_groups.index('I_g')::num_compartments] = - jacob[Sg_idx,SEIR_groups.index('I_g')::num_compartments]
 
         # df^Eg/dRqh all h
-        for ah in range(num_age_groups):
-            jacob[Eg_idx,ah * num_compartments + SEIR_groups.index('Rq_g')] = - jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('Rq_g')]
+        # for ah in range(num_age_groups):
+        #     jacob[Eg_idx,ah * num_compartments + SEIR_groups.index('Rq_g')] = - jacob[Sg_idx,ah * num_compartments + SEIR_groups.index('Rq_g')]       
+        jacob[Eg_idx,SEIR_groups.index('Rq_g')::num_compartments] = - jacob[Sg_idx,SEIR_groups.index('Rq_g')::num_compartments]
 
         # # df^Eg/dEg
-        jacob[Eg_idx,Eg_idx] = - dynModel.groups[age_groups[ag]].parameters['sigma']
+        jacob[Eg_idx, Eg_idx] = -dynModel.groups[age_groups[ag]].parameters['sigma']
 
         #### Derivatives for the function that yields I_g
         # Deriv w.r.t E_g
+        # t.append(time())
         jacob[Ig_idx, Eg_idx] = dynModel.groups[age_groups[ag]].parameters['sigma']
+
         # Deriv w.r.t I_g
         jacob[Ig_idx, Ig_idx] = -dynModel.groups[age_groups[ag]].parameters['mu'] - u_hat[Nmtestg_idx]/X_hat[Ng_idx]
+            
         # Deriv w.r.t N_g
         jacob[Ig_idx, Ng_idx] = u_hat[Nmtestg_idx] * X_hat[Ig_idx]/((X_hat[Ng_idx])**2)
 
         #### Derivatives for the function that yields R_g
         # Deriv w.r.t I_g
+        # t.append(time())
         jacob[Rg_idx, Ig_idx] = dynModel.groups[age_groups[ag]].parameters['mu']*(1 - dynModel.groups[age_groups[ag]].parameters['p_H'] - dynModel.groups[age_groups[ag]].parameters['p_ICU'])
         # Deriv w.r.t R_g
         jacob[Rg_idx, Rg_idx] = -u_hat[Natestg_idx]/X_hat[Ng_idx]
@@ -171,6 +191,7 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method, t):
 
         #### Derivatives for the function that yields Ia_g
         # Deriv w.r.t I_g
+        # t.append(time())
         jacob[Iag_idx, Ig_idx] = dynModel.groups[age_groups[ag]].parameters['p_Ia']*u_hat[Nmtestg_idx]/X_hat[Ng_idx]
         # Deriv w.r.t N_g
         jacob[Iag_idx, Ng_idx] = -dynModel.groups[age_groups[ag]].parameters['p_Ia']*u_hat[Nmtestg_idx]*X_hat[Ig_idx]/((X_hat[Ng_idx])**2)
@@ -179,6 +200,7 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method, t):
 
         #### Derivatives for the function that yields Ips_g
         # Deriv w.r.t I_g
+        # t.append(time())
         jacob[Ipsg_idx, Ig_idx] = dynModel.groups[age_groups[ag]].parameters['p_Ips']*u_hat[Nmtestg_idx]/X_hat[Ng_idx]
         # Deriv w.r.t N_g
         jacob[Ipsg_idx, Ng_idx] = -dynModel.groups[age_groups[ag]].parameters['p_Ips']*u_hat[Nmtestg_idx]*X_hat[Ig_idx]/((X_hat[Ng_idx])**2)
@@ -187,15 +209,16 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method, t):
 
         #### Derivatives for the function that yields Ims_g
         # Deriv w.r.t I_g
+        # t.append(time())
         jacob[Imsg_idx, Ig_idx] = dynModel.groups[age_groups[ag]].parameters['p_Ims']*u_hat[Nmtestg_idx]/X_hat[Ng_idx]
         # Deriv w.r.t N_g
         jacob[Imsg_idx, Ng_idx] = -dynModel.groups[age_groups[ag]].parameters['p_Ims']*u_hat[Nmtestg_idx]*X_hat[Ig_idx]/((X_hat[Ng_idx])**2)
         # Deriv w.r.t Ims_g
         jacob[Imsg_idx, Imsg_idx] = -dynModel.groups[age_groups[ag]].parameters['mu']
 
-
         #### Derivatives for the function that yields Iss_g
         # Deriv w.r.t I_g
+        # t.append(time())
         jacob[Issg_idx, Ig_idx] = dynModel.groups[age_groups[ag]].parameters['p_Iss']*u_hat[Nmtestg_idx]/X_hat[Ng_idx]
         # Deriv w.r.t N_g
         jacob[Issg_idx, Ng_idx] = -dynModel.groups[age_groups[ag]].parameters['p_Iss']*u_hat[Nmtestg_idx]*X_hat[Ig_idx]/((X_hat[Ng_idx])**2)
@@ -204,6 +227,7 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method, t):
 
         #### Derivatives for the function that yields Rq_g
         # Deriv w.r.t Ia, Ips, Iss
+        # t.append(time())
         jacob[Rqg_idx, Iag_idx] = dynModel.groups[age_groups[ag]].parameters['mu']
         jacob[Rqg_idx, Ipsg_idx] = dynModel.groups[age_groups[ag]].parameters['mu']
         jacob[Rqg_idx, Imsg_idx] = dynModel.groups[age_groups[ag]].parameters['mu']
@@ -218,6 +242,7 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method, t):
 
         ########### f^Ng
         # df^Ng/dNg
+        # t.append(time())
         jacob[Ng_idx,Ng_idx] = u_hat[Nmtestg_idx] * X_hat[Ig_idx] / (X_hat[Ng_idx]**2) + u_hat[Natestg_idx] * X_hat[Rg_idx] / (X_hat[Ng_idx]**2)
 
         # df^Ng/dIg
@@ -227,6 +252,7 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method, t):
         jacob[Ng_idx,Rg_idx] = - u_hat[Natestg_idx] / X_hat[Ng_idx]
 
         ########### f^Hg
+        # t.append(time())
         # df^Hg/dHg
         jacob[Hg_idx,Hg_idx] = - (dynModel.groups[age_groups[ag]].parameters['lambda_H_R'] + dynModel.groups[age_groups[ag]].parameters['lambda_H_D'])
         # df^Hg/dIg
@@ -236,6 +262,7 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method, t):
 
         ########### f^ICUg
         # df^ICUg/dICUg
+        # t.append(time())
         jacob[ICUg_idx,ICUg_idx] = - (dynModel.groups[age_groups[ag]].parameters['lambda_ICU_R'] + dynModel.groups[age_groups[ag]].parameters['lambda_ICU_D'])
         # df^ICUg/dIg
         jacob[ICUg_idx,Ig_idx] = dynModel.groups[age_groups[ag]].parameters['mu'] * dynModel.groups[age_groups[ag]].parameters['p_ICU']
@@ -243,6 +270,7 @@ def get_Jacobian_X(dynModel, X_hat, u_hat, mixing_method, t):
         jacob[ICUg_idx,Issg_idx] = dynModel.groups[age_groups[ag]].parameters['mu'] * (dynModel.groups[age_groups[ag]].parameters['p_ICU'] / (dynModel.groups[age_groups[ag]].parameters['p_H'] + dynModel.groups[age_groups[ag]].parameters['p_ICU']))
 
         ########### f^Dg
+        # t.append(time())
         # df^Dg/dHg
         jacob[Dg_idx,Hg_idx] = dynModel.groups[age_groups[ag]].parameters['lambda_H_D']
         # df^Dg/dICUg
@@ -1065,7 +1093,6 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
     Gamma_x: rows = number of "types" of constraints, columns = num_compartments * num_age_groups
     Gamma_u: rows = number of "types" of constraints, columns = num_controls * num_age_groups"""
 
-
     # shorthand for a few useful parameters
     T = dynModel.time_steps
     Xt_dim = num_compartments * num_age_groups
@@ -1082,9 +1109,13 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
     # Some pre-processing:
     # Calculate matrices A and B, and vector c, at given Xhat_seq and uhat_seq, across all the necessary time indices
     # Hold these as dictionaries, where the key is the time t.
-    At = {}
-    Bt = {}
-    ct = {}
+    At = np.zeros((T-k, Xt_dim, Xt_dim))
+    Bt = np.zeros((T-k, Xt_dim, ut_dim))
+    ct = np.zeros((T-k, Xt_dim))
+    jacob_Xs = np.zeros((T-k, Xt_dim, Xt_dim))
+    jacob_us = np.zeros((T-k, Xt_dim, ut_dim))
+    gf_vecs = np.zeros((T-k, Xt_dim))
+    # start51 = time()
     #for t in range(k,T+1):
     for t in range(k,T):
         # print("calculate_all_coefs for loop, t = ", t)
@@ -1095,66 +1126,47 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
 
         jacob_X = get_Jacobian_X(dynModel, Xhat_t, uhat_t, dynModel.mixing_method, t)
         jacob_u = get_Jacobian_u(dynModel, Xhat_t, uhat_t, dynModel.mixing_method, t)
-
-        # Calculate linearization coefficients for X(t+1)
-        At[t] = np.eye(Xt_dim) + dynModel.dt * jacob_X
-        Bt[t] = dynModel.dt * jacob_u
-        # print("Calculating C(t) for t = {}".format(t))
-        # print("The time in the dynamical model is: {}".format(dynModel.t))
-        # print("********************************")
-
-
+ 
+        jacob_Xs[t-k] = jacob_X
+        jacob_us[t-k] = jacob_u
         gf_vec = get_F(dynModel, Xhat_t, uhat_t, t)
-        ct[t] = dynModel.dt * (gf_vec - jacob_X @ Xhat_t ) - jacob_u @ uhat_t #Revisit whether we need to multiply entire expression with dt
+        gf_vecs[t-k] = gf_vec
 
-        tol = 1e-6
-        mu_g = dynModel.groups[age_groups[0]].parameters['mu']
-        pICU_g = dynModel.groups[age_groups[0]].parameters['p_ICU']
-        pH_g = dynModel.groups[age_groups[0]].parameters['p_H']
-        lambda_ICU_R_g = dynModel.groups[age_groups[0]].parameters['lambda_ICU_R']
-        lambda_ICU_D_g = dynModel.groups[age_groups[0]].parameters['lambda_ICU_D']
+    ICUg_idx = list(range(SEIR_groups.index('ICU_g'), num_age_groups * num_compartments, num_compartments))
 
-        #print("1-lambda_ICU_R_g - lambda_ICU_R_g term = ", 1 - lambda_ICU_R_g - lambda_ICU_D_g)
-        #print("mu_g p_ICU_g term = ", mu_g * pICU_g)
-        #print("mu_g p_ICU_g / p_ICU_g + p_H_g term = ", mu_g * pICU_g / (pICU_g + pH_g))
-        # print("calculation of At,Bt,ct for t = ", t)
+    At = np.tile(np.expand_dims(np.eye(Xt_dim), axis=0), (T-k, 1, 1)) + dynModel.dt * jacob_Xs
+    Bt = dynModel.dt * jacob_us
+    ct = dynModel.dt * (gf_vecs - np.squeeze(np.matmul(jacob_Xs, np.expand_dims(Xhat_seq.T[:-1], -1)), -1)) - np.squeeze(np.matmul(jacob_us, np.expand_dims(uhat_seq.T, -1)), -1)
+    
+    assert(abs(ct[:,ICUg_idx]) < 0.0001).all()
 
-        x_approx = jacob_X @ Xhat_t
-        u_approx = jacob_u @ uhat_t
-        for ag in range(num_age_groups):
-            ICUg_idx = ag*num_compartments + SEIR_groups.index('ICU_g')
-            BounceICUg_idx = ag*num_controls + controls.index('BounceICU_g')
-            # print("At[t][ICU] is equal to", At[t][ICUg_idx,:])
-            # print("Bt[t][ICU] is equal to", Bt[t][ICUg_idx,:])
-            # print("for group", ag, age_groups[ag], "ct[t][ICU] is equal to", ct[t][ICUg_idx])
-            # print("components are", gf_vec[ICUg_idx], x_approx[ICUg_idx], u_approx[ICUg_idx])
-            assert(abs(ct[t][ICUg_idx]) < 0.0001)
+    # end51 = time()
+    # print("5.1. [While]: Preprocessing {}".format(int((end51 - start51) * 10**5) / 10**5))
 
-            # if (abs(ct[t][ICUg_idx]) > tol):
-            #    print("ct[t][ICU] is not zero and equal to", ct[t][ICUg_idx])
-
-
+    # start52 = time()
     # All constraint coefficients are stored in dictionary u_constr_coeffs: u_constr_coeffs has a key for each
     # period t in {k,k+1,...,T-1}. The value for key t stores, in turn, another dictionary, which holds the constraint coefficients
     # of the constraints indexed with t.
     # In that dictionary, the key is the index of a constraint "type", and the value is a 2D numpy array with
     # (ut_dim) rows, and T-k columns (one for every time period k, k+1, ..., T-1). These are the coefficients for
     # all the controls u(k),...,u(T-1) appearing in the expression a*X(t) + b*u(t).
-    u_constr_coeffs = {}
+    # u_constr_coeffs = {}
+    u_constr_coeffs = np.zeros((T-k, num_constraints, ut_dim, T-k), dtype=numpyArrayDatatype)
 
     # The linear expression for a constraint also has constants, which we store in a separate dictionary: constr_constants.
     # The constr_constants dictionary has a key for each period in {k,k+1,...,T-1}. The value for key t stores, in turn, another dictionary,
     # which holds the constants of the constraints indexed with t.
     # In that dictionary, the key is the index of a constraint "type", and the value is the constant corresponding to the specific
     # constraint type index and time period.
-    constr_constants = {}
+    # constr_constants = {}
+    constr_constants = np.zeros((T-k, num_constraints), dtype=numpyArrayDatatype)
 
     # Initialize with zeros. (May want to try using sparse matrices here!)
-    for t in np.arange(k,T):
-        u_constr_coeffs[t] = {}
-        constr_constants[t] = {}
-        for constr_index in range(num_constraints):
-            u_constr_coeffs[t][constr_index] = np.zeros((ut_dim,T-k), dtype=numpyArrayDatatype)
+    # for t in np.arange(k,T):
+    #     u_constr_coeffs[t] = {}
+    #     constr_constants[t] = {}
+    #     for constr_index in range(num_constraints):
+    #         u_constr_coeffs[t][constr_index] = np.zeros((ut_dim,T-k), dtype=numpyArrayDatatype)
 
     # All objective coefficients are stored in a 2D numpy array with (ut_dim) rows, and (T-k) columns
     # (one for every time period k, k+1, ..., T-1). Column with index t stores the coefficients in the objective for decision u_{k+t}, which
@@ -1164,58 +1176,61 @@ def calculate_all_coefs(dynModel, k, Xhat_seq, uhat_seq, Gamma_x, Gamma_u, d_mat
     # We keep track of certain partial products of matrices / vectors that are useful
     # NOTE. When comparing this with Overleaf, note that we are only keeping track of
     # the relevant matrices for the current period t (i.e, ignoring t-1,t-2,etc.)
-    At_bar = {}
+    # At_bar_dict = {}
+    At_bar = np.zeros((T-k+1, Xt_dim, Xt_dim))
     Xt_bar = Xhat_seq[:,0]      # initialize with X(k)=Xhat(k)
 
     # print("Computing constants for all periods.")
+    # end52 = time()
+    # print("5.2. [While]: Initialization {}".format(int((end52 - start52) * 10**5) / 10**5))
 
-
+    # start53 = time()
     for t in range(k,T): # loop over times k, k+1, ..., T - 1 to model constraints indexed with t
-
         # Calculate constants for period t
-        for constr_index in range(num_constraints):
-            constr_constants[t][constr_index] = Gamma_x[constr_index,:] @ Xt_bar
-
-        # print("Calculated constants for time {}".format(t))
+        constr_constants[t-k] = Gamma_x @ Xt_bar
+            
         # Update auxiliary vector Xt_bar
-        Xt_bar = At[t] @ Xt_bar + ct[t]
+        Xt_bar = At[t-k] @ Xt_bar + ct[t-k]
 
         # Calculate coefficients for all controls appearing in the constraint for period t
         # NOTE: The coefficients for control u(tau) are stored on column indexed (tau-k) of the 2D array
 
-        for constr_index in range(num_constraints):
-            # coefs for u[t]
-            u_constr_coeffs[t][constr_index][:,t-k] = Gamma_u[constr_index,:]
-
+        u_constr_coeffs[t-k,:,:,t-k] = Gamma_u
 
         # Calculate coefficients for objective coefficient for u_t. Note that this is not the final coefficient of u_t.
         # Since the objective adds linear terms over all k, k+1..., T-1, u_t will receive additional contributions to its coefficient
         u_obj_coeffs[:,t-k] += e_matrix[:,t-k]
 
         # Initialize At_bar for tau=t-1
-        At_bar[t-1] = np.eye(Xt_dim,Xt_dim)
+        At_bar[t-k] = np.eye(Xt_dim,Xt_dim)
 
         for tau in range(t-1,k-1,-1):
-            At_bar_times_Bt = At_bar[tau] @ Bt[tau]
+            At_bar_times_Bt = At_bar[tau-k+1] @ Bt[tau-k]
             all_constraint_coefs_matrix = Gamma_x @ At_bar_times_Bt
-            for constr_index in range(num_constraints):
-                # coefs for u[t-1], u[t-2], ..., u[k] in the constraints
-                u_constr_coeffs[t][constr_index][:,tau-k] = all_constraint_coefs_matrix[constr_index, :]
 
+            u_constr_coeffs[t-k,:,:,tau-k] = all_constraint_coefs_matrix
+            
             # coefs for u[t-1], u[t-2], ..., u[k] in the objective
             u_obj_coeffs[:,tau-k] += d_matrix[:,t-k] @ At_bar_times_Bt
 
             # Update At_bar for next round
-            At_bar[tau-1] = At_bar[tau] @ At[tau]
+            At_bar[tau-k] = At_bar[tau-k+1] @ At[tau-k]
 
-        # print("Computed constraint and obj coeff for time {}".format(t))
+    # print("Computed constraint and obj coeff for time {}".format(t))
+    # end53 = time()
+    # print("5.3. [While]: Compute recursive X and coefficients {}".format(int((end53 - start53) * 10**5) / 10**5))
 
+    # start54 = time()
     # Now we handle the case of t=T
-    At_bar[T-1] = np.eye(Xt_dim,Xt_dim)
-    # Add up the contribution of eta * X_T in the coefficients of decision u_t, t = k, ..., T-1
+
+    At_bar[T-k] = np.eye(Xt_dim,Xt_dim)
+
+    # # Add up the contribution of eta * X_T in the coefficients of decision u_t, t = k, ..., T-1
     for tau in range(T-1,k-1,-1):
-        u_obj_coeffs[:,tau-k] += d_matrix[:,T-k] @ At_bar[tau] @ Bt[tau]
-        At_bar[tau-1] = At_bar[tau] @ At[tau]
+        u_obj_coeffs[:,tau-k] += d_matrix[:,T-k] @ At_bar[tau-k+1] @ Bt[tau-k]
+        At_bar[tau-k] = At_bar[tau-k+1] @ At[tau-k]
+    # end54 = time()
+    # print("5.4. [While]: Compute time step T {}".format(int((end54 - start54) * 10**5) / 10**5))
 
     return u_constr_coeffs, constr_constants, u_obj_coeffs
 
@@ -1474,31 +1489,55 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
             upper_bounds = np.ones(np.shape(obj_vec), dtype=numpyArrayDatatype) * np.inf
             lower_bounds = np.zeros(np.shape(obj_vec), dtype=numpyArrayDatatype)
 
-            for i in range(len(obj_vec)):
-                if i in all_lockdowns_idx_all_times:
-                    lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - trust_region_radius, 0)
+                        # Optimized
+            np_all_lockdowns_idx_all_times = np.array(all_lockdowns_idx_all_times)
+            np_lock_home_idx_all_times = np.array(lock_home_idx_all_times)
+            np_a_test_idx_all_times = np.array(a_test_idx_all_times)
+            np_m_test_idx_all_times = np.array(m_test_idx_all_times)
+
+            # Work, Other, School, Leisure, Transport
+            lower_bounds[np_all_lockdowns_idx_all_times] = np.maximum(uhat_seq[np_all_lockdowns_idx_all_times%ut_dim, np_all_lockdowns_idx_all_times//ut_dim] - trust_region_radius, 0)
+            upper_bounds[np_all_lockdowns_idx_all_times] = np.minimum(uhat_seq[np_all_lockdowns_idx_all_times%ut_dim, np_all_lockdowns_idx_all_times//ut_dim] + trust_region_radius, 1)
+
+            # Home
+            lower_bounds[np_lock_home_idx_all_times] = 1
+            upper_bounds[np_lock_home_idx_all_times] = 1
+
+            # A tests
+            lower_bounds[np_a_test_idx_all_times] = np.maximum(uhat_seq[np_a_test_idx_all_times%ut_dim, np_a_test_idx_all_times//ut_dim] - (trust_region_radius * dynModel.parameters['global-parameters']['C_atest']), 0)
+            upper_bounds[np_a_test_idx_all_times] = np.minimum(uhat_seq[np_a_test_idx_all_times%ut_dim, np_a_test_idx_all_times//ut_dim] + (trust_region_radius * dynModel.parameters['global-parameters']['C_atest']), dynModel.parameters['global-parameters']['C_atest'])
+
+            # M tests
+            lower_bounds[np_m_test_idx_all_times] = np.maximum(uhat_seq[np_m_test_idx_all_times%ut_dim, np_m_test_idx_all_times//ut_dim] - (trust_region_radius * dynModel.parameters['global-parameters']['C_mtest']), 0)
+            upper_bounds[np_m_test_idx_all_times] = np.minimum(uhat_seq[np_m_test_idx_all_times%ut_dim, np_m_test_idx_all_times//ut_dim] + (trust_region_radius * dynModel.parameters['global-parameters']['C_mtest']), dynModel.parameters['global-parameters']['C_mtest'])
+
+
+
+            # for i in range(len(obj_vec)):
+            #     if i in all_lockdowns_idx_all_times:
+            #         lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - trust_region_radius, 0)
                     
-                    assert lower_bounds[i] >= 0
+            #         assert lower_bounds[i] >= 0
 
-                    upper_bounds[i] = min(uhat_seq[i%ut_dim, i//ut_dim] + trust_region_radius, 1)
+            #         upper_bounds[i] = min(uhat_seq[i%ut_dim, i//ut_dim] + trust_region_radius, 1)
 
-                if i in lock_home_idx_all_times:
-                    upper_bounds[i] = 1
-                    lower_bounds[i] = 1
+            #     if i in lock_home_idx_all_times:
+            #         upper_bounds[i] = 1
+            #         lower_bounds[i] = 1
 
-                if i in a_test_idx_all_times:
-                    lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - (trust_region_radius * dynModel.parameters['global-parameters']['C_atest']), 0)
+            #     if i in a_test_idx_all_times:
+            #         lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - (trust_region_radius * dynModel.parameters['global-parameters']['C_atest']), 0)
                     
-                    assert lower_bounds[i] >= 0
+            #         assert lower_bounds[i] >= 0
 
-                    upper_bounds[i] = min(uhat_seq[i%ut_dim, i//ut_dim] + (trust_region_radius * dynModel.parameters['global-parameters']['C_atest']), dynModel.parameters['global-parameters']['C_atest'])
+            #         upper_bounds[i] = min(uhat_seq[i%ut_dim, i//ut_dim] + (trust_region_radius * dynModel.parameters['global-parameters']['C_atest']), dynModel.parameters['global-parameters']['C_atest'])
 
-                if i in m_test_idx_all_times:
-                    lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - (trust_region_radius * dynModel.parameters['global-parameters']['C_mtest']), 0)
+            #     if i in m_test_idx_all_times:
+            #         lower_bounds[i] = max(uhat_seq[i%ut_dim, i//ut_dim] - (trust_region_radius * dynModel.parameters['global-parameters']['C_mtest']), 0)
                     
-                    assert lower_bounds[i] >= 0
+            #         assert lower_bounds[i] >= 0
 
-                    upper_bounds[i] = min(uhat_seq[i%ut_dim, i//ut_dim] + (trust_region_radius * dynModel.parameters['global-parameters']['C_mtest']), dynModel.parameters['global-parameters']['C_mtest'])
+            #         upper_bounds[i] = min(uhat_seq[i%ut_dim, i//ut_dim] + (trust_region_radius * dynModel.parameters['global-parameters']['C_mtest']), dynModel.parameters['global-parameters']['C_mtest'])
 
 
                 # if i in lock_work_idx_all_times:
@@ -1555,6 +1594,19 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
                 m_test_id = controls.index('Nmtest_g')
                 a_test_id = controls.index('Natest_g')
 
+                # m_test_idx_range = list(range(m_test_id, num_age_groups * num_controls, num_controls))
+                # a_test_idx_range = list(range(a_test_id, num_age_groups * num_controls, num_controls))
+                
+                # if (k % lockdown_freq) != 0:
+                #     mod.addConstr(u_vars_vec[m_test_idx_range] == dynModel.m_tests_controls[k-1][age_groups[:]])
+                #     mod.addConstr(u_vars_vec[a_test_idx_range] == dynModel.a_tests_controls[k-1][age_groups[:]])
+
+                m_test_idx_lhs = []
+                m_test_idx_rhs = []
+
+                a_test_idx_lhs = []
+                a_test_idx_rhs = []
+
                 for time_index in range(T - dynModel.END_DAYS):
 
                     if time_index == k and (time_index % lockdown_freq) != 0:
@@ -1571,13 +1623,24 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
                         for ag in range(num_age_groups):
                             m_test_idx = m_test_id + ag * num_controls
                             a_test_idx = a_test_id + ag * num_controls
+                            
+                            m_test_idx_lhs.append((time_index - k) * ut_dim + m_test_idx)
+                            m_test_idx_rhs.append((time_index - k - 1) * ut_dim + m_test_idx)
 
-                            mod.addConstr(u_vars_vec[(time_index - k) * ut_dim + m_test_idx] == u_vars_vec[(time_index - k - 1) * ut_dim + m_test_idx])
-                            mod.addConstr(u_vars_vec[(time_index - k) * ut_dim + a_test_idx] == u_vars_vec[(time_index - k - 1) * ut_dim + a_test_idx])
+                            a_test_idx_lhs.append((time_index - k) * ut_dim + a_test_idx)
+                            a_test_idx_rhs.append((time_index - k - 1) * ut_dim + a_test_idx)
 
+                            # mod.addConstr(u_vars_vec[(time_index - k) * ut_dim + m_test_idx] == u_vars_vec[(time_index - k - 1) * ut_dim + m_test_idx])
+                            # mod.addConstr(u_vars_vec[(time_index - k) * ut_dim + a_test_idx] == u_vars_vec[(time_index - k - 1) * ut_dim + a_test_idx])
+
+                mod.addConstr(u_vars_vec[m_test_idx_lhs] == u_vars_vec[m_test_idx_rhs])
+                mod.addConstr(u_vars_vec[a_test_idx_lhs] == u_vars_vec[a_test_idx_rhs])
 
             # Biweekly lockdown constraints
             if lockdown_freq > 1:
+
+                act_test_idx_lhs = []
+                act_test_idx_rhs = []
 
                 for time_index in range(T - dynModel.END_DAYS):
 
@@ -1596,7 +1659,10 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
                                 act_lock_id = controls.index(act)
                                 act_lock_idx = act_lock_id + ag * num_controls
 
-                                mod.addConstr(u_vars_vec[(time_index - k) * ut_dim + act_lock_idx] == u_vars_vec[(time_index - k - 1) * ut_dim + act_lock_idx])
+                                act_test_idx_lhs.append((time_index - k) * ut_dim + act_lock_idx)
+                                act_test_idx_rhs.append((time_index - k - 1) * ut_dim + act_lock_idx)
+                                # mod.addConstr(u_vars_vec[(time_index - k) * ut_dim + act_lock_idx] == u_vars_vec[(time_index - k - 1) * ut_dim + act_lock_idx])
+                mod.addConstr(u_vars_vec[act_test_idx_lhs] == u_vars_vec[act_test_idx_rhs])
 
 
 
