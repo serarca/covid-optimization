@@ -1685,7 +1685,11 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
             # ToDo: Remove when running as it reduces efficiency
             # mod.Params.InfUnbdInfo = 1
 
-            mod.addConstrs(u_vars_vec[i] >= 0 for i in range(ut_dim * (T-k)))
+            # mod.addConstrs(u_vars_vec[i] >= 0 for i in range(ut_dim * (T-k)))
+
+            eye = np.eye(u_vars_vec.shape[0])
+            zeros = np.zeros(u_vars_vec.shape[0])
+            lower_constrs = mod.addMConstrs(eye, u_vars_vec, ">=", zeros)
 
   
 
