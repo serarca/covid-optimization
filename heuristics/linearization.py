@@ -1463,13 +1463,13 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
             assert( np.shape(obj_coefs) == (ut_dim,T-k) )
             assert( len(constr_coefs) == T-k )
             assert( len(constr_consts) == T-k )
-            for t in range(k,T):
-                assert( len(constr_coefs[t]) == num_constraints )
-                assert( len(constr_consts[t]) == num_constraints )
+            for t in range(k, T):
+                assert( len(constr_coefs[t-k]) == num_constraints )
+                assert( len(constr_consts[t-k]) == num_constraints )
 
                 for i in range(num_constraints):
-                    assert( np.shape(constr_coefs[t][i])==np.shape(uhat_seq) )
-                    assert( np.shape(constr_consts[t][i])==() )
+                    assert( np.shape(constr_coefs[t-k][i])==np.shape(uhat_seq) )
+                    assert( np.shape(constr_consts[t-k][i])==() )
 
             # create empty model
             mod = gb.Model("Linearization Heuristic")
@@ -1672,12 +1672,13 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
             for t in range(k,T):
                 #print("Time %d number of constraints %d" %(t,len(constr_coefs[t])))
                 for con in range(num_constraints):
-                    cons_vec = np.reshape(constr_coefs[t][con], (ut_dim * (T-k),), 'F').transpose()
+                    cons_vec = np.reshape(constr_coefs[t-k][con], (ut_dim * (T-k),), 'F').transpose()
                     ConstMatrix[(t-k) * num_constraints + con, :] = cons_vec
-                    ConstRHS[(t-k) * num_constraints + con] = K[con,t] - constr_consts[t][con]
+                    ConstRHS[(t-k) * num_constraints + con] = K[con,t] - constr_consts[t-k][con]
                     # cname = ("%s[t=%d]" %(all_labels[con],t))
                     # expr = (u_vars_vec @ cons_vec) + (constr_consts[t][con])
                     # mod.addConstr((u_vars_vec @ cons_vec) + (constr_consts[t][con]) <= K[con,t], name=cname)
+            
             all_const = mod.addMConstrs(ConstMatrix, u_vars_vec, "<", ConstRHS)
             # optimize the model
 
