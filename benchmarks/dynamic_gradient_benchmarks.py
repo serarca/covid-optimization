@@ -182,7 +182,7 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
 
 
 	constant_gradients_filename = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d"%(
-		"constant_gradient",
+		"time_gradient",
 		result["experiment_params"]["xi"],
 		result["experiment_params"]["icus"],
 		result["testing_heuristic"],
@@ -194,7 +194,7 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
 		result["experiment_params"]["delta_schooling"],
 		experiment_params["eta"],
 		90,
-		90,
+		14,
 	)
 
 
