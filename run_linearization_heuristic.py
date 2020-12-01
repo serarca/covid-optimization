@@ -101,7 +101,7 @@ def main():
     xi = all_instances[instance_index][1]
     icus = all_instances[instance_index][2]
     mtests = all_instances[instance_index][3]
-    atests = mtests
+    atests = 0
 
     # atests = all_instances[instance_index][4]
     print(all_instances[instance_index])

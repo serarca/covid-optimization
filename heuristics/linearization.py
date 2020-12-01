@@ -1349,7 +1349,7 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
 
     # Initialize lockdown policy for first u_hat
 
-    if initial_uhat in ["dynamic_gradienst", "time_gradient"]:
+    if initial_uhat in ["dynamic_gradient", "time_gradient"]:
         h = initial_uhat
         n = "xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d.yaml"%(
             dynModel.experiment_params["xi"]*0.1,
