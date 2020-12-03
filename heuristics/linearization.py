@@ -1295,12 +1295,12 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
     #Check that if we target only activities or groups, we are using the 
     # correct starting point
     if not targetActivities:
-        assert initial_uhat in ["constant_gradient", "age_group_gradient"]
+        assert initial_uhat in ["time_gradient", "age_group_gradient"]
         if not targetGroups:
-            assert initial_uhat == "constant_gradient"
+            assert initial_uhat == "time_gradient"
     
     if not targetGroups:
-        assert initial_uhat in ["constant_gradient", "activity_gradient"]
+        assert initial_uhat in ["time_gradient", "activity_gradient"]
 
     dynModel.reset_time(0)
 
@@ -1358,7 +1358,7 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
 
     # Initialize lockdown policy for first u_hat
 
-    if initial_uhat in ["dynamic_gradient", "time_gradient","age_group_gradient","activity_gradient","constant_gradient"]:
+    if initial_uhat in ["dynamic_gradient", "time_gradient","age_group_gradient","activity_gradient","time_gradient"]:
         h = initial_uhat
         n = "xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d.yaml"%(
             dynModel.experiment_params["xi"]*0.1,
@@ -1372,7 +1372,7 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
             dynModel.experiment_params["delta_schooling"],
             dynModel.econ_params["employment_params"]["eta"],
             90,
-            14 if initial_uhat!="constant_gradient" else 90
+            14 
         )
 
         with open("benchmarks/results/%s/%s"%(h,n)) as file:
