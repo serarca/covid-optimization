@@ -1,0 +1,10 @@
+\ Model Linearization Heuristic_copy
+\ LP format - for model browsing. Use MPS format to capture full model detail.
+Maximize
+ 
+Subject To
+ R4482: u[5] - u[6] = -0
+Bounds
+ -infinity <= u[5] <= 0.05
+ u[6] >= 0.95
+End
