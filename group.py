@@ -2,7 +2,6 @@ from collections import defaultdict
 import numpy as np
 import pandas as pd
 import math
-import gurobipy as gb
 from copy import deepcopy
 
 all_activities = ['home','leisure','other','school','transport','work']
@@ -141,10 +140,10 @@ class DynamicalModel:
 		for n in self.groups:
 			self.groups[n].update_total_contacts(time_of_flow, alphas)
 
-			if (B_H is not False) and (B_ICU is not False):
-				if(isinstance(B_H[n], gb.Var) or isinstance(B_ICU[n], gb.Var) ):
-					print("Take Time Step: B_H and B_ICU are gurobi variables. Skipping bounding and capcity assertion checks.")
-					self.use_gurobi_vars = True
+			# if (B_H is not False) and (B_ICU is not False):
+				# if(isinstance(B_H[n], gb.Var) or isinstance(B_ICU[n], gb.Var) ):
+				# 	print("Take Time Step: B_H and B_ICU are gurobi variables. Skipping bounding and capcity assertion checks.")
+				# 	self.use_gurobi_vars = True
 
 		# Store Lockdown and testing controls for time t
 		self.lockdown_controls += [alphas]
@@ -260,16 +259,16 @@ class DynamicalModel:
 		for n in self.groups:
 			self.groups[n].reset_time(new_time)
 
-			if(
-			isinstance(self.groups[n].H[new_time], gb.Var)
-			or
-			isinstance(self.groups[n].ICU[new_time], gb.Var)
-			or
-			isinstance(self.groups[n].H[new_time], gb.LinExpr)
-			or
-			isinstance(self.groups[n].ICU[new_time], gb.LinExpr)):
-				print("Reset Time: B_H and B_ICU are gurobi variables. Fixing the use_gurobi_vars flag to True.")
-				self.use_gurobi_vars = True
+			# if(
+			# isinstance(self.groups[n].H[new_time], gb.Var)
+			# or
+			# isinstance(self.groups[n].ICU[new_time], gb.Var)
+			# or
+			# isinstance(self.groups[n].H[new_time], gb.LinExpr)
+			# or
+			# isinstance(self.groups[n].ICU[new_time], gb.LinExpr)):
+			# 	print("Reset Time: B_H and B_ICU are gurobi variables. Fixing the use_gurobi_vars flag to True.")
+			# 	self.use_gurobi_vars = True
 
 		# reset internal calculations of econ values, deaths, rewards
 		self.economic_values = self.economic_values[0:new_time+1]
@@ -516,7 +515,7 @@ class SEIR_group:
 		# Group name
 		self.name = group_parameters['name']
 		self.parameters = group_parameters['parameters']
-		self.contacts = group_parameters['contacts']
+		self.contacts = group_parameters['contacts_spc']
 		self.initial_conditions = group_initialization
 		self.mixing_method = mixing_method
 		self.time_steps = time_steps

@@ -91,11 +91,11 @@ with open("../parameters/fitted.yaml") as file:
     universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
 # Read initialization
-with open("../initialization/60days.yaml") as file:
+with open("../initialization/oct21.yaml") as file:
     # The FullLoader parameter handles the conversion from YAML
     # scalar values to Python the dictionary format
     initialization = yaml.load(file, Loader=yaml.FullLoader)
-    start_day = 61
+    start_day = 0
 
 # Read econ parameters
 with open("../parameters/econ.yaml") as file:
@@ -110,6 +110,20 @@ experiment_params = {
 
 # Define mixing parameter
 mixing_method = universe_params["mixing"]
+
+alphas_d = {
+    'work':mixing_method['param_alpha'],
+    'transport':mixing_method['param_alpha'],
+    'school':mixing_method['param_alpha'],
+    'other':mixing_method['param_alpha'],
+    'leisure':mixing_method['param_alpha'],
+    'home':mixing_method['param_alpha'],
+}
+fast_mixing_method = {
+	"name":"mult",
+	"param_alpha":alphas_d,
+	"param_beta":alphas_d,
+}
 
 
 
@@ -133,7 +147,7 @@ for g in age_groups:
     a_tests[g] = u_hat_dict[g]['Natest_g']
 
 # Construct model
-dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method, start_day)
+dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method, start_day, 0.0)
 
 initial_state = dynModel.get_state(0)
 
@@ -149,14 +163,9 @@ m_tests_vec = tests_to_vector(m_tests)
 a_tests_vec = tests_to_vector(a_tests)
 alphas_matrix = alphas_to_matrix(alphas)
 
-fast = FastDynamicalModel(universe_params, econ_params, experiment_params, simulation_params['dt'], mixing_method)
+fast = FastDynamicalModel(universe_params, econ_params, experiment_params, simulation_params['dt'], fast_mixing_method, simulation_params['time_periods'], start_day, 0.0)
 for t in range(1):
-	if start_day + t < universe_params['days_before_gamma']:
-			lockdown_status = "pre-gamma"
-	else:
-		lockdown_status = "post-gamma"
-	print(lockdown_status)
-	new_state, econs_fast = fast.take_time_step(state_matrix, m_tests_vec, a_tests_vec, alphas_matrix, lockdown_status)
+	new_state, econs_fast = fast.take_time_step(state_matrix, m_tests_vec, a_tests_vec, alphas_matrix, t, 'spc')
 
 
 slow_total_contacts = np.zeros(len(age_groups), order="C")

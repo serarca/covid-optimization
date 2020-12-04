@@ -59,7 +59,7 @@ def main():
         "frequencies":[(7,14)],
         "region":["fitted-scaled"], 
         "econ": ["econ-scaled"],
-        "init": ["60days-scaled"],
+        "init": ["oct21-scaled"],
         "eta":[0, 0.1, 0.2],
         # "eta":[0, 0.1],
         "trust_region_radius":[0.05],
@@ -89,15 +89,15 @@ def main():
 
     n_days = 90
     groups = "all"
-    start_day = 60
+    start_day = 0
     optimize_bouncing = False
 
     print(len(all_instances))
 
 
-    # scaling_econ_param(scaling, money_scaling)
-    # scaling_fitted(scaling, money_scaling)
-    # scaling_init(scaling)
+    scaling_econ_param(scaling, money_scaling, groups)
+    scaling_fitted(scaling, money_scaling, groups)
+    scaling_init(scaling, groups)
 
     # Final time step is used if we want to evaluate 
     # the hueristic at any time before the n_days
@@ -113,7 +113,7 @@ def main():
     xi = all_instances[instance_index][1]
     icus = all_instances[instance_index][2]
     mtests = all_instances[instance_index][3]
-    atests = mtests
+    atests = 0
 
     # atests = all_instances[instance_index][4]
     print(all_instances[instance_index])
@@ -252,23 +252,44 @@ def run_linearization_heuristic(simulation_params, experiment_params, start_day,
 
 
     # Read group parameters
-    with open("parameters/"+simulation_params["region"]+".yaml") as file:
+    with open("parameters/"+simulation_params["region"]+".yaml","r") as file:
         # The FullLoader parameter handles the conversion from YAML
         # scalar values to Python the dictionary format
+        while file is None:
+            print("Failed reading fitted param")
+            file = open("parameters/"+simulation_params["region"]+".yaml","r")
+        
         universe_params = yaml.load(file, Loader=yaml.FullLoader)
+        
+        while universe_params is None:
+            print("Failed converting to yaml fitted param")
+            universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
         # Read initialization
-    with open(f"initialization/{simulation_params['init']}.yaml") as file:
+    with open(f"initialization/{simulation_params['init']}.yaml","r") as file:
         # The FullLoader parameter handles the conversion from YAML
         # scalar values to Python the dictionary format
+        while file is None:
+            print("Failed reading init param")
+            file = open(f"initialization/{simulation_params['init']}.yaml","r")
+
         initialization = yaml.load(file, Loader=yaml.FullLoader)
-        
+        while initialization is None:
+            print("Failed converting to yaml init param")
+            initialization = yaml.load(file, Loader=yaml.FullLoader)
     
     # Read econ parameters
-    with open(f"parameters/{simulation_params['econ']}.yaml") as file:
-        econ_params = yaml.load(file, Loader=yaml.FullLoader)
+    with open(f"parameters/{simulation_params['econ']}.yaml","r") as file:
+        while file is None:
+            print("Failed reading econ param")
+            file = open(f"initialization/{simulation_params['init']}.yaml","r")
 
+        econ_params = yaml.load(file, Loader=yaml.FullLoader)
+        while econ_params is None:
+            print("Failed converting to yaml econ param")
+            econ_params = yaml.load(file, Loader=yaml.FullLoader)
     
+    print(universe_params)
 
     # Define mixing method
     mixing_method = universe_params['mixing']
@@ -661,59 +682,7 @@ def scaling_econ_param(scaling, money_scaling):
     with open('parameters/econ-scaled.yaml', 'w') as file:
         yaml.dump(scaled_econ, file)
 
-def scaling_init(scaling):
-    # Import data
-    old_init = yaml.load(open( "initialization/60days.yaml", "rb" ), Loader=yaml.FullLoader)
-    # scaling = 1000.0
 
-    # Construct initialization
-    scaled_init_dict = {}
-    for group in old_init:
-        scaled_init_dict[group] = {
-                "S": old_init[group]["S"] / scaling,
-                "E": old_init[group]["E"] / scaling,
-                "I": old_init[group]["I"] / scaling,
-                "R": old_init[group]["R"] / scaling,
-                "Ia": old_init[group]["Ia"] / scaling,
-                "Ips": old_init[group]["Ips"] / scaling,
-                "Ims": old_init[group]["Ims"] / scaling,
-                "Iss": old_init[group]["Iss"] / scaling,
-                "Rq": old_init[group]["Rq"] / scaling,
-                "H": old_init[group]["H"] / scaling,
-                "ICU": old_init[group]["ICU"] / scaling,
-                "D": old_init[group]["D"] / scaling,
-        }
-
-    with open('initialization/60days-scaled.yaml', 'w') as file:
-        yaml.dump(scaled_init_dict, file)
-
-
-def scaling_fitted(scaling, money_scaling):
-    # Import data
-    old_fitted = yaml.load(open( "parameters/fitted.yaml", "rb" ), Loader=yaml.FullLoader)
-    scaling = 1000.0
-
-    scaled_fitted = dict(old_fitted)
-
-    # Scale global_param
-    scaled_fitted["global-parameters"]["C_H"] = scaled_fitted["global-parameters"]["C_H"] / scaling
-
-    scaled_fitted["global-parameters"]["C_ICU"] = scaled_fitted["global-parameters"]["C_ICU"] / scaling
-
-
-
-    # for group_h in scaled_fitted["seir-groups"]:
-        # # Scale contacts
-        # for act in scaled_fitted["seir-groups"][group_h]["contacts"]:
-        #     for group_g in scaled_fitted["seir-groups"][group_h]["contacts"][act]:
-        #         scaled_fitted["seir-groups"][group_h]["contacts"][act][group_g] = scaled_fitted["seir-groups"][group_h]["contacts"][act][group_g] * scaling
-        
-        # Scale econ death value
-        # scaled_fitted["seir-groups"][group_h]["economics"]["death_value"] = scaled_fitted["seir-groups"][group_h]["economics"]["death_value"] * scaling
-            
-
-    with open('parameters/fitted-scaled.yaml', 'w') as file:
-        yaml.dump(scaled_fitted, file)
 
 
 def scaling_econ_param(scaling, money_scaling, groups):
@@ -757,9 +726,9 @@ def scaling_econ_param(scaling, money_scaling, groups):
 def scaling_init(scaling, groups):
     # Import data
     if groups == "all":
-        old_init = yaml.load(open( "initialization/60days.yaml", "rb" ), Loader=yaml.FullLoader)
+        old_init = yaml.load(open( "initialization/oct21.yaml", "rb" ), Loader=yaml.FullLoader)
     elif groups == "one":
-        old_init = yaml.load(open( "initialization/60days_one_group.yaml", "rb" ), Loader=yaml.FullLoader)
+        old_init = yaml.load(open( "initialization/oct21_one_group.yaml", "rb" ), Loader=yaml.FullLoader)
 
     
     # scaling = 1000.0
@@ -783,10 +752,10 @@ def scaling_init(scaling, groups):
         }
 
     if groups == "all":
-        with open('initialization/60days-scaled.yaml', 'w') as file:
+        with open('initialization/oct21-scaled.yaml', 'w') as file:
             yaml.dump(scaled_init_dict, file)
     elif groups == "one":
-        with open('initialization/60days_one_group-scaled.yaml', 'w') as file:
+        with open('initialization/oct21_one_group-scaled.yaml', 'w') as file:
             yaml.dump(scaled_init_dict, file)
 
     
