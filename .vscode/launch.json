@@ -1,0 +1,55 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+    
+    
+    
+
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/alexh/anaconda3/envs/covid/bin/python"
+        },
+        {
+            "name": "Python: example",
+            "type": "python",
+            "request": "launch",
+            "program": "example.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/alexh/anaconda3/envs/covid/bin/python"
+        },
+        {
+            "name": "Python: run_linearization",
+            "type": "python",
+            "request": "launch",
+            "program": "run_linearization_heuristic.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/alexh/anaconda3/envs/covid/bin/python"
+        },
+        {
+            "name": "Python: gen_params",
+            "type": "python",
+            "request": "launch",
+            "program": "parameters/gen_params.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/alexh/anaconda3/envs/covid/bin/python",
+            "env": {"PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"}
+        },
+        {
+            "name": "Python: params_fitting",
+            "type": "python",
+            "request": "launch",
+            "program": "parameter_fitting/ParameterFittingTwoGamma.py",
+            "console": "integratedTerminal",
+            "pythonPath": "/home/alexh/anaconda3/envs/covid/bin/python",
+            "env": {"PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"}
+        }
+    ]
+}
