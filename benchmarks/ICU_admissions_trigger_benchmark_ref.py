@@ -53,12 +53,12 @@ quar_freq = 1
 
 
 thresholds_to_try = {
-	"icu_utilization_rate":[0.1*(i+1) for i in range(11)],
-	"sevenday_avg_newICU":[10*(i+1) for i in range(41)] 
+	"icu_utilization_rate":[0.2*(i+1) for i in range(5)],
+	"sevenday_avg_newICU":[20*(i+1) for i in range(21)] 
 }
 lockdowns_to_try = {
-	"low_activity":[0.1*i for i in range(11)],
-	"high_activity":[0.1*i for i in range(11)]
+	"low_activity":[0.2*i for i in range(6)],
+	"high_activity":[0.2*i for i in range(6)]
 }
 
 
@@ -406,9 +406,9 @@ for delta in params_to_try["delta_schooling"]:
 						a_tests_vec = dict_to_vector(a_tests)
 
 						total_iterations = (
-							(len(thresholds_to_try["icu_utilization_rate"])-1)/2*
+							len(thresholds_to_try["icu_utilization_rate"])*
 							len(thresholds_to_try["sevenday_avg_newICU"])*
-							len(lockdowns_to_try["high_activity"])*
+							(len(lockdowns_to_try["high_activity"])-1)/2*
 							len(lockdowns_to_try["low_activity"])
 						)
 
