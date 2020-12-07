@@ -467,7 +467,7 @@ for delta in params_to_try["delta_schooling"]:
 														best_result = partial_result
 														print(best_result)
 
-													print(counter/total_iterations)
+													#print(counter/total_iterations)
 													counter+=1
 
 						result_policy = French_trigger_policy(experiment_params, best_result["thresholds"], best_result["activity_levels"])
