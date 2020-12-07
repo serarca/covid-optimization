@@ -43,9 +43,9 @@ def main():
     scaling = 10000
     money_scaling = 1000
     xi_mult_values = [0,10,25,50,100,150]
-    testing_values = [0, 30000]
+    testing_values = [0]
     # , 60000, 120000]
-    icu_values = [2000]
+    icu_values = [2600, 2900, 3200]
     # , 2300, 2600, 2900, 3200]
 
     params_to_try = {
@@ -58,12 +58,11 @@ def main():
         "region":["fitted-scaled"], 
         "econ": ["econ-scaled"],
         "init": ["oct21-scaled"],
-        "eta":[0.1],
-        # , 0, 0.2],
+        "eta":[0.1, 0, 0.2],
         "xi":[mult * 37199.03 * scaling / money_scaling for mult in xi_mult_values],
         "trust_region_radius":[0.05],
         "max_inner_iterations_mult":[2],
-        "initial_uhat":["time_gradient"]
+        "initial_uhat":["time_gradient","activity_gradient", "age_group_gradient","dynamic_gradient"]
         # "full_lockdown", "full_open","dynamic_gradient", "activity_gradient", "age_group_gradient", "time_gradient"
     }
 

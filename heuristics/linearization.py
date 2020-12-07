@@ -1712,22 +1712,43 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
 
                 mod.addConstr(u_vars_vec[hom_groups_idx_lhs] == u_vars_vec[hom_groups_idx_rhs])
 
-            # Homogenous testing across groups (if targeting tests is false)
+            # Testing proportional to the population across groups 
+            # (if targeting tests is false)
             if not targetTests:
-                hom_tests_idx_lhs = []
-                hom_tests_idx_rhs = []
+                prop_tests_idx = []
+                proportional_tests = np.zeros(ut_dim*(T-k))
 
-                for time_index in range(k, T - dynModel.END_DAYS):
-                    for ag in range(num_age_groups-1):
-                        for test in ["Nmtest_g","Natest_g"]:
-                            test_lock_id = controls.index(test)
-                            test_lock_g1_idx = test_lock_id + ag * num_controls
-                            test_lock_g2_idx = test_lock_id + (ag+1) * num_controls
+                age_group_initial_population = [sum([dynModel.initialization[group][cat] for cat in dynModel.initialization[group].keys()]) for group in dynModel.initialization.keys()]
 
-                            hom_tests_idx_lhs.append((time_index - k) * ut_dim + act_lock_g1_idx)
-                            hom_tests_idx_rhs.append((time_index - k) * ut_dim + act_lock_g2_idx)
+                assert dynModel.total_population == sum(age_group_initial_population)
 
-                mod.addConstr(u_vars_vec[hom_tests_idx_lhs] == u_vars_vec[hom_tests_idx_rhs])
+                for time_index in range(k, T):
+                    if time_index == k or (time_index % test_freq) == 0:
+
+                        total_tests_at_time_time_index = 0
+                        for ag in range(num_age_groups):
+                            
+                            for test in ["Nmtest_g"]:
+                                test_id = controls.index(test)
+                                test_g_idx = test_id + ag * num_controls
+                                
+                                # Number of tests proportional to the initial 
+                                # population 
+                                if test == "Nmtest_g":
+                                    prop_test = dynModel.parameters['global-parameters']['C_mtest'] * (age_group_initial_population[ag] / dynModel.total_population)
+                                    total_tests_at_time_time_index += prop_test
+                                
+                                if test == "Natest_g":
+                                    prop_test = dynModel.parameters['global-parameters']['C_atest'] * (age_group_initial_population[ag] / dynModel.total_population)
+                    
+                                proportional_tests[((time_index - k) * ut_dim + test_g_idx)] = prop_test
+
+                                print(f"Tests for index {((time_index - k) * ut_dim + test_g_idx)} are {prop_test}")
+                                
+                                prop_tests_idx.append(((time_index - k) * ut_dim + test_g_idx))
+                        assert total_tests_at_time_time_index == dynModel.parameters['global-parameters']['C_mtest']
+
+                mod.addConstr(u_vars_vec[prop_tests_idx] >= proportional_tests[prop_tests_idx])
 
 
             ConstMatrix = np.zeros(((T-k) * num_constraints, ut_dim * (T-k)), dtype=numpyArrayDatatype)
