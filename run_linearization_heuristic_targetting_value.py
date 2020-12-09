@@ -45,7 +45,7 @@ def main():
     xi_mult_values = [0,10,25,50,100,150]
     testing_values = [0]
     # , 60000, 120000]
-    icu_values = [2600, 2900, 3200]
+    icu_values = [2500,3000,3500]
     # , 2300, 2600, 2900, 3200]
 
     params_to_try = {
