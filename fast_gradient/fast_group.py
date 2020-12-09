@@ -276,6 +276,13 @@ class FastDynamicalModel:
 		denom[denom == 0] = 1e-6
 		return self.mu*self.p_ICU*(self.state[:,cont.index("I")] + self.state[:,cont.index("Iss")]/denom)
 
+	def get_new_infections(self):
+		return self.sigma*self.state[:,cont.index("E")]
+
+	def get_new_infections_old(self):
+		return self.sigma[6:9]*(self.state[:,cont.index("E")])[6:9]
+
+
 	def update_N(self):
 		self.new_state[:,cont.index("N")] = self.state[:,cont.index("N")]+(
 			- self.m_tests*self.state[:,cont.index("I")]/self.pop

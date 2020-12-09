@@ -96,23 +96,15 @@ for delta in params_to_try["delta_schooling"]:
 #
 #SBATCH --job-name=test
 #
-#SBATCH --time=12:00:00
+#SBATCH --time=1:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=1G
 
 ml python/3.6.1
-python3 simple_benchmarks.py --delta %f --icus %d --eta %f --groups all --xi %f --a_tests %d --m_tests %d
-python3 time_gradient_benchmarks.py --delta %f --icus %d --eta %f --groups all --xi %f --a_tests %d --m_tests %d
-python3 age_group_gradient_benchmarks.py --delta %f --icus %d --eta %f --groups all --xi %f --a_tests %d --m_tests %d
-python3 activity_gradient_benchmarks.py --delta %f --icus %d --eta %f --groups all --xi %f --a_tests %d --m_tests %d
-python3 dynamic_gradient_benchmarks.py --delta %f --icus %d --eta %f --groups all --xi %f --a_tests %d --m_tests %d
+python3 French_trigger_or_benchmark_ref.py --delta %f --icus %d --eta %f --groups all --xi %f --a_tests %d --m_tests %d
 """%(
 									delta, icus, eta, xi, tests[1], tests[0],
-									delta, icus, eta, xi, tests[1], tests[0],
-									delta, icus, eta, xi, tests[1], tests[0],
-									delta, icus, eta, xi, tests[1], tests[0],
-									delta, icus, eta, xi, tests[1], tests[0]
 								)
 							)
 						if counter < 540:
