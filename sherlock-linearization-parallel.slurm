@@ -8,7 +8,7 @@
 
  
 
-#SBATCH --array=80 # there is a max array size - 512 tasks
+#SBATCH --array=0-35 # there is a max array size - 512 tasks
 
 #SBATCH -J run_linearization_heuristic
 
@@ -17,7 +17,7 @@
 
 
 
-#SBATCH -t 0-10
+#SBATCH -t 0-20
 
 
 #SBATCH -o parallel_runs_outputs/linearization_heur_runs-%A-%a.out
@@ -50,7 +50,7 @@ ml load py-scipy/1.4.1_py36
 
 # source activate myenv
 
-srun --exclusive -n 1 python3 run_linearization_heuristic.py $((SLURM_ARRAY_TASK_ID + 1000))
+srun --exclusive -n 1 python3 run_linearization_heuristic.py $SLURM_ARRAY_TASK_ID
 
 # for i in {0..29}; do
 #     srun --exclusive -n 1 python3 run_linearization_heuristic.py $((SLURM_ARRAY_TASK_ID * 50 + i)) &

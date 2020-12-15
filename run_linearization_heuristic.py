@@ -42,8 +42,10 @@ def main():
     scaling = 10000
     money_scaling = 1000
     xi_mult_values = [0,10,25,50,100,150]
-    testing_values = [0, 30000, 60000, 120000]
-    icu_values = [2000, 2300, 2600, 2900, 3200]
+    testing_values = [0]
+    # [0, 30000, 60000, 120000]
+    icu_values = [2900]
+    # [2000, 2300, 2600, 2900, 3200]
 
     params_to_try = {
         "delta_schooling":[0.5, 1, 5],
@@ -55,10 +57,10 @@ def main():
         "region":["fitted-scaled"], 
         "econ": ["econ-scaled"],
         "init": ["oct21-scaled"],
-        "eta":[0, 0.1, 0.2],
+        "eta":[0, 0.2],
         "trust_region_radius":[0.05],
         "max_inner_iterations_mult":[2],
-        "initial_uhat":["dynamic_gradient"]
+        "initial_uhat":["full_lockdown"]
         # "full_lockdown", "full_open","dynamic_gradient",
     }
 
@@ -78,7 +80,7 @@ def main():
     #     "eta":[0.1]
     # }
 
-    n_days = 90
+    n_days = 180
     groups = "all"
     start_day = 0
     optimize_bouncing = False
