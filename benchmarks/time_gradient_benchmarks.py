@@ -61,7 +61,7 @@ groups = run_params["groups"]
 # Global variables
 simulation_params = {
 	'dt':1.0,
-	'days': 90.0,
+	'days': 180.0,
 	'region': "fitted",
 	'heuristic': 'benchmark',
 	'mixing_method': {'name': 'multi'}
