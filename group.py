@@ -287,6 +287,8 @@ class DynamicalModel:
 		for t in range(self.time_steps):
 			self.take_time_step(m_tests_vec[t], a_tests_vec[t], alphas_vec[t])
 
+			
+
 	# Given a state and set of alphas, returns the economic value
 	def get_economic_value(self, state, alphas):
 		econ_activities = ["transport","leisure","other"]
