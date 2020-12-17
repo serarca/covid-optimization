@@ -60,7 +60,7 @@ def main():
         "eta":[0, 0.2],
         "trust_region_radius":[0.05],
         "max_inner_iterations_mult":[2],
-        "initial_uhat":["full_lockdown"]
+        "initial_uhat":["dynamic_gradient"]
         # "full_lockdown", "full_open","dynamic_gradient",
     }
 

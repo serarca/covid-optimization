@@ -1371,7 +1371,7 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
             "all",
             dynModel.experiment_params["delta_schooling"],
             dynModel.econ_params["employment_params"]["eta"],
-            90,
+            dynModel.time_steps - dynModel.END_DAYS,
             14 
         )
 
