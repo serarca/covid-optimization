@@ -1280,7 +1280,7 @@ def get_real_reward(dynModel, uhat_seq):
 # Main function: runs the linearization heuristic
 # @profile
 # @log_execution_time
-def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_iterations_mult=2, initial_uhat="dynamic_gradient", optimize_bouncing=True, targetActivities=True, targetGroups=True, targetTests=True):
+def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_iterations_mult=2, initial_uhat="dynamic_gradient", optimize_bouncing=True, targetActivities=True, targetGroups=True, targetTests=True, deltaFairnessOne=False, deltaFair=0.1):
     """Run the heuristic based on linearization. Takes a dynamical model, resets the time to 0, and runs it following the linearization heuristic. Returns the dynamical model after running it."""
 
     # age_groups = dynModel.groups.keys()
@@ -1749,7 +1749,49 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
                         assert total_tests_at_time_time_index == dynModel.parameters['global-parameters']['C_mtest']
 
                 mod.addConstr(u_vars_vec[prop_tests_idx] >= proportional_tests[prop_tests_idx])
+            
+            if deltaFairnessOne:
+                fairOne_idx_lhs = []
+                fairOne_idx_rhs = []
 
+                for time_index in range(k, T - dynModel.END_DAYS):
+                    
+                    if time_index == k or (time_index % lockdown_freq) == 0:
+
+                        for ag in range(num_age_groups):
+                            for ah in range(num_age_groups):
+                                if ag != ah:
+                                    for act in ["leisure", "transport", "other"]:
+                                        act_lock_id = controls.index(act)
+                                        act_lock_g_idx = act_lock_id + ag * num_controls
+                                        act_lock_h_idx = act_lock_id + ah * num_controls
+
+                                        fairOne_idx_lhs.append((time_index - k) * ut_dim + act_lock_g_idx)
+                                        fairOne_idx_rhs.append((time_index - k) * ut_dim + act_lock_h_idx)
+                    
+                mod.addConstr(u_vars_vec[fairOne_idx_lhs] <= u_vars_vec[fairOne_idx_rhs] * (1 + deltaFair))
+                mod.addConstr(u_vars_vec[fairOne_idx_lhs] >= u_vars_vec[fairOne_idx_rhs] * (1 - deltaFair))
+
+                fairWorkOne_idx_rhs = []
+                fairWorkOne_idx_lhs = []
+
+                for time_index in range(k, T - dynModel.END_DAYS):
+                    
+                    if time_index == k or (time_index % lockdown_freq) == 0:
+
+                        for ag in [0, 7, 8]:
+                            for ah in [0, 7, 8]:
+                                act = "work"
+                                act_lock_id = controls.index(act)
+                                act_lock_g_idx = act_lock_id + ag * num_controls
+                                act_lock_h_idx = act_lock_id + ah * num_controls
+
+                                fairWorkOne_idx_lhs.append((time_index - k) * ut_dim + act_lock_g_idx)
+                                fairWorkOne_idx_rhs.append((time_index - k) * ut_dim + act_lock_h_idx)
+
+                mod.addConstr(u_vars_vec[fairWorkOne_idx_lhs] <= u_vars_vec[fairWorkOne_idx_rhs] * (1 + deltaFair))
+                mod.addConstr(u_vars_vec[fairWorkOne_idx_lhs] >= u_vars_vec[fairWorkOne_idx_rhs] * (1 - deltaFair))
+                                        
 
             ConstMatrix = np.zeros(((T-k) * num_constraints, ut_dim * (T-k)), dtype=numpyArrayDatatype)
 
