@@ -63,7 +63,7 @@ def main():
         "xi":[mult * 37199.03 * scaling / money_scaling for mult in xi_mult_values],
         "trust_region_radius":[0.05],
         "max_inner_iterations_mult":[2],
-        "initial_uhat":["dynamic_gradient"]
+        "initial_uhat":["time_gradient"]
         # "full_lockdown", "full_open","dynamic_gradient", "activity_gradient", "age_group_gradient", "time_gradient"
     }
 

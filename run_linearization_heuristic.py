@@ -60,7 +60,7 @@ def main():
         "eta":[0, 0.2],
         "trust_region_radius":[0.05],
         "max_inner_iterations_mult":[2],
-        "initial_uhat":["dynamic_gradient"]
+        "initial_uhat":["full_lockdown"]
         # "full_lockdown", "full_open","dynamic_gradient",
     }
 
@@ -80,7 +80,7 @@ def main():
     #     "eta":[0.1]
     # }
 
-    n_days = 180
+    n_days = 360
     groups = "all"
     start_day = 0
     optimize_bouncing = False
