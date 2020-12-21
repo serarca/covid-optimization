@@ -1754,6 +1754,8 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
                 fairOne_idx_lhs = []
                 fairOne_idx_rhs = []
 
+                print(f"deltaFair is: {deltaFair}")
+
                 for time_index in range(k, T - dynModel.END_DAYS):
                     
                     if time_index == k or (time_index % lockdown_freq) == 0:
