@@ -63,8 +63,9 @@ def main():
         "xi":[mult * 37199.03 * scaling / money_scaling for mult in xi_mult_values],
         "trust_region_radius":[0.05],
         "max_inner_iterations_mult":[2],
-        "initial_uhat":["time_gradient"]
+        "initial_uhat":["time_gradient"],
         # "full_lockdown", "full_open","dynamic_gradient", "activity_gradient", "age_group_gradient", "time_gradient"
+        "deltaFair":[0,0.25,0.5,0.75,1]
     }
 
 
@@ -119,12 +120,13 @@ def main():
     trust_region_radius = all_instances[instance_index][9]
     max_inner_iterations_mult = all_instances[instance_index][10]
     initial_uhat = all_instances[instance_index][11]
+    deltaFair = all_instances[instance_index][12]
     
     targetActivities = True
     targetGroups = True
     targetTests = True
     fairness = True
-    deltaFair = 0.1
+    # deltaFair = 0.1
 
     if initial_uhat == "time_gradient":
         targetActivities = False
