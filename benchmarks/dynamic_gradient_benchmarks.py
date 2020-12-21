@@ -193,7 +193,7 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
 		result["groups"],
 		result["experiment_params"]["delta_schooling"],
 		experiment_params["eta"],
-		180,
+		simulation_params['days'],
 		14,
 	)
 
