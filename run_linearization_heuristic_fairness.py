@@ -129,15 +129,15 @@ def main():
     fairness = True
     # deltaFair = 0.1
 
-    if initial_uhat == "time_gradient":
-        targetActivities = False
-        targetGroups = False
+    # if initial_uhat == "time_gradient":
+    #     targetActivities = False
+    #     targetGroups = False
     
-    if initial_uhat == "age_group_gradient":
-        targetActivities = False
+    # if initial_uhat == "age_group_gradient":
+    #     targetActivities = False
     
-    if initial_uhat == "activity_gradient":
-        targetGroups = False
+    # if initial_uhat == "activity_gradient":
+    #     targetGroups = False
 
 
     run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling, targetActivities, targetGroups, targetTests, fairness, deltaFair)
