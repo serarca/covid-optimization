@@ -295,7 +295,7 @@ def run_linearization_heuristic(simulation_params, experiment_params, start_day,
             print("Failed converting to yaml econ param")
             econ_params = yaml.load(file, Loader=yaml.FullLoader)
     
-    print(universe_params)
+    # print(universe_params)
 
     # Define mixing method
     mixing_method = universe_params['mixing']

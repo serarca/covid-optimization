@@ -1310,6 +1310,7 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
 
     # shorthand for a few useful parameters
     T = dynModel.time_steps
+    print(f"The value of T is: {T}")
     
     Xt_dim = num_compartments * num_age_groups
     ut_dim = num_controls * num_age_groups
@@ -1355,6 +1356,23 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
 
     Natestg_idx_all = slice(controls.index('Natest_g'), ut_dim,num_controls)
     uhat_seq[Natestg_idx_all,:] = dynModel.parameters['global-parameters']['C_atest']/num_age_groups
+
+    # if we aren't optimizing tests we fix the tests to be proportional to the initial population of each group.
+    if not targetTests:
+        age_group_initial_population = [sum([dynModel.initialization[group][cat] for cat in dynModel.initialization[group].keys()]) for group in dynModel.initialization.keys()]
+
+        
+        for ag in range(num_age_groups):
+            m_test_index = (controls.index('Nmtest_g') + num_controls * ag)
+            a_test_index = (controls.index('Natest_g') + num_controls * ag)
+            
+            uhat_seq[m_test_index,:] = dynModel.parameters['global-parameters']['C_mtest'] * (age_group_initial_population[ag] / dynModel.total_population)
+
+            uhat_seq[a_test_index,:] = dynModel.parameters['global-parameters']['C_atest'] * (age_group_initial_population[ag] / dynModel.total_population)
+            
+
+
+
 
     # Initialize lockdown policy for first u_hat
 
@@ -1723,7 +1741,7 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
                 assert dynModel.total_population == sum(age_group_initial_population)
 
                 for time_index in range(k, T):
-                    if time_index == k or (time_index % test_freq) == 0:
+                    if time_index == k or (time_index % test_freq) == 0 or time_index >= T - dynModel.END_DAYS:
 
                         total_tests_at_time_time_index = 0
                         for ag in range(num_age_groups):
@@ -1743,7 +1761,7 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
                     
                                 proportional_tests[((time_index - k) * ut_dim + test_g_idx)] = prop_test
 
-                                print(f"Tests for index {((time_index - k) * ut_dim + test_g_idx)} are {prop_test}")
+                                # print(f"Tests for index {((time_index - k) * ut_dim + test_g_idx)} are {prop_test}")
                                 
                                 prop_tests_idx.append(((time_index - k) * ut_dim + test_g_idx))
                         assert total_tests_at_time_time_index == dynModel.parameters['global-parameters']['C_mtest']

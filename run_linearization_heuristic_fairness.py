@@ -36,8 +36,7 @@ def main():
     instance_index = 0
 
     if len(sys.argv) > 1:
-        instance_index =0-23
-        #  int(sys.argv[1])
+        instance_index = int(sys.argv[1])
 
     # 30 * 37199.03
     # Some paramters to test the linearization heuristic
@@ -66,7 +65,7 @@ def main():
         "max_inner_iterations_mult":[2],
         "initial_uhat":["time_gradient"],
         # "full_lockdown", "full_open","dynamic_gradient", "activity_gradient", "age_group_gradient", "time_gradient"
-        "deltaFair":[200]
+        "deltaFair":[0,0.25,0.5,1,1.5]
     }
 
 
@@ -301,7 +300,7 @@ def run_linearization_heuristic(simulation_params, experiment_params, start_day,
             print("Failed converting to yaml econ param")
             econ_params = yaml.load(file, Loader=yaml.FullLoader)
     
-    print(universe_params)
+    # print(universe_params)
 
     # Define mixing method
     mixing_method = universe_params['mixing']

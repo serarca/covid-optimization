@@ -8,7 +8,7 @@
 
  
 
-#SBATCH --array=0-23 # there is a max array size - 512 tasks
+#SBATCH --array=34,35,38,41,95,96,97,98,101,102,103,104,110,112,116,117,118 # there is a max array size - 512 tasks
 
 #SBATCH -J fairness_linearization_heur
 
