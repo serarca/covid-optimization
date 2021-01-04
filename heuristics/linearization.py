@@ -1799,8 +1799,8 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
                     
                     if time_index == k or (time_index % lockdown_freq) == 0:
 
-                        for ag in [0, 7, 8]:
-                            for ah in [0, 7, 8]:
+                        for ag in [1,2,3,4,5,6]:
+                            for ah in [1,2,3,4,5,6]:
                                 act = "work"
                                 act_lock_id = controls.index(act)
                                 act_lock_g_idx = act_lock_id + ag * num_controls
