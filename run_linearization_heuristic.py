@@ -42,13 +42,13 @@ def main():
     scaling = 10000
     money_scaling = 1000
     xi_mult_values = [0,10,25,50,100,150]
-    testing_values = [0]
+    testing_values = [30000, 60000, 120000]
     # [0, 30000, 60000, 120000]
-    icu_values = [2900]
+    icu_values = [2600,2900,3200]
     # [2000, 2300, 2600, 2900, 3200]
 
     params_to_try = {
-        "delta_schooling":[0.5, 1, 5],
+        "delta_schooling":[0.5],
         "xi":[mult * 37199.03 * scaling / money_scaling for mult in xi_mult_values],
         "icus":[ic / scaling for ic in icu_values],
         "mtests":[test_cap / scaling for test_cap in testing_values],
@@ -57,10 +57,10 @@ def main():
         "region":["fitted-scaled"], 
         "econ": ["econ-scaled"],
         "init": ["oct21-scaled"],
-        "eta":[0, 0.2],
+        "eta":[0.1, 0.2],
         "trust_region_radius":[0.05],
         "max_inner_iterations_mult":[2],
-        "initial_uhat":["full_lockdown"]
+        "initial_uhat":["dynamic_gradient"]
         # "full_lockdown", "full_open","dynamic_gradient",
     }
 
@@ -80,7 +80,7 @@ def main():
     #     "eta":[0.1]
     # }
 
-    n_days = 360
+    n_days = 90
     groups = "all"
     start_day = 0
     optimize_bouncing = False
@@ -277,7 +277,7 @@ def run_linearization_heuristic(simulation_params, experiment_params, start_day,
             print("Failed converting to yaml econ param")
             econ_params = yaml.load(file, Loader=yaml.FullLoader)
     
-    print(universe_params)
+    # print(universe_params)
 
     # Define mixing method
     mixing_method = universe_params['mixing']
