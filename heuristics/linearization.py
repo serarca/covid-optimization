@@ -1813,6 +1813,7 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
                 mod.addConstr(u_vars_vec[fairWorkOne_idx_lhs] >= u_vars_vec[fairWorkOne_idx_rhs] * (1 - deltaFair))
                                         
 
+
             ConstMatrix = np.zeros(((T-k) * num_constraints, ut_dim * (T-k)), dtype=numpyArrayDatatype)
 
             ConstRHS = np.zeros(((T-k) * num_constraints,), dtype=numpyArrayDatatype)
