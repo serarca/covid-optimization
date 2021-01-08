@@ -4,15 +4,3 @@ sbatch sherlock_scripts/script_2.sh
 sbatch sherlock_scripts/script_3.sh
 sbatch sherlock_scripts/script_4.sh
 sbatch sherlock_scripts/script_5.sh
-sbatch sherlock_scripts/script_6.sh
-sbatch sherlock_scripts/script_7.sh
-sbatch sherlock_scripts/script_8.sh
-sbatch sherlock_scripts/script_9.sh
-sbatch sherlock_scripts/script_10.sh
-sbatch sherlock_scripts/script_11.sh
-sbatch sherlock_scripts/script_12.sh
-sbatch sherlock_scripts/script_13.sh
-sbatch sherlock_scripts/script_14.sh
-sbatch sherlock_scripts/script_15.sh
-sbatch sherlock_scripts/script_16.sh
-sbatch sherlock_scripts/script_17.sh
