@@ -1789,8 +1789,8 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
                                         fairOne_idx_lhs.append((time_index - k) * ut_dim + act_lock_g_idx)
                                         fairOne_idx_rhs.append((time_index - k) * ut_dim + act_lock_h_idx)
                     
-                mod.addConstr(u_vars_vec[fairOne_idx_lhs] <= u_vars_vec[fairOne_idx_rhs] * (1 + deltaFair))
-                mod.addConstr(u_vars_vec[fairOne_idx_lhs] >= u_vars_vec[fairOne_idx_rhs] * (1 - deltaFair))
+                mod.addConstr(u_vars_vec[fairOne_idx_lhs] <= u_vars_vec[fairOne_idx_rhs] + deltaFair)
+                mod.addConstr(u_vars_vec[fairOne_idx_lhs] >= u_vars_vec[fairOne_idx_rhs]  - deltaFair)
 
                 fairWorkOne_idx_rhs = []
                 fairWorkOne_idx_lhs = []
@@ -1809,8 +1809,8 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
                                 fairWorkOne_idx_lhs.append((time_index - k) * ut_dim + act_lock_g_idx)
                                 fairWorkOne_idx_rhs.append((time_index - k) * ut_dim + act_lock_h_idx)
 
-                mod.addConstr(u_vars_vec[fairWorkOne_idx_lhs] <= u_vars_vec[fairWorkOne_idx_rhs] * (1 + deltaFair))
-                mod.addConstr(u_vars_vec[fairWorkOne_idx_lhs] >= u_vars_vec[fairWorkOne_idx_rhs] * (1 - deltaFair))
+                mod.addConstr(u_vars_vec[fairWorkOne_idx_lhs] <= u_vars_vec[fairWorkOne_idx_rhs] + deltaFair)
+                mod.addConstr(u_vars_vec[fairWorkOne_idx_lhs] >= u_vars_vec[fairWorkOne_idx_rhs] - deltaFair)
                                         
 
 

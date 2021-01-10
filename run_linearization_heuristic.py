@@ -42,9 +42,9 @@ def main():
     scaling = 10000
     money_scaling = 1000
     xi_mult_values = [0,10,25,50,100,150]
-    testing_values = [30000, 60000, 120000]
+    testing_values = [60000]
     # [0, 30000, 60000, 120000]
-    icu_values = [2600,2900,3200]
+    icu_values = [2900]
     # [2000, 2300, 2600, 2900, 3200]
 
     params_to_try = {
@@ -57,7 +57,7 @@ def main():
         "region":["fitted-scaled"], 
         "econ": ["econ-scaled"],
         "init": ["oct21-scaled"],
-        "eta":[0.1, 0.2],
+        "eta":[0.1],
         "trust_region_radius":[0.05],
         "max_inner_iterations_mult":[2],
         "initial_uhat":["dynamic_gradient"]
@@ -80,7 +80,7 @@ def main():
     #     "eta":[0.1]
     # }
 
-    n_days = 90
+    n_days = 360
     groups = "all"
     start_day = 0
     optimize_bouncing = False
