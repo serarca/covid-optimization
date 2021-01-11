@@ -1,0 +1,75 @@
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'icus': [2900], 'eta': [0.1], 'tests': [[0, 0]], 'xi': [31619175.5], 'testing': ['homogeneous']}}
+results/time_gradient/xi-31619175_icus-2900_testing-homogeneous_natests-0_nmtests-0_T-90_startday-0_groups-all_dschool-0.500000_eta-0.100000_freq-90-14.yaml
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'icus': [2900], 'eta': [0.1], 'tests': [[0, 0]], 'xi': [31619175.5], 'testing': ['homogeneous']}}
+Traceback (most recent call last):
+  File "activity_gradient_benchmarks.py", line 351, in <module>
+    result_gradient = gradient_descent(experiment_params, 14, plot=True)
+  File "activity_gradient_benchmarks.py", line 203, in gradient_descent
+    initial_alphas = yaml.load(file, Loader=yaml.FullLoader)["policy"]
+  File "/home/users/xwarnes/.local/lib/python3.6/site-packages/yaml/__init__.py", line 114, in load
+    return loader.get_single_data()
+  File "/home/users/xwarnes/.local/lib/python3.6/site-packages/yaml/constructor.py", line 49, in get_single_data
+    node = self.get_single_node()
+  File "/home/users/xwarnes/.local/lib/python3.6/site-packages/yaml/composer.py", line 36, in get_single_node
+    document = self.compose_document()
+  File "/home/users/xwarnes/.local/lib/python3.6/site-packages/yaml/composer.py", line 55, in compose_document
+    node = self.compose_node(None, None)
+  File "/home/users/xwarnes/.local/lib/python3.6/site-packages/yaml/composer.py", line 84, in compose_node
+    node = self.compose_mapping_node(anchor)
+  File "/home/users/xwarnes/.local/lib/python3.6/site-packages/yaml/composer.py", line 133, in compose_mapping_node
+    item_value = self.compose_node(node, item_key)
+  File "/home/users/xwarnes/.local/lib/python3.6/site-packages/yaml/composer.py", line 82, in compose_node
+    node = self.compose_sequence_node(anchor)
+  File "/home/users/xwarnes/.local/lib/python3.6/site-packages/yaml/composer.py", line 111, in compose_sequence_node
+    node.value.append(self.compose_node(node, index))
+  File "/home/users/xwarnes/.local/lib/python3.6/site-packages/yaml/composer.py", line 84, in compose_node
+    node = self.compose_mapping_node(anchor)
+  File "/home/users/xwarnes/.local/lib/python3.6/site-packages/yaml/composer.py", line 127, in compose_mapping_node
+    while not self.check_event(MappingEndEvent):
+  File "/home/users/xwarnes/.local/lib/python3.6/site-packages/yaml/parser.py", line 98, in check_event
+    self.current_event = self.state()
+  File "/home/users/xwarnes/.local/lib/python3.6/site-packages/yaml/parser.py", line 428, in parse_block_mapping_key
+    if self.check_token(KeyToken):
+  File "/home/users/xwarnes/.local/lib/python3.6/site-packages/yaml/scanner.py", line 116, in check_token
+    self.fetch_more_tokens()
+  File "/home/users/xwarnes/.local/lib/python3.6/site-packages/yaml/scanner.py", line 173, in fetch_more_tokens
+    return self.fetch_stream_end()
+  File "/home/users/xwarnes/.local/lib/python3.6/site-packages/yaml/scanner.py", line 377, in fetch_stream_end
+    self.remove_possible_simple_key()
+  File "/home/users/xwarnes/.local/lib/python3.6/site-packages/yaml/scanner.py", line 319, in remove_possible_simple_key
+    "could not find expected ':'", self.get_mark())
+yaml.scanner.ScannerError: while scanning a simple key
+  in "results/time_gradient/xi-31619175_icus-2900_testing-homogeneous_natests-0_nmtests-0_T-90_startday-0_groups-all_dschool-0.500000_eta-0.100000_freq-90-14.yaml", line 1436, column 3
+could not find expected ':'
+  in "results/time_gradient/xi-31619175_icus-2900_testing-homogeneous_natests-0_nmtests-0_T-90_startday-0_groups-all_dschool-0.500000_eta-0.100000_freq-90-14.yaml", line 1436, column 4
+300
+(0.5, 0.29, 0.0, (7, 14), 'fitted-scaled', 'econ-scaled', 'oct21-scaled', 0.1, 316191755.0, 0.05, 2, 'activity_gradient')
+Total Population is: 1227.820999439713
+The value of T is: 104
+Missing starting point -- Running the initial heuristic.
+/home/groups/daniancu/covid-optimization/covid-optimization
+Traceback (most recent call last):
+  File "/home/groups/daniancu/covid-optimization/covid-optimization/heuristics/linearization.py", line 1398, in run_heuristic_linearization
+    with open("benchmarks/results/%s/%s"%(h,n)) as file:
+FileNotFoundError: [Errno 2] No such file or directory: 'benchmarks/results/activity_gradient/xi-31619175_icus-2900_testing-homogeneous_natests-0_nmtests-0_T-90_startday-0_groups-all_dschool-0.500000_eta-0.100000_freq-90-14.yaml'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "run_linearization_heuristic_targetting_value.py", line 870, in <module>
+    main()
+  File "run_linearization_heuristic_targetting_value.py", line 142, in main
+    run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling, targetActivities, targetGroups, targetTests)
+  File "run_linearization_heuristic_targetting_value.py", line 181, in run_lin_heur_and_save_yaml
+    dynModel = run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, targetActivities, targetGroups, targetTests)
+  File "run_linearization_heuristic_targetting_value.py", line 323, in run_linearization_heuristic
+    linearization.run_heuristic_linearization(dynModel, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, targetActivities, targetGroups, targetTests)
+  File "/home/groups/daniancu/covid-optimization/covid-optimization/heuristics/linearization.py", line 1416, in run_heuristic_linearization
+    with open("benchmarks/results/%s/%s"%(h,n)) as file:
+FileNotFoundError: [Errno 2] No such file or directory: 'benchmarks/results/activity_gradient/xi-31619175_icus-2900_testing-homogeneous_natests-0_nmtests-0_T-90_startday-0_groups-all_dschool-0.500000_eta-0.100000_freq-90-14.yaml'
+srun: error: sh02-01n13: task 0: Exited with exit code 1
+srun: launch/slurm: _step_signal: Terminating StepId=15369806.0

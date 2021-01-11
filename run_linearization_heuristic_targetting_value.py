@@ -42,12 +42,13 @@ def main():
     # Some paramters to test the linearization heuristic
     scaling = 10000
     money_scaling = 1000
-    xi_mult_values = [50]
+    xi_mult_values = range(0,1000,10)
 
-    total_population = 12278209.99439713
-    testing_values_perc = np.linspace(0.005,0.035,num=50)
+    # total_population = 12278209.99439713
+    # testing_values_perc = np.linspace(0.005,0.035,num=50)
 
-    testing_values = [total_population * p for p in testing_values_perc]
+    testing_values = [0]
+    # [total_population * p for p in testing_values_perc]
     # , 60000, 120000]
     icu_values = [2900]
     # , 2300, 2600, 2900, 3200]
@@ -66,7 +67,7 @@ def main():
         "xi":[mult * 37199.03 * scaling / money_scaling for mult in xi_mult_values],
         "trust_region_radius":[0.05],
         "max_inner_iterations_mult":[2],
-        "initial_uhat":["age_group_gradient"]
+        "initial_uhat":["age_group_gradient","activity_gradient","time_gradient"]
         # "full_lockdown", "full_open","dynamic_gradient", "activity_gradient", "age_group_gradient", "time_gradient"
     }
 

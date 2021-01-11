@@ -1,0 +1,27 @@
+100
+(0.5, 286432531.0, 0.29, 0.0, (7, 14), 'fitted-scaled', 'econ-scaled', 'oct21-scaled', 0.1, 0.05, 2, 'dynamic_gradient')
+Traceback (most recent call last):
+  File "run_linearization_heuristic.py", line 846, in <module>
+    main()
+  File "run_linearization_heuristic.py", line 121, in main
+    run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling)
+  File "run_linearization_heuristic.py", line 160, in run_lin_heur_and_save_yaml
+    dynModel = run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing)
+  File "run_linearization_heuristic.py", line 250, in run_linearization_heuristic
+    universe_params = yaml.load(file, Loader=yaml.FullLoader)
+  File "/home/users/xwarnes/.local/lib/python3.6/site-packages/yaml/__init__.py", line 112, in load
+    loader = Loader(stream)
+  File "/home/users/xwarnes/.local/lib/python3.6/site-packages/yaml/loader.py", line 24, in __init__
+    Reader.__init__(self, stream)
+  File "/home/users/xwarnes/.local/lib/python3.6/site-packages/yaml/reader.py", line 85, in __init__
+    self.determine_encoding()
+  File "/home/users/xwarnes/.local/lib/python3.6/site-packages/yaml/reader.py", line 135, in determine_encoding
+    self.update(1)
+  File "/home/users/xwarnes/.local/lib/python3.6/site-packages/yaml/reader.py", line 169, in update
+    self.check_printable(data)
+  File "/home/users/xwarnes/.local/lib/python3.6/site-packages/yaml/reader.py", line 144, in check_printable
+    'unicode', "special characters are not allowed")
+yaml.reader.ReaderError: unacceptable character #x0000: special characters are not allowed
+  in "parameters/fitted-scaled.yaml", position 0
+srun: error: sh02-01n28: task 0: Exited with exit code 1
+srun: launch/slurm: _step_signal: Terminating StepId=15367682.0

@@ -41,7 +41,7 @@ def main():
     # Some paramters to test the linearization heuristic
     scaling = 10000
     money_scaling = 1000
-    xi_mult_values = range(0,500,10)
+    xi_mult_values = range(500,1000,10)
     testing_values = [0, 60000]
     # [0, 30000, 60000, 120000]
     icu_values = [2900]

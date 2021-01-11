@@ -1,0 +1,19 @@
+100
+(0.5, 334791270.0, 0.29, 6.0, (7, 14), 'fitted-scaled', 'econ-scaled', 'oct21-scaled', 0.1, 0.05, 2, 'dynamic_gradient')
+The value of T is: 104
+Traceback (most recent call last):
+  File "run_linearization_heuristic.py", line 846, in <module>
+    main()
+  File "run_linearization_heuristic.py", line 121, in main
+    run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling)
+  File "run_linearization_heuristic.py", line 160, in run_lin_heur_and_save_yaml
+    dynModel = run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing)
+  File "run_linearization_heuristic.py", line 299, in run_linearization_heuristic
+    linearization.run_heuristic_linearization(dynModel, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing)
+  File "/home/groups/daniancu/covid-optimization/covid-optimization/heuristics/linearization.py", line 1341, in run_heuristic_linearization
+    Gamma_x, Gamma_u, K, all_labels = calculate_all_constraints(dynModel,bounce_existing)
+  File "/home/groups/daniancu/covid-optimization/covid-optimization/heuristics/linearization.py", line 930, in calculate_all_constraints
+    mu_g = curr_group.parameters['mu']
+KeyError: 'mu'
+srun: error: sh02-01n27: task 0: Exited with exit code 1
+srun: launch/slurm: _step_signal: Terminating StepId=15367712.0
