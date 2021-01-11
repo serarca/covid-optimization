@@ -1,0 +1,40 @@
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'icus': [2900], 'eta': [0.1], 'tests': [[1860334, 0]], 'xi': [1859951.5], 'testing': ['homogeneous']}}
+results/time_gradient/xi-1859951_icus-2900_testing-homogeneous_natests-0_nmtests-1860334_T-90_startday-0_groups-all_dschool-0.500000_eta-0.100000_freq-90-14.yaml
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'icus': [2900], 'eta': [0.1], 'tests': [[1860334, 0]], 'xi': [1859951.5], 'testing': ['homogeneous']}}
+results/age_group_gradient/xi-1859951_icus-2900_testing-homogeneous_natests-0_nmtests-1860334_T-90_startday-0_groups-all_dschool-0.500000_eta-0.100000_freq-90-14.yaml
+100
+(0.5, 0.29, 186.03348476359287, (7, 14), 'fitted-scaled', 'econ-scaled', 'oct21-scaled', 0.1, 18599515.0, 0.05, 2, 'age_group_gradient')
+Total Population is: 1227.820999439713
+The value of T is: 104
+Missing starting point -- Running the initial heuristic.
+/home/groups/daniancu/covid-optimization/covid-optimization
+90
+Total Reward at the start of the inner iterations: 53160334.64477294
+Using license file /share/software/user/restricted/gurobi/9.0.3_py36/licenses/gurobi.lic
+Set parameter TokenServer to value license4.stanford.edu
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 17772 Constrs, 9360 Vars, 8251630 NZs
+  Matrix coefficient range    : [ 1.03079e-13, 1 ]
+  Objective coefficient range : [ 9.19308e-20, 2.3828e+07 ]
+  Variable bound range        : [ 0.05, 29.9721 ]
+  RHS coefficient range       : [ 1.26678e-07, 186.033 ]
+Traceback (most recent call last):
+  File "run_linearization_heuristic_targetting_value.py", line 869, in <module>
+    main()
+  File "run_linearization_heuristic_targetting_value.py", line 141, in main
+    run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling, targetActivities, targetGroups, targetTests)
+  File "run_linearization_heuristic_targetting_value.py", line 180, in run_lin_heur_and_save_yaml
+    dynModel = run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, targetActivities, targetGroups, targetTests)
+  File "run_linearization_heuristic_targetting_value.py", line 322, in run_linearization_heuristic
+    linearization.run_heuristic_linearization(dynModel, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, targetActivities, targetGroups, targetTests)
+  File "/home/groups/daniancu/covid-optimization/covid-optimization/heuristics/linearization.py", line 1898, in run_heuristic_linearization
+    assert(False)
+AssertionError
+srun: error: sh02-01n27: task 0: Exited with exit code 1
+srun: launch/slurm: _step_signal: Terminating StepId=15344418.0

@@ -41,8 +41,8 @@ def main():
     # Some paramters to test the linearization heuristic
     scaling = 10000
     money_scaling = 1000
-    xi_mult_values = [0,10,25,50,100,150]
-    testing_values = [60000]
+    xi_mult_values = range(0,500,10)
+    testing_values = [0, 60000]
     # [0, 30000, 60000, 120000]
     icu_values = [2900]
     # [2000, 2300, 2600, 2900, 3200]
@@ -80,7 +80,7 @@ def main():
     #     "eta":[0.1]
     # }
 
-    n_days = 360
+    n_days = 90
     groups = "all"
     start_day = 0
     optimize_bouncing = False

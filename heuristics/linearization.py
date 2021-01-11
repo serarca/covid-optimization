@@ -3,6 +3,7 @@ import yaml
 from inspect import getsourcefile
 import os.path
 import sys
+import os
 
 from threadpoolctl import threadpool_limits
 import numpy as np
@@ -1376,7 +1377,7 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
 
     # Initialize lockdown policy for first u_hat
 
-    if initial_uhat in ["dynamic_gradient", "time_gradient","age_group_gradient","activity_gradient","time_gradient"]:
+    if initial_uhat in ["dynamic_gradient", "time_gradient","age_group_gradient","activity_gradient"]:
         h = initial_uhat
         n = "xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d.yaml"%(
             dynModel.experiment_params["xi"]*0.1,
@@ -1393,8 +1394,31 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
             14 
         )
 
-        with open("benchmarks/results/%s/%s"%(h,n)) as file:
-            result = yaml.load(file, Loader=yaml.FullLoader)
+        try:
+            with open("benchmarks/results/%s/%s"%(h,n)) as file:
+                result = yaml.load(file, Loader=yaml.FullLoader)
+        except FileNotFoundError:
+            if initial_uhat in ["dynamic_gradient", "time_gradient","age_group_gradient","activity_gradient"]:
+                print("Missing starting point -- Running the initial heuristic.")
+
+                path = os.getcwd()
+                print(path)
+                os.chdir(f"{path}/benchmarks")
+                
+                if not os.path.exists(f"results/time_gradient/{n}"):
+                    os.system(f"python3 time_gradient_benchmarks.py --delta {dynModel.experiment_params['delta_schooling']} --icus {int(dynModel.experiment_params['icus']*10000)} --eta {dynModel.econ_params['employment_params']['eta']} --groups all --xi {dynModel.experiment_params['xi']*0.1} --a_tests {int(dynModel.parameters['global-parameters']['C_atest']*10000)} --m_tests {int(dynModel.parameters['global-parameters']['C_mtest']*10000)}")
+
+                if not os.path.exists(f"results/{h}/{n}"):
+                    os.system(f"python3 {h}_benchmarks.py --delta {dynModel.experiment_params['delta_schooling']} --icus {int(dynModel.experiment_params['icus']*10000)} --eta {dynModel.econ_params['employment_params']['eta']} --groups all --xi {dynModel.experiment_params['xi']*0.1} --a_tests {int(dynModel.parameters['global-parameters']['C_atest']*10000)} --m_tests {int(dynModel.parameters['global-parameters']['C_mtest']*10000)}")
+                
+                os.chdir(path)
+
+                with open("benchmarks/results/%s/%s"%(h,n)) as file:
+
+                    result = yaml.load(file, Loader=yaml.FullLoader)
+            else:
+                print(f"Missing file. Initial u_hat is {initial_uhat}. Instance is: {s}. Please create the initial starting point.")
+                assert(False)
 
         # Starting the uhat_seq 
         for t in range(T):

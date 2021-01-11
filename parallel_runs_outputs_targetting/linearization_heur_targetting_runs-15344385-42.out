@@ -1,0 +1,59 @@
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'icus': [2900], 'eta': [0.1], 'tests': [[5208937, 0]], 'xi': [1859951.5], 'testing': ['homogeneous']}}
+Traceback (most recent call last):
+  File "time_gradient_benchmarks.py", line 323, in <module>
+    result_gradient = gradient_descent(experiment_params, 14, plot=True)
+  File "time_gradient_benchmarks.py", line 281, in gradient_descent
+    dynModel.take_time_step(m_tests, a_tests, alpha[t])
+  File "/home/groups/daniancu/covid-optimization/covid-optimization/group.py", line 166, in take_time_step
+    self.groups[n].take_time_step(m_tests[n], a_tests[n], self.beds, self.icus, False, False)
+  File "/home/groups/daniancu/covid-optimization/covid-optimization/group.py", line 600, in take_time_step
+    self.update_I(m_tests, a_tests)
+  File "/home/groups/daniancu/covid-optimization/covid-optimization/group.py", line 684, in update_I
+    assert self.I[self.parent.t]+delta_I*self.dt >= 0, (f'Total infected is negative: {self.I[self.parent.t]+delta_I*self.dt}. \n Infected time t: {self.I[self.parent.t]}. \n Delta I: {delta_I}.\n Total N time t: {self.N[self.parent.t]}.\n Total E time t: {self.E[self.parent.t]}.\n M tests at time t: {m_tests}.\n Total m_tests: {m_tests * self.dt * self.I[self.parent.t]/self.N[self.parent.t]}.\n  Total new infected: {self.dt * self.parameters["sigma"]*self.E[self.parent.t]}.\n  Total recovered or going to H, ICU: {self.dt * self.parameters["mu"]*self.I[self.parent.t]}')
+AssertionError: Total infected is negative: -42.63238851626659. 
+ Infected time t: 570.2626264934048. 
+ Delta I: -612.8950150096714.
+ Total N time t: 532448.7278708424.
+ Total E time t: 598.1802277074494.
+ M tests at time t: 578770.7777777778.
+ Total m_tests: 619.8744153131826.
+  Total new infected: 149.54505692686234.
+  Total recovered or going to H, ICU: 142.5656566233512
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'icus': [2900], 'eta': [0.1], 'tests': [[5208937, 0]], 'xi': [1859951.5], 'testing': ['homogeneous']}}
+Traceback (most recent call last):
+  File "age_group_gradient_benchmarks.py", line 351, in <module>
+    result_gradient = gradient_descent(experiment_params, 14, plot=True)
+  File "age_group_gradient_benchmarks.py", line 202, in gradient_descent
+    with open("results/"+constant_gradients_filename+".yaml") as file:
+FileNotFoundError: [Errno 2] No such file or directory: 'results/time_gradient/xi-1859951_icus-2900_testing-homogeneous_natests-0_nmtests-5208937_T-90_startday-0_groups-all_dschool-0.500000_eta-0.100000_freq-90-14.yaml'
+100
+(0.5, 0.29, 520.89375733806, (7, 14), 'fitted-scaled', 'econ-scaled', 'oct21-scaled', 0.1, 18599515.0, 0.05, 2, 'age_group_gradient')
+Total Population is: 1227.820999439713
+The value of T is: 104
+Missing starting point -- Running the initial heuristic.
+/home/groups/daniancu/covid-optimization/covid-optimization
+Traceback (most recent call last):
+  File "/home/groups/daniancu/covid-optimization/covid-optimization/heuristics/linearization.py", line 1398, in run_heuristic_linearization
+    with open("benchmarks/results/%s/%s"%(h,n)) as file:
+FileNotFoundError: [Errno 2] No such file or directory: 'benchmarks/results/age_group_gradient/xi-1859951_icus-2900_testing-homogeneous_natests-0_nmtests-5208937_T-90_startday-0_groups-all_dschool-0.500000_eta-0.100000_freq-90-14.yaml'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "run_linearization_heuristic_targetting_value.py", line 869, in <module>
+    main()
+  File "run_linearization_heuristic_targetting_value.py", line 141, in main
+    run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling, targetActivities, targetGroups, targetTests)
+  File "run_linearization_heuristic_targetting_value.py", line 180, in run_lin_heur_and_save_yaml
+    dynModel = run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, targetActivities, targetGroups, targetTests)
+  File "run_linearization_heuristic_targetting_value.py", line 322, in run_linearization_heuristic
+    linearization.run_heuristic_linearization(dynModel, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, targetActivities, targetGroups, targetTests)
+  File "/home/groups/daniancu/covid-optimization/covid-optimization/heuristics/linearization.py", line 1416, in run_heuristic_linearization
+    with open("benchmarks/results/%s/%s"%(h,n)) as file:
+FileNotFoundError: [Errno 2] No such file or directory: 'benchmarks/results/age_group_gradient/xi-1859951_icus-2900_testing-homogeneous_natests-0_nmtests-5208937_T-90_startday-0_groups-all_dschool-0.500000_eta-0.100000_freq-90-14.yaml'
+srun: error: sh02-01n23: task 0: Exited with exit code 1
+srun: launch/slurm: _step_signal: Terminating StepId=15344445.0

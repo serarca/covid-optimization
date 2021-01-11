@@ -8,7 +8,7 @@
 
  
 
-#SBATCH --array=0-99 # there is a max array size - 512 tasks
+#SBATCH --array=0-49 # there is a max array size - 512 tasks
 
 #SBATCH -J run_targetting_linearization_heur
 
