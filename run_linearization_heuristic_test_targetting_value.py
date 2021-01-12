@@ -42,8 +42,12 @@ def main():
     # Some paramters to test the linearization heuristic
     scaling = 10000
     money_scaling = 1000
-    xi_mult_values = [0,10,25,50,100,150]
-    testing_values = [0, 30000, 60000, 120000]
+    xi_mult_values = [0]
+    total_population = 12278209.99439713
+    testing_values_perc = np.linspace(0,0.035,num=100)
+
+    testing_values = [total_population * p for p in testing_values_perc]
+
     # , 60000, 120000]
     icu_values = [2900]
     # , 2300, 2600, 2900, 3200]
@@ -62,7 +66,7 @@ def main():
         "xi":[mult * 37199.03 * scaling / money_scaling for mult in xi_mult_values],
         "trust_region_radius":[0.05],
         "max_inner_iterations_mult":[2],
-        "initial_uhat":["dynamic_gradient"]
+        "initial_uhat":["full_open"]
         # , "dynamic_gradient"]
         # "full_lockdown", "full_open","dynamic_gradient", "activity_gradient", "age_group_gradient", "time_gradient"
     }
@@ -120,19 +124,19 @@ def main():
     max_inner_iterations_mult = all_instances[instance_index][10]
     initial_uhat = all_instances[instance_index][11]
     
-    targetActivities = True
-    targetGroups = True
-    targetTests = False
+    targetActivities = False
+    targetGroups = False
+    targetTests = True
 
-    if initial_uhat == "time_gradient":
-        targetActivities = False
-        targetGroups = False
+    # if initial_uhat == "time_gradient":
+    #     targetActivities = False
+    #     targetGroups = False
     
-    if initial_uhat == "age_group_gradient":
-        targetActivities = False
+    # if initial_uhat == "age_group_gradient":
+    #     targetActivities = False
     
-    if initial_uhat == "activity_gradient":
-        targetGroups = False
+    # if initial_uhat == "activity_gradient":
+    #     targetGroups = False
 
 
     run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling, targetActivities, targetGroups, targetTests)

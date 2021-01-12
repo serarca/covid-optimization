@@ -1,0 +1,16 @@
+100
+(0.5, 0.29, 28.215078522478255, (7, 14), 'fitted-scaled', 'econ-scaled', 'oct21-scaled', 0.1, 0.0, 0.05, 2, 'full_open')
+Traceback (most recent call last):
+  File "run_linearization_heuristic_test_targetting_value.py", line 869, in <module>
+    main()
+  File "run_linearization_heuristic_test_targetting_value.py", line 142, in main
+    run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling, targetActivities, targetGroups, targetTests)
+  File "run_linearization_heuristic_test_targetting_value.py", line 181, in run_lin_heur_and_save_yaml
+    dynModel = run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, targetActivities, targetGroups, targetTests)
+  File "run_linearization_heuristic_test_targetting_value.py", line 322, in run_linearization_heuristic
+    linearization.run_heuristic_linearization(dynModel, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, targetActivities, targetGroups, targetTests)
+  File "/home/groups/daniancu/covid-optimization/covid-optimization/heuristics/linearization.py", line 1299, in run_heuristic_linearization
+    assert initial_uhat in ["time_gradient", "age_group_gradient"]
+AssertionError
+srun: error: sh02-01n30: task 0: Exited with exit code 1
+srun: launch/slurm: _step_signal: Terminating StepId=15381431.0
