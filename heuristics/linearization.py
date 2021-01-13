@@ -1281,7 +1281,7 @@ def get_real_reward(dynModel, uhat_seq):
 # Main function: runs the linearization heuristic
 # @profile
 # @log_execution_time
-def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_iterations_mult=2, initial_uhat="dynamic_gradient", optimize_bouncing=True, targetActivities=True, targetGroups=True, targetTests=True, deltaFairnessOne=False, deltaFair=0.1):
+def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_iterations_mult=2, initial_uhat="dynamic_gradient", optimize_bouncing=True, targetActivities=True, targetGroups=True, targetTests=True, deltaFairnessOne=False, deltaFair=0.1, optimizeLockdowns=True):
     """Run the heuristic based on linearization. Takes a dynamical model, resets the time to 0, and runs it following the linearization heuristic. Returns the dynamical model after running it."""
 
     # age_groups = dynModel.groups.keys()
@@ -1296,12 +1296,12 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
     #Check that if we target only activities or groups, we are using the 
     # correct starting point
     if not targetActivities:
-        assert initial_uhat in ["time_gradient", "age_group_gradient"]
+        assert initial_uhat in ["time_gradient", "age_group_gradient", "full_open"]
         if not targetGroups:
-            assert initial_uhat == "time_gradient"
+            assert initial_uhat in ["time_gradient", "full_open"]
     
     if not targetGroups:
-        assert initial_uhat in ["time_gradient", "activity_gradient"]
+        assert initial_uhat in ["time_gradient", "activity_gradient", "full_open"]
 
     dynModel.reset_time(0)
 
@@ -1549,6 +1549,11 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
             # Work, Other, School, Leisure, Transport
             lower_bounds[np_all_lockdowns_idx_all_times] = np.maximum(uhat_seq[np_all_lockdowns_idx_all_times%ut_dim, np_all_lockdowns_idx_all_times//ut_dim] - trust_region_radius, 0)
             upper_bounds[np_all_lockdowns_idx_all_times] = np.minimum(uhat_seq[np_all_lockdowns_idx_all_times%ut_dim, np_all_lockdowns_idx_all_times//ut_dim] + trust_region_radius, 1)
+
+            if not optimizeLockdowns:
+                lower_bounds[np_all_lockdowns_idx_all_times] = np.maximum(uhat_seq[np_all_lockdowns_idx_all_times%ut_dim, np_all_lockdowns_idx_all_times//ut_dim], 0)
+                upper_bounds[np_all_lockdowns_idx_all_times] = np.minimum(uhat_seq[np_all_lockdowns_idx_all_times%ut_dim, np_all_lockdowns_idx_all_times//ut_dim], 1)
+
 
             # Home
             lower_bounds[np_lock_home_idx_all_times] = 1
