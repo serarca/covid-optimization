@@ -27,6 +27,7 @@ except:
 import pandas as pd
 import logging
 import itertools as it
+from itertools import chain
 
 #from joblib import Parallel, delayed
 
@@ -40,7 +41,7 @@ def main():
 
     # 30 * 37199.03
     # Some paramters to test the linearization heuristic
-    xi_mult_values = range(0,200,5)
+    xi_mult_values = chain(range(0,200,5), range(0, 1000, 10))
     testing_values = [0]
     # [0, 30000, 60000, 120000]
     icu_values = [2900]

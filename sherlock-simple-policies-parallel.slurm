@@ -8,7 +8,7 @@
 
  
 
-#SBATCH --array=0 # there is a max array size - 512 tasks
+#SBATCH --array=0-419 # there is a max array size - 512 tasks
 
 #SBATCH -J run_linearization_heuristic
 
