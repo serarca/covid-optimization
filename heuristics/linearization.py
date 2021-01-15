@@ -1281,7 +1281,7 @@ def get_real_reward(dynModel, uhat_seq):
 # Main function: runs the linearization heuristic
 # @profile
 # @log_execution_time
-def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_iterations_mult=2, initial_uhat="dynamic_gradient", optimize_bouncing=True, targetActivities=True, targetGroups=True, targetTests=True, deltaFairnessOne=False, deltaFair=0.1, optimizeLockdowns=True):
+def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_iterations_mult=2, initial_uhat="dynamic_gradient", optimize_bouncing=True, targetActivities=True, targetGroups=True, targetTests=True, deltaFairnessOne=False, deltaFair=0.1, optimizeLockdowns=True, averageLockConst=False, pLock=1, optimizeOnlyDeaths=False):
     """Run the heuristic based on linearization. Takes a dynamical model, resets the time to 0, and runs it following the linearization heuristic. Returns the dynamical model after running it."""
 
     # age_groups = dynModel.groups.keys()
@@ -1841,7 +1841,13 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
                 mod.addConstr(u_vars_vec[fairWorkOne_idx_lhs] <= u_vars_vec[fairWorkOne_idx_rhs] + deltaFair)
                 mod.addConstr(u_vars_vec[fairWorkOne_idx_lhs] >= u_vars_vec[fairWorkOne_idx_rhs] - deltaFair)
                                         
+            if averageLockConst:
+                assert targetActivities == False
+                print(f"p_lock is: {pLock}")
 
+                work_id = controls.index("work")
+
+                mod.addConstr(sum([dynModel.lockdown_controls[i][g]["work"] * dynModel.groups[g].N[0] for i in range(0,k) for g in dynModel.groups]) + sum([u_vars_vec[(i-k) * ut_dim + work_id + num_controls * age_groups.index(g)] * dynModel.groups[g].N[0] for i in range(k,T) for g in dynModel.groups]) >= (1-pLock) * T * sum([dynModel.groups[g].N[0] for g in dynModel.groups]))
 
             ConstMatrix = np.zeros(((T-k) * num_constraints, ut_dim * (T-k)), dtype=numpyArrayDatatype)
 
