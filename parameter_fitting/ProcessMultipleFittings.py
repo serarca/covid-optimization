@@ -36,18 +36,19 @@ for sim_i in range(100):
     fluctuation_samples = {
         "days_ahead": np.random.uniform(low=-5,high=5),
         "days_switch": np.random.uniform(low=-5,high=5),
-        "multiplier_beta": np.random.uniform(low=-0.2,high=0.2),
-        "multiplier_p_icu": np.random.uniform(low=-0.2,high=0.2),
-        "multiplier_p_d": np.random.uniform(low=-0.2,high=0.2),
-        "multiplier_lambda_h": np.random.uniform(low=-0.2,high=0.2),
-        "multiplier_lambda_icu": np.random.uniform(low=-0.2,high=0.2),
+        "multiplier_beta": np.random.uniform(low=-0.15,high=0.15),
+        "multiplier_p_icu": np.random.uniform(low=-0.15,high=0.15),
+        "multiplier_p_d": np.random.uniform(low=-0.15,high=0.15),
+        "multiplier_lambda_h": np.random.uniform(low=-0.15,high=0.15),
+        "multiplier_lambda_icu": np.random.uniform(low=-0.15,high=0.15),
         "alpha_other": np.random.uniform(low=-0.2,high=0.03),
         "l_school_march": np.random.uniform(low=0,high=0.2),
         "l_school_may": np.random.uniform(low=0,high=0.2),
         "l_school_july": np.random.uniform(low=-0.19,high=0.2),
-        "l_school_september": np.random.uniform(low=-0.19,high=0),
-        "alpha_mixing": np.random.uniform(low=-0.1,high=0.1),
+        "l_school_september": np.random.uniform(low=-0.2,high=0),
+        "alpha_mixing": np.random.uniform(low=-0.2,high=0.2),
         "econ_value": np.random.uniform(low=-0.1,high=0.1),
+        "l_work_april": np.random.uniform(low=-0.1,high=0.1),
     }
 
     print(fluctuation_samples)
@@ -769,6 +770,7 @@ for sim_i in range(100):
 
     # Calculate l-april and l-may
     l_april = np.mean([google['work'][i] for i in range(len(google)) if google['date'][i][0:7]=="2020-04"])
+    print('l_april',l_april)
     l_may = np.mean([google['work'][i] for i in range(len(google)) if google['date'][i][0:7]=="2020-05"])
     print("april",l_april)
     print("may",l_may)
@@ -784,7 +786,7 @@ for sim_i in range(100):
 
     m.addConstr(nu+gamma==1)
     m.addConstr(
-            nu*l_april  + gamma == (0.5851+fluctuation_samples['econ_value'])+epsilonp_1-epsilonn_1
+            nu*(l_april+fluctuation_samples['l_work_april']) + gamma == (0.5851+fluctuation_samples['econ_value'])+epsilonp_1-epsilonn_1
     )
 
     m.setObjective(epsilonp_1+epsilonn_1)
