@@ -42,8 +42,12 @@ def main():
     # Some paramters to test the linearization heuristic
     scaling = 10000
     money_scaling = 1000
-    xi_mult_values = [0,10,25,50,100,150]
-    testing_values = [0, 30000, 60000, 120000]
+    xi_mult_values = [0]
+    total_population = 12278209.99439713
+    testing_values_perc = np.linspace(0,0.035,num=100)
+
+    testing_values = [total_population * p for p in testing_values_perc]
+
     # , 60000, 120000]
     icu_values = [2900]
     # , 2300, 2600, 2900, 3200]
@@ -62,7 +66,7 @@ def main():
         "xi":[mult * 37199.03 * scaling / money_scaling for mult in xi_mult_values],
         "trust_region_radius":[0.05],
         "max_inner_iterations_mult":[2],
-        "initial_uhat":["dynamic_gradient"]
+        "initial_uhat":["full_open"]
         # , "dynamic_gradient"]
         # "full_lockdown", "full_open","dynamic_gradient", "activity_gradient", "age_group_gradient", "time_gradient"
     }
@@ -120,22 +124,25 @@ def main():
     max_inner_iterations_mult = all_instances[instance_index][10]
     initial_uhat = all_instances[instance_index][11]
     
-    targetActivities = True
-    targetGroups = True
-    targetTests = False
-
-    if initial_uhat == "time_gradient":
-        targetActivities = False
-        targetGroups = False
+    targetActivities = False
+    targetGroups = False
     
-    if initial_uhat == "age_group_gradient":
-        targetActivities = False
+    optimizeLockdowns = False
+
+    targetTests = True
+
+    # if initial_uhat == "time_gradient":
+    #     targetActivities = False
+    #     targetGroups = False
     
-    if initial_uhat == "activity_gradient":
-        targetGroups = False
+    # if initial_uhat == "age_group_gradient":
+    #     targetActivities = False
+    
+    # if initial_uhat == "activity_gradient":
+    #     targetGroups = False
 
 
-    run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling, targetActivities, targetGroups, targetTests)
+    run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling, targetActivities, targetGroups, targetTests, optimizeLockdowns)
     
     
     # run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, targetActivities, targetGroups, targetTests)
@@ -146,7 +153,7 @@ def main():
     #     load_pickle_and_create_yaml(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, scaling, money_scaling, heur)
 
 
-def run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling, targetActivities, targetGroups, targetTests):
+def run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling, targetActivities, targetGroups, targetTests, optimizeLockdowns):
     ''' Runs the linearization heuristic with the experiment parameters passed as arguments and saves the resulting dynamical model as a pickle object.'''
 
     experiment_params = {
@@ -174,10 +181,10 @@ def run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, 
         'eta': eta
     }
 
-    dynModel = run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, targetActivities, targetGroups, targetTests)
+    dynModel = run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, targetActivities, targetGroups, targetTests, optimizeLockdowns)
 
     result = {
-            "lockdown_heuristic":f"linearization_heuristic_optBouncing={optimize_bouncing}_initial_uhat={initial_uhat}_targetGroups={targetGroups}_targetAct={targetActivities}_targetTests={targetTests}",
+            "lockdown_heuristic":f"linearization_heuristic_optBouncing={optimize_bouncing}_initial_uhat={initial_uhat}_targetGroups={targetGroups}_targetAct={targetActivities}_targetTests={targetTests}_optimizeLockdowns={optimizeLockdowns}",
             "groups":groups,
             "experiment_params":{
                 "delta_schooling":delta,
@@ -248,7 +255,7 @@ def run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region, tes
     pickle.dump(dynModel_linearization_heur,open(f"linearization_heuristic_dyn_models/dynModel_linHeur_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}_testFreq={test_freq}_lockFreq={lockdown_freq}_eta={eta}_groups={groups}.p","wb"), protocol=-1)
 
 
-def run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, targetActivities, targetGroups, targetTests):
+def run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, targetActivities, targetGroups, targetTests, optimizeLockdowns):
     ''' Takes a set of simulation_params and experiment parameters (delta_school, emotional cost of deaths (xi), max icus, max tests, testing and lockdown frequencies) and a set of simulation paramters (required by the constructor in group.py), creates a dynamical system, runs the linearization heuristic and returns the dynamical system after running the heuristic. 
     '''
 
@@ -315,7 +322,7 @@ def run_linearization_heuristic(simulation_params, experiment_params, start_day,
     dynModel.econ_params["employment_params"]["eta"] = simulation_params["eta"]
 
 
-    linearization.run_heuristic_linearization(dynModel, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, targetActivities, targetGroups, targetTests)
+    linearization.run_heuristic_linearization(dynModel, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, targetActivities, targetGroups, targetTests, False, 0.1,optimizeLockdowns)
 
     end_time = time()
 
@@ -326,337 +333,6 @@ def run_linearization_heuristic(simulation_params, experiment_params, start_day,
     return dynModel
 
 
-def run_pickled_dynModels_prop_bouncing(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day):
-    ''' Loads all the pickled dynamical models and runs them with proportional bouncing, saving the results in another pickle object'''
-
-    pickled_dyn_model = f"linearization_heuristic_dyn_models/dynModel_linHeur_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}_testFreq={test_freq}_lockFreq={lockdown_freq}_eta={eta}_groups={groups}.p"
-
-    run_dyn_model_with_no_bouncing_and_pickle(pickled_dyn_model, groups)
-
-
-def run_all_pickled_dynModels_prop_bouncing(n_days, params_to_try, groups):
-    ''' Loads all the pickled dynamical models and runs them with proportional bouncing, saving the results in another pickle object'''
-
-    for delta in params_to_try["delta_schooling"]:
-        for xi in params_to_try["xi"]:
-            for icus in params_to_try["icus"]:
-                for tests in params_to_try["tests"]:
-                    for test_freq, lockdown_freq in params_to_try['frequencies']:
-                        for eta in params_to_try["eta"]:
-                            pickled_dyn_model = f"linearization_heuristic_dyn_models/dynModel_linHeur_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}_testFreq={test_freq}_lockFreq={lockdown_freq}_eta={eta}_groups={groups}.p"
-
-                            run_dyn_model_with_no_bouncing_and_pickle(pickled_dyn_model, groups)
-
-
-def run_dyn_model_with_no_bouncing_and_pickle(pickled_dyn_model, groups):
-    ''' Loads a pickled dynamical model and re-runs it with proportional-bouncing, then saves the resulting dynamical model into another pickle object'''
-
-    dynModel = pickle.load(open(pickled_dyn_model,"rb"))
-
-    n_days = int(dynModel.time_steps-dynModel.END_DAYS * dynModel.dt)
-    delta = dynModel.experiment_params['delta_schooling']
-    xi = dynModel.experiment_params['xi']
-    icus = dynModel.icus
-    tests = dynModel.parameters['global-parameters']['C_mtest']
-
-    # Recover all the controls from the 
-    # dynamical model except for bouncing decisions
-    lockdowns = dynModel.lockdown_controls
-    m_tests_cont = dynModel.m_tests_controls
-    a_tests_cont = dynModel.a_tests_controls
-
-    dynModel.reset_time(0)
-    dynModel.simulate(m_tests_cont, a_tests_cont, lockdowns)
-
-    pickle.dump(dynModel,open(f"linearization_heuristic_dyn_models/dynModel_linHeur_Prop_Bouncing_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}_testFreq={dynModel.experiment_params['test_freq']}_lockFreq={dynModel.experiment_params['lockdown_freq']}_eta={dynModel.econ_params['employment_params']['eta']}_groups={groups}.p","wb"), protocol=-1)
-
-
-def load_pickles_and_create_csv(n_days, params_to_try, final_time_step, groups):
-    ''' Loads all pickled dynamical models and creates an excel spreadsheet to visualize the resulting metrics.'''
-
-    results = []
-    for delta in params_to_try["delta_schooling"]:
-        for xi in params_to_try["xi"]:
-            for icus in params_to_try["icus"]:
-                for tests in params_to_try["tests"]:
-                    for heur in ["","_Prop_Bouncing"]:
-                        for test_freq, lockdown_freq in params_to_try['frequencies']:
-                            for eta in params_to_try["eta"]:
-                            
-                                dynModel = pickle.load(open(f"linearization_heuristic_dyn_models/dynModel_linHeur{heur}_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}_testFreq={test_freq}_lockFreq={lockdown_freq}_eta={eta}_groups={groups}.p","rb"))
-
-                                results.append({
-                                    "heuristic":f"linearization_heuristic{heur}",
-                                "delta_schooling":delta,
-                                "lockdown_freq":lockdown_freq,
-                                "test_freq":test_freq,
-                                "xi":xi,
-                                "icus":icus,
-                                "tests":tests,
-                                "eta":eta,
-                                "testing":"linearization_heuristic",
-                                "economics_value":dynModel.get_total_economic_value(final_time_step),
-                                "deaths":dynModel.get_total_deaths(final_time_step),
-                                "reward":dynModel.get_total_reward(final_time_step)
-                            })
-
-    pd.DataFrame(results).to_excel(f"linearization_heuristic_dyn_models/linearization_heuristic_results_{n_days}_days.xlsx")
-
-
-def load_pickle_and_create_yaml(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, scaling, money_scaling, heur):
-    ''' Loads all pickled dynamical models and creates an excel spreadsheet to visualize the resulting metrics.'''
-
-    dynModel = pickle.load(open(f"linearization_heuristic_dyn_models/dynModel_linHeur{heur}_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}_testFreq={test_freq}_lockFreq={lockdown_freq}_eta={eta}_groups={groups}.p","rb"))
-
-
-    result = {
-            "lockdown_heuristic":f"linearization_heuristic{heur}",
-            "groups":groups,
-            "experiment_params":{
-                "delta_schooling":delta,
-                "xi":(xi/scaling) * money_scaling, 
-                "icus":icus * scaling,
-                "n_a_tests":tests * scaling,
-                "n_m_tests":tests * scaling,
-                "start_day":start_day,
-                "T":n_days,
-                "eta":eta,
-                "lockdown_freq":lockdown_freq,
-                "test_freq":test_freq
-            },
-            "testing_heuristic":f"linearization_heuristic{heur}",
-            "results":{
-                "economics_value":float(dynModel.get_total_economic_value()) * money_scaling,
-                "deaths":float(dynModel.get_total_deaths()) * scaling,
-                "reward":float(dynModel.get_total_reward()),
-            },
-            "policy":dynModel.lockdown_controls,
-            "a_tests":[{g: test * scaling for g,test in a.items()} for a in dynModel.a_tests_controls],
-            "m_tests":[{g: test * scaling for g,test in m.items()}  for m in dynModel.m_tests_controls],
-            
-    }
-
-    result["filename"] = f"{result['lockdown_heuristic']}/xi-{result['experiment_params']['xi']}_icus-{result['experiment_params']['icus']}_testing-{result['testing_heuristic']}_natests-{result['experiment_params']['n_a_tests']}_nmtests-{result['experiment_params']['n_m_tests']}_T-{result['experiment_params']['T']}_startday-{result['experiment_params']['start_day']}_groups-{result['groups']}_dschool-{result['experiment_params']['delta_schooling']}_eta-{result['experiment_params']['eta']}_lockdownFreq-{result['experiment_params']['lockdown_freq']}_testingFreq-{result['experiment_params']['test_freq']}"
-
-    fn =  f"benchmarks/results/{result['filename']}.yaml"
-    
-    with open(fn, 'w') as file:
-        yaml.dump(result, file)
-
-
-def load_pickles_and_create_yaml(n_days, params_to_try, final_time_step, groups, start_day, scaling, money_scaling):
-    ''' Loads all pickled dynamical models and creates an excel spreadsheet to visualize the resulting metrics.'''
-
-    results = []
-    for delta in params_to_try["delta_schooling"]:
-        for xi in params_to_try["xi"]:
-            for icus in params_to_try["icus"]:
-                for tests in params_to_try["tests"]:
-                    for heur in ["","_Prop_Bouncing"]:
-                        for test_freq, lockdown_freq in params_to_try['frequencies']:
-                            for eta in params_to_try["eta"]:
-                            
-                                dynModel = pickle.load(open(f"linearization_heuristic_dyn_models/dynModel_linHeur{heur}_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}_testFreq={test_freq}_lockFreq={lockdown_freq}_eta={eta}_groups={groups}.p","rb"))
-
-
-                                result = {
-                                        "lockdown_heuristic":f"linearization_heuristic{heur}",
-                                        "groups":groups,
-                                        "experiment_params":{
-                                            "delta_schooling":delta,
-                                            "xi":(xi/scaling) * money_scaling, 
-                                            "icus":icus * scaling,
-                                            "n_a_tests":tests * scaling,
-                                            "n_m_tests":tests * scaling,
-                                            "start_day":start_day,
-                                            "T":n_days,
-                                            "eta":eta,
-                                            "lockdown_freq":lockdown_freq,
-                                            "test_freq":test_freq
-                                        },
-                                        "testing_heuristic":f"linearization_heuristic{heur}",
-                                        "results":{
-                                            "economics_value":float(dynModel.get_total_economic_value()) * money_scaling,
-                                            "deaths":float(dynModel.get_total_deaths()) * scaling,
-                                            "reward":float(dynModel.get_total_reward()),
-                                        },
-                                        "policy":dynModel.lockdown_controls,
-                                        "a_tests":[{g: test * scaling for g,test in a.items()} for a in dynModel.a_tests_controls],
-                                        "m_tests":[{g: test * scaling for g,test in m.items()}  for m in dynModel.m_tests_controls],
-                                        
-                                }
-
-                                result["filename"] = f"{result['lockdown_heuristic']}/xi-{result['experiment_params']['xi']}_icus-{result['experiment_params']['icus']}_testing-{result['testing_heuristic']}_natests-{result['experiment_params']['n_a_tests']}_nmtests-{result['experiment_params']['n_m_tests']}_T-{result['experiment_params']['T']}_startday-{result['experiment_params']['start_day']}_groups-{result['groups']}_dschool-{result['experiment_params']['delta_schooling']}_eta-{result['experiment_params']['eta']}_lockdownFreq-{result['experiment_params']['lockdown_freq']}_testingFreq-{result['experiment_params']['test_freq']}"
-
-                                fn =  f"benchmarks/results/{result['filename']}.yaml"
-                                
-                                with open(fn, 'w') as file:
-                                    yaml.dump(result, file)
-
-
-
-
-
-def unpickle_plot_and_print_results(n_days, params_to_try, simulation_params):
-    '''PLOT AND PRINT RESULTS FROM THE DYNAMICAL MODEL SIMULATED USING THE SIMULATION PARAMS'''
-
-    for delta in params_to_try["delta_schooling"]:
-        for xi in params_to_try["xi"]:
-            for icus in params_to_try["icus"]:
-                for tests in params_to_try["tests"]:
-                    for heur in ["","_Prop_Bouncing"]:
-                        for test_freq, lockdown_freq in params_to_try['frequencies']:
-                            for eta in params_to_try["eta"]:
-
-                                dynModel = pickle.load(open(f"linearization_heuristic_dyn_models/dynModel_linHeur{heur}_n_days={n_days}_deltas={delta}_xi={xi}_icus={icus}_maxTests={tests}_testFreq={test_freq}_lockFreq={lockdown_freq}_eta={eta}.p","rb"))
-
-                                # heuristic = simulation_params['heuristic']+heur
-                                T = dynModel.time_steps
-
-                                K_mtest = tests
-                                K_atest = tests
-
-                                # Retrieve optimal lockdown decisions
-                                # Express as dictionary where given an age group, an activity key corresponds to an np.array of length T.
-                                # That array holds the lockdown decisions for that age group and that activity used in the simulation of dynModel.
-                                lockdowns_sim = {}
-                                for n in dynModel.groups:
-                                    lockdowns_sim[n] = {}
-                                    for act in dynModel.lockdown_controls[0][n]:
-                                        lockdowns_sim[n][act] = np.zeros(T)
-                                        for t in range(T):
-                                            lockdowns_sim[n][act][t] = dynModel.lockdown_controls[t][n][act]
-
-                                # Retrieve simulated testing decisions
-                                m_tests_sim = {}
-                                for n in dynModel.groups:
-                                    m_tests_sim[n] = np.zeros(T)
-                                    for t in range(T):
-                                        m_tests_sim[n][t] = dynModel.m_tests_controls[t][n]
-
-                                a_tests_sim = {}
-                                for n in dynModel.groups:
-                                    a_tests_sim[n] = np.zeros(T)
-                                    for t in range(T):
-                                        a_tests_sim[n][t] = dynModel.a_tests_controls[t][n]
-
-
-                                # # Retrieve simulated bouncing decisions
-
-                                B_H_sim = {}
-                                for n,g in dynModel.groups.items():
-                                    B_H_sim[n] = np.zeros(T-1)
-                                    for t in range(T-1):
-                                        B_H_sim[n][t] = g.B_H[t]
-
-                                B_ICU_sim = {}
-                                for n,g in dynModel.groups.items():
-                                    B_ICU_sim[n] = np.zeros(T-1)
-                                    for t in range(T-1):
-                                        B_ICU_sim[n][t] = g.B_ICU[t]
-
-                                print("Deaths through the end of the horizon:", sum([dynModel.deaths[t] for t in range(0,T+1) if t!=0]))
-                                print("Economic output through the end of the horizon:", sum([dynModel.economic_values[t] for t in range(0,T+1) if t!=0]))
-
-
-
-                                # Plotting
-                                time_axis = [i*simulation_params["dt"] for i in range(T+1)]
-                                time_axis_controls = [i*simulation_params["dt"] for i in range(T)]
-
-                                groups = dynModel.groups.keys()
-                                groups = sorted(groups)
-                                
-                                for i,group in enumerate(groups):
-                                    plt.subplot(13,len(groups),i+1)
-                                    plt.plot(time_axis, dynModel.groups[group].S, label="Susceptible")
-                                    plt.title(group)
-                                    plt.legend(loc='upper right')
-                                    plt.ylim(-1,np.max([np.max(dynModel.groups[group].S) for group in groups]))
-
-                                for i,group in enumerate(groups):
-                                    plt.subplot(13,len(groups),i+1+len(groups))
-                                    plt.plot(time_axis, dynModel.groups[group].E, label="Exposed")
-                                    plt.plot(time_axis, dynModel.groups[group].I, label="Infected")
-                                    plt.legend(loc='upper right')
-                                    plt.ylim(-1,np.max([max(np.max(dynModel.groups[group].E),np.max(dynModel.groups[group].I)) for group in groups]))
-
-                                for i,group in enumerate(groups):
-                                    plt.subplot(13,len(groups),i+1+len(groups)*2)
-                                    plt.plot(time_axis, dynModel.groups[group].R, label="Recovered")
-                                    plt.ylim(-1,np.max([np.max(dynModel.groups[group].R) for group in groups]))
-                                    plt.legend(loc='upper right')
-
-                                for i,group in enumerate(groups):
-                                    plt.subplot(13,len(groups),i+1+len(groups)*3)
-                                    plt.plot(time_axis, dynModel.groups[group].Rq, label="Recovered Q")
-                                    plt.ylim(-1,np.max([np.max(dynModel.groups[group].Rq) for group in groups]))
-                                    plt.legend(loc='upper right')
-
-                                for i,group in enumerate(groups):
-                                    plt.subplot(13,len(groups),i+1+len(groups)*4)
-                                    plt.plot(time_axis, dynModel.groups[group].Ia, label="Infected A-Q")
-                                    plt.plot(time_axis, dynModel.groups[group].Ips, label="Infected PS-Q")
-                                    plt.plot(time_axis, dynModel.groups[group].Ims, label="Infected MS-Q")
-                                    plt.plot(time_axis, dynModel.groups[group].Iss, label="Infected SS-Q")
-                                    plt.ylim(-1,np.max([max(np.max(dynModel.groups[group].Ia),np.max(dynModel.groups[group].Ips),np.max(dynModel.groups[group].Ims),np.max(dynModel.groups[group].Iss)) for group in groups]))
-                                    plt.legend(loc='upper right')
-
-                                for i,group in enumerate(groups):
-                                    plt.subplot(13,len(groups),i+1+len(groups)*5)
-                                    plt.plot(time_axis, dynModel.groups[group].H, label="Hospital")
-                                    plt.plot(time_axis, dynModel.groups[group].ICU, label="ICU")
-                                    plt.plot(time_axis, dynModel.groups[group].D, label="Dead")
-                                    plt.ylim(-1,np.max([max(np.max(dynModel.groups[group].H),np.max(dynModel.groups[group].ICU),np.max(dynModel.groups[group].D)) for group in groups]))
-                                    plt.legend(loc='upper right')
-
-
-                                for i,group in enumerate(groups):
-                                    plt.subplot(13,len(groups),i+1+len(groups)*6)
-                                    plt.plot(time_axis_controls,m_tests_sim[group], label = "M tests")
-                                    plt.plot(time_axis_controls,a_tests_sim[group], label = "A tests")
-                                    # plt.plot(range(0,int(simulation_params['time_periods'])),
-                                    # np.array(re_change_order(m_tests_vec)[group])+max(float(args.m_tests),float(args.a_tests))/100, label="M Tests")
-                                    # plt.plot(range(0,int(simulation_params['time_periods'])), re_change_order(a_tests_vec)[group], label="A Tests")
-                                    plt.ylim(-max(float(K_mtest),float(K_atest))/10,max(float(K_mtest),float(K_atest))+max(float(K_mtest),float(K_atest))/10)
-                                    plt.legend(loc='upper right')
-
-                                for i,group in enumerate(groups):
-                                    plt.subplot(13,len(groups),i+1+len(groups)*7)
-                                    plt.plot(time_axis_controls, lockdowns_sim[group]["home"]+0.01, label="Home")
-                                    plt.plot(time_axis_controls, lockdowns_sim[group]["work"]+0.01*2, label="Work")
-                                    plt.plot(time_axis_controls, lockdowns_sim[group]["transport"]+0.01*3, label="Transport")
-                                    plt.plot(time_axis_controls, lockdowns_sim[group]["school"]+0.01*4, label="School")
-                                    plt.plot(time_axis_controls, lockdowns_sim[group]["leisure"]+0.01*5, label="Leisure")
-                                    plt.plot(time_axis_controls, lockdowns_sim[group]["other"]+0.01*6, label="Other")
-                                    plt.ylim(-0.1,1.1)
-                                    plt.legend(loc='upper right')
-
-                                for i,group in enumerate(groups):
-                                    plt.subplot(13,len(groups),i+1+len(groups)*8)
-                                    plt.plot(time_axis_controls, dynModel.groups[group].B_H, label="Bounced H")
-                                    plt.plot(time_axis_controls, dynModel.groups[group].B_ICU, label="Bounced ICU")
-                                    plt.ylim(-1,np.max([max(np.max(dynModel.groups[group].B_H),np.max(dynModel.groups[group].B_ICU)) for group in groups]))
-                                    plt.legend(loc='upper right')
-
-                                plt.subplot(13,2,19)
-                                #plt.plot(time_axis, [sum([dynModel.groups[group].H[i] for group in groups]) for i in range(len(time_axis))], label="Total Hospital Beds")
-                                plt.plot(time_axis, [sum([dynModel.groups[group].ICU[i] for group in groups]) for i in range(len(time_axis))], label="Total ICUs")
-                                #plt.axhline(y=parameters['global-parameters']['C_H'], color='r', linestyle='dashed', label= "Hospital Capacity")
-                                plt.axhline(y=dynModel.icus, color='g', linestyle='dashed', label= "ICU Capacity")
-                                plt.legend(loc='upper right')
-
-                                plt.subplot(13,2,20)
-                                #plt.plot(time_axis, [sum([dynModel.groups[group].H[i] for group in groups]) for i in range(len(time_axis))], label="Total Hospital Beds")
-                                plt.plot(time_axis, [sum([dynModel.groups[group].D[i] for group in groups]) for i in range(len(time_axis))], label="Total Deaths")
-                                #plt.axhline(y=parameters['global-parameters']['C_H'], color='r', linestyle='dashed', label= "Hospital Capacity")
-                                plt.legend(loc='upper right')
-
-                                figure = plt.gcf() # get current figure
-                                figure.set_size_inches(7*len(groups),24)
-                                figure.suptitle('Region: %s, %s Heuristic with Total Days: %s, Initial Infected percentage: %2d, M-test daily capacity: %s, A-test daily capacity: %s, Mixing: %s'%(simulation_params['region'],simulation_params['heuristic'],T,simulation_params['perc_infected'],K_mtest,K_atest,simulation_params['mixing_method']["name"]), fontsize=22)
-                                plt.savefig("results_runs/linearization_heuristic_dyn_models/"+simulation_params['region']+"_"+simulation_params['heuristic']+heur+"_heuristic"+"_n_days_"+str(T)+"_tests_"+str(dynModel.parameters['global-parameters']['C_mtest'])+ "_icu_cap_"+str(dynModel.icus)+"_deltaS_"+str(delta)+"_xi_"+str(xi)+"_mixing_" + simulation_params['mixing_method']["name"]+"_testFreq="+str(test_freq)+"_lockFreq="+str(lockdown_freq)+".pdf")
-                                plt.close()
 
 
 def scaling_econ_param(scaling, money_scaling):

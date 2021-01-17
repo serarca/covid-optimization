@@ -65,7 +65,7 @@ def main():
         "max_inner_iterations_mult":[2],
         "initial_uhat":["activity_gradient"],
         # "full_lockdown", "full_open","dynamic_gradient", "activity_gradient", "age_group_gradient", "time_gradient"
-        "deltaFair":[0,0.25,0.5,1,1.5]
+        "deltaFair":[0.1,0.2,0.3,0.4,0.6,0.7,0.8,0.9]
     }
 
 

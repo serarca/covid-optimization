@@ -8,7 +8,7 @@
 
  
 
-#SBATCH --array=1,26,27,29,30,36,40,52,56,57,62,64,65,69,70,71,72,95 # there is a max array size - 512 tasks
+#SBATCH --array=0-3 # there is a max array size - 512 tasks
 
 #SBATCH -J run_linearization_heuristic
 
@@ -30,7 +30,7 @@
 
 #SBATCH -n 1
 
-# SBATCH --mem-per-cpu=7gb
+# SBATCH --mem-per-cpu=900GB
 
 
 # Load software

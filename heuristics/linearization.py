@@ -3,6 +3,7 @@ import yaml
 from inspect import getsourcefile
 import os.path
 import sys
+import os
 
 from threadpoolctl import threadpool_limits
 import numpy as np
@@ -1280,7 +1281,7 @@ def get_real_reward(dynModel, uhat_seq):
 # Main function: runs the linearization heuristic
 # @profile
 # @log_execution_time
-def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_iterations_mult=2, initial_uhat="dynamic_gradient", optimize_bouncing=True, targetActivities=True, targetGroups=True, targetTests=True, deltaFairnessOne=False, deltaFair=0.1):
+def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_iterations_mult=2, initial_uhat="dynamic_gradient", optimize_bouncing=True, targetActivities=True, targetGroups=True, targetTests=True, deltaFairnessOne=False, deltaFair=0.1, optimizeLockdowns=True, averageLockConst=False, pLock=1, optimizeOnlyDeaths=False):
     """Run the heuristic based on linearization. Takes a dynamical model, resets the time to 0, and runs it following the linearization heuristic. Returns the dynamical model after running it."""
 
     # age_groups = dynModel.groups.keys()
@@ -1295,12 +1296,12 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
     #Check that if we target only activities or groups, we are using the 
     # correct starting point
     if not targetActivities:
-        assert initial_uhat in ["time_gradient", "age_group_gradient"]
+        assert initial_uhat in ["time_gradient", "age_group_gradient", "full_open"]
         if not targetGroups:
-            assert initial_uhat == "time_gradient"
+            assert initial_uhat in ["time_gradient", "full_open"]
     
     if not targetGroups:
-        assert initial_uhat in ["time_gradient", "activity_gradient"]
+        assert initial_uhat in ["time_gradient", "activity_gradient", "full_open"]
 
     dynModel.reset_time(0)
 
@@ -1376,7 +1377,7 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
 
     # Initialize lockdown policy for first u_hat
 
-    if initial_uhat in ["dynamic_gradient", "time_gradient","age_group_gradient","activity_gradient","time_gradient"]:
+    if initial_uhat in ["dynamic_gradient", "time_gradient","age_group_gradient","activity_gradient"]:
         h = initial_uhat
         n = "xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d.yaml"%(
             dynModel.experiment_params["xi"]*0.1,
@@ -1393,8 +1394,31 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
             14 
         )
 
-        with open("benchmarks/results/%s/%s"%(h,n)) as file:
-            result = yaml.load(file, Loader=yaml.FullLoader)
+        try:
+            with open("benchmarks/results/%s/%s"%(h,n)) as file:
+                result = yaml.load(file, Loader=yaml.FullLoader)
+        except FileNotFoundError:
+            if initial_uhat in ["dynamic_gradient", "time_gradient","age_group_gradient","activity_gradient"]:
+                print("Missing starting point -- Running the initial heuristic.")
+
+                path = os.getcwd()
+                print(path)
+                os.chdir(f"{path}/benchmarks")
+                
+                if not os.path.exists(f"results/time_gradient/{n}"):
+                    os.system(f"python3 time_gradient_benchmarks.py --delta {dynModel.experiment_params['delta_schooling']} --icus {int(dynModel.experiment_params['icus']*10000)} --eta {dynModel.econ_params['employment_params']['eta']} --groups all --xi {dynModel.experiment_params['xi']*0.1} --a_tests {int(dynModel.parameters['global-parameters']['C_atest']*10000)} --m_tests {int(dynModel.parameters['global-parameters']['C_mtest']*10000)}")
+
+                if not os.path.exists(f"results/{h}/{n}"):
+                    os.system(f"python3 {h}_benchmarks.py --delta {dynModel.experiment_params['delta_schooling']} --icus {int(dynModel.experiment_params['icus']*10000)} --eta {dynModel.econ_params['employment_params']['eta']} --groups all --xi {dynModel.experiment_params['xi']*0.1} --a_tests {int(dynModel.parameters['global-parameters']['C_atest']*10000)} --m_tests {int(dynModel.parameters['global-parameters']['C_mtest']*10000)}")
+                
+                os.chdir(path)
+
+                with open("benchmarks/results/%s/%s"%(h,n)) as file:
+
+                    result = yaml.load(file, Loader=yaml.FullLoader)
+            else:
+                print(f"Missing file. Initial u_hat is {initial_uhat}. Instance is: {s}. Please create the initial starting point.")
+                assert(False)
 
         # Starting the uhat_seq 
         for t in range(T):
@@ -1525,6 +1549,11 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
             # Work, Other, School, Leisure, Transport
             lower_bounds[np_all_lockdowns_idx_all_times] = np.maximum(uhat_seq[np_all_lockdowns_idx_all_times%ut_dim, np_all_lockdowns_idx_all_times//ut_dim] - trust_region_radius, 0)
             upper_bounds[np_all_lockdowns_idx_all_times] = np.minimum(uhat_seq[np_all_lockdowns_idx_all_times%ut_dim, np_all_lockdowns_idx_all_times//ut_dim] + trust_region_radius, 1)
+
+            if not optimizeLockdowns:
+                lower_bounds[np_all_lockdowns_idx_all_times] = np.maximum(uhat_seq[np_all_lockdowns_idx_all_times%ut_dim, np_all_lockdowns_idx_all_times//ut_dim], 0)
+                upper_bounds[np_all_lockdowns_idx_all_times] = np.minimum(uhat_seq[np_all_lockdowns_idx_all_times%ut_dim, np_all_lockdowns_idx_all_times//ut_dim], 1)
+
 
             # Home
             lower_bounds[np_lock_home_idx_all_times] = 1
@@ -1789,8 +1818,8 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
                                         fairOne_idx_lhs.append((time_index - k) * ut_dim + act_lock_g_idx)
                                         fairOne_idx_rhs.append((time_index - k) * ut_dim + act_lock_h_idx)
                     
-                mod.addConstr(u_vars_vec[fairOne_idx_lhs] <= u_vars_vec[fairOne_idx_rhs] * (1 + deltaFair))
-                mod.addConstr(u_vars_vec[fairOne_idx_lhs] >= u_vars_vec[fairOne_idx_rhs] * (1 - deltaFair))
+                mod.addConstr(u_vars_vec[fairOne_idx_lhs] <= u_vars_vec[fairOne_idx_rhs] + deltaFair)
+                mod.addConstr(u_vars_vec[fairOne_idx_lhs] >= u_vars_vec[fairOne_idx_rhs]  - deltaFair)
 
                 fairWorkOne_idx_rhs = []
                 fairWorkOne_idx_lhs = []
@@ -1809,10 +1838,16 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
                                 fairWorkOne_idx_lhs.append((time_index - k) * ut_dim + act_lock_g_idx)
                                 fairWorkOne_idx_rhs.append((time_index - k) * ut_dim + act_lock_h_idx)
 
-                mod.addConstr(u_vars_vec[fairWorkOne_idx_lhs] <= u_vars_vec[fairWorkOne_idx_rhs] * (1 + deltaFair))
-                mod.addConstr(u_vars_vec[fairWorkOne_idx_lhs] >= u_vars_vec[fairWorkOne_idx_rhs] * (1 - deltaFair))
+                mod.addConstr(u_vars_vec[fairWorkOne_idx_lhs] <= u_vars_vec[fairWorkOne_idx_rhs] + deltaFair)
+                mod.addConstr(u_vars_vec[fairWorkOne_idx_lhs] >= u_vars_vec[fairWorkOne_idx_rhs] - deltaFair)
                                         
+            if averageLockConst:
+                assert targetActivities == False
+                print(f"p_lock is: {pLock}")
 
+                work_id = controls.index("work")
+
+                mod.addConstr(sum([dynModel.lockdown_controls[i][g]["work"] * dynModel.groups[g].N[0] for i in range(0,k) for g in dynModel.groups]) + sum([u_vars_vec[(i-k) * ut_dim + work_id + num_controls * age_groups.index(g)] * dynModel.groups[g].N[0] for i in range(k,T) for g in dynModel.groups]) >= (1-pLock) * T * sum([dynModel.groups[g].N[0] for g in dynModel.groups]))
 
             ConstMatrix = np.zeros(((T-k) * num_constraints, ut_dim * (T-k)), dtype=numpyArrayDatatype)
 

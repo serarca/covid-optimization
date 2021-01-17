@@ -273,7 +273,7 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
 
 
 
-		print(total_reward, total_deaths, total_econ)
+		# print(total_reward, total_deaths, total_econ)
 		return -total_reward
 
 

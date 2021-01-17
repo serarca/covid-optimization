@@ -61,7 +61,7 @@ groups = run_params["groups"]
 # Global variables
 simulation_params = {
 	'dt':1.0,
-	'days': 360.0,
+	'days': 90.0,
 	'region': "fitted",
 	'heuristic': 'benchmark',
 	'mixing_method': {'name': 'multi'}
@@ -273,7 +273,7 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
 
 
 
-		print(total_reward, total_deaths, total_econ)
+		# print(total_reward, total_deaths, total_econ)
 		return -total_reward
 
 	lower_bounds_matrix = np.zeros((len(intervention_times),len(age_groups),len(rel_activities)))
