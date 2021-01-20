@@ -181,7 +181,7 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
         },
         "testing_heuristic":experiment_params["testing"],
     }
-    result["filename"] = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d_randomInstance-%d"%(
+    result["filename"] = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d"%(
         result["lockdown_heuristic"],
         result["experiment_params"]["xi"],
         result["experiment_params"]["icus"],
@@ -194,9 +194,26 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
         result["experiment_params"]["delta_schooling"],
         experiment_params["eta"],
         result["experiment_params"]["test_freq"],
-        result["experiment_params"]["policy_freq"],
-        args.random_instance
+        result["experiment_params"]["policy_freq"]
     )
+    if args.random_instance > -1:
+            
+        result["filename"] = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d_randomInstance-%d"%(
+            result["lockdown_heuristic"],
+            result["experiment_params"]["xi"],
+            result["experiment_params"]["icus"],
+            result["testing_heuristic"],
+            result["experiment_params"]["n_a_tests"],
+            result["experiment_params"]["n_m_tests"],
+            result["experiment_params"]["T"],
+            result["experiment_params"]["start_day"],
+            result["groups"],
+            result["experiment_params"]["delta_schooling"],
+            experiment_params["eta"],
+            result["experiment_params"]["test_freq"],
+            result["experiment_params"]["policy_freq"],
+            args.random_instance
+        )
 
 
     intervention_times = [t*quar_freq for t in range(int((simulation_params['days']-1)/quar_freq)+1)]

@@ -1432,10 +1432,16 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
                 
                 else:
 
+                    print(f"Running gradients")
+
                     if not os.path.exists(f"results/time_gradient/{n}"):
+                        print(f"No time_gradient, running")
+
                         os.system(f"python3 time_gradient_benchmarks.py --delta {dynModel.experiment_params['delta_schooling']} --icus {int(dynModel.experiment_params['icus']*10000)} --eta {dynModel.econ_params['employment_params']['eta']} --groups all --xi {dynModel.experiment_params['xi']*0.1} --a_tests {int(dynModel.parameters['global-parameters']['C_atest']*10000)} --m_tests {int(dynModel.parameters['global-parameters']['C_mtest']*10000)}")
 
                     if not os.path.exists(f"results/{h}/{n}"):
+                        print(f"no results/{h}/{n}, running")
+
                         os.system(f"python3 {h}_benchmarks.py --delta {dynModel.experiment_params['delta_schooling']} --icus {int(dynModel.experiment_params['icus']*10000)} --eta {dynModel.econ_params['employment_params']['eta']} --groups all --xi {dynModel.experiment_params['xi']*0.1} --a_tests {int(dynModel.parameters['global-parameters']['C_atest']*10000)} --m_tests {int(dynModel.parameters['global-parameters']['C_mtest']*10000)}")
                     
                 os.chdir(path)
