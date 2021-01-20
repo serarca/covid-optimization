@@ -116,6 +116,8 @@ for i,f in enumerate(files_to_process):
 					"H_perc":np.sum([state[other_group]["H"] for other_group in age_groups])/np.sum([state[other_group]["N"]+state[other_group]["Rq"] for other_group in age_groups]),
 					"ICU_utilization":np.sum([state[other_group]["ICU"] for other_group in age_groups])/experiment_params["icus"],
 					"xi+cost_death":experiment_params["xi"]+econ_params["econ_cost_death"][ag],
+					"cost_death":econ_params["econ_cost_death"][ag],
+					"xi":experiment_params["xi"],
 					"contacts_received":np.sum([universe_params["seir-groups"][ag]["contacts_spc"][act][other_group] for other_group in age_groups]),
 					"contacts_received(deaths)":np.sum([universe_params["seir-groups"][ag]["contacts_spc"][act][other_group]*universe_params["seir-groups"][ag]['parameters']['lambda_H_D']*14.55 for other_group in age_groups]),
 					"infections_received":np.sum([universe_params["seir-groups"][ag]["contacts_spc"][act][other_group]*state[other_group]["I"]/(state[other_group]["Rq"]+state[other_group]["N"]) for other_group in age_groups]),
