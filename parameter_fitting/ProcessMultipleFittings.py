@@ -21,6 +21,7 @@ sys.path.insert(0,parentdir)
 sys.path.insert(0, parentdir+"/heuristics")
 sys.path.insert(0, parentdir+"/heuristics/LP-Models")
 sys.path.insert(0, parentdir+"/fast_gradient")
+import random
 
 
 from fast_group import FastDynamicalModel
@@ -32,23 +33,25 @@ import math
 import matplotlib.dates as mdates
 
 # We define the way that parameter fluctuations will be 
+ext = 0.1
+
 for sim_i in range(100):
     fluctuation_samples = {
-        "days_ahead": np.random.uniform(low=-5,high=5),
-        "days_switch": np.random.uniform(low=-5,high=5),
-        "multiplier_beta": np.random.uniform(low=-0.15,high=0.15),
-        "multiplier_p_icu": np.random.uniform(low=-0.15,high=0.15),
-        "multiplier_p_d": np.random.uniform(low=-0.15,high=0.15),
-        "multiplier_lambda_h": np.random.uniform(low=-0.15,high=0.15),
-        "multiplier_lambda_icu": np.random.uniform(low=-0.15,high=0.15),
-        "alpha_other": np.random.uniform(low=-0.2,high=0.03),
-        "l_school_march": np.random.uniform(low=0,high=0.2),
-        "l_school_may": np.random.uniform(low=0,high=0.2),
-        "l_school_july": np.random.uniform(low=-0.19,high=0.2),
-        "l_school_september": np.random.uniform(low=-0.2,high=0),
-        "alpha_mixing": np.random.uniform(low=-0.2,high=0.2),
-        "econ_value": np.random.uniform(low=-0.1,high=0.1),
-        "l_work_april": np.random.uniform(low=-0.1,high=0.1),
+        "days_ahead": np.random.uniform(low=-5*ext,high=5*ext),
+        "days_switch": np.random.uniform(low=-5*ext,high=5*ext),
+        "multiplier_beta": np.random.uniform(low=-0.15*ext,high=0.15*ext),
+        "multiplier_p_icu": np.random.uniform(low=-0.15*ext,high=0.15*ext),
+        "multiplier_p_d": np.random.uniform(low=-0.15*ext,high=0.15*ext),
+        "multiplier_lambda_h": np.random.uniform(low=-0.15*ext,high=0.15*ext),
+        "multiplier_lambda_icu": np.random.uniform(low=-0.15*ext,high=0.15*ext),
+        "alpha_other": np.random.uniform(low=-0.2*ext,high=0.03*ext),
+        "l_school_march": np.random.uniform(low=0*ext,high=0.2*ext),
+        "l_school_may": np.random.uniform(low=0*ext,high=0.2*ext),
+        "l_school_july": np.random.uniform(low=-0.19*ext,high=0.2*ext),
+        "l_school_september": np.random.uniform(low=-0.2*ext,high=0*ext),
+        "alpha_mixing": np.random.uniform(low=-0.2*ext,high=0.2*ext),
+        "econ_value": np.random.uniform(low=-0.1*ext,high=0.1*ext),
+        "l_work_april": np.random.uniform(low=-0.1*ext,high=0.1*ext),
     }
 
     print(fluctuation_samples)
@@ -90,29 +93,6 @@ for sim_i in range(100):
 
 
     # In[22]:
-
-
-    # In[57]:
-    b = best[1]
-    days_ahead_opt = b['days_ahead']
-    days_switch_opt = b['days_switch']
-    v= b['result']
-    print("days_ahead",days_ahead_opt)
-    print("days_switch",days_switch_opt)
-    n_samples = 1
-    maxiter = 50
-    print("alpha:",v[0])
-    print("beta_change:",v[1]-1)
-    print("mix:",v[2])
-    print("school_lockdown:",v[3])
-    print("school_may_jun:",v[4])
-    print("school_jul_aug:",v[5])
-    print("school_sep_oct:",v[6])
-    print("change_p_ICU:",v[7]-1)
-    print("change_lambda_H:",v[8]-1)
-    print("change_lambda_ICU:",v[9]-1)
-    print("change_p_death:",v[10]-1)
-
 
 
 
@@ -340,7 +320,7 @@ for sim_i in range(100):
 
 
     # Generate samples
-    samples = 1+np.random.randn(n_samples,(final_date-date_1).days+150, 5)*0.05/2/np.sqrt(3)
+    samples = 1+np.random.randn(1,(final_date-date_1).days+150, 5)*0.05/2/np.sqrt(3)
 
 
     # In[16]:
@@ -361,8 +341,14 @@ for sim_i in range(100):
     n_sample = 0
 
     # Choose the best parameters
-    best_error_i = np.argmin([r['value'] for r in all_results])
+    list_small_indices = [i for i in range(len(all_results)) if all_results[i]['value']<0.71 ]
+    print("List of options:", list_small_indices)
+    best_error_i = random.choice(list_small_indices)
+
+
+
     best_v = all_results[best_error_i]["result"]
+
     best_days_ahead = all_results[best_error_i]["days_ahead"] + fluctuation_samples["days_ahead"]
     best_days_switch = all_results[best_error_i]["days_switch"] + fluctuation_samples["days_switch"]
 
@@ -683,6 +669,7 @@ for sim_i in range(100):
 
     error = error_beds_total+error_beds_tail+error_beds_peak+error_icus_total+error_icus_tail+error_icus_peak+error_deaths_total+error_deaths_tail+error_deaths_peak
 
+    print("Error:", error)
 
     # In[8]:
 
@@ -816,6 +803,7 @@ for sim_i in range(100):
         else:
             schooling_param[age_group] = 0
             
+
     # Calculate the cost of death
     econ_cost_death = {}
     age_groups_n = [0,10,20,30,40,50,60,70,80]
