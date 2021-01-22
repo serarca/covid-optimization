@@ -33,25 +33,44 @@ import math
 import matplotlib.dates as mdates
 
 # We define the way that parameter fluctuations will be 
-ext = 0.1
+ext = {
+    "multiplier_beta": 0.05,
+    "multiplier_p_icu": 1,
+    "multiplier_p_d": 1,
+    "multiplier_lambda_h": 1,
+    "multiplier_lambda_icu": 1,
+    "alpha_other": 1,
+    "l_school_march": 1,
+    "l_school_may": 1,
+    "l_school_july": 1,
+    "l_school_september": 1,
+    "alpha_mixing": 0.1,
+    "econ_value": 1,
+    "l_work_april": 1,
+}
+
+parser = argparse.ArgumentParser(description='Arguments')
+parser.add_argument('--identifier', action="store", dest='identifier', type=int)
+args = parser.parse_args()
+
+identifier = args.identifier
+
 
 for sim_i in range(100):
     fluctuation_samples = {
-        "days_ahead": np.random.uniform(low=-5*ext,high=5*ext),
-        "days_switch": np.random.uniform(low=-5*ext,high=5*ext),
-        "multiplier_beta": np.random.uniform(low=-0.15*ext,high=0.15*ext),
-        "multiplier_p_icu": np.random.uniform(low=-0.15*ext,high=0.15*ext),
-        "multiplier_p_d": np.random.uniform(low=-0.15*ext,high=0.15*ext),
-        "multiplier_lambda_h": np.random.uniform(low=-0.15*ext,high=0.15*ext),
-        "multiplier_lambda_icu": np.random.uniform(low=-0.15*ext,high=0.15*ext),
-        "alpha_other": np.random.uniform(low=-0.2*ext,high=0.03*ext),
-        "l_school_march": np.random.uniform(low=0*ext,high=0.2*ext),
-        "l_school_may": np.random.uniform(low=0*ext,high=0.2*ext),
-        "l_school_july": np.random.uniform(low=-0.19*ext,high=0.2*ext),
-        "l_school_september": np.random.uniform(low=-0.2*ext,high=0*ext),
-        "alpha_mixing": np.random.uniform(low=-0.2*ext,high=0.2*ext),
-        "econ_value": np.random.uniform(low=-0.1*ext,high=0.1*ext),
-        "l_work_april": np.random.uniform(low=-0.1*ext,high=0.1*ext),
+        "multiplier_beta": np.random.uniform(low=-0.15*ext["multiplier_beta"]*(identifier==0),high=0.15*ext["multiplier_beta"]*(identifier==0)),
+        "multiplier_p_icu": np.random.uniform(low=-0.15*ext["multiplier_p_icu"]*(identifier==1),high=0.15*ext["multiplier_p_icu"]*(identifier==1)),
+        "multiplier_p_d": np.random.uniform(low=-0.15*ext["multiplier_p_d"]*(identifier==2),high=0.15*ext["multiplier_p_d"]*(identifier==2)),
+        "multiplier_lambda_h": np.random.uniform(low=-0.15*ext["multiplier_lambda_h"]*(identifier==3),high=0.15*ext["multiplier_lambda_h"]*(identifier==3)),
+        "multiplier_lambda_icu": np.random.uniform(low=-0.15*ext["multiplier_lambda_icu"]*(identifier==4),high=0.15*ext["multiplier_lambda_icu"]*(identifier==4)),
+        "alpha_other": np.random.uniform(low=-0.2*ext["alpha_other"]*(identifier==5),high=0.03*ext["alpha_other"]*(identifier==5)),
+        "l_school_march": np.random.uniform(low=0*ext["l_school_march"]*(identifier==6),high=0.2*ext["l_school_march"]*(identifier==6)),
+        "l_school_may": np.random.uniform(low=0*ext["l_school_may"]*(identifier==7),high=0.2*ext["l_school_may"]*(identifier==7)),
+        "l_school_july": np.random.uniform(low=-0.19*ext["l_school_july"]*(identifier==8),high=0.2*ext["l_school_july"]*(identifier==8)),
+        "l_school_september": np.random.uniform(low=-0.2*ext["l_school_september"]*(identifier==9),high=0*ext["l_school_september"]*(identifier==9)),
+        "alpha_mixing": np.random.uniform(low=-0.2*ext["alpha_mixing"]*(identifier==10),high=0.2*ext["alpha_mixing"]*(identifier==10)),
+        "econ_value": np.random.uniform(low=-0.1*ext["econ_value"]*(identifier==11),high=0.1*ext["econ_value"]*(identifier==11)),
+        "l_work_april": np.random.uniform(low=-0.1*ext["l_work_april"]*(identifier==12),high=0.1*ext["l_work_april"]*(identifier==12)),
     }
 
     print(fluctuation_samples)
@@ -343,14 +362,22 @@ for sim_i in range(100):
     # Choose the best parameters
     list_small_indices = [i for i in range(len(all_results)) if all_results[i]['value']<0.71 ]
     print("List of options:", list_small_indices)
-    best_error_i = random.choice(list_small_indices)
 
 
-
+    best_error_i = np.argmin([r['value'] for r in all_results])
     best_v = all_results[best_error_i]["result"]
 
-    best_days_ahead = all_results[best_error_i]["days_ahead"] + fluctuation_samples["days_ahead"]
-    best_days_switch = all_results[best_error_i]["days_switch"] + fluctuation_samples["days_switch"]
+    best_days_ahead = all_results[best_error_i]["days_ahead"]
+    best_days_switch = all_results[best_error_i]["days_switch"]
+
+
+    if identifier == 13:
+        best_error_i = random.choice(list_small_indices)
+        best_v = all_results[best_error_i]["result"]
+        best_days_ahead = all_results[best_error_i]["days_ahead"]
+        best_days_switch = all_results[best_error_i]["days_switch"]
+
+
 
 
     # In[7]:
@@ -723,7 +750,7 @@ for sim_i in range(100):
         del universe_params['seir-groups'][ag]['parameters']['p_ICU_cond_ss']
         del universe_params['seir-groups'][ag]['parameters']['p_death_cond_ss']
         
-    with open('../parameters/simulations/fitted_%d.yaml'%sim_i, 'w') as file:
+    with open('../parameters/simulations/fitted_%d_%d.yaml'%(identifier,sim_i), 'w') as file:
         yaml.dump(universe_params, file)
         
         
@@ -833,7 +860,7 @@ for sim_i in range(100):
         "econ_cost_death":econ_cost_death,
         "upper_bounds":upper_bounds,
     }
-    with open('../parameters/simulations/econ_%d.yaml'%sim_i, 'w') as file:
+    with open('../parameters/simulations/econ_%d_%d.yaml'%(identifier,sim_i), 'w') as file:
         yaml.dump(econ_params, file)
 
 
@@ -848,7 +875,7 @@ for sim_i in range(100):
                 state[age_group][c] = float(m[i,j])
         return state
 
-    with open('../parameters/simulations/oct21_%d.yaml'%sim_i, 'w') as file:
+    with open('../parameters/simulations/oct21_%d_%d.yaml'%(identifier,sim_i), 'w') as file:
         yaml.dump(matrix_to_state(final_state), file)
 
 

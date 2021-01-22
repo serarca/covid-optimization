@@ -68,21 +68,14 @@ rel_activities = ['leisure','other','school','transport','work']
 simulation_params['time_periods'] = int(math.ceil(simulation_params["days"]/simulation_params["dt"]))
 
 # Read files
-folder = "../benchmarks/results/dynamic_gradient/"
+folder = "../benchmarks/results/linearization_heuristic_optBouncing=False_initial_uhat=dynamic_gradient/"
 files = [f for f in listdir(folder) if (isfile(join(folder, f)) and f[0:2]=="xi")]
 
 
 files_to_process = []
 for i,f in enumerate(files):
 	
-	keys = f.split("_")
-	if (
-		("dschool-0.500000" in keys) and
-		("eta-0.200000" in keys) and
-		("natests-0" in keys) and
-		("nmtests-0" in keys)
-	):
-		files_to_process.append(f)
+	files_to_process.append(f)
 
 
 print(len(files_to_process))
@@ -90,7 +83,7 @@ features = []
 for i,f in enumerate(files_to_process):
 	print(i/len(files_to_process))
 	with open(folder+f) as file:
-		file_result = yaml.load(file, Loader=yaml.FullLoader)
+		file_result = yaml.load(file, Loader=yaml.UnsafeLoader)
 
 	experiment_params = file_result["experiment_params"]
 	mixing_method = universe_params["mixing"]
@@ -107,6 +100,11 @@ for i,f in enumerate(files_to_process):
 		for act in rel_activities:
 			for ag in age_groups:
 				features.append({
+					"delta_schooling": experiment_params["delta_schooling"],
+					"eta":experiment_params["eta"],
+					"natests":experiment_params["n_a_tests"],
+					"nmtests":experiment_params["n_m_tests"],
+					"icus_available":experiment_params["icus"],
 					"act":act,
 					"ag":ag,
 					"lockdown":file_result['policy'][t][ag][act],
