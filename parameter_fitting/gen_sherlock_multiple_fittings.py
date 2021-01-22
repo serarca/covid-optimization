@@ -47,6 +47,7 @@ for identifier in range(14):
 #SBATCH --mem-per-cpu=1G
 
 ml python/3.6.1
+ml gurobi
 python3 ProcessMultipleFittings.py --identifier %d
 """%(identifier)
 		)
