@@ -44,7 +44,7 @@ def main():
     money_scaling = 1000
     xi_mult_values = [50]
     total_population = 12278209.99439713
-    testing_values_perc = np.linspace(0,0.035,num=100)
+    testing_values_perc = np.linspace(0.035,0.05,num=50)
 
     testing_values = [total_population * p for p in testing_values_perc]
 
