@@ -8,7 +8,7 @@
 
  
 
-#SBATCH --array=0-49 # there is a max array size - 512 tasks
+#SBATCH --array=1,26,39,40,41,42,43,44,45,46,47,48,49,50,51,73,74,77,78,85,86,87 # there is a max array size - 512 tasks
 
 #SBATCH -J test_target
 
