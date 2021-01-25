@@ -48,7 +48,7 @@ def main():
     money_scaling = 1000
     xi_mult_values = range(0, 1000, 100)
     # chain(range(0,200,5), range(0, 1000, 10))
-    testing_values = [60000]
+    testing_values = [0]
     # [0, 30000, 60000, 120000]
     icu_values = [2900]
     # [2000, 2300, 2600, 2900, 3200]
