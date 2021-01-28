@@ -56,6 +56,8 @@ activities = ['home','leisure','other','school','transport','work']
 controls = [ 'Nmtest_g', 'Natest_g', 'BounceH_g', 'BounceICU_g' ]
 controls.extend(activities)
 
+init_param = ["multiplier_beta", "multiplier_p_icu", "multiplier_p_d","multiplier_lambda_h", "multiplier_lambda_icu", "alpha_other","l_school_march", "l_school_may", "l_school_july", "l_school_september", "alpha_mixing", "econ_value", "l_work_april"]
+
 num_age_groups = len(age_groups)
 num_compartments = len(SEIR_groups)
 num_controls = len(controls)
@@ -1281,7 +1283,7 @@ def get_real_reward(dynModel, uhat_seq):
 # Main function: runs the linearization heuristic
 # @profile
 # @log_execution_time
-def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_iterations_mult=2, initial_uhat="dynamic_gradient", optimize_bouncing=True, targetActivities=True, targetGroups=True, targetTests=True, deltaFairnessOne=False, deltaFair=0.1, optimizeLockdowns=True, averageLockConst=False, pLock=1, optimizeOnlyDeaths=False, random_instance=-1):
+def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_iterations_mult=2, initial_uhat="dynamic_gradient", optimize_bouncing=True, targetActivities=True, targetGroups=True, targetTests=True, deltaFairnessOne=False, deltaFair=0.1, optimizeLockdowns=True, averageLockConst=False, pLock=1, optimizeOnlyDeaths=False, random_instance=-1, init_param_varying="None"):
     """Run the heuristic based on linearization. Takes a dynamical model, resets the time to 0, and runs it following the linearization heuristic. Returns the dynamical model after running it."""
 
     # age_groups = dynModel.groups.keys()
@@ -1394,7 +1396,7 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
             14 
         )
         if random_instance > -1:
-            n = "xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d_randomInstance-%d.yaml"%(
+            n = "xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d_initParamVarying-%s_randomInstance-%d.yaml"%(
             dynModel.experiment_params["xi"]*0.1,
             dynModel.experiment_params["icus"]*10000,
             "homogeneous",
@@ -1407,6 +1409,7 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
             dynModel.econ_params["employment_params"]["eta"],
             dynModel.time_steps - dynModel.END_DAYS,
             14,
+            init_param_varying,
             random_instance
         )
 
@@ -1425,10 +1428,10 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
                 if random_instance > -1:
 
                     if not os.path.exists(f"results/time_gradient/{n}"):
-                        os.system(f"python3 time_gradient_benchmarks.py --delta {dynModel.experiment_params['delta_schooling']} --icus {int(dynModel.experiment_params['icus']*10000)} --eta {dynModel.econ_params['employment_params']['eta']} --groups all --xi {dynModel.experiment_params['xi']*0.1} --a_tests {int(dynModel.parameters['global-parameters']['C_atest']*10000)} --m_tests {int(dynModel.parameters['global-parameters']['C_mtest']*10000)} --random_instance {random_instance} --gamma {dynModel.econ_params['employment_params']['gamma']} --nu {dynModel.econ_params['employment_params']['nu']}")
+                        os.system(f"python3 time_gradient_benchmarks.py --delta {dynModel.experiment_params['delta_schooling']} --icus {int(dynModel.experiment_params['icus']*10000)} --eta {dynModel.econ_params['employment_params']['eta']} --groups all --xi {dynModel.experiment_params['xi']*0.1} --a_tests {int(dynModel.parameters['global-parameters']['C_atest']*10000)} --m_tests {int(dynModel.parameters['global-parameters']['C_mtest']*10000)} --random_instance {random_instance} --initParamVarying {init_param_varying} --gamma {dynModel.econ_params['employment_params']['gamma']} --nu {dynModel.econ_params['employment_params']['nu']}")
 
                     if not os.path.exists(f"results/{h}/{n}"):
-                        os.system(f"python3 {h}_benchmarks.py --delta {dynModel.experiment_params['delta_schooling']} --icus {int(dynModel.experiment_params['icus']*10000)} --eta {dynModel.econ_params['employment_params']['eta']} --groups all --xi {dynModel.experiment_params['xi']*0.1} --a_tests {int(dynModel.parameters['global-parameters']['C_atest']*10000)} --m_tests {int(dynModel.parameters['global-parameters']['C_mtest']*10000)} --random_instance {random_instance} --gamma {dynModel.econ_params['employment_params']['gamma']} --nu {dynModel.econ_params['employment_params']['nu']}")
+                        os.system(f"python3 {h}_benchmarks.py --delta {dynModel.experiment_params['delta_schooling']} --icus {int(dynModel.experiment_params['icus']*10000)} --eta {dynModel.econ_params['employment_params']['eta']} --groups all --xi {dynModel.experiment_params['xi']*0.1} --a_tests {int(dynModel.parameters['global-parameters']['C_atest']*10000)} --m_tests {int(dynModel.parameters['global-parameters']['C_mtest']*10000)} --random_instance {random_instance} --initParamVarying {init_param_varying} --gamma {dynModel.econ_params['employment_params']['gamma']} --nu {dynModel.econ_params['employment_params']['nu']}")
                 
                 else:
 

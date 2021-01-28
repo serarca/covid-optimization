@@ -25,6 +25,8 @@ from fast_group import FastDynamicalModel
 from aux import *
 from scipy.optimize import Bounds,minimize,LinearConstraint
 
+init_param = ["multiplier_beta", "multiplier_p_icu", "multiplier_p_d","multiplier_lambda_h", "multiplier_lambda_icu", "alpha_other","l_school_march", "l_school_may", "l_school_july", "l_school_september", "alpha_mixing", "econ_value", "l_work_april"]
+
 
 parser = argparse.ArgumentParser(description='Arguments')
 parser.add_argument('--delta', action="store", dest='delta', type=float)
@@ -35,6 +37,7 @@ parser.add_argument('--xi', action="store", dest='xi', type=float)
 parser.add_argument('--a_tests', action="store", dest='a_tests', type=int)
 parser.add_argument('--m_tests', action="store", dest='m_tests', type=int)
 parser.add_argument('--random_instance', action="store", dest='random_instance', default=-1 ,type=int)
+parser.add_argument('--initParamVarying', action="store", dest='init_param_varying', default="None" ,type=str)
 parser.add_argument('--gamma', action="store", dest='gamma', default=-1 ,type=float)
 parser.add_argument('--nu', action="store", dest='nu', default=-1 ,type=float)
 
@@ -80,7 +83,7 @@ if groups == "all":
         universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
     if args.random_instance > -1:
-        with open(f"../parameters/simulations/fitted_{args.random_instance}.yaml") as file:
+        with open(f"../parameters/simulations/fitted_{init_param.index(args.init_param_varying)}_{args.random_instance}.yaml") as file:
             universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
     # Read initialization
@@ -89,7 +92,7 @@ if groups == "all":
         start_day = 0
 
     if args.random_instance > -1:
-        with open(f"../parameters/simulations/oct21_{args.random_instance}.yaml") as file:
+        with open(f"../parameters/simulations/oct21_{init_param.index(args.init_param_varying)}_{args.random_instance}.yaml") as file:
             initialization = yaml.load(file, Loader=yaml.FullLoader)
             start_day = 0
 
@@ -98,7 +101,7 @@ if groups == "all":
         econ_params = yaml.load(file, Loader=yaml.FullLoader)
 
     if args.random_instance > -1:
-        with open(f"../parameters/simulations/econ_{args.random_instance}.yaml") as file:
+        with open(f"../parameters/simulations/econ_{init_param.index(args.init_param_varying)}_{args.random_instance}.yaml") as file:
             econ_params = yaml.load(file, Loader=yaml.FullLoader)
 
 
@@ -198,7 +201,7 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
     )
 
     if args.random_instance > -1:
-        result["filename"] = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d_randomInstance-%d"%(
+        result["filename"] = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d_initParamVarying-%s_randomInstance-%d"%(
         result["lockdown_heuristic"],
         result["experiment_params"]["xi"],
         result["experiment_params"]["icus"],
@@ -212,6 +215,7 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
         experiment_params["eta"],
         result["experiment_params"]["test_freq"],
         result["experiment_params"]["policy_freq"],
+        args.init_param_varying,
         args.random_instance
         )
 
@@ -233,7 +237,7 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
         )
 
     if args.random_instance > -1:
-        constant_gradients_filename = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d_randomInstance-%d"%(
+        constant_gradients_filename = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d_initParamVarying-%s_randomInstance-%d"%(
         "time_gradient",
         result["experiment_params"]["xi"],
         result["experiment_params"]["icus"],
@@ -247,6 +251,7 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
         experiment_params["eta"],
         simulation_params['days'],
         14,
+        args.init_param_varying,
         args.random_instance
         )
 

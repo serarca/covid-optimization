@@ -681,11 +681,14 @@ class SEIR_group:
 	def update_I(self, m_tests, a_tests):
 		delta_I = self.parameters['sigma']*self.E[self.parent.t] - self.parameters['mu']*self.I[self.parent.t] - m_tests*self.I[self.parent.t]/(self.N[self.parent.t] if self.N[self.parent.t]!=0 else 10e-6)
 
-		assert self.I[self.parent.t]+delta_I*self.dt >= 0, (f'Total infected is negative: {self.I[self.parent.t]+delta_I*self.dt}. \n Infected time t: {self.I[self.parent.t]}. \n Delta I: {delta_I}.\n Total N time t: {self.N[self.parent.t]}.\n Total E time t: {self.E[self.parent.t]}.\n M tests at time t: {m_tests}.\n Total m_tests: {m_tests * self.dt * self.I[self.parent.t]/self.N[self.parent.t]}.\n  Total new infected: {self.dt * self.parameters["sigma"]*self.E[self.parent.t]}.\n  Total recovered or going to H, ICU: {self.dt * self.parameters["mu"]*self.I[self.parent.t]}')
+		# assert self.I[self.parent.t]+delta_I*self.dt >= 0, (f'Total infected is negative: {self.I[self.parent.t]+delta_I*self.dt}. \n Infected time t: {self.I[self.parent.t]}. \n Delta I: {delta_I}.\n Total N time t: {self.N[self.parent.t]}.\n Total E time t: {self.E[self.parent.t]}.\n M tests at time t: {m_tests}.\n Total m_tests: {m_tests * self.dt * self.I[self.parent.t]/self.N[self.parent.t]}.\n  Total new infected: {self.dt * self.parameters["sigma"]*self.E[self.parent.t]}.\n  Total recovered or going to H, ICU: {self.dt * self.parameters["mu"]*self.I[self.parent.t]}')
 
-		self.I += [self.I[self.parent.t]+delta_I*self.dt]
+		self.I += [max(self.I[self.parent.t]+delta_I*self.dt, 0)]
 
-		assert self.I[-1] >= 0, (f"Number of Infected is negative for t={self.parent.t+1}: {self.I[-1]}")
+		if self.I[-1] == 0:
+			print(f"Number of Infected is zero for t={self.parent.t+1}: {self.I[-1]}")
+
+		# assert self.I[-1] >= 0, (f"Number of Infected is negative for t={self.parent.t+1}: {self.I[-1]}")
 
 
 	# Updates recovered
