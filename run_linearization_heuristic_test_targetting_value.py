@@ -44,7 +44,7 @@ def main():
     money_scaling = 1000
     xi_mult_values = [50]
     total_population = 12278209.99439713
-    testing_values_perc = np.linspace(0.05,0.1,num=100)
+    testing_values_perc = np.linspace(0.0,0.1,num=200)
 
     testing_values = [total_population * p for p in testing_values_perc]
 
@@ -129,7 +129,7 @@ def main():
     
     optimizeLockdowns = False
 
-    targetTests = True
+    targetTests = False
 
     # if initial_uhat == "time_gradient":
     #     targetActivities = False

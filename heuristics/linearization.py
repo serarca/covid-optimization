@@ -1829,7 +1829,10 @@ def run_heuristic_linearization(dynModel, trust_region_radius=0.2, max_inner_ite
                                 # print(f"Tests for index {((time_index - k) * ut_dim + test_g_idx)} are {prop_test}")
                                 
                                 prop_tests_idx.append(((time_index - k) * ut_dim + test_g_idx))
-                        assert total_tests_at_time_time_index == dynModel.parameters['global-parameters']['C_mtest']
+                        if abs(total_tests_at_time_time_index - dynModel.parameters['global-parameters']['C_mtest']) > 0.000001:
+                            print(f"total_tests_at_time_time_index = {total_tests_at_time_time_index}")
+                            print(f"dynModel.parameters['global-parameters']['C_mtest'] = {dynModel.parameters['global-parameters']['C_mtest']}")
+                            assert(False)
 
                 mod.addConstr(u_vars_vec[prop_tests_idx] >= proportional_tests[prop_tests_idx])
             
