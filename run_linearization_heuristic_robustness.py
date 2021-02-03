@@ -52,7 +52,7 @@ def main():
     # [0, 30000, 60000, 120000]
     icu_values = [2900]
     # [2000, 2300, 2600, 2900, 3200]
-    random_instances=range(50,100)
+    random_instances=range(0,50)
 
 
     init_param_to_vary = init_param[0:1]
@@ -123,7 +123,7 @@ def main():
     # For names of regions see the "parameters" folder
     # region = 'fitted'
 
-    # delta = all_instances[instance_index][0]
+    delta = all_instances[instance_index][0]
     xi = all_instances[instance_index][1]
     icus = all_instances[instance_index][2]
     mtests = all_instances[instance_index][3]
@@ -136,7 +136,7 @@ def main():
     region = all_instances[instance_index][5]
     econ = all_instances[instance_index][6]
     init = all_instances[instance_index][7]
-    # eta = all_instances[instance_index][8]
+    eta = all_instances[instance_index][8]
     trust_region_radius = all_instances[instance_index][9]
     max_inner_iterations_mult = all_instances[instance_index][10]
     initial_uhat = all_instances[instance_index][11]
@@ -149,15 +149,17 @@ def main():
 
 
     random.seed(random_instance)
-    eta = random.uniform(eta_inteval_lb, eta_inteval_ub)
-    delta = random.uniform(delta_school_interval_lb, delta_school_interval_ub)
+    # eta = random.uniform(eta_inteval_lb, eta_inteval_ub)
+    # delta = random.uniform(delta_school_interval_lb, delta_school_interval_ub)
 
-    econ_activ_april = random.uniform(econ_act_april_interval_lb, econ_act_april_interval_ub)
-    lock_work_april = random.uniform(lock_work_april_interval_lb, lock_work_april_interval_ub)
+    # econ_activ_april = random.uniform(econ_act_april_interval_lb, econ_act_april_interval_ub)
+    # lock_work_april = random.uniform(lock_work_april_interval_lb, lock_work_april_interval_ub)
 
-    nu = econ_activ_april / (1 + lock_work_april)
-    gamma = 1 - nu
+    # nu = econ_activ_april / (1 + lock_work_april)
+    # gamma = 1 - nu
 
+    nu = 9999
+    gamma = 99999
 
     run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling, random_instance, nu, gamma, init_param_varying)
     
@@ -302,9 +304,9 @@ def run_linearization_heuristic(simulation_params, experiment_params, start_day,
 
 
     # Change eta, nu, and gamma
-    dynModel.econ_params["employment_params"]["eta"] = simulation_params["eta"]
-    dynModel.econ_params["employment_params"]["nu"] = 1 - gamma - simulation_params["eta"]
-    dynModel.econ_params["employment_params"]["gamma"] = gamma
+    # dynModel.econ_params["employment_params"]["eta"] = simulation_params["eta"]
+    # dynModel.econ_params["employment_params"]["nu"] = 1 - gamma - simulation_params["eta"]
+    # dynModel.econ_params["employment_params"]["gamma"] = gamma
 
     targetActivities=True
     targetGroups=True
