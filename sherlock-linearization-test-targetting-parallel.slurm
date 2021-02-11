@@ -8,7 +8,7 @@
 
  
 
-#SBATCH --array=75,76,83
+#SBATCH --array=0
 
 # there is a max array size - 512 tasks
 

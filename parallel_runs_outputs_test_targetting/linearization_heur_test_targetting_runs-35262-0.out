@@ -1,0 +1,50 @@
+Lmod has detected the following error: The following module(s) are unknown:
+"python/3.6.1"
+
+Please check the spelling or version number. Also try "module spider ..."
+
+
+
+Lmod has detected the following error: The following module(s) are unknown:
+"viz"
+
+Please check the spelling or version number. Also try "module spider ..."
+
+
+
+Lmod has detected the following error: The following module(s) are unknown:
+"py-matplotlib/3.2.1_py36"
+
+Please check the spelling or version number. Also try "module spider ..."
+
+
+
+Lmod has detected the following error: The following module(s) are unknown:
+"py-pandas/1.0.3_py36"
+
+Please check the spelling or version number. Also try "module spider ..."
+
+
+
+Lmod has detected the following error: The following module(s) are unknown:
+"gurobi/9.0.3_py36"
+
+Please check the spelling or version number. Also try "module spider ..."
+
+
+
+Lmod has detected the following error: The following module(s) are unknown:
+"py-scipy/1.4.1_py36"
+
+Please check the spelling or version number. Also try "module spider ..."
+
+
+
+Traceback (most recent call last):
+  File "run_linearization_heuristic_test_targetting_value.py", line 17, in <module>
+    import linearization
+  File "/usr/local/ifs/projects/daniancu-covid-targets/covid-optimization/heuristics/linearization.py", line 15, in <module>
+    import gurobipy as gb
+ModuleNotFoundError: No module named 'gurobipy'
+srun: error: yen10: task 0: Exited with exit code 1
+srun: Terminating job step 35262.0
