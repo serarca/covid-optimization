@@ -47,7 +47,7 @@ def main():
     # total_population = 12278209.99439713
     # testing_values_perc = np.linspace(0.005,0.035,num=50)
 
-    testing_values = [60000]
+    testing_values = [0]
     # [total_population * p for p in testing_values_perc]
     # , 60000, 120000]
     icu_values = [2900]
