@@ -130,7 +130,7 @@ def main():
     
     optimizeLockdowns = False
 
-    targetTests = False
+    targetTests = True
 
     # if initial_uhat == "time_gradient":
     #     targetActivities = False
