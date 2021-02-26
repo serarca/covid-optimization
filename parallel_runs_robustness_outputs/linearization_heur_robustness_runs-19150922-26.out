@@ -1,0 +1,36 @@
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'icus': [2900], 'eta': [0.1], 'tests': [[0, 0]], 'xi': [0.0], 'testing': ['homogeneous']}}
+results/time_gradient/xi-0_icus-2900_testing-homogeneous_natests-0_nmtests-0_T-90_startday-0_groups-all_dschool-0.500000_eta-0.100000_freq-90-14_initParamVarying-multiplier_beta_randomInstance-46.yaml
+usage: activity_gradient_benchmarks.py [-h] [--delta DELTA] [--icus ICUS]
+                                       [--eta ETA] [--groups GROUPS] [--xi XI]
+                                       [--a_tests A_TESTS] [--m_tests M_TESTS]
+activity_gradient_benchmarks.py: error: unrecognized arguments: --random_instance 46 --initParamVarying multiplier_beta --gamma 0.4727188003050071 --nu 0.4272811996949929
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+480
+(0.5, 0.0, 0.29, 0.0, (7, 14), 'fitted-scaled', 'econ-scaled', 'oct21-scaled', 0.1, 0.05, 2, 'activity_gradient', 46, 'multiplier_beta')
+The value of T is: 104
+Missing starting point -- Running the initial heuristic.
+/home/groups/daniancu/covid-optimization/covid-optimization
+Traceback (most recent call last):
+  File "/home/groups/daniancu/covid-optimization/covid-optimization/heuristics/linearization.py", line 1417, in run_heuristic_linearization
+    with open("benchmarks/results/%s/%s"%(h,n)) as file:
+FileNotFoundError: [Errno 2] No such file or directory: 'benchmarks/results/activity_gradient/xi-0_icus-2900_testing-homogeneous_natests-0_nmtests-0_T-90_startday-0_groups-all_dschool-0.500000_eta-0.100000_freq-90-14_initParamVarying-multiplier_beta_randomInstance-46.yaml'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "run_linearization_heuristic_robustness.py", line 440, in <module>
+    main()
+  File "run_linearization_heuristic_robustness.py", line 176, in main
+    run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling, random_instance, init_param_varying, targetActivities, targetGroups, targetTests)
+  File "run_linearization_heuristic_robustness.py", line 215, in run_lin_heur_and_save_yaml
+    dynModel = run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, random_instance, init_param_varying, targetActivities, targetGroups, targetTests)
+  File "run_linearization_heuristic_robustness.py", line 333, in run_linearization_heuristic
+    linearization.run_heuristic_linearization(dynModel, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, targetActivities, targetGroups, targetTests, deltaFairnessOne, deltaFair, optimizeLockdowns, averageLockConst, pLock, optimizeOnlyDeaths, random_instance, init_param_varying)
+  File "/home/groups/daniancu/covid-optimization/covid-optimization/heuristics/linearization.py", line 1452, in run_heuristic_linearization
+    with open("benchmarks/results/%s/%s"%(h,n)) as file:
+FileNotFoundError: [Errno 2] No such file or directory: 'benchmarks/results/activity_gradient/xi-0_icus-2900_testing-homogeneous_natests-0_nmtests-0_T-90_startday-0_groups-all_dschool-0.500000_eta-0.100000_freq-90-14_initParamVarying-multiplier_beta_randomInstance-46.yaml'
+srun: error: sh02-10n45: task 0: Exited with exit code 1
+srun: launch/slurm: _step_signal: Terminating StepId=19151224.0

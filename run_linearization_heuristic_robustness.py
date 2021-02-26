@@ -46,29 +46,29 @@ def main():
     # Some paramters to test the linearization heuristic
     scaling = 10000
     money_scaling = 1000
-    xi_mult_values = range(0, 1000, 100)
+    xi_mult_values = [0,10,25,50,100,150]
     # chain(range(0,200,5), range(0, 1000, 10))
     testing_values = [0]
     # [0, 30000, 60000, 120000]
     icu_values = [2900]
     # [2000, 2300, 2600, 2900, 3200]
-    random_instances=range(0,50)
+    random_instances=range(0,40)
 
 
     init_param_to_vary = init_param[0:1]
 
 
-    eta_inteval_lb = 0
-    eta_inteval_ub = 0.2
+    # eta_inteval_lb = 0
+    # eta_inteval_ub = 0.2
 
-    delta_school_interval_lb = 0
-    delta_school_interval_ub = 1
+    # delta_school_interval_lb = 0
+    # delta_school_interval_ub = 1
 
-    lock_work_april_interval_lb = 48.51
-    lock_work_april_interval_ub = 68.51
+    # lock_work_april_interval_lb = 48.51
+    # lock_work_april_interval_ub = 68.51
 
-    econ_act_april_interval_lb = 0.19182
-    econ_act_april_interval_ub = 0.23444666666   
+    # econ_act_april_interval_lb = 0.19182
+    # econ_act_april_interval_ub = 0.23444666666   
     
 
     params_to_try = {
@@ -84,7 +84,7 @@ def main():
         "eta":[0.1],
         "trust_region_radius":[0.05],
         "max_inner_iterations_mult":[2],
-        "initial_uhat":["dynamic_gradient"],
+        "initial_uhat":["dynamic_gradient","activity_gradient", "age_group_gradient", "time_gradient"],
         "random_instances":random_instances,
         "init_param_to_vary": init_param_to_vary
         # "full_lockdown", "full_open","dynamic_gradient",
@@ -158,10 +158,22 @@ def main():
     # nu = econ_activ_april / (1 + lock_work_april)
     # gamma = 1 - nu
 
-    nu = 9999
-    gamma = 99999
+    targetActivities = True
+    targetGroups = True
+    targetTests = True
 
-    run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling, random_instance, nu, gamma, init_param_varying)
+    if initial_uhat == "time_gradient":
+        targetActivities = False
+        targetGroups = False
+    
+    if initial_uhat == "age_group_gradient":
+        targetActivities = False
+    
+    if initial_uhat == "activity_gradient":
+        targetGroups = False
+
+
+    run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling, random_instance, init_param_varying, targetActivities, targetGroups, targetTests)
     
     
     # run_lin_heur_and_pickle_dynModel(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day)
@@ -172,7 +184,7 @@ def main():
     #     load_pickle_and_create_yaml(delta, xi, icus, tests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, scaling, money_scaling, heur)
 
 
-def run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling, random_instance, nu, gamma, init_param_varying):
+def run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling, random_instance, init_param_varying, targetActivities, targetGroups, targetTests):
     ''' Runs the linearization heuristic with the experiment parameters passed as arguments and saves the resulting dynamical model as a pickle object.'''
 
     experiment_params = {
@@ -200,7 +212,7 @@ def run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, 
         'eta': eta
     }
 
-    dynModel = run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, random_instance, nu, gamma, init_param_varying)
+    dynModel = run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, random_instance, init_param_varying, targetActivities, targetGroups, targetTests)
 
     result = {
             "lockdown_heuristic":f"linearization_heuristic_optBouncing={optimize_bouncing}_initial_uhat={initial_uhat}_initParamVarying={init_param_varying}",
@@ -240,7 +252,7 @@ def run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, 
 
 
 
-def run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, random_instance, nu, gamma, init_param_varying):
+def run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, random_instance, init_param_varying, targetActivities, targetGroups, targetTests):
     ''' Takes a set of simulation_params and experiment parameters (delta_school, emotional cost of deaths (xi), max icus, max tests, testing and lockdown frequencies) and a set of simulation paramters (required by the constructor in group.py), creates a dynamical system, runs the linearization heuristic and returns the dynamical system after running the heuristic. 
     '''
 
@@ -308,9 +320,9 @@ def run_linearization_heuristic(simulation_params, experiment_params, start_day,
     # dynModel.econ_params["employment_params"]["nu"] = 1 - gamma - simulation_params["eta"]
     # dynModel.econ_params["employment_params"]["gamma"] = gamma
 
-    targetActivities=True
-    targetGroups=True
-    targetTests=True
+    # targetActivities=True
+    # targetGroups=True
+    # targetTests=True
     deltaFairnessOne=False
     deltaFair=0.1
     optimizeLockdowns=True
