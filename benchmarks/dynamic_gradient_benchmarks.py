@@ -282,10 +282,10 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
     m_tests_vec = dict_to_vector(m_tests)
     a_tests_vec = dict_to_vector(a_tests)
 
-    if args.random_instance > -1 and args.gamma > -1:
-        fastModel.econ_params["employment_params"]["eta"] = experiment_params["eta"]
-        fastModel.econ_params["employment_params"]["nu"] = 1 - args.gamma - experiment_params["eta"]
-        fastModel.econ_params["employment_params"]["gamma"] = args.gamma
+    # if args.random_instance > -1 and args.gamma > -1:
+    #     fastModel.econ_params["employment_params"]["eta"] = experiment_params["eta"]
+    #     fastModel.econ_params["employment_params"]["nu"] = 1 - args.gamma - experiment_params["eta"]
+    #     fastModel.econ_params["employment_params"]["gamma"] = args.gamma
 
 
     def simulate(x):
@@ -369,10 +369,10 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
     dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method, start_day, experiment_params["eta"], extra_data = True)
     
     
-    if args.random_instance > -1 and args.gamma > -1:
-        dynModel.econ_params["employment_params"]["eta"] = experiment_params["eta"]
-        dynModel.econ_params["employment_params"]["nu"] = 1 - args.gamma - experiment_params["eta"]
-        dynModel.econ_params["employment_params"]["gamma"] = args.gamma
+    # if args.random_instance > -1 and args.gamma > -1:
+    #     dynModel.econ_params["employment_params"]["eta"] = experiment_params["eta"]
+    #     dynModel.econ_params["employment_params"]["nu"] = 1 - args.gamma - experiment_params["eta"]
+    #     dynModel.econ_params["employment_params"]["gamma"] = args.gamma
 
     
     if experiment_params["testing"] == "homogeneous":

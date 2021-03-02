@@ -20,7 +20,7 @@
 #SBATCH -t 0-20
 
 
-#SBATCH -o parallel_runs_robustness_outputs_2/linearization_heur_robustness_runs-%A-%a.out
+#SBATCH -o parallel_runs_robustness_outputs_3/linearization_heur_robustness_runs-%A-%a.out
 
 #SBATCH --mail-type=ALL
 
