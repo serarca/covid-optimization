@@ -55,7 +55,7 @@ def main():
     random_instances=range(0,40)
 
 
-    init_param_to_vary = init_param[0:2]
+    init_param_to_vary = init_param[5:6]
 
 
     # eta_inteval_lb = 0
@@ -84,7 +84,7 @@ def main():
         "eta":[0.1],
         "trust_region_radius":[0.05],
         "max_inner_iterations_mult":[2],
-        "initial_uhat":["activity_gradient", "age_group_gradient"],
+        "initial_uhat":["activity_gradient", "age_group_gradient", "dynamic_gradient"],
         "random_instances":random_instances,
         "init_param_to_vary": init_param_to_vary
         # "full_lockdown", "full_open","dynamic_gradient",
