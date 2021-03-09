@@ -41,7 +41,8 @@ def main():
 
     # 30 * 37199.03
     # Some paramters to test the linearization heuristic
-    xi_mult_values = chain(range(0,200,5), range(0, 1000, 10))
+    xi_mult_values = [1, 3, 4, 6, 7, 8, 9]
+    # chain(range(0,200,5), range(0, 1000, 10))
     testing_values = [0]
     # [0, 30000, 60000, 120000]
     icu_values = [2900]

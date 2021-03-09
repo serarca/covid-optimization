@@ -42,7 +42,7 @@ def main():
     # Some paramters to test the linearization heuristic
     scaling = 10000
     money_scaling = 1000
-    xi_mult_values = [1,2,3,4,5,6,7,8,9, 15, 20, 30, 35,  45, 50, 55, 70, 75, 80, 90, 95,  110, 115, 120, 130, 135, 140, 145, 160, 260, 150, 0, 190, 560, 80, 45, 500, 185, 175, 310, 330, 130, 900, 660, 380, 540, 230, 85, 180, 100, 65, 590, 580, 60, 420, 110, 470, 280, 670, 750, 250, 120, 610, 460, 1e16, 520, 720, 360, 320, 550, 510, 630, 650, 350, 300, 5, 620, 200, 760, 135, 390, 35, 810, 210, 410, 870, 530, 940, 145, 740, 370, 600, 490, 40, 480, 680, 270, 25, 430, 980, 730, 780, 165, 160, 820, 15, 95, 195, 400, 640, 450, 690, 30, 115, 10, 290, 240, 75, 55, 170, 140, 70, 710, 20, 90, 440, 125, 340, 700, 220, 105, 155, 570, 50, 960, 800]
+    xi_mult_values = [10000000000000000, 1, 640, 3, 4, 6, 7, 8, 9, 520, 11, 650, 390, 400, 145, 410, 35, 420, 165, 550, 430, 690, 440, 60, 700, 70, 710, 720, 730, 610, 740, 620, 750, 115, 630, 380, 125]
 
     # total_population = 12278209.99439713
     # testing_values_perc = np.linspace(0.005,0.035,num=50)
@@ -67,7 +67,7 @@ def main():
         "xi":[mult * 37199.03 * scaling / money_scaling for mult in xi_mult_values],
         "trust_region_radius":[0.05],
         "max_inner_iterations_mult":[2],
-        "initial_uhat":["time_gradient"]
+        "initial_uhat":["age_group_gradient"]
         # "full_lockdown", "full_open","dynamic_gradient", "activity_gradient", "age_group_gradient", "time_gradient"
     }
 

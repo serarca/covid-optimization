@@ -55,7 +55,7 @@ def main():
     random_instances=range(0,40)
 
 
-    init_param_to_vary = init_param[8:9]
+    init_param_to_vary = init_param[9:10]
 
 
     # eta_inteval_lb = 0

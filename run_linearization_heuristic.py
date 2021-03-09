@@ -41,8 +41,9 @@ def main():
     # Some paramters to test the linearization heuristic
     scaling = 10000
     money_scaling = 1000
-    xi_mult_values = range(0,205,5)
-    testing_values = [0, 30000, 60000]
+    xi_mult_values = [1, 3, 4, 6, 7, 8, 9]
+    # range(0,205,5)
+    testing_values = [0]
     # [0, 30000, 60000, 120000]
     icu_values = [2900]
     # [2000, 2300, 2600, 2900, 3200]
@@ -57,7 +58,7 @@ def main():
         "region":["fitted-scaled"], 
         "econ": ["econ-scaled"],
         "init": ["oct21-scaled"],
-        "eta":[0,0.1,0.2],
+        "eta":[0.1],
         "trust_region_radius":[0.05],
         "max_inner_iterations_mult":[2],
         "initial_uhat":["dynamic_gradient"]
