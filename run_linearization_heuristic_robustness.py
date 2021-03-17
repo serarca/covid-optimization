@@ -46,16 +46,18 @@ def main():
     # Some paramters to test the linearization heuristic
     scaling = 10000
     money_scaling = 1000
-    xi_mult_values = [0,10,25,50,100,150]
+    xi_mult_values = [15]
+    # 0,10,25,50,100,150
     # chain(range(0,200,5), range(0, 1000, 10))
     testing_values = [0]
     # [0, 30000, 60000, 120000]
     icu_values = [2900]
     # [2000, 2300, 2600, 2900, 3200]
-    random_instances=range(0,40)
+    random_instances=range(30,40)
+    # range(0,20)
 
 
-    init_param_to_vary = init_param[10:13]
+    init_param_to_vary = init_param
 
 
     # eta_inteval_lb = 0
@@ -84,7 +86,7 @@ def main():
         "eta":[0.1],
         "trust_region_radius":[0.05],
         "max_inner_iterations_mult":[2],
-        "initial_uhat":["time_gradient"],
+        "initial_uhat":["dynamic_gradient","age_group_gradient", "activity_gradient", "time_gradient"],
         "random_instances":random_instances,
         "init_param_to_vary": init_param_to_vary
         # "full_lockdown", "full_open","dynamic_gradient",
