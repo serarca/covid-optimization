@@ -133,7 +133,7 @@ print(V)
 
 init_param = ["alpha_mixing", "multiplier_beta", "multiplier_p_icu", "multiplier_p_d","multiplier_lambda_h", "multiplier_lambda_icu", "alpha_other","l_school_march", "l_school_may", "l_school_july", "l_school_september",  "econ_value", "l_work_april"]
 
-xi_mult_values = [0,10,25,50,100,150]
+xi_mult_values = [15]
 
 testing_values = [0]
    

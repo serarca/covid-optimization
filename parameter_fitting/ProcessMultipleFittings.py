@@ -323,7 +323,7 @@ for sim_i in range(100):
 
     for ag in universe_params['seir-groups']:
         universe_params['seir-groups'][ag]["parameters"]["beta"] = (
-            [original_beta for t in range(t_days_beta) ]
+            [original_beta for t in range(t_days_beta)]
         )
 
 
@@ -338,9 +338,9 @@ for sim_i in range(100):
     # In[15]:
 
 
-    # Generate samples
-    samples = 1+np.random.randn(1,(final_date-date_1).days+150, 5)*0.05/2/np.sqrt(3)
-
+    # # Generate samples
+    # samples = 1+np.random.randn(1,(final_date-date_1).days+150, 5)*0.05/2/np.sqrt(3)
+    
 
     # In[16]:
 
@@ -358,6 +358,8 @@ for sim_i in range(100):
     # Create a nominal path
     samples = samples*0+1
     n_sample = 0
+
+    
 
     # Choose the best parameters
     list_small_indices = [i for i in range(len(all_results)) if all_results[i]['value']<0.71 ]

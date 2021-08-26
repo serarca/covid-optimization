@@ -83,7 +83,7 @@ if groups == "all":
         universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
     if args.random_instance > -1:
-        with open(f"../parameters/simulations/fitted_{init_param.index(args.init_param_varying)}_{args.random_instance}.yaml") as file:
+        with open(f"../parameters/multiple_initial_conditions/fitted_{args.random_instance}.yaml") as file:
             universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
     # Read initialization
@@ -92,7 +92,7 @@ if groups == "all":
         start_day = 0
 
     if args.random_instance > -1:
-        with open(f"../parameters/simulations/oct21_{init_param.index(args.init_param_varying)}_{args.random_instance}.yaml") as file:
+        with open(f"../parameters/multiple_initial_conditions/oct21_{args.random_instance}.yaml") as file:
             initialization = yaml.load(file, Loader=yaml.FullLoader)
             start_day = 0
 
@@ -101,7 +101,7 @@ if groups == "all":
         econ_params = yaml.load(file, Loader=yaml.FullLoader)
 
     if args.random_instance > -1:
-        with open(f"../parameters/simulations/econ_{init_param.index(args.init_param_varying)}_{args.random_instance}.yaml") as file:
+        with open(f"../parameters/multiple_initial_conditions/econ_{args.random_instance}.yaml") as file:
             econ_params = yaml.load(file, Loader=yaml.FullLoader)
 
 
@@ -201,7 +201,7 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
     )
     if args.random_instance > -1:
             
-        result["filename"] = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d_initParamVarying-%s_randomInstance-%d"%(
+        result["filename"] = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d_randomInstance-%d"%(
             result["lockdown_heuristic"],
             result["experiment_params"]["xi"],
             result["experiment_params"]["icus"],
@@ -215,7 +215,6 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
             experiment_params["eta"],
             result["experiment_params"]["test_freq"],
             result["experiment_params"]["policy_freq"],
-            args.init_param_varying,
             args.random_instance
         )
 
