@@ -738,7 +738,7 @@ class SEIR_group:
 		assert self.Rq[-1] >= 0, (f"Number of Recovered Quarantined is negative for t={self.parent.t+1}: {self.Rq[-1]}")
 
 	def update_H(self, m_tests, a_tests, h_cap, icu_cap, B_H):
-		tol = 1e-9
+		tol = 1e-10
 		# For each group, calculate the entering amount
 		entering_h = {}
 		summ_entering_h = 0
@@ -749,7 +749,7 @@ class SEIR_group:
 			summ_staying_h += (1-g.parameters['lambda_H_R']-g.parameters['lambda_H_D'])*g.H[self.parent.t]
 
 		if B_H is False:
-			B_H = entering_h[self.name]*((summ_entering_h-h_cap+summ_staying_h) if summ_entering_h-h_cap+summ_staying_h>0 else 0)/(summ_entering_h if summ_entering_h!=0 else 10e-6)
+			B_H = entering_h[self.name]*((summ_entering_h-h_cap+summ_staying_h) if summ_entering_h-h_cap+summ_staying_h>0 else 0)/(summ_entering_h if summ_entering_h!=0 else 10e-10)
 			# ALTERNATIVE CLEANER EXPRESSION: (EASIER TO READ AND AVOIDS THE 1e-6 IN DENOMINATOR)
 			# B_H = (0 if entering_h[self.name]==0 else (entering_h[self.name]/summ_entering_h*max(0,summ_entering_h-h_cap+summ_staying_h)))
 		# Update bouncing variables
@@ -762,7 +762,7 @@ class SEIR_group:
 		)
 		self.H += [self.H[self.parent.t]+delta_H*self.dt- B_H]
 
-		assert self.H[-1] >= 0, (f"Number of Hospitalizations is negative for t={self.parent.t+1}: {self.H[-1]}")
+		assert self.H[-1] >= -10e6, (f"Number of Hospitalizations is negative for t={self.parent.t+1}: {self.H[-1]}")
 
 	def update_ICU(self, m_tests, a_tests, h_cap, icu_cap, B_ICU, B_ICU_perc):
 		tol = 1e-9
@@ -795,7 +795,7 @@ class SEIR_group:
 		self.ICU += [self.ICU[self.parent.t]+delta_ICU*self.dt - B_ICU]
 		# print("update_ICU(): ICU occupancy at end of period t={} for group {} IS {}".format(self.parent.t, self.name,self.ICU[-1]))
 		
-		assert self.ICU[-1] >= 0, (f"Number of ICUs is negative for t={self.parent.t+1}: {self.ICU[-1]} \n B_ICU = {B_ICU} \n Delta ICU = {delta_ICU}")
+		assert self.ICU[-1] >= -tol, (f"Number of ICUs is negative for t={self.parent.t+1}: {self.ICU[-1]} \n B_ICU = {B_ICU} \n Delta ICU = {delta_ICU}")
 
 
 	def update_D(self, m_tests, a_tests, h_cap, icu_cap, B_H, B_ICU, B_ICU_perc):
