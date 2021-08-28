@@ -7,8 +7,8 @@
 # Running from project space instead of home is recommended
 
  
-
-#SBATCH --array=0-519 # there is a max array size - 512 tasks
+# there is a max array size - 512 tasks
+#SBATCH --array=2501-3000 
 
 #SBATCH -J run_mult_init_cond_linearization_heuristic
 
