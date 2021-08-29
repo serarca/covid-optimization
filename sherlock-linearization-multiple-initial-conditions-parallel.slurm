@@ -8,7 +8,7 @@
 
  
 # there is a max array size - 512 tasks
-#SBATCH --array=2501-3000 
+#SBATCH --array=18840-19337 
 
 #SBATCH -J run_mult_init_cond_linearization_heuristic
 
