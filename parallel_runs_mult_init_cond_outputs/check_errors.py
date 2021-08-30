@@ -6,7 +6,7 @@ import os
 
 error_runs = []
 for n in os.listdir():
-    if n != "check_errors.py" and n != "delete_errors.py" and n!= "check_infeasible.py":
+    if n != "check_errors.py" and n != "delete_errors.py" and n!= "check_infeasible.py" and n!= "check_runs.py":
         a = n.split("-")
         if len(a)<2:
             print(a)

@@ -6,7 +6,7 @@ import os
 
 
 for n in os.listdir():
-    if n != "check_errors.py" and n != "delete_errors.py" and n!= "check_infeasible.py":
+    if n != "check_errors.py" and n != "delete_errors.py" and n!= "check_infeasible.py" and n!= "check_runs.py":
         
         with open(n) as file:
             if "srun: error" in file.read():
