@@ -95,7 +95,7 @@ upper_bound_params = pd.read_excel("./ile-de-france_data_master.xlsx",sheet_name
 
 
 mean_init_param = {
-    "beta":0.03923794546657925,
+    "beta":(0.03923794546657925/2.9)*6.4,
     "mu":mean_params['mu'].values,
     "sigma":mean_params['sigma'].values,
     "p_ICU":mean_params['p_ICU'].values,
@@ -107,7 +107,7 @@ mean_init_param = {
 }
 
 sigma_init_param = {
-    "beta": (2.99 - 2.8) * (0.03923794546657925/2.9) / 6,
+    "beta": (10 - 2.8) * (0.03923794546657925/2.9) / 6,
     "mu":((upper_bound_params['mu'] - lower_bound_params['mu'])/6).values,
     "sigma":((upper_bound_params['sigma'] - lower_bound_params['sigma'])/6).values,
     "p_ICU":((upper_bound_params['p_ICU'] - lower_bound_params['p_ICU'])/6).values,
@@ -123,7 +123,7 @@ sigma_init_param = {
 
 
 start_time = time()
-for sim_i in range(1000):
+for sim_i in range(1000, 1500):
 
     np.random.seed(sim_i)
 
