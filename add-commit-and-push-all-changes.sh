@@ -1,6 +1,9 @@
 #!/bin/bash
 
 echo 'We will add commit and push all changes in chunks of 1000 files'
+set -e
+
+git pull &&
 
 while [[ $(git status -s) ]]
 do
