@@ -85,11 +85,11 @@ while True:
 
     # break
 
-    number_of_PD_processes = sum([1  for l in all_running_processes.split() if ' PD ' in l])
+    number_of_PD_processes = sum([1  for l in all_running_processes.split() if l=='PD'])
 
-    number_of_CF_processes = sum([1  for l in all_running_processes.split() if ' CF ' in l])
+    number_of_CF_processes = sum([1  for l in all_running_processes.split() if l=='CF'])
 
-    number_of_running_processes = sum([1  for l in all_running_processes.split() if ' R ' in l])
+    number_of_running_processes = sum([1  for l in all_running_processes.split() if l=='R'])
 
 
     print(f"number of processes = {number_of_running_processes}")

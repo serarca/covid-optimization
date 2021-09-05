@@ -1,0 +1,3296 @@
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+{'groups': 'all', 'params_to_try': {'delta_schooling': [1.0], 'icus': [2900], 'eta': [0.1], 'tests': [[0, 0]], 'xi': [15326000.36], 'testing': ['homogeneous']}}
+results/time_gradient/xi-15326000_icus-2900_testing-homogeneous_natests-0_nmtests-0_T-90_startday-0_groups-all_dschool-1.000000_eta-0.100000_freq-90-14_randomInstance-350.yaml
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+{'groups': 'all', 'params_to_try': {'delta_schooling': [1.0], 'icus': [2900], 'eta': [0.1], 'tests': [[0, 0]], 'xi': [15326000.36], 'testing': ['homogeneous']}}
+results/dynamic_gradient/xi-15326000_icus-2900_testing-homogeneous_natests-0_nmtests-0_T-90_startday-0_groups-all_dschool-1.000000_eta-0.100000_freq-90-14_randomInstance-350.yaml
+[20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360, 370, 380, 390, 400, 410, 420, 430, 440, 450, 460, 470, 480, 490, 500, 510, 520, 530, 540, 550, 560, 570, 580, 590, 600, 610, 620, 630, 640, 650, 660, 670, 680, 690, 700, 710, 720, 730, 740, 750, 760, 770, 780, 790, 800, 810, 820, 830, 840, 850, 860, 870, 880, 890, 900, 910, 920, 930, 940, 950, 960, 970, 980, 990]
+19500
+(1, 153260003.6, 0.29, 0.0, (7, 14), 'fitted-scaled', 'econ-scaled', 'oct21-scaled', 0.1, 0.05, 2, 'dynamic_gradient', 350)
+The value of T is: 104
+Missing starting point -- Running the initial heuristic.
+/home/groups/daniancu/covid-optimization/covid-optimization
+90
+Total Reward at the start of the inner iterations: 53107121.9657199
+Using license file /share/software/user/restricted/gurobi/9.0.3_py36/licenses/gurobi.lic
+Set parameter TokenServer to value license4.stanford.edu
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 16026 Constrs, 9360 Vars, 6372956 NZs
+  Matrix coefficient range    : [ 1.98735e-13, 1 ]
+  Objective coefficient range : [ 7.9114e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.0205667, 1 ]
+  RHS coefficient range       : [ 9.09138e-08, 0.367666 ]
+Objective value for Line heur k = 0: 25844903.60872468
+90
+Actual reward of current solution: 52325320.683960676
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 16026 Constrs, 9360 Vars, 6886217 NZs
+  Matrix coefficient range    : [ 3.15714e-13, 1 ]
+  Objective coefficient range : [ 3.24399e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.05328e-08, 0.429368 ]
+Objective value for Line heur k = 0: 16492932.083850013
+90
+Actual reward of current solution: 53200459.76092974
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 16026 Constrs, 9360 Vars, 6358389 NZs
+  Matrix coefficient range    : [ 2.18321e-13, 1 ]
+  Objective coefficient range : [ 5.37863e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.05485e-08, 0.369756 ]
+Objective value for Line heur k = 0: 25926111.708740994
+90
+Actual reward of current solution: 52307275.68828692
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 16026 Constrs, 9360 Vars, 6886217 NZs
+  Matrix coefficient range    : [ 3.47456e-13, 1 ]
+  Objective coefficient range : [ 1.76252e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.0363491, 1 ]
+  RHS coefficient range       : [ 3.49462e-08, 0.441147 ]
+Objective value for Line heur k = 0: 14986177.895295296
+90
+Actual reward of current solution: 53247182.82382811
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 16026 Constrs, 9360 Vars, 6358389 NZs
+  Matrix coefficient range    : [ 2.35269e-13, 1 ]
+  Objective coefficient range : [ 1.08717e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.24752e-08, 0.37142 ]
+Objective value for Line heur k = 0: 25793499.80022368
+90
+Actual reward of current solution: 52326032.66252093
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 16026 Constrs, 9360 Vars, 6875262 NZs
+  Matrix coefficient range    : [ 3.69e-13, 1 ]
+  Objective coefficient range : [ 8.92347e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.0230369, 1 ]
+  RHS coefficient range       : [ 5.83494e-08, 0.442687 ]
+Objective value for Line heur k = 0: 14654753.976597674
+90
+Actual reward of current solution: 53256250.472558945
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 16026 Constrs, 9360 Vars, 6358389 NZs
+  Matrix coefficient range    : [ 2.45427e-13, 1 ]
+  Objective coefficient range : [ 2.88574e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 3.34438e-08, 0.370901 ]
+Objective value for Line heur k = 0: 25828371.903179538
+90
+Actual reward of current solution: 52382835.83498592
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 16026 Constrs, 9360 Vars, 6838680 NZs
+  Matrix coefficient range    : [ 3.84642e-13, 1 ]
+  Objective coefficient range : [ 2.52179e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.06984e-07, 0.438116 ]
+Objective value for Line heur k = 0: 15097342.024226801
+90
+Actual reward of current solution: 53290669.428214334
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 16026 Constrs, 9360 Vars, 6358389 NZs
+  Matrix coefficient range    : [ 2.55355e-13, 1 ]
+  Objective coefficient range : [ 3.29559e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.0244792, 1 ]
+  RHS coefficient range       : [ 2.35488e-08, 0.371026 ]
+Objective value for Line heur k = 0: 25723803.805537924
+90
+Actual reward of current solution: 52433572.742119454
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 16026 Constrs, 9360 Vars, 6838680 NZs
+  Matrix coefficient range    : [ 3.90909e-13, 1 ]
+  Objective coefficient range : [ 1.33181e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.0290929, 1 ]
+  RHS coefficient range       : [ 1.04399e-07, 0.432871 ]
+Objective value for Line heur k = 0: 15666222.79000821
+90
+Actual reward of current solution: 53331311.15302565
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 16026 Constrs, 9360 Vars, 6347770 NZs
+  Matrix coefficient range    : [ 2.5797e-13, 1 ]
+  Objective coefficient range : [ 5.10146e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.83209e-08, 0.367337 ]
+Objective value for Line heur k = 0: 26163929.780311644
+90
+Actual reward of current solution: 52451565.218611166
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 16026 Constrs, 9360 Vars, 6824001 NZs
+  Matrix coefficient range    : [ 3.93179e-13, 1 ]
+  Objective coefficient range : [ 8.06767e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 3.1124e-08, 0.432879 ]
+Objective value for Line heur k = 0: 15782760.674263543
+90
+Actual reward of current solution: 53336041.04382892
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 16026 Constrs, 9360 Vars, 6347770 NZs
+  Matrix coefficient range    : [ 2.58495e-13, 1 ]
+  Objective coefficient range : [ 8.97568e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.00245167, 1 ]
+  RHS coefficient range       : [ 1.54593e-08, 0.367212 ]
+Objective value for Line heur k = 0: 26188665.52912385
+90
+Actual reward of current solution: 52475899.577547155
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 16026 Constrs, 9360 Vars, 6824001 NZs
+  Matrix coefficient range    : [ 3.90149e-13, 1 ]
+  Objective coefficient range : [ 5.93591e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 9.06368e-09, 0.43157 ]
+Objective value for Line heur k = 0: 15997697.362265816
+90
+Actual reward of current solution: 53348993.71534796
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 16026 Constrs, 9360 Vars, 6325643 NZs
+  Matrix coefficient range    : [ 2.56538e-13, 1 ]
+  Objective coefficient range : [ 2.0625e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.50153e-08, 0.366543 ]
+Objective value for Line heur k = 0: 26308748.01963631
+90
+Actual reward of current solution: 52458397.024089195
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 16026 Constrs, 9360 Vars, 6824001 NZs
+  Matrix coefficient range    : [ 3.9273e-13, 1 ]
+  Objective coefficient range : [ 2.61349e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 9.06368e-09, 0.432531 ]
+Objective value for Line heur k = 0: 15842960.18952798
+90
+Actual reward of current solution: 53348993.71534796
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 16026 Constrs, 9360 Vars, 6325643 NZs
+  Matrix coefficient range    : [ 2.56538e-13, 1 ]
+  Objective coefficient range : [ 2.0625e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.50153e-08, 0.366543 ]
+Objective value for Line heur k = 0: 26308748.01963631
+90
+Actual reward of current solution: 52458397.024089195
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 16026 Constrs, 9360 Vars, 6824001 NZs
+  Matrix coefficient range    : [ 3.9273e-13, 1 ]
+  Objective coefficient range : [ 2.61349e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 9.06368e-09, 0.432531 ]
+Objective value for Line heur k = 0: 15842960.18952798
+90
+Actual reward of current solution: 53348993.71534796
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 16026 Constrs, 9360 Vars, 6325643 NZs
+  Matrix coefficient range    : [ 2.56538e-13, 1 ]
+  Objective coefficient range : [ 2.0625e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.50153e-08, 0.366543 ]
+Objective value for Line heur k = 0: 26308748.01963631
+90
+Actual reward of current solution: 52458397.024089195
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 16026 Constrs, 9360 Vars, 6824001 NZs
+  Matrix coefficient range    : [ 3.9273e-13, 1 ]
+  Objective coefficient range : [ 2.61349e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 9.06368e-09, 0.432531 ]
+Objective value for Line heur k = 0: 15842960.18952798
+90
+Actual reward of current solution: 53348993.71534796
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 16026 Constrs, 9360 Vars, 6325643 NZs
+  Matrix coefficient range    : [ 2.56538e-13, 1 ]
+  Objective coefficient range : [ 2.0625e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.50153e-08, 0.366543 ]
+Objective value for Line heur k = 0: 26308748.01963631
+90
+Actual reward of current solution: 52458397.024089195
+Minimum Difference with past solutions:0.049999999999999684.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 16026 Constrs, 9360 Vars, 6824001 NZs
+  Matrix coefficient range    : [ 3.9273e-13, 1 ]
+  Objective coefficient range : [ 2.61349e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 9.06368e-09, 0.432531 ]
+Objective value for Line heur k = 0: 15842960.18952798
+90
+Actual reward of current solution: 53348993.71534796
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=0
+89
+Total Reward at the start of the inner iterations: 53348993.71534796
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15915 Constrs, 9270 Vars, 6212118 NZs
+  Matrix coefficient range    : [ 2.56538e-13, 1 ]
+  Objective coefficient range : [ 2.0625e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.03512e-08, 1 ]
+Objective value for Line heur k = 1: 26128901.82386996
+89
+Actual reward of current solution: 52937916.51963024
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15915 Constrs, 9270 Vars, 6456222 NZs
+  Matrix coefficient range    : [ 3.21711e-13, 1 ]
+  Objective coefficient range : [ 1.45344e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.03512e-08, 1 ]
+Objective value for Line heur k = 1: 20222505.069797583
+89
+Actual reward of current solution: 53402286.38285453
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15915 Constrs, 9270 Vars, 6212118 NZs
+  Matrix coefficient range    : [ 2.71804e-13, 1 ]
+  Objective coefficient range : [ 5.20423e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.03512e-08, 1 ]
+Objective value for Line heur k = 1: 24596894.70252612
+89
+Actual reward of current solution: 52922399.69200637
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15915 Constrs, 9270 Vars, 6456222 NZs
+  Matrix coefficient range    : [ 3.29704e-13, 1 ]
+  Objective coefficient range : [ 1.8652e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.03512e-08, 1 ]
+Objective value for Line heur k = 1: 19335238.61002307
+89
+Actual reward of current solution: 53411222.725648925
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15915 Constrs, 9270 Vars, 6212118 NZs
+  Matrix coefficient range    : [ 2.79915e-13, 1 ]
+  Objective coefficient range : [ 1.32797e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.03512e-08, 1 ]
+Objective value for Line heur k = 1: 24099987.004221458
+89
+Actual reward of current solution: 52906274.606726155
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15915 Constrs, 9270 Vars, 6456222 NZs
+  Matrix coefficient range    : [ 3.3713e-13, 1 ]
+  Objective coefficient range : [ 8.6522e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.03512e-08, 1 ]
+Objective value for Line heur k = 1: 18438642.37505319
+89
+Actual reward of current solution: 53406138.466389984
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15915 Constrs, 9270 Vars, 6212118 NZs
+  Matrix coefficient range    : [ 2.80766e-13, 1 ]
+  Objective coefficient range : [ 4.41526e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.03512e-08, 1 ]
+Objective value for Line heur k = 1: 24297145.987847965
+89
+Actual reward of current solution: 52903349.61300229
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15915 Constrs, 9270 Vars, 6456222 NZs
+  Matrix coefficient range    : [ 3.39825e-13, 1 ]
+  Objective coefficient range : [ 5.05981e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.03512e-08, 1 ]
+Objective value for Line heur k = 1: 18237357.644635398
+89
+Actual reward of current solution: 53408676.635672346
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15915 Constrs, 9270 Vars, 6212118 NZs
+  Matrix coefficient range    : [ 2.82081e-13, 1 ]
+  Objective coefficient range : [ 4.88937e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.03512e-08, 1 ]
+Objective value for Line heur k = 1: 24300773.619719204
+89
+Actual reward of current solution: 52909973.75844547
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15915 Constrs, 9270 Vars, 6456222 NZs
+  Matrix coefficient range    : [ 3.4044e-13, 1 ]
+  Objective coefficient range : [ 8.40878e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.0106134, 1 ]
+  RHS coefficient range       : [ 1.03512e-08, 1 ]
+Objective value for Line heur k = 1: 18298004.556561172
+89
+Actual reward of current solution: 53422404.770689406
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15915 Constrs, 9270 Vars, 6212118 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.03548e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.03512e-08, 1 ]
+Objective value for Line heur k = 1: 24445471.59484885
+89
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15915 Constrs, 9270 Vars, 6445491 NZs
+  Matrix coefficient range    : [ 3.4044e-13, 1 ]
+  Objective coefficient range : [ 2.08985e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.03512e-08, 1 ]
+Objective value for Line heur k = 1: 18501661.492889233
+89
+Actual reward of current solution: 53414047.50938635
+Minimum Difference with past solutions:0.0393866087171455.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15915 Constrs, 9270 Vars, 6212118 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.07982e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.03512e-08, 1 ]
+Objective value for Line heur k = 1: 24350348.614904415
+89
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=1
+88
+Total Reward at the start of the inner iterations: 53422404.770689406
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15750 Constrs, 9180 Vars, 6099660 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.03548e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 3.48529e-08, 1 ]
+Objective value for Line heur k = 2: 24436224.886581432
+88
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15750 Constrs, 9180 Vars, 6333033 NZs
+  Matrix coefficient range    : [ 3.4044e-13, 1 ]
+  Objective coefficient range : [ 2.08985e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.22042e-08, 1 ]
+Objective value for Line heur k = 2: 18550303.315537274
+88
+Actual reward of current solution: 53414047.50938635
+Minimum Difference with past solutions:0.0393866087171455.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15750 Constrs, 9180 Vars, 6099660 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.07982e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 3.48529e-08, 1 ]
+Objective value for Line heur k = 2: 24341915.389880195
+88
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=2
+87
+Total Reward at the start of the inner iterations: 53422404.770689406
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15585 Constrs, 9090 Vars, 5988323 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.03548e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.88615e-08, 1 ]
+Objective value for Line heur k = 3: 24432524.784521922
+87
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15585 Constrs, 9090 Vars, 6221696 NZs
+  Matrix coefficient range    : [ 3.4044e-13, 1 ]
+  Objective coefficient range : [ 2.08985e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.88615e-08, 1 ]
+Objective value for Line heur k = 3: 18607538.196731057
+87
+Actual reward of current solution: 53414047.50938635
+Minimum Difference with past solutions:0.0393866087171455.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15585 Constrs, 9090 Vars, 5988323 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.07982e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.88615e-08, 1 ]
+Objective value for Line heur k = 3: 24339072.666434914
+87
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=3
+86
+Total Reward at the start of the inner iterations: 53422404.770689406
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15420 Constrs, 9000 Vars, 5878107 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.03548e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.02617e-07, 1 ]
+Objective value for Line heur k = 4: 24429687.209630635
+86
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15420 Constrs, 9000 Vars, 6111480 NZs
+  Matrix coefficient range    : [ 3.4044e-13, 1 ]
+  Objective coefficient range : [ 2.08985e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.02617e-07, 1 ]
+Objective value for Line heur k = 4: 18667513.675507657
+86
+Actual reward of current solution: 53414047.50938635
+Minimum Difference with past solutions:0.0393866087171455.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15420 Constrs, 9000 Vars, 5878107 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.07982e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.02617e-07, 1 ]
+Objective value for Line heur k = 4: 24337119.818037707
+86
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=4
+85
+Total Reward at the start of the inner iterations: 53422404.770689406
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15255 Constrs, 8910 Vars, 5769012 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.03548e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 8.92427e-08, 1 ]
+Objective value for Line heur k = 5: 24425044.883937515
+85
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15255 Constrs, 8910 Vars, 6002385 NZs
+  Matrix coefficient range    : [ 3.4044e-13, 1 ]
+  Objective coefficient range : [ 2.08985e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.83702e-08, 1 ]
+Objective value for Line heur k = 5: 18726817.66689847
+85
+Actual reward of current solution: 53414047.50938635
+Minimum Difference with past solutions:0.0393866087171455.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15255 Constrs, 8910 Vars, 5769012 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.07982e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 8.92427e-08, 1 ]
+Objective value for Line heur k = 5: 24333379.050490465
+85
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=5
+84
+Total Reward at the start of the inner iterations: 53422404.770689406
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15090 Constrs, 8820 Vars, 5661038 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.03548e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 8.23436e-08, 1 ]
+Objective value for Line heur k = 6: 24417106.050830074
+84
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15090 Constrs, 8820 Vars, 5894411 NZs
+  Matrix coefficient range    : [ 3.4044e-13, 1 ]
+  Objective coefficient range : [ 2.08985e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.83319e-08, 1 ]
+Objective value for Line heur k = 6: 18783463.800500803
+84
+Actual reward of current solution: 53414047.50938635
+Minimum Difference with past solutions:0.0393866087171455.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 15090 Constrs, 8820 Vars, 5661038 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.07982e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 8.23436e-08, 1 ]
+Objective value for Line heur k = 6: 24326351.72479471
+84
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=6
+83
+Total Reward at the start of the inner iterations: 53422404.770689406
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 14925 Constrs, 8730 Vars, 5554185 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.03548e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.19961e-09, 1 ]
+Objective value for Line heur k = 7: 24405038.49583529
+83
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 14925 Constrs, 8730 Vars, 5787558 NZs
+  Matrix coefficient range    : [ 3.4044e-13, 1 ]
+  Objective coefficient range : [ 2.08985e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.45094e-08, 1 ]
+Objective value for Line heur k = 7: 18836262.29129344
+83
+Actual reward of current solution: 53414047.50938635
+Minimum Difference with past solutions:0.0393866087171455.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 14925 Constrs, 8730 Vars, 5554185 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.07982e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.19961e-09, 1 ]
+Objective value for Line heur k = 7: 24315200.83519748
+83
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=7
+82
+Total Reward at the start of the inner iterations: 53422404.770689406
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 14760 Constrs, 8640 Vars, 5448453 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.03548e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 7.74162e-09, 1 ]
+Objective value for Line heur k = 8: 24388340.47274353
+82
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 14760 Constrs, 8640 Vars, 5681826 NZs
+  Matrix coefficient range    : [ 3.4044e-13, 1 ]
+  Objective coefficient range : [ 2.08985e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 7.17268e-08, 1 ]
+Objective value for Line heur k = 8: 18884410.56282618
+82
+Actual reward of current solution: 53414047.50938635
+Minimum Difference with past solutions:0.0393866087171455.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 14760 Constrs, 8640 Vars, 5448453 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.07982e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 7.74162e-09, 1 ]
+Objective value for Line heur k = 8: 24299420.881688807
+82
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=8
+81
+Total Reward at the start of the inner iterations: 53422404.770689406
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 14595 Constrs, 8550 Vars, 5343842 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.03548e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 5.92898e-08, 1 ]
+Objective value for Line heur k = 9: 24366611.30520528
+81
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 14595 Constrs, 8550 Vars, 5577215 NZs
+  Matrix coefficient range    : [ 3.4044e-13, 1 ]
+  Objective coefficient range : [ 2.08985e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 8.49097e-08, 1 ]
+Objective value for Line heur k = 9: 18927197.083050556
+81
+Actual reward of current solution: 53414047.50938635
+Minimum Difference with past solutions:0.0393866087171455.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 14595 Constrs, 8550 Vars, 5343842 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.07982e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 5.92898e-08, 1 ]
+Objective value for Line heur k = 9: 24278607.659420524
+81
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=9
+80
+Total Reward at the start of the inner iterations: 53422404.770689406
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 14430 Constrs, 8460 Vars, 5240352 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.03548e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 9.37427e-08, 1 ]
+Objective value for Line heur k = 10: 24339361.964105073
+80
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 14430 Constrs, 8460 Vars, 5473725 NZs
+  Matrix coefficient range    : [ 3.4044e-13, 1 ]
+  Objective coefficient range : [ 2.08985e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 5.94371e-08, 1 ]
+Objective value for Line heur k = 10: 18963742.72639375
+80
+Actual reward of current solution: 53414047.50938635
+Minimum Difference with past solutions:0.0393866087171455.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 14430 Constrs, 8460 Vars, 5240352 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.07982e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 9.37427e-08, 1 ]
+Objective value for Line heur k = 10: 24252268.075777855
+80
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=10
+79
+Total Reward at the start of the inner iterations: 53422404.770689406
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 14265 Constrs, 8370 Vars, 5137983 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.03548e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 5.64208e-08, 1 ]
+Objective value for Line heur k = 11: 24305817.596644208
+79
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 14265 Constrs, 8370 Vars, 5371356 NZs
+  Matrix coefficient range    : [ 3.4044e-13, 1 ]
+  Objective coefficient range : [ 2.08985e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.22867e-08, 1 ]
+Objective value for Line heur k = 11: 18992715.04705967
+79
+Actual reward of current solution: 53414047.50938635
+Minimum Difference with past solutions:0.0393866087171455.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 14265 Constrs, 8370 Vars, 5137983 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.07982e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 5.64208e-08, 1 ]
+Objective value for Line heur k = 11: 24219621.793936133
+79
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=11
+78
+Total Reward at the start of the inner iterations: 53422404.770689406
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 14100 Constrs, 8280 Vars, 5036735 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.03548e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.53822e-08, 1 ]
+Objective value for Line heur k = 12: 24264663.25282342
+78
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 14100 Constrs, 8280 Vars, 5270108 NZs
+  Matrix coefficient range    : [ 3.4044e-13, 1 ]
+  Objective coefficient range : [ 2.08985e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 4.52369e-08, 1 ]
+Objective value for Line heur k = 12: 19011945.434280146
+78
+Actual reward of current solution: 53414047.50938635
+Minimum Difference with past solutions:0.0393866087171455.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 14100 Constrs, 8280 Vars, 5036735 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.07982e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.53822e-08, 1 ]
+Objective value for Line heur k = 12: 24179345.74139679
+78
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=12
+77
+Total Reward at the start of the inner iterations: 53422404.770689406
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13935 Constrs, 8190 Vars, 4936608 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.03548e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 3.57805e-08, 1 ]
+Objective value for Line heur k = 13: 24213671.07218043
+77
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13935 Constrs, 8190 Vars, 5169981 NZs
+  Matrix coefficient range    : [ 3.4044e-13, 1 ]
+  Objective coefficient range : [ 2.08985e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.13268e-07, 1 ]
+Objective value for Line heur k = 13: 19017856.20518079
+77
+Actual reward of current solution: 53414047.50938635
+Minimum Difference with past solutions:0.0393866087171455.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13935 Constrs, 8190 Vars, 4936608 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.07982e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 3.57805e-08, 1 ]
+Objective value for Line heur k = 13: 24129199.45910005
+77
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=13
+76
+Total Reward at the start of the inner iterations: 53422404.770689406
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13770 Constrs, 8100 Vars, 4837656 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.03548e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 9.57763e-08, 0.36863 ]
+Objective value for Line heur k = 14: 24149118.956187144
+76
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13770 Constrs, 8100 Vars, 5071029 NZs
+  Matrix coefficient range    : [ 3.4044e-13, 1 ]
+  Objective coefficient range : [ 2.08985e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.47432e-08, 0.404067 ]
+Objective value for Line heur k = 14: 19004558.794472013
+76
+Actual reward of current solution: 53414047.50938635
+Minimum Difference with past solutions:0.0393866087171455.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13770 Constrs, 8100 Vars, 4837656 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.07982e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 9.57763e-08, 0.36918 ]
+Objective value for Line heur k = 14: 24065440.879576366
+76
+Actual reward of current solution: 52929149.01010249
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=14
+75
+Total Reward at the start of the inner iterations: 53422404.770689406
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13659 Constrs, 8010 Vars, 4731513 NZs
+  Matrix coefficient range    : [ 2.82265e-13, 1 ]
+  Objective coefficient range : [ 2.03548e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.84736e-08, 1 ]
+Objective value for Line heur k = 15: 24032480.35490956
+75
+Actual reward of current solution: 53241853.725024536
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13659 Constrs, 8010 Vars, 4811453 NZs
+  Matrix coefficient range    : [ 2.96629e-13, 1 ]
+  Objective coefficient range : [ 8.75709e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.84736e-08, 1 ]
+Objective value for Line heur k = 15: 21790899.957705278
+75
+Actual reward of current solution: 53423431.851323426
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13659 Constrs, 8010 Vars, 4731513 NZs
+  Matrix coefficient range    : [ 2.8413e-13, 1 ]
+  Objective coefficient range : [ 2.77737e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.84736e-08, 1 ]
+Objective value for Line heur k = 15: 23231834.10435666
+75
+Actual reward of current solution: 53240375.25034568
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13659 Constrs, 8010 Vars, 4811453 NZs
+  Matrix coefficient range    : [ 2.9682e-13, 1 ]
+  Objective coefficient range : [ 8.45079e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.84736e-08, 1 ]
+Objective value for Line heur k = 15: 21515590.190160375
+75
+Actual reward of current solution: 53426491.21133728
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13659 Constrs, 8010 Vars, 4731513 NZs
+  Matrix coefficient range    : [ 2.84767e-13, 1 ]
+  Objective coefficient range : [ 1.92666e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.84736e-08, 1 ]
+Objective value for Line heur k = 15: 23000491.241137393
+75
+Actual reward of current solution: 53248027.6307866
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13659 Constrs, 8010 Vars, 4811453 NZs
+  Matrix coefficient range    : [ 2.96421e-13, 1 ]
+  Objective coefficient range : [ 1.80167e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.84736e-08, 1 ]
+Objective value for Line heur k = 15: 21438884.517492697
+75
+Actual reward of current solution: 53435177.323192425
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13659 Constrs, 8010 Vars, 4731513 NZs
+  Matrix coefficient range    : [ 2.84001e-13, 1 ]
+  Objective coefficient range : [ 8.77077e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.84736e-08, 1 ]
+Objective value for Line heur k = 15: 23064804.17331942
+75
+Actual reward of current solution: 53257259.149396844
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13659 Constrs, 8010 Vars, 4811453 NZs
+  Matrix coefficient range    : [ 2.95851e-13, 1 ]
+  Objective coefficient range : [ 3.61646e-22, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.84736e-08, 1 ]
+Objective value for Line heur k = 15: 21549390.089509975
+75
+Actual reward of current solution: 53444853.718715966
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13659 Constrs, 8010 Vars, 4731513 NZs
+  Matrix coefficient range    : [ 2.83002e-13, 1 ]
+  Objective coefficient range : [ 1.75726e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.84736e-08, 1 ]
+Objective value for Line heur k = 15: 23178427.311212536
+75
+Actual reward of current solution: 53268638.42257845
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13659 Constrs, 8010 Vars, 4811453 NZs
+  Matrix coefficient range    : [ 2.95195e-13, 1 ]
+  Objective coefficient range : [ 2.67002e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.84736e-08, 1 ]
+Objective value for Line heur k = 15: 21680505.43247538
+75
+Actual reward of current solution: 53456926.42950901
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13659 Constrs, 8010 Vars, 4731513 NZs
+  Matrix coefficient range    : [ 2.81862e-13, 1 ]
+  Objective coefficient range : [ 9.78696e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.84736e-08, 1 ]
+Objective value for Line heur k = 15: 23315240.267872524
+75
+Actual reward of current solution: 53283568.922347546
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13659 Constrs, 8010 Vars, 4811453 NZs
+  Matrix coefficient range    : [ 2.9431e-13, 1 ]
+  Objective coefficient range : [ 8.2842e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.84736e-08, 1 ]
+Objective value for Line heur k = 15: 21846480.4786508
+75
+Actual reward of current solution: 53473600.028138354
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13659 Constrs, 8010 Vars, 4731513 NZs
+  Matrix coefficient range    : [ 2.80467e-13, 1 ]
+  Objective coefficient range : [ 3.73787e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.0307383, 1 ]
+  RHS coefficient range       : [ 6.84736e-08, 1 ]
+Objective value for Line heur k = 15: 23497953.80292909
+75
+Actual reward of current solution: 53307251.97503416
+Minimum Difference with past solutions:0.050000000000000044.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13659 Constrs, 8010 Vars, 4811453 NZs
+  Matrix coefficient range    : [ 2.93139e-13, 1 ]
+  Objective coefficient range : [ 5.87023e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.0179495, 1 ]
+  RHS coefficient range       : [ 6.84736e-08, 1 ]
+Objective value for Line heur k = 15: 22099232.346130017
+75
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13659 Constrs, 8010 Vars, 4724282 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.84736e-08, 1 ]
+Objective value for Line heur k = 15: 23836834.500310663
+75
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13659 Constrs, 8010 Vars, 4793050 NZs
+  Matrix coefficient range    : [ 2.91362e-13, 1 ]
+  Objective coefficient range : [ 1.01705e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.84736e-08, 1 ]
+Objective value for Line heur k = 15: 22200913.170744352
+75
+Actual reward of current solution: 53500753.09489354
+Minimum Difference with past solutions:0.03205047312715559.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13659 Constrs, 8010 Vars, 4724282 NZs
+  Matrix coefficient range    : [ 2.79064e-13, 1 ]
+  Objective coefficient range : [ 7.97136e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.84736e-08, 1 ]
+Objective value for Line heur k = 15: 23784330.72297985
+75
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=15
+74
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13494 Constrs, 7920 Vars, 4619301 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.49728e-08, 1 ]
+Objective value for Line heur k = 16: 23749932.225399133
+74
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13494 Constrs, 7920 Vars, 4688069 NZs
+  Matrix coefficient range    : [ 2.91362e-13, 1 ]
+  Objective coefficient range : [ 1.01705e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.49728e-08, 1 ]
+Objective value for Line heur k = 16: 22141394.977683518
+74
+Actual reward of current solution: 53500753.09489354
+Minimum Difference with past solutions:0.03205047312715559.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13494 Constrs, 7920 Vars, 4619301 NZs
+  Matrix coefficient range    : [ 2.79064e-13, 1 ]
+  Objective coefficient range : [ 7.97136e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.49728e-08, 1 ]
+Objective value for Line heur k = 16: 23698427.64137499
+74
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=16
+73
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13329 Constrs, 7830 Vars, 4515536 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.60999e-08, 1 ]
+Objective value for Line heur k = 17: 23648844.51644734
+73
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13329 Constrs, 7830 Vars, 4584304 NZs
+  Matrix coefficient range    : [ 2.91362e-13, 1 ]
+  Objective coefficient range : [ 1.01705e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.60999e-08, 1 ]
+Objective value for Line heur k = 17: 22066757.7922548
+73
+Actual reward of current solution: 53500753.09489354
+Minimum Difference with past solutions:0.03205047312715559.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13329 Constrs, 7830 Vars, 4515536 NZs
+  Matrix coefficient range    : [ 2.79064e-13, 1 ]
+  Objective coefficient range : [ 7.97136e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.60999e-08, 1 ]
+Objective value for Line heur k = 17: 23598298.15697996
+73
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=17
+72
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13164 Constrs, 7740 Vars, 4412987 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 5.26003e-08, 1 ]
+Objective value for Line heur k = 18: 23539183.611261267
+72
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13164 Constrs, 7740 Vars, 4481755 NZs
+  Matrix coefficient range    : [ 2.91362e-13, 1 ]
+  Objective coefficient range : [ 1.01705e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 5.26003e-08, 1 ]
+Objective value for Line heur k = 18: 21983067.21243995
+72
+Actual reward of current solution: 53500753.09489354
+Minimum Difference with past solutions:0.03205047312715559.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 13164 Constrs, 7740 Vars, 4412987 NZs
+  Matrix coefficient range    : [ 2.79064e-13, 1 ]
+  Objective coefficient range : [ 7.97136e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 5.26003e-08, 1 ]
+Objective value for Line heur k = 18: 23489574.20533899
+72
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=18
+71
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 12999 Constrs, 7650 Vars, 4311654 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.17422e-07, 1 ]
+Objective value for Line heur k = 19: 23423850.776820835
+71
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 12999 Constrs, 7650 Vars, 4380422 NZs
+  Matrix coefficient range    : [ 2.91362e-13, 1 ]
+  Objective coefficient range : [ 1.01705e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.17422e-07, 1 ]
+Objective value for Line heur k = 19: 21893455.700612836
+71
+Actual reward of current solution: 53500753.09489354
+Minimum Difference with past solutions:0.03205047312715559.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 12999 Constrs, 7650 Vars, 4311654 NZs
+  Matrix coefficient range    : [ 2.79064e-13, 1 ]
+  Objective coefficient range : [ 7.97136e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.17422e-07, 1 ]
+Objective value for Line heur k = 19: 23375167.19990858
+71
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=19
+70
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 12834 Constrs, 7560 Vars, 4211537 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.1714e-08, 1 ]
+Objective value for Line heur k = 20: 23304352.294281784
+70
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 12834 Constrs, 7560 Vars, 4280305 NZs
+  Matrix coefficient range    : [ 2.91362e-13, 1 ]
+  Objective coefficient range : [ 1.01705e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 7.09556e-08, 1 ]
+Objective value for Line heur k = 20: 21799544.375156738
+70
+Actual reward of current solution: 53500753.09489354
+Minimum Difference with past solutions:0.03205047312715559.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 12834 Constrs, 7560 Vars, 4211537 NZs
+  Matrix coefficient range    : [ 2.79064e-13, 1 ]
+  Objective coefficient range : [ 7.97136e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.20758e-08, 1 ]
+Objective value for Line heur k = 20: 23256588.543017946
+70
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=20
+69
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 12669 Constrs, 7470 Vars, 4112636 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 7.40945e-08, 1 ]
+Objective value for Line heur k = 21: 23181469.610326786
+69
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 12669 Constrs, 7470 Vars, 4181404 NZs
+  Matrix coefficient range    : [ 2.91362e-13, 1 ]
+  Objective coefficient range : [ 1.01705e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 3.67301e-08, 1 ]
+Objective value for Line heur k = 21: 21702166.222339947
+69
+Actual reward of current solution: 53500753.09489354
+Minimum Difference with past solutions:0.03205047312715559.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 12669 Constrs, 7470 Vars, 4112636 NZs
+  Matrix coefficient range    : [ 2.79064e-13, 1 ]
+  Objective coefficient range : [ 7.97136e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.60256e-08, 1 ]
+Objective value for Line heur k = 21: 23134622.0580619
+69
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=21
+68
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 12504 Constrs, 7380 Vars, 4014951 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 5.46439e-08, 1 ]
+Objective value for Line heur k = 22: 23055594.814577233
+68
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 12504 Constrs, 7380 Vars, 4083719 NZs
+  Matrix coefficient range    : [ 2.91362e-13, 1 ]
+  Objective coefficient range : [ 1.01705e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 4.63219e-08, 1 ]
+Objective value for Line heur k = 22: 21601726.033792518
+68
+Actual reward of current solution: 53500753.09489354
+Minimum Difference with past solutions:0.03205047312715559.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 12504 Constrs, 7380 Vars, 4014951 NZs
+  Matrix coefficient range    : [ 2.79064e-13, 1 ]
+  Objective coefficient range : [ 7.97136e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 5.42737e-08, 1 ]
+Objective value for Line heur k = 22: 23009660.520499777
+68
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=22
+67
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 12339 Constrs, 7290 Vars, 3918482 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 3.58238e-08, 1 ]
+Objective value for Line heur k = 23: 22926887.397155832
+67
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 12339 Constrs, 7290 Vars, 3987250 NZs
+  Matrix coefficient range    : [ 2.91362e-13, 1 ]
+  Objective coefficient range : [ 1.01705e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.38392e-08, 1 ]
+Objective value for Line heur k = 23: 21498364.292023543
+67
+Actual reward of current solution: 53500753.09489354
+Minimum Difference with past solutions:0.03205047312715559.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 12339 Constrs, 7290 Vars, 3918482 NZs
+  Matrix coefficient range    : [ 2.79064e-13, 1 ]
+  Objective coefficient range : [ 7.97136e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 3.5308e-08, 1 ]
+Objective value for Line heur k = 23: 22881862.710217644
+67
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=23
+66
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 12174 Constrs, 7200 Vars, 3823229 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.70987e-08, 1 ]
+Objective value for Line heur k = 24: 22795325.37031297
+66
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 12174 Constrs, 7200 Vars, 3891997 NZs
+  Matrix coefficient range    : [ 2.91362e-13, 1 ]
+  Objective coefficient range : [ 1.01705e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 8.90004e-10, 1 ]
+Objective value for Line heur k = 24: 21392001.6067103
+66
+Actual reward of current solution: 53500753.09489354
+Minimum Difference with past solutions:0.03205047312715559.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 12174 Constrs, 7200 Vars, 3823229 NZs
+  Matrix coefficient range    : [ 2.79064e-13, 1 ]
+  Objective coefficient range : [ 7.97136e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.6427e-08, 1 ]
+Objective value for Line heur k = 24: 22751204.197255336
+66
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=24
+65
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 12009 Constrs, 7110 Vars, 3729192 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.91336e-09, 1 ]
+Objective value for Line heur k = 25: 22660674.98032431
+65
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 12009 Constrs, 7110 Vars, 3797960 NZs
+  Matrix coefficient range    : [ 2.91362e-13, 1 ]
+  Objective coefficient range : [ 1.01705e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.39328e-10, 1 ]
+Objective value for Line heur k = 25: 21282285.356582467
+65
+Actual reward of current solution: 53500753.09489354
+Minimum Difference with past solutions:0.03205047312715559.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 12009 Constrs, 7110 Vars, 3729192 NZs
+  Matrix coefficient range    : [ 2.79064e-13, 1 ]
+  Objective coefficient range : [ 7.97136e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.75574e-09, 1 ]
+Objective value for Line heur k = 25: 22617445.93119466
+65
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=25
+64
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 11844 Constrs, 7020 Vars, 3636371 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.15708e-08, 1 ]
+Objective value for Line heur k = 26: 22522365.86151975
+64
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 11844 Constrs, 7020 Vars, 3705139 NZs
+  Matrix coefficient range    : [ 2.91362e-13, 1 ]
+  Objective coefficient range : [ 1.01705e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 4.83091e-08, 1 ]
+Objective value for Line heur k = 26: 21168415.68314003
+64
+Actual reward of current solution: 53500753.09489354
+Minimum Difference with past solutions:0.03205047312715559.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 11844 Constrs, 7020 Vars, 3636371 NZs
+  Matrix coefficient range    : [ 2.79064e-13, 1 ]
+  Objective coefficient range : [ 7.97136e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.26057e-08, 1 ]
+Objective value for Line heur k = 26: 22480006.974922486
+64
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=26
+63
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 11679 Constrs, 6930 Vars, 3544766 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 9.64564e-09, 1 ]
+Objective value for Line heur k = 27: 22379215.485688444
+63
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 11679 Constrs, 6930 Vars, 3613534 NZs
+  Matrix coefficient range    : [ 2.91362e-13, 1 ]
+  Objective coefficient range : [ 1.01705e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 7.58048e-08, 1 ]
+Objective value for Line heur k = 27: 21048773.662419148
+63
+Actual reward of current solution: 53500753.09489354
+Minimum Difference with past solutions:0.03205047312715559.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 11679 Constrs, 6930 Vars, 3544766 NZs
+  Matrix coefficient range    : [ 2.79064e-13, 1 ]
+  Objective coefficient range : [ 7.97136e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 5.48579e-09, 1 ]
+Objective value for Line heur k = 27: 22337684.138518166
+63
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=27
+62
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 11514 Constrs, 6840 Vars, 3454431 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 5.2202e-09, 0.35268 ]
+Objective value for Line heur k = 28: 22228878.63561495
+62
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 11514 Constrs, 6840 Vars, 3523199 NZs
+  Matrix coefficient range    : [ 2.91362e-13, 1 ]
+  Objective coefficient range : [ 1.01705e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.19363e-08, 0.362964 ]
+Objective value for Line heur k = 28: 20920185.870584432
+62
+Actual reward of current solution: 53500753.09489354
+Minimum Difference with past solutions:0.03205047312715559.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 11514 Constrs, 6840 Vars, 3454431 NZs
+  Matrix coefficient range    : [ 2.79064e-13, 1 ]
+  Objective coefficient range : [ 7.97136e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 3.0532e-09, 0.35295 ]
+Objective value for Line heur k = 28: 22188092.063113287
+62
+Actual reward of current solution: 53320311.162918344
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=28
+61
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 11403 Constrs, 6750 Vars, 3361054 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.04089e-08, 1 ]
+Objective value for Line heur k = 29: 22061724.776001412
+61
+Actual reward of current solution: 53445362.72907059
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 11403 Constrs, 6750 Vars, 3375285 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 1.55921e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.04089e-08, 1 ]
+Objective value for Line heur k = 29: 21567771.901154786
+61
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=29
+60
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 11238 Constrs, 6660 Vars, 3268896 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.82203e-08, 1 ]
+Objective value for Line heur k = 30: 21904738.567362044
+60
+Actual reward of current solution: 53445362.72907059
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 11238 Constrs, 6660 Vars, 3283127 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 1.55921e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.82203e-08, 1 ]
+Objective value for Line heur k = 30: 21419955.506589107
+60
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=30
+59
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 11073 Constrs, 6570 Vars, 3178011 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 4.63784e-08, 1 ]
+Objective value for Line heur k = 31: 21742590.969088826
+59
+Actual reward of current solution: 53445362.72907059
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 11073 Constrs, 6570 Vars, 3192242 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 1.55921e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 4.63784e-08, 1 ]
+Objective value for Line heur k = 31: 21266887.782829154
+59
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=31
+58
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 10908 Constrs, 6480 Vars, 3088399 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.41116e-08, 1 ]
+Objective value for Line heur k = 32: 21576821.887299027
+58
+Actual reward of current solution: 53445362.72907059
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 10908 Constrs, 6480 Vars, 3102630 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 1.55921e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.41116e-08, 1 ]
+Objective value for Line heur k = 32: 21110155.95197863
+58
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=32
+57
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 10743 Constrs, 6390 Vars, 3000060 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 8.11274e-08, 1 ]
+Objective value for Line heur k = 33: 21408160.359975282
+57
+Actual reward of current solution: 53445362.72907059
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 10743 Constrs, 6390 Vars, 3014291 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 1.55921e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 8.11274e-08, 1 ]
+Objective value for Line heur k = 33: 20950510.898762275
+57
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=33
+56
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 10578 Constrs, 6300 Vars, 2912994 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 9.17298e-08, 1 ]
+Objective value for Line heur k = 34: 21236946.683415394
+56
+Actual reward of current solution: 53445362.72907059
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 10578 Constrs, 6300 Vars, 2927225 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 1.55921e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 9.17298e-08, 1 ]
+Objective value for Line heur k = 34: 20788301.99933427
+56
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=34
+55
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 10413 Constrs, 6210 Vars, 2827201 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 7.85639e-08, 1 ]
+Objective value for Line heur k = 35: 21063333.057247993
+55
+Actual reward of current solution: 53445362.72907059
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 10413 Constrs, 6210 Vars, 2841432 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 1.55921e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 7.75516e-08, 1 ]
+Objective value for Line heur k = 35: 20623683.25488629
+55
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=35
+54
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 10248 Constrs, 6120 Vars, 2742681 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 5.77564e-08, 1 ]
+Objective value for Line heur k = 36: 20887377.34233499
+54
+Actual reward of current solution: 53445362.72907059
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 10248 Constrs, 6120 Vars, 2756912 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 1.55921e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.79176e-08, 1 ]
+Objective value for Line heur k = 36: 20456708.49594344
+54
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=36
+53
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 10083 Constrs, 6030 Vars, 2659434 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 3.56697e-08, 1 ]
+Objective value for Line heur k = 37: 20709083.592766304
+53
+Actual reward of current solution: 53445362.72907059
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 10083 Constrs, 6030 Vars, 2673665 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 1.55921e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 4.887e-08, 1 ]
+Objective value for Line heur k = 37: 20287370.24558854
+53
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=37
+52
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 9918 Constrs, 5940 Vars, 2577460 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 4.09648e-08, 1 ]
+Objective value for Line heur k = 38: 20528412.6547484
+52
+Actual reward of current solution: 53445362.72907059
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 9918 Constrs, 5940 Vars, 2591691 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 1.55921e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 3.49742e-08, 1 ]
+Objective value for Line heur k = 38: 20115604.764684793
+52
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=38
+51
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 9753 Constrs, 5850 Vars, 2496759 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.97874e-08, 1 ]
+Objective value for Line heur k = 39: 20345269.08235598
+51
+Actual reward of current solution: 53445362.72907059
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 9753 Constrs, 5850 Vars, 2510990 NZs
+  Matrix coefficient range    : [ 2.78072e-13, 1 ]
+  Objective coefficient range : [ 1.55921e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.10586e-08, 1 ]
+Objective value for Line heur k = 39: 19941266.677477878
+51
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=39
+50
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 9588 Constrs, 5760 Vars, 2417331 NZs
+  Matrix coefficient range    : [ 2.78227e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.89344e-08, 1 ]
+Objective value for Line heur k = 40: 20159457.249285553
+50
+Actual reward of current solution: 53445362.72907059
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 9588 Constrs, 5760 Vars, 2431562 NZs
+  Matrix coefficient range    : [ 2.78227e-13, 1 ]
+  Objective coefficient range : [ 1.55921e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.74235e-09, 1 ]
+Objective value for Line heur k = 40: 19764059.60285657
+50
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=40
+49
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 9423 Constrs, 5670 Vars, 2339176 NZs
+  Matrix coefficient range    : [ 2.78708e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 7.94224e-09, 1 ]
+Objective value for Line heur k = 41: 19970582.317535233
+49
+Actual reward of current solution: 53445362.72907059
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 9423 Constrs, 5670 Vars, 2353407 NZs
+  Matrix coefficient range    : [ 2.78708e-13, 1 ]
+  Objective coefficient range : [ 1.55921e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 8.58644e-09, 1 ]
+Objective value for Line heur k = 41: 19583384.913403586
+49
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=41
+48
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 9258 Constrs, 5580 Vars, 2262348 NZs
+  Matrix coefficient range    : [ 2.80965e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 4.01118e-09, 0.335837 ]
+Objective value for Line heur k = 42: 19777841.05455723
+48
+Actual reward of current solution: 53445362.72907059
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 9258 Constrs, 5580 Vars, 2276579 NZs
+  Matrix coefficient range    : [ 2.8107e-13, 1 ]
+  Objective coefficient range : [ 1.55921e-20, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.6125e-08, 0.339496 ]
+Objective value for Line heur k = 42: 19398025.6396252
+48
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=42
+47
+Total Reward at the start of the inner iterations: 53506770.852941036
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 9147 Constrs, 5490 Vars, 2185637 NZs
+  Matrix coefficient range    : [ 2.84255e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 7.04067e-09, 1 ]
+Objective value for Line heur k = 43: 19566114.805191454
+47
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 9147 Constrs, 5490 Vars, 2170958 NZs
+  Matrix coefficient range    : [ 2.84255e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 7.04067e-09, 1 ]
+Objective value for Line heur k = 43: 19540012.534740616
+47
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=43
+46
+Total Reward at the start of the inner iterations: 53510102.604886584
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 8982 Constrs, 5400 Vars, 2095485 NZs
+  Matrix coefficient range    : [ 2.88176e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.09509e-08, 1 ]
+Objective value for Line heur k = 44: 19339939.649321426
+46
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 8982 Constrs, 5400 Vars, 2110164 NZs
+  Matrix coefficient range    : [ 2.88176e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.09509e-08, 1 ]
+Objective value for Line heur k = 44: 19366599.688948642
+46
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=44
+45
+Total Reward at the start of the inner iterations: 53510102.604886584
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 8817 Constrs, 5310 Vars, 2021304 NZs
+  Matrix coefficient range    : [ 2.92507e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.51343e-08, 1 ]
+Objective value for Line heur k = 45: 19136621.94023849
+45
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 8817 Constrs, 5310 Vars, 2035983 NZs
+  Matrix coefficient range    : [ 2.92507e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.51343e-08, 1 ]
+Objective value for Line heur k = 45: 19163837.097135905
+45
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=45
+44
+Total Reward at the start of the inner iterations: 53510102.604886584
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 8652 Constrs, 5220 Vars, 1948415 NZs
+  Matrix coefficient range    : [ 2.97124e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.93157e-08, 1 ]
+Objective value for Line heur k = 46: 18930394.239032973
+44
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 8652 Constrs, 5220 Vars, 1963094 NZs
+  Matrix coefficient range    : [ 2.97124e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.93157e-08, 1 ]
+Objective value for Line heur k = 46: 18958163.16590197
+44
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=46
+43
+Total Reward at the start of the inner iterations: 53510102.604886584
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 8487 Constrs, 5130 Vars, 1876818 NZs
+  Matrix coefficient range    : [ 3.01957e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.33765e-08, 1 ]
+Objective value for Line heur k = 47: 18721388.604271565
+43
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 8487 Constrs, 5130 Vars, 1891497 NZs
+  Matrix coefficient range    : [ 3.01957e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.33765e-08, 1 ]
+Objective value for Line heur k = 47: 18749710.52315777
+43
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=47
+42
+Total Reward at the start of the inner iterations: 53510102.604886584
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 8322 Constrs, 5040 Vars, 1806513 NZs
+  Matrix coefficient range    : [ 3.06966e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.72709e-08, 1 ]
+Objective value for Line heur k = 48: 18509641.55204034
+42
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 8322 Constrs, 5040 Vars, 1821192 NZs
+  Matrix coefficient range    : [ 3.06966e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.72709e-08, 1 ]
+Objective value for Line heur k = 48: 18538515.810612954
+42
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=48
+41
+Total Reward at the start of the inner iterations: 53510102.604886584
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 8157 Constrs, 4950 Vars, 1737500 NZs
+  Matrix coefficient range    : [ 3.12129e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.3333e-08, 1 ]
+Objective value for Line heur k = 49: 18295144.11045257
+41
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 8157 Constrs, 4950 Vars, 1752179 NZs
+  Matrix coefficient range    : [ 3.12129e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 3.31445e-08, 1 ]
+Objective value for Line heur k = 49: 18324569.75681554
+41
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=49
+40
+Total Reward at the start of the inner iterations: 53510102.604886584
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 7992 Constrs, 4860 Vars, 1669779 NZs
+  Matrix coefficient range    : [ 3.17434e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.69927e-08, 1 ]
+Objective value for Line heur k = 50: 18077865.001691535
+40
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 7992 Constrs, 4860 Vars, 1684458 NZs
+  Matrix coefficient range    : [ 3.17434e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.2454e-08, 1 ]
+Objective value for Line heur k = 50: 18107840.10084526
+40
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=50
+39
+Total Reward at the start of the inner iterations: 53510102.604886584
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 7827 Constrs, 4770 Vars, 1603350 NZs
+  Matrix coefficient range    : [ 3.22874e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 3.52785e-08, 1 ]
+Objective value for Line heur k = 51: 17857760.99745806
+39
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 7827 Constrs, 4770 Vars, 1618029 NZs
+  Matrix coefficient range    : [ 3.22874e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.01755e-08, 1 ]
+Objective value for Line heur k = 51: 17888281.23864465
+39
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=51
+38
+Total Reward at the start of the inner iterations: 53510102.604886584
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 7662 Constrs, 4680 Vars, 1538213 NZs
+  Matrix coefficient range    : [ 3.28448e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 3.84584e-08, 1 ]
+Objective value for Line heur k = 52: 17634780.744515855
+38
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 7662 Constrs, 4680 Vars, 1552892 NZs
+  Matrix coefficient range    : [ 3.28448e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.63928e-09, 1 ]
+Objective value for Line heur k = 52: 17665836.436703775
+38
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=52
+37
+Total Reward at the start of the inner iterations: 53510102.604886584
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 7497 Constrs, 4590 Vars, 1474368 NZs
+  Matrix coefficient range    : [ 3.34155e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 4.22882e-08, 1 ]
+Objective value for Line heur k = 53: 17408864.434981417
+37
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 7497 Constrs, 4590 Vars, 1489047 NZs
+  Matrix coefficient range    : [ 3.34155e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.3087e-08, 1 ]
+Objective value for Line heur k = 53: 17440433.982585568
+37
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=53
+36
+Total Reward at the start of the inner iterations: 53510102.604886584
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 7332 Constrs, 4500 Vars, 1411815 NZs
+  Matrix coefficient range    : [ 3.39993e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 4.67679e-08, 1 ]
+Objective value for Line heur k = 54: 17179939.239080805
+36
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 7332 Constrs, 4500 Vars, 1426494 NZs
+  Matrix coefficient range    : [ 3.39993e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.43363e-08, 1 ]
+Objective value for Line heur k = 54: 17211975.025300544
+36
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=54
+35
+Total Reward at the start of the inner iterations: 53510102.604886584
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 7167 Constrs, 4410 Vars, 1350554 NZs
+  Matrix coefficient range    : [ 3.45966e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 5.18686e-08, 1 ]
+Objective value for Line heur k = 55: 16947907.961273357
+35
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 7167 Constrs, 4410 Vars, 1365233 NZs
+  Matrix coefficient range    : [ 3.45966e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 3.56625e-08, 1 ]
+Objective value for Line heur k = 55: 16980305.943797685
+35
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=55
+34
+Total Reward at the start of the inner iterations: 53510102.604886584
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 7002 Constrs, 4320 Vars, 1290639 NZs
+  Matrix coefficient range    : [ 3.51645e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 5.7651e-08, 0.319409 ]
+Objective value for Line heur k = 56: 16712624.479954343
+34
+Actual reward of current solution: 53506770.852941036
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 7002 Constrs, 4320 Vars, 1305318 NZs
+  Matrix coefficient range    : [ 3.52634e-13, 1 ]
+  Objective coefficient range : [ 4.16794e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 4.75788e-08, 0.318765 ]
+Objective value for Line heur k = 56: 16745158.962448983
+34
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=56
+33
+Total Reward at the start of the inner iterations: 53510102.604886584
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 6891 Constrs, 4230 Vars, 1232024 NZs
+  Matrix coefficient range    : [ 3.57238e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.20253e-08, 1 ]
+Objective value for Line heur k = 57: 16449661.709627137
+33
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 6891 Constrs, 4230 Vars, 1224793 NZs
+  Matrix coefficient range    : [ 3.57238e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.20253e-08, 1 ]
+Objective value for Line heur k = 57: 16524077.261001773
+33
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=57
+32
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 6726 Constrs, 4140 Vars, 1167416 NZs
+  Matrix coefficient range    : [ 3.62884e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.65325e-08, 1 ]
+Objective value for Line heur k = 58: 16281132.377456676
+32
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 6726 Constrs, 4140 Vars, 1174647 NZs
+  Matrix coefficient range    : [ 3.62884e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.65325e-08, 1 ]
+Objective value for Line heur k = 58: 16209251.248986635
+32
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=58
+31
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 6561 Constrs, 4050 Vars, 1111331 NZs
+  Matrix coefficient range    : [ 3.68669e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 7.08945e-08, 1 ]
+Objective value for Line heur k = 59: 16034873.990617763
+31
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 6561 Constrs, 4050 Vars, 1118562 NZs
+  Matrix coefficient range    : [ 3.68669e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 7.08945e-08, 1 ]
+Objective value for Line heur k = 59: 15965525.681485433
+31
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=59
+30
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 6396 Constrs, 3960 Vars, 1056538 NZs
+  Matrix coefficient range    : [ 3.74646e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 7.50069e-08, 1 ]
+Objective value for Line heur k = 60: 15785311.590842787
+30
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 6396 Constrs, 3960 Vars, 1063769 NZs
+  Matrix coefficient range    : [ 3.74646e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 7.50069e-08, 1 ]
+Objective value for Line heur k = 60: 15718495.442310471
+30
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=60
+29
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 6231 Constrs, 3870 Vars, 1003037 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 7.88473e-08, 1 ]
+Objective value for Line heur k = 61: 15532415.857458897
+29
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 6231 Constrs, 3870 Vars, 1010268 NZs
+  Matrix coefficient range    : [ 3.80845e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 7.88473e-08, 1 ]
+Objective value for Line heur k = 61: 15468131.523506805
+29
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=61
+28
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 6066 Constrs, 3780 Vars, 950828 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 8.24293e-08, 1 ]
+Objective value for Line heur k = 62: 15276138.276359767
+28
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 6066 Constrs, 3780 Vars, 958059 NZs
+  Matrix coefficient range    : [ 3.85915e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 8.24293e-08, 1 ]
+Objective value for Line heur k = 62: 15214385.293847438
+28
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=62
+27
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 5901 Constrs, 3690 Vars, 899911 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.00321e-07, 1 ]
+Objective value for Line heur k = 63: 15016418.431338869
+27
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 5901 Constrs, 3690 Vars, 907142 NZs
+  Matrix coefficient range    : [ 3.85915e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.01527e-07, 1 ]
+Objective value for Line heur k = 63: 14957195.731766429
+27
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=63
+26
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 5736 Constrs, 3600 Vars, 850286 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.21892e-07, 1 ]
+Objective value for Line heur k = 64: 14753183.926773198
+26
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 5736 Constrs, 3600 Vars, 857517 NZs
+  Matrix coefficient range    : [ 3.85915e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.24626e-07, 1 ]
+Objective value for Line heur k = 64: 14696488.996176686
+26
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=64
+25
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 5571 Constrs, 3510 Vars, 801953 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.0106e-07, 1 ]
+Objective value for Line heur k = 65: 14486343.191683546
+25
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 5571 Constrs, 3510 Vars, 809184 NZs
+  Matrix coefficient range    : [ 3.85915e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 9.80822e-08, 1 ]
+Objective value for Line heur k = 65: 14432170.376790147
+25
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=65
+24
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 5406 Constrs, 3420 Vars, 754912 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 3.67829e-08, 1 ]
+Objective value for Line heur k = 66: 14215766.99483129
+24
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 5406 Constrs, 3420 Vars, 762143 NZs
+  Matrix coefficient range    : [ 3.85915e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 4.17694e-08, 1 ]
+Objective value for Line heur k = 66: 14164103.945725724
+24
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=66
+23
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 5241 Constrs, 3330 Vars, 709163 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.66655e-07, 1 ]
+Objective value for Line heur k = 67: 13941247.666581668
+23
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 5241 Constrs, 3330 Vars, 716394 NZs
+  Matrix coefficient range    : [ 3.85915e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.68652e-07, 1 ]
+Objective value for Line heur k = 67: 13892067.796406016
+23
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=67
+22
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 5076 Constrs, 3240 Vars, 664706 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.52588e-07, 1 ]
+Objective value for Line heur k = 68: 13662411.667431805
+22
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 5076 Constrs, 3240 Vars, 671937 NZs
+  Matrix coefficient range    : [ 3.85915e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.45949e-07, 1 ]
+Objective value for Line heur k = 68: 13615658.137038473
+22
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=68
+21
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 4911 Constrs, 3150 Vars, 621541 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.24449e-07, 1 ]
+Objective value for Line heur k = 69: 13378533.286602478
+21
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 4911 Constrs, 3150 Vars, 628772 NZs
+  Matrix coefficient range    : [ 3.85915e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.15702e-07, 1 ]
+Objective value for Line heur k = 69: 13334084.973211668
+21
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=69
+20
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 4746 Constrs, 3060 Vars, 579722 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 8.4405e-08, 0.302323 ]
+Objective value for Line heur k = 70: 13088138.286565285
+20
+Actual reward of current solution: 53510102.604886584
+Minimum Difference with past solutions:0.05.
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 4746 Constrs, 3060 Vars, 586953 NZs
+  Matrix coefficient range    : [ 3.85915e-13, 1 ]
+  Objective coefficient range : [ 2.51921e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 7.27493e-08, 0.302699 ]
+Objective value for Line heur k = 70: 13045737.462676557
+20
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=70
+19
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 4635 Constrs, 2970 Vars, 537939 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 8.26651e-08, 1 ]
+Objective value for Line heur k = 71: 12793665.886776142
+19
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=71
+18
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 4470 Constrs, 2880 Vars, 497432 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 9.4731e-08, 1 ]
+Objective value for Line heur k = 72: 12495621.414875228
+18
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=72
+17
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 4305 Constrs, 2790 Vars, 458255 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 9.32048e-08, 1 ]
+Objective value for Line heur k = 73: 12191821.378118303
+17
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=73
+16
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 4140 Constrs, 2700 Vars, 420408 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 9.12327e-08, 1 ]
+Objective value for Line heur k = 74: 11882912.842578549
+16
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=74
+15
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 3975 Constrs, 2610 Vars, 383891 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 8.97477e-08, 1 ]
+Objective value for Line heur k = 75: 11569071.79676187
+15
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=75
+14
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 3810 Constrs, 2520 Vars, 348704 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 8.9087e-08, 1 ]
+Objective value for Line heur k = 76: 11250275.76905173
+14
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=76
+13
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 3645 Constrs, 2430 Vars, 314847 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 8.93288e-08, 1 ]
+Objective value for Line heur k = 77: 10926418.11003575
+13
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=77
+12
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 3480 Constrs, 2340 Vars, 282320 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 8.21564e-08, 1 ]
+Objective value for Line heur k = 78: 10597355.5588598
+12
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=78
+11
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 3315 Constrs, 2250 Vars, 251123 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.0686e-08, 1 ]
+Objective value for Line heur k = 79: 10262927.31949514
+11
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=79
+10
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 3150 Constrs, 2160 Vars, 221256 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.43797e-08, 1 ]
+Objective value for Line heur k = 80: 9922960.824270483
+10
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=80
+9
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 2985 Constrs, 2070 Vars, 192719 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.61192e-08, 1 ]
+Objective value for Line heur k = 81: 9577268.51747622
+9
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=81
+8
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 2820 Constrs, 1980 Vars, 165512 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.35576e-08, 1 ]
+Objective value for Line heur k = 82: 9225632.818406941
+8
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=82
+7
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 2655 Constrs, 1890 Vars, 139635 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.40266e-08, 1 ]
+Objective value for Line heur k = 83: 8867767.389150811
+7
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=83
+6
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 2490 Constrs, 1800 Vars, 115142 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.64327e-08, 0.288463 ]
+Objective value for Line heur k = 84: 8503225.188938972
+6
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=84
+5
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 2379 Constrs, 1710 Vars, 91605 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.11872e-08, 1 ]
+Objective value for Line heur k = 85: 8130750.612050621
+5
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=85
+4
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 2214 Constrs, 1620 Vars, 69363 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.22693e-07, 1 ]
+Objective value for Line heur k = 86: 7751110.944223495
+4
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=86
+3
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 2049 Constrs, 1530 Vars, 48470 NZs
+  Matrix coefficient range    : [ 3.77586e-13, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 2.37076e-07, 1 ]
+Objective value for Line heur k = 87: 7364805.677172263
+3
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=87
+2
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 1884 Constrs, 1440 Vars, 28926 NZs
+  Matrix coefficient range    : [ 6.17176e-12, 1 ]
+  Objective coefficient range : [ 1.63261e-21, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 3.58951e-07, 1 ]
+Objective value for Line heur k = 88: 6972403.792367396
+2
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=88
+1
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 1719 Constrs, 1350 Vars, 15687 NZs
+  Matrix coefficient range    : [ 8.9855e-12, 1 ]
+  Objective coefficient range : [ 0.00122554, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 4.98801e-07, 1 ]
+Objective value for Line heur k = 89: 6575153.624154935
+1
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=89
+0
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 1554 Constrs, 1260 Vars, 5166 NZs
+  Matrix coefficient range    : [ 2.81263e-10, 1 ]
+  Objective coefficient range : [ 0.00122554, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.81258e-07, 0.284339 ]
+Objective value for Line heur k = 90: 6176096.644435883
+0
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=90
+0
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 1443 Constrs, 1170 Vars, 4563 NZs
+  Matrix coefficient range    : [ 3.94573e-10, 1 ]
+  Objective coefficient range : [ 0.00156624, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.81258e-07, 0.284339 ]
+Objective value for Line heur k = 91: 5734941.383523908
+0
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=91
+0
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 1332 Constrs, 1080 Vars, 3996 NZs
+  Matrix coefficient range    : [ 5.07883e-10, 1 ]
+  Objective coefficient range : [ 0.00156624, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.81258e-07, 0.284339 ]
+Objective value for Line heur k = 92: 5293787.195669001
+0
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=92
+0
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 1221 Constrs, 990 Vars, 3465 NZs
+  Matrix coefficient range    : [ 6.21193e-10, 1 ]
+  Objective coefficient range : [ 0.00156624, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.81258e-07, 0.284339 ]
+Objective value for Line heur k = 93: 4852634.138662649
+0
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=93
+0
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 1110 Constrs, 900 Vars, 2970 NZs
+  Matrix coefficient range    : [ 7.34503e-10, 1 ]
+  Objective coefficient range : [ 0.00156624, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.81258e-07, 0.284339 ]
+Objective value for Line heur k = 94: 4411482.174334531
+0
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=94
+0
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 999 Constrs, 810 Vars, 2511 NZs
+  Matrix coefficient range    : [ 8.47813e-10, 1 ]
+  Objective coefficient range : [ 0.00156624, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.81258e-07, 0.284339 ]
+Objective value for Line heur k = 95: 3970331.212921455
+0
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=95
+0
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 888 Constrs, 720 Vars, 2088 NZs
+  Matrix coefficient range    : [ 9.61123e-10, 1 ]
+  Objective coefficient range : [ 0.00156624, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.81258e-07, 0.284339 ]
+Objective value for Line heur k = 96: 3529181.1412494257
+0
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=96
+0
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 777 Constrs, 630 Vars, 1701 NZs
+  Matrix coefficient range    : [ 1.07443e-09, 1 ]
+  Objective coefficient range : [ 0.00437483, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.81258e-07, 0.284339 ]
+Objective value for Line heur k = 97: 3088031.840049269
+0
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=97
+0
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 666 Constrs, 540 Vars, 1350 NZs
+  Matrix coefficient range    : [ 1.18774e-09, 1 ]
+  Objective coefficient range : [ 0.00437483, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.81258e-07, 0.284339 ]
+Objective value for Line heur k = 98: 2646883.1940775695
+0
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=98
+0
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 555 Constrs, 450 Vars, 1035 NZs
+  Matrix coefficient range    : [ 1.30105e-09, 1 ]
+  Objective coefficient range : [ 0.00437483, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.81258e-07, 0.284339 ]
+Objective value for Line heur k = 99: 2205735.0975581314
+0
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=99
+0
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 444 Constrs, 360 Vars, 756 NZs
+  Matrix coefficient range    : [ 1.41436e-09, 1 ]
+  Objective coefficient range : [ 0.00437483, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.81258e-07, 0.284339 ]
+Objective value for Line heur k = 100: 1764587.4566510876
+0
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=100
+0
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 333 Constrs, 270 Vars, 513 NZs
+  Matrix coefficient range    : [ 1.52767e-09, 1 ]
+  Objective coefficient range : [ 0.00437483, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.81258e-07, 0.284339 ]
+Objective value for Line heur k = 101: 1323440.19009573
+0
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=101
+0
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 222 Constrs, 180 Vars, 306 NZs
+  Matrix coefficient range    : [ 1.64098e-09, 1 ]
+  Objective coefficient range : [ 0.00437483, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.81258e-07, 0.284339 ]
+Objective value for Line heur k = 102: 882293.2287859293
+0
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=102
+0
+Total Reward at the start of the inner iterations: 53526104.76691971
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 111 Constrs, 90 Vars, 135 NZs
+  Matrix coefficient range    : [ 1, 1 ]
+  Objective coefficient range : [ 3772.05, 1.58488e+08 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 6.81258e-07, 0.284339 ]
+Objective value for Line heur k = 103: 441146.5147716423
+0
+Actual reward of current solution: 53526104.76691971
+Minimum Difference with past solutions:0.0.
+New solution equals old solution at k=103
+Total running time for 90 days is 2334.943429708481
+Economic Value: 57164379.01450913
+Deaths 0.023648667975468166
+Total Reward 53526104.76691971
