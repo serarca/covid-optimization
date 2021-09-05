@@ -85,6 +85,8 @@ while True:
 
     # break
 
+    number_of_CF_processes = sum([1  for l in all_running_processes.split() if 'R' in l])
+
     number_of_running_processes = sum([1  for l in all_running_processes.split() if 'R' in l])
 
 
