@@ -85,14 +85,16 @@ while True:
 
     # break
 
-    number_of_CF_processes = sum([1  for l in all_running_processes.split() if 'R' in l])
+    number_of_PD_processes = sum([1  for l in all_running_processes.split() if 'PD' in l])
+
+    number_of_CF_processes = sum([1  for l in all_running_processes.split() if 'CF' in l])
 
     number_of_running_processes = sum([1  for l in all_running_processes.split() if 'R' in l])
 
 
     print(f"number of processes = {number_of_running_processes}")
 
-    if number_of_running_processes < 2:
+    if number_of_PD_processes == 0 and number_of_CF_processes == 0 and number_of_running_processes < 100:
         number_of_parallel_jobs = 500
 
         print("in inner if")
