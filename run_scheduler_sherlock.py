@@ -30,7 +30,7 @@ def calculate_missing_jobs(foldername):
         if n != "check_errors.py" and n != "delete_errors.py" and n!= "check_infeasible.py" and n!= "check_runs.py":
             a = n.split("-")
             if len(a)<2:
-                print(a)
+                # print(a)
             print(a[2][:-4])
             run_number = a[2][:-4]
             
@@ -40,6 +40,9 @@ def calculate_missing_jobs(foldername):
             #         error_runs.append(int(run_number))
 
     all_runs = set(range(19500))
+
+    if sorted(list(all_runs.difference(set(runs)))):
+        sys.exit("All jobs have been runned!!")
 
     print(len(sorted(list(all_runs.difference(set(runs))))))
     return sorted(list(all_runs.difference(set(runs))))
