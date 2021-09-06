@@ -52,7 +52,7 @@ def main():
     # [0, 30000, 60000, 120000]
     icu_values = [2900]
     # [2000, 2300, 2600, 2900, 3200]
-    random_instances=range(500)
+    random_instances=range(1000, 1500)
     # range(0,20)
 
     # eta_inteval_lb = 0
