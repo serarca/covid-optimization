@@ -211,7 +211,7 @@ def run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, 
     dynModel = run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, random_instance, targetActivities, targetGroups, targetTests)
 
     result = {
-            "lockdown_heuristic":f"linearization_heuristic_optBouncing={optimize_bouncing}_initial_uhat={initial_uhat}_multiple_init_cond",
+            "lockdown_heuristic":f"linearization_heuristic_optBouncing={optimize_bouncing}_initial_uhat={initial_uhat}_multiple_init_cond-HighBeta",
             "groups":groups,
             "experiment_params":{
                 "delta_schooling":delta,
