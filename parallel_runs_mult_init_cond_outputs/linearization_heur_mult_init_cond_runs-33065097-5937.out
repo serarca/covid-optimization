@@ -1,0 +1,52 @@
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'icus': [2900], 'eta': [0.1], 'tests': [[0, 0]], 'xi': [29908020.12], 'testing': ['homogeneous']}}
+Traceback (most recent call last):
+  File "time_gradient_benchmarks.py", line 373, in <module>
+    result_gradient = gradient_descent(experiment_params, 14, plot=True)
+  File "time_gradient_benchmarks.py", line 331, in gradient_descent
+    dynModel.take_time_step(m_tests, a_tests, alpha[t])
+  File "/home/groups/daniancu/covid-optimization/covid-optimization/group.py", line 166, in take_time_step
+    self.groups[n].take_time_step(m_tests[n], a_tests[n], self.beds, self.icus, False, False)
+  File "/home/groups/daniancu/covid-optimization/covid-optimization/group.py", line 598, in take_time_step
+    self.update_S(m_tests, a_tests)
+  File "/home/groups/daniancu/covid-optimization/covid-optimization/group.py", line 667, in update_S
+    assert self.S[-1] >= 0, (f"Number of S is negative for t={self.parent.t+1}: {self.S[-1]} \n Total contacts: {self.total_contacts}")
+AssertionError: Number of S is negative for t=1: -2.0525883519454913e-07 
+ Total contacts: [-3.1007200195831183e-35]
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'icus': [2900], 'eta': [0.1], 'tests': [[0, 0]], 'xi': [29908020.12], 'testing': ['homogeneous']}}
+Traceback (most recent call last):
+  File "dynamic_gradient_benchmarks.py", line 423, in <module>
+    result_gradient = gradient_descent(experiment_params, 14, plot=True)
+  File "dynamic_gradient_benchmarks.py", line 258, in gradient_descent
+    with open("results/"+constant_gradients_filename+".yaml") as file:
+FileNotFoundError: [Errno 2] No such file or directory: 'results/time_gradient/xi-29908020_icus-2900_testing-homogeneous_natests-0_nmtests-0_T-90_startday-0_groups-all_dschool-0.500000_eta-0.100000_freq-90-14_randomInstance-1437.yaml'
+[20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360, 370, 380, 390, 400, 410, 420, 430, 440, 450, 460, 470, 480, 490, 500, 510, 520, 530, 540, 550, 560, 570, 580, 590, 600, 610, 620, 630, 640, 650, 660, 670, 680, 690, 700, 710, 720, 730, 740, 750, 760, 770, 780, 790, 800, 810, 820, 830, 840, 850, 860, 870, 880, 890, 900, 910, 920, 930, 940, 950, 960, 970, 980, 990]
+19500
+(0.5, 299080201.2, 0.29, 0.0, (7, 14), 'fitted-scaled', 'econ-scaled', 'oct21-scaled', 0.1, 0.05, 2, 'dynamic_gradient', 1437)
+The value of T is: 104
+Missing starting point -- Running the initial heuristic.
+/home/groups/daniancu/covid-optimization/covid-optimization
+Traceback (most recent call last):
+  File "/home/groups/daniancu/covid-optimization/covid-optimization/heuristics/linearization.py", line 1416, in run_heuristic_linearization
+    with open("benchmarks/results/%s/%s"%(h,n)) as file:
+FileNotFoundError: [Errno 2] No such file or directory: 'benchmarks/results/dynamic_gradient/xi-29908020_icus-2900_testing-homogeneous_natests-0_nmtests-0_T-90_startday-0_groups-all_dschool-0.500000_eta-0.100000_freq-90-14_randomInstance-1437.yaml'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "run_linearization_heuristic_multiple_init_cond.py", line 436, in <module>
+    main()
+  File "run_linearization_heuristic_multiple_init_cond.py", line 172, in main
+    run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling, random_instance, targetActivities, targetGroups, targetTests)
+  File "run_linearization_heuristic_multiple_init_cond.py", line 211, in run_lin_heur_and_save_yaml
+    dynModel = run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, random_instance, targetActivities, targetGroups, targetTests)
+  File "run_linearization_heuristic_multiple_init_cond.py", line 329, in run_linearization_heuristic
+    linearization.run_heuristic_linearization(dynModel, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, targetActivities, targetGroups, targetTests, deltaFairnessOne, deltaFair, optimizeLockdowns, averageLockConst, pLock, optimizeOnlyDeaths, random_instance)
+  File "/home/groups/daniancu/covid-optimization/covid-optimization/heuristics/linearization.py", line 1451, in run_heuristic_linearization
+    with open("benchmarks/results/%s/%s"%(h,n)) as file:
+FileNotFoundError: [Errno 2] No such file or directory: 'benchmarks/results/dynamic_gradient/xi-29908020_icus-2900_testing-homogeneous_natests-0_nmtests-0_T-90_startday-0_groups-all_dschool-0.500000_eta-0.100000_freq-90-14_randomInstance-1437.yaml'
+srun: error: sh02-01n20: task 0: Exited with exit code 1
+srun: launch/slurm: _step_signal: Terminating StepId=33065650.0
