@@ -1,0 +1,31 @@
+[20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360, 370, 380, 390, 400, 410, 420, 430, 440, 450, 460, 470, 480, 490, 500, 510, 520, 530, 540, 550, 560, 570, 580, 590, 600, 610, 620, 630, 640, 650, 660, 670, 680, 690, 700, 710, 720, 730, 740, 750, 760, 770, 780, 790, 800, 810, 820, 830, 840, 850, 860, 870, 880, 890, 900, 910, 920, 930, 940, 950, 960, 970, 980, 990]
+19500
+(5, 5579854.5, 0.29, 0.0, (7, 14), 'fitted-scaled', 'econ-scaled', 'oct21-scaled', 0.1, 0.05, 2, 'dynamic_gradient', 1035)
+The value of T is: 104
+90
+Total Reward at the start of the inner iterations: 90335750.02536191
+Using license file /share/software/user/restricted/gurobi/9.0.3_py36/licenses/gurobi.lic
+Set parameter TokenServer to value license4.stanford.edu
+Gurobi status: 3
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 16026 Constrs, 9360 Vars, 6900077 NZs
+  Matrix coefficient range    : [ 1.00006e-13, 1 ]
+  Objective coefficient range : [ 8.61308e-21, 1.08083e+07 ]
+  Variable bound range        : [ 0.05, 1 ]
+  RHS coefficient range       : [ 1.52396e-10, 0.290146 ]
+ERROR. Problem infeasible at time k=0. Halting...
+Traceback (most recent call last):
+  File "run_linearization_heuristic_multiple_init_cond.py", line 436, in <module>
+    main()
+  File "run_linearization_heuristic_multiple_init_cond.py", line 172, in main
+    run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling, random_instance, targetActivities, targetGroups, targetTests)
+  File "run_linearization_heuristic_multiple_init_cond.py", line 211, in run_lin_heur_and_save_yaml
+    dynModel = run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, random_instance, targetActivities, targetGroups, targetTests)
+  File "run_linearization_heuristic_multiple_init_cond.py", line 329, in run_linearization_heuristic
+    linearization.run_heuristic_linearization(dynModel, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, targetActivities, targetGroups, targetTests, deltaFairnessOne, deltaFair, optimizeLockdowns, averageLockConst, pLock, optimizeOnlyDeaths, random_instance)
+  File "/home/groups/daniancu/covid-optimization/covid-optimization/heuristics/linearization.py", line 1932, in run_heuristic_linearization
+    assert(False)
+AssertionError
+srun: error: sh02-08n53: task 0: Exited with exit code 1
+srun: launch/slurm: _step_signal: Terminating StepId=33472616.0
