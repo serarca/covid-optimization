@@ -27,115 +27,253 @@ from scipy.optimize import Bounds,minimize,LinearConstraint
 from os import listdir
 from os.path import isfile, join
 
+def append_instances_to_csv(csv_file, instances_folder):
 
-# Global variables
-simulation_params = {
+
+	# Global variables
+	simulation_params = {
 	'dt':1.0,
 	'days': 90.0,
 	'region': "fitted",
 	'heuristic': 'benchmark',
 	'mixing_method': {'name': 'multi'}
-}
-simulation_params['time_periods'] = int(math.ceil(simulation_params["days"]/simulation_params["dt"]))
+	}
 
-if groups == "all":
-	age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29', 'age_group_30_39', 'age_group_40_49',
-	'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
+	simulation_params['time_periods'] = int(math.ceil(simulation_params["days"]/simulation_params["dt"]))
 
-	# Read group parameters
-	with open("../parameters/fitted.yaml") as file:
-	    universe_params = yaml.load(file, Loader=yaml.FullLoader)
+	init_param = ["multiplier_beta", "multiplier_p_icu", "multiplier_p_d","multiplier_lambda_h", "multiplier_lambda_icu", "alpha_other","l_school_march", "l_school_may", "l_school_july", "l_school_september", "alpha_mixing", "econ_value", "l_work_april"]
 
-	# Read initialization
-	with open("../initialization/oct21.yaml") as file:
-		initialization = yaml.load(file, Loader=yaml.FullLoader)
-		start_day = 0
-
-	# Read econ parameters
-	with open("../parameters/econ.yaml") as file:
-		econ_params = yaml.load(file, Loader=yaml.FullLoader)
+	age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29', 'age_group_30_39', 'age_group_40_49', 'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
 
 
-cont = [ 'S', 'E', 'I', 'R', 'N', 'Ia', 'Ips', \
-       'Ims', 'Iss', 'Rq', 'H', 'ICU', 'D' ]
-activities = ['home','leisure','other','school','transport','work']
-rel_activities = ['leisure','other','school','transport','work']
+	cont = [ 'S', 'E', 'I', 'R', 'N', 'Ia', 'Ips', \
+		'Ims', 'Iss', 'Rq', 'H', 'ICU', 'D' ]
+	activities = ['home','leisure','other','school','transport','work']
+	rel_activities = ['leisure','other','school','transport','work']
 
+	# Define time variables
+	simulation_params['time_periods'] = int(math.ceil(simulation_params["days"]/simulation_params["dt"]))
 
-# age_groups = ['age_group_30_39']
+	# Read files
+	files = [f for f in listdir(instances_folder) if (isfile(join(instances_folder, f)) and f[0:2]=="xi")]
 
-# Define time variables
-simulation_params['time_periods'] = int(math.ceil(simulation_params["days"]/simulation_params["dt"]))
+	files_to_process = []
+	for i,f in enumerate(files):
+		
+		files_to_process.append(f)
 
-# Read files
-folder = "../benchmarks/results/linearization_heuristic_optBouncing=False_initial_uhat=dynamic_gradient/"
-files = [f for f in listdir(folder) if (isfile(join(folder, f)) and f[0:2]=="xi")]
-
-
-files_to_process = []
-for i,f in enumerate(files):
+	print(len(files_to_process))
 	
-	files_to_process.append(f)
+	max_number_files = 1
+
+	# Default parameter files (for dynamic-gradient)
+
+	group_params_file = "../parameters/fitted.yaml"
+	initialization_file = "../initialization/oct21.yaml"
+	econ_param_file = "../parameters/econ.yaml"
 
 
-print(len(files_to_process))
-features = []
-for i,f in enumerate(files_to_process):
-	print(i/len(files_to_process))
-	with open(folder+f) as file:
-		file_result = yaml.load(file, Loader=yaml.UnsafeLoader)
+	for i,f in enumerate(files_to_process):
 
-	experiment_params = file_result["experiment_params"]
-	mixing_method = universe_params["mixing"]
+		## If instance is multiple_init_cond change param folders
+		if "multiple_init_cond" in instances_folder:
+			randomInstance = f.split("-")[-1]
+			group_params_file = f"../parameters/multiple_initial_conditions/fitted_{randomInstance}"
+			initialization_file = f"../parameters/multiple_initial_conditions/oct21_{randomInstance}"
+			econ_param_file = f"../parameters/multiple_initial_conditions/econ_{randomInstance}"
 
-	dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method, start_day, experiment_params["eta"], extra_data = True)
 
-	for t in range(simulation_params['time_periods']):
-		state = dynModel.get_state(t)
-		result = dynModel.take_time_step(file_result['m_tests'][t], file_result['a_tests'][t], file_result['policy'][t])
+		## If instance is Robust
+		if "initParamVarying" in instances_folder:
+			randomInstance = f.split("-")[-1]
+			initParamVarying = instances_folder.split("=")[-1][:-1]
+			group_params_file = f"../parameters/simulations/fitted_{init_param.index(initParamVarying)}_{randomInstance}"
+			initialization_file = f"../parameters/simulations/oct21_{init_param.index(initParamVarying)}_{randomInstance}"
+			econ_param_file = f"../parameters/simulations/econ_{init_param.index(initParamVarying)}_{randomInstance}"
+		
+		
 
-		econ_gradients = dynModel.econ_gradients
 
-		# Extract the features
+
+		# Read group parameters
+		with open(group_params_file) as file:
+			universe_params = yaml.load(file, Loader=yaml.FullLoader)
+
+		# Read initialization
+		with open(initialization_file) as file:
+			initialization = yaml.load(file, Loader=yaml.FullLoader)
+			start_day = 0
+
+		# Read econ parameters
+		with open(econ_param_file) as file:
+			econ_params = yaml.load(file, Loader=yaml.FullLoader)
+
+		
+		features = {}
+
 		for act in rel_activities:
-			for ag in age_groups:
-				features.append({
-					"delta_schooling": experiment_params["delta_schooling"],
-					"eta":experiment_params["eta"],
-					"natests":experiment_params["n_a_tests"],
-					"nmtests":experiment_params["n_m_tests"],
-					"icus_available":experiment_params["icus"],
-					"act":act,
-					"ag":ag,
-					"lockdown":file_result['policy'][t][ag][act],
-					"econ_gradient":econ_gradients[act][ag]/state[ag]["N"],
-					"I_perc":np.sum([state[other_group]["I"] for other_group in age_groups])/np.sum([state[other_group]["N"]+state[other_group]["Rq"] for other_group in age_groups]),
-					"R_perc":np.sum([state[other_group]["R"] for other_group in age_groups])/np.sum([state[other_group]["N"]+state[other_group]["Rq"] for other_group in age_groups]),
-					"H_perc":np.sum([state[other_group]["H"] for other_group in age_groups])/np.sum([state[other_group]["N"]+state[other_group]["Rq"] for other_group in age_groups]),
-					"ICU_utilization":np.sum([state[other_group]["ICU"] for other_group in age_groups])/experiment_params["icus"],
-					"xi+cost_death":experiment_params["xi"]+econ_params["econ_cost_death"][ag],
-					"cost_death":econ_params["econ_cost_death"][ag],
-					"xi":experiment_params["xi"],
-					"contacts_received":np.sum([universe_params["seir-groups"][ag]["contacts_spc"][act][other_group] for other_group in age_groups]),
-					"contacts_received(deaths)":np.sum([universe_params["seir-groups"][ag]["contacts_spc"][act][other_group]*universe_params["seir-groups"][ag]['parameters']['lambda_H_D']*14.55 for other_group in age_groups]),
-					"infections_received":np.sum([universe_params["seir-groups"][ag]["contacts_spc"][act][other_group]*state[other_group]["I"]/(state[other_group]["Rq"]+state[other_group]["N"]) for other_group in age_groups]),
-					"deaths_received":np.sum([universe_params["seir-groups"][ag]["contacts_spc"][act][other_group]*state[other_group]["I"]/(state[other_group]["Rq"]+state[other_group]["N"])*universe_params["seir-groups"][ag]['parameters']['lambda_H_D']*14.55 for other_group in age_groups]),
-					"deaths_econ_received":np.sum([universe_params["seir-groups"][ag]["contacts_spc"][act][other_group]*state[other_group]["I"]/(state[other_group]["Rq"]+state[other_group]["N"])*universe_params["seir-groups"][ag]['parameters']['lambda_H_D']*14.55*(experiment_params["xi"]+econ_params["econ_cost_death"][ag]) for other_group in age_groups]),
-					"contacts_given":np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag] for other_group in age_groups]),
-					"contacts_given(deaths)":np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag]*universe_params["seir-groups"][other_group]['parameters']['lambda_H_D']*14.55 for other_group in age_groups]),
-					"infections_given":np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag]*state[ag]["I"]/(state[ag]["Rq"]+state[ag]["N"]) for other_group in age_groups]),
-					"deaths_given":np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag]*state[ag]["I"]/(state[ag]["Rq"]+state[ag]["N"])*universe_params["seir-groups"][other_group]['parameters']['lambda_H_D']*14.55 for other_group in age_groups]),
-					"deaths_econ_given":np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag]*state[ag]["I"]/(state[ag]["Rq"]+state[ag]["N"])*universe_params["seir-groups"][other_group]['parameters']['lambda_H_D']*14.55*(experiment_params["xi"]+econ_params["econ_cost_death"][other_group]) for other_group in age_groups]),
-					"death_prob":universe_params["seir-groups"][ag]['parameters']['lambda_H_D']*14.55,
-					"t":t,
-				})
+			features[act] = []
+
+		if i >= max_number_files:
+			break
+		
+		print(i/len(files_to_process))
+		with open(instances_folder+f) as file:
+			file_result = yaml.load(file, Loader=yaml.UnsafeLoader)
+
+		experiment_params = file_result["experiment_params"]
+		mixing_method = universe_params["mixing"]
+
+		dynModel = DynamicalModel(universe_params, econ_params, experiment_params, initialization, simulation_params['dt'], simulation_params['time_periods'], mixing_method, start_day, experiment_params["eta"], extra_data = True)
+
+		sevendays_newICU = []
+		sevendays_newInf = []
+		sevendays_newInf_old = []
 
 
-pd.DataFrame(features).to_csv("dataset.csv")
+		for t in range(simulation_params['time_periods']):
+			print(f"t is {t}")
+			
+			state = dynModel.get_state(t)
+			result = dynModel.take_time_step(file_result['m_tests'][t], file_result['a_tests'][t], file_result['policy'][t])
+
+			if (t==0):
+				initial_population = np.sum([state[ag]["N"] for ag in age_groups])
+				initial_population_old = np.sum([state[ag]["N"] for ag in ['age_group_60_69', 'age_group_70_79', 'age_group_80_plus']])
+
+
+			## Compute new infections 
+			# Find incidence rate over last 7 days in overall population
+			newInfections = np.sum([dynModel.groups[ag].parameters['sigma']*state[ag]["E"] for ag in age_groups])
+			sevendays_newInf.append(newInfections)
+			# Drop first entry if larger than 7
+			if len(sevendays_newInf)>7:
+				sevendays_newInf = sevendays_newInf[1:8]
+			incidence_rate = np.sum(sevendays_newInf)/initial_population
+			
+			# Find incidence rate over last 7 days in population aged 60+
+			newInfections_old = np.sum([dynModel.groups[ag].parameters['sigma']*state[ag]["E"] for ag in ['age_group_60_69', 'age_group_70_79', 'age_group_80_plus']])
+			sevendays_newInf_old.append(newInfections_old)
+			# Drop first entry if larger than 7
+			if len(sevendays_newInf_old)>7:
+				sevendays_newInf_old = sevendays_newInf_old[1:8]
+			incidence_rate_old = np.sum(sevendays_newInf_old)/initial_population_old
+			######
+			## Compute new ICU admissions
+			newICU = np.sum([dynModel.groups[ag].parameters['mu']*(dynModel.groups[ag].parameters['p_ICU']*state[ag]["I"] + ((dynModel.groups[ag].parameters['p_ICU'])/(dynModel.groups[ag].parameters['p_H']+dynModel.groups[ag].parameters['p_ICU']))*state[ag]["Iss"]) for ag in age_groups])
+			sevendays_newICU.append(newICU)
+			# Drop first entry if larger than 7
+			if len(sevendays_newICU)>7:
+				sevendays_newICU = sevendays_newICU[1:8]
+			sevendays_avg_newICU = np.sum(sevendays_newICU)/len(sevendays_newICU)
+
+			econ_gradients = dynModel.econ_gradients
+
+			# Extract the features
+			for act in rel_activities:
+				for ag in age_groups:
+					p_death = 1 / (universe_params["seir-groups"][ag]['parameters']['lambda_H_R'] / universe_params["seir-groups"][ag]['parameters']['lambda_H_D'] + 1)
+
+					
+					features[act].append({
+						"age_group":ag,
+						"activity":act,
+						"t":t,
+						"lockdown":file_result['policy'][t][ag][act],
+						"icu_capacity":experiment_params["icus"],
+						"theta_schooling": experiment_params["delta_schooling"],
+						"beta": universe_params["seir-groups"][ag]['parameters']['beta'][0],
+						"alpha_1_2": universe_params["mixing"]['param_alpha'],
+						"nu_other_act":experiment_params["eta"],
+						"nu_work":econ_params["employment_params"]['nu'],
+						"chi":experiment_params["xi"],
+						"vg_life":econ_params["econ_cost_death"][ag],
+						"xi+vg_life":experiment_params["xi"]+econ_params["econ_cost_death"][ag],
+						"p_H": universe_params["seir-groups"][ag]['parameters']['p_H'],
+						"p_ICU": universe_params["seir-groups"][ag]['parameters']['p_ICU'],
+						"p_ss": universe_params["seir-groups"][ag]['parameters']['p_ss'],
+						"p_D": p_death,
+						"econ_gradient_normalized":econ_gradients[act][ag]/state[ag]["N"],
+						"econ_gradient_not_normalized":econ_gradients[act][ag],
+						"I_perc":np.sum([state[other_group]["I"] for other_group in age_groups])/np.sum([state[other_group]["N"]+state[other_group]["Rq"] for other_group in age_groups]),
+						"R_perc":np.sum([state[other_group]["R"] for other_group in age_groups])/np.sum([state[other_group]["N"]+state[other_group]["Rq"] for other_group in age_groups]),
+						"H_perc":np.sum([state[other_group]["H"] for other_group in age_groups])/np.sum([state[other_group]["N"]+state[other_group]["Rq"] for other_group in age_groups]),
+						"ICU_utilization":np.sum([state[other_group]["ICU"] for other_group in age_groups])/experiment_params["icus"],
+						"contacts_received":np.sum([universe_params["seir-groups"][ag]["contacts_spc"][act][other_group] for other_group in age_groups]),
+						"contacts_received_into_deaths":np.sum([universe_params["seir-groups"][ag]["contacts_spc"][act][other_group]* p_death for other_group in age_groups]),
+						"infections_received":np.sum([universe_params["seir-groups"][ag]["contacts_spc"][act][other_group]*state[other_group]["I"]/(state[other_group]["Rq"]+state[other_group]["N"]) for other_group in age_groups]),
+						"deaths_received":np.sum([universe_params["seir-groups"][ag]["contacts_spc"][act][other_group]*state[other_group]["I"]/(state[other_group]["Rq"]+state[other_group]["N"])*p_death for other_group in age_groups]),
+						"deaths_received_econ":np.sum([universe_params["seir-groups"][ag]["contacts_spc"][act][other_group]*state[other_group]["I"]/(state[other_group]["Rq"]+state[other_group]["N"])*p_death*(experiment_params["xi"]+econ_params["econ_cost_death"][ag]) for other_group in age_groups]),
+						"contacts_given":np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag] for other_group in age_groups]),
+						"contacts_given_into_deaths":np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag] * p_death for other_group in age_groups]),
+						"infections_given":np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag]*state[ag]["I"]/(state[ag]["Rq"]+state[ag]["N"]) for other_group in age_groups]),
+						"deaths_given":np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag]*state[ag]["I"]/(state[ag]["Rq"]+state[ag]["N"]) * p_death for other_group in age_groups]),
+						"deaths_given_econ":np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag]*state[ag]["I"]/(state[ag]["Rq"]+state[ag]["N"]) * p_death *(experiment_params["xi"]+econ_params["econ_cost_death"][other_group]) for other_group in age_groups]),
+						"econ_contacts_ratio": econ_gradients[act][ag] / (state[ag]["N"] * np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag] for other_group in age_groups])),
+						"econ_contacts_death_cost_ratio":econ_gradients[act][ag] / (state[ag]["N"] * universe_params["seir-groups"][ag]['parameters']['beta'][0] * np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag] for other_group in age_groups]) * (experiment_params["xi"]+econ_params["econ_cost_death"][ag]) * universe_params["seir-groups"][ag]['parameters']['sigma'] *universe_params["seir-groups"][ag]['parameters']['mu']),
+						"ICU_new_daily_admissions": newICU,
+						"ICU_seven_day_avg_daily_admissions": sevendays_avg_newICU,
+						"Infections_new_rate_over_seven_days": incidence_rate,	
+						"Infections_new_rate_over_seven_days_elderly": incidence_rate_old,
+						"S": state[ag]["S"],
+						"E": state[ag]["E"],
+						"I": state[ag]["I"],
+						"Ia": state[ag]["Ia"],
+						"Ims": state[ag]["Ims"],
+						"Ips": state[ag]["Ips"],
+						"Iss": state[ag]["Iss"],
+						"ICU": state[ag]["ICU"],
+						"H": state[ag]["H"],
+						"R": state[ag]["R"], 
+						"Rq": state[ag]["Rq"],
+						"D": state[ag]["D"]
+					})
+					
+
+		for act in rel_activities:
+
+			if not os.path.exists(csv_file+f"_{act}.csv"):
+				useHeader = True
+			else:
+				useHeader = False
+			
+			print(f"act is: {act}")
+			print(f"features in act is: {features[act][0]}")
+
+			pd.DataFrame(features[act]).to_csv(csv_file+f"_{act}.csv", mode='a', header=useHeader, index=False)
 
 
 
+def main():
+	
+	csv_file = "dataset"
 
 
+	## Dynamic-Gradient-Instances
 
+	instances_folder = "../benchmarks/results/linearization_heuristic_optBouncing=False_initial_uhat=dynamic_gradient_multiple_init_cond-HighBeta/"
+
+	append_instances_to_csv(csv_file, instances_folder)
+
+	instances_folder = "../benchmarks/results/linearization_heuristic_optBouncing=False_initial_uhat=dynamic_gradient_multiple_init_cond/"
+
+	append_instances_to_csv(csv_file, instances_folder)
+
+	instances_folder = "../benchmarks/results/linearization_heuristic_optBouncing=False_initial_uhat=dynamic_gradient/"
+
+	append_instances_to_csv(csv_file, instances_folder)
+
+	init_param = ["multiplier_beta", "multiplier_p_icu", "multiplier_p_d","multiplier_lambda_h", "multiplier_lambda_icu", "alpha_other","l_school_march", "l_school_may", "l_school_july", "l_school_september", "alpha_mixing", "econ_value", "l_work_april"]
+
+	for init_param_varying in init_param:
+		instances_folder = f"../benchmarks/results/linearization_heuristic_optBouncing=False_initial_uhat=dynamic_gradient_initParamVarying={init_param_varying}/"
+
+		append_instances_to_csv(csv_file, instances_folder)
+
+
+	## 
+
+
+if __name__ == "__main__":
+    main()
 
