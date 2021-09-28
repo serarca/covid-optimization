@@ -242,6 +242,9 @@ def append_instances_to_csv(csv_file, instances_folder):
 
 			pd.DataFrame(features[act]).to_csv(csv_file+f"_{act}.csv", mode='a', header=useHeader, index=False)
 
+			with open("log.txt", 'w') as file:
+				file.write(f"Just ran file number {i} from folder {instances_folder}.")
+
 
 
 def main():
@@ -271,7 +274,7 @@ def main():
 		append_instances_to_csv(csv_file, instances_folder)
 
 
-	## 
+	
 
 
 if __name__ == "__main__":
