@@ -114,8 +114,8 @@ def append_instances_to_csv(csv_file, instances_folder):
 		for act in rel_activities:
 			features[act] = []
 
-		if i >= max_number_files:
-			break
+#		if i >= max_number_files:
+#			break
 		
 		print(i/len(files_to_process))
 		with open(instances_folder+f) as file:
