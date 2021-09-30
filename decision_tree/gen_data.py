@@ -114,8 +114,8 @@ def append_instances_to_csv(csv_file, instances_folder):
 		for act in rel_activities:
 			features[act] = []
 
-#		if i >= max_number_files:
-#			break
+		if i >= max_number_files:
+			break
 		
 		print(i/len(files_to_process))
 		with open(instances_folder+f) as file:
@@ -209,8 +209,8 @@ def append_instances_to_csv(csv_file, instances_folder):
 						"infections_given":np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag]*state[ag]["I"]/(state[ag]["Rq"]+state[ag]["N"]) for other_group in age_groups]),
 						"deaths_given":np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag]*state[ag]["I"]/(state[ag]["Rq"]+state[ag]["N"]) * p_death for other_group in age_groups]),
 						"deaths_given_econ":np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag]*state[ag]["I"]/(state[ag]["Rq"]+state[ag]["N"]) * p_death *(experiment_params["xi"]+econ_params["econ_cost_death"][other_group]) for other_group in age_groups]),
-						"econ_contacts_ratio": dynModel.econ_gradients[act][ag] / (np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag] for other_group in age_groups])),
-						"econ_contacts_death_cost_ratio":dynModel.econ_gradients[act][ag] / (universe_params["seir-groups"][ag]['parameters']['beta'][0] * np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag] for other_group in age_groups]) * (experiment_params["xi"]+econ_params["econ_cost_death"][ag]) * universe_params["seir-groups"][ag]['parameters']['sigma'] *universe_params["seir-groups"][ag]['parameters']['mu']),
+						"econ_contacts_ratio": dynModel.econ_gradients_normalized[act][ag] / (np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag] for other_group in age_groups])),
+						"econ_contacts_death_cost_ratio":dynModel.econ_gradients_normalized[act][ag] / (universe_params["seir-groups"][ag]['parameters']['beta'][0] * np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag] for other_group in age_groups]) * (experiment_params["xi"]+econ_params["econ_cost_death"][ag]) * universe_params["seir-groups"][ag]['parameters']['sigma'] *universe_params["seir-groups"][ag]['parameters']['mu']),
 						"ICU_new_daily_admissions": newICU,
 						"ICU_seven_day_avg_daily_admissions": sevendays_avg_newICU,
 						"Infections_new_rate_over_seven_days": incidence_rate,	
