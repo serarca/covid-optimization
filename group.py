@@ -84,6 +84,9 @@ class DynamicalModel:
 				self.parameters['seir-groups'][ag]['parameters']['beta'][self.time_steps-k-1] = 0.0
 
 		# Modify eta
+		# eta is nu_other_act
+		# gamma is nu_fixed
+		# nu is no_work
 		self.econ_params["employment_params"]["eta"] = eta
 		self.econ_params["employment_params"]["nu"] = 1 - eta - self.econ_params["employment_params"]["gamma"]
 
@@ -297,6 +300,7 @@ class DynamicalModel:
 		v_schooling = 0
 		self.v_g = {}
 		self.econ_gradients = {"work":{},"school":{},"other":{},"leisure":{},"transport":{}}
+		self.econ_gradients_normalized = {"work":{},"school":{},"other":{},"leisure":{},"transport":{}}
 
 		for age_group in state:
 			v_g = sum([self.econ_params["employment_params"]["v"][age_group][activity] for activity in econ_activities])
@@ -335,6 +339,12 @@ class DynamicalModel:
 			)
 			for act in eta_activities:
 				self.econ_gradients[act][age_group]=v_g*self.econ_params["employment_params"]["eta"]*(state[age_group]["S"] + state[age_group]["E"] + state[age_group]["I"] + state[age_group]["R"])/len(eta_activities)
+
+			# Calculate econ gradients normalized
+			self.econ_gradients_normalized["work"][age_group]=v_g*self.econ_params["employment_params"]["nu"]
+			self.econ_gradients_normalized["school"][age_group]=(self.experiment_params['delta_schooling']*self.econ_params['schooling_params'][age_group])
+			for act in eta_activities:
+				self.econ_gradients_normalized[act][age_group]=v_g*self.econ_params["employment_params"]["eta"]/len(eta_activities)
 
 		return v_employment + v_schooling
 
