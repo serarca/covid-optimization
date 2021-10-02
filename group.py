@@ -305,6 +305,9 @@ class DynamicalModel:
 		for age_group in state:
 			v_g = sum([self.econ_params["employment_params"]["v"][age_group][activity] for activity in econ_activities])
 			self.v_g[age_group] = v_g
+			
+			v_g_mean = sum([sum([self.econ_params["employment_params"]["v"][a_g][activity] for activity in econ_activities]) for a_g in self.age_groups]) / len(self.age_groups)
+
 			l_mean = np.mean([np.sum([alphas[ag][act] for act in eta_activities]) for ag in alphas])/3.0
 			l_mean_upper_bound = np.sum([self.econ_params["upper_bounds"][act] for act in eta_activities])
 
@@ -338,13 +341,13 @@ class DynamicalModel:
 				(state[age_group]["S"] + state[age_group]["E"] + state[age_group]["I"] + state[age_group]["R"])*self.dt
 			)
 			for act in eta_activities:
-				self.econ_gradients[act][age_group]=v_g*self.econ_params["employment_params"]["eta"]*(state[age_group]["S"] + state[age_group]["E"] + state[age_group]["I"] + state[age_group]["R"])/len(eta_activities)
+				self.econ_gradients[act][age_group]=v_g_mean * self.econ_params["employment_params"]["eta"]*(state[age_group]["S"] + state[age_group]["E"] + state[age_group]["I"] + state[age_group]["R"])/len(eta_activities)
 
 			# Calculate econ gradients normalized
 			self.econ_gradients_normalized["work"][age_group]=v_g*self.econ_params["employment_params"]["nu"]
 			self.econ_gradients_normalized["school"][age_group]=(self.experiment_params['delta_schooling']*self.econ_params['schooling_params'][age_group])
 			for act in eta_activities:
-				self.econ_gradients_normalized[act][age_group]=v_g*self.econ_params["employment_params"]["eta"]/len(eta_activities)
+				self.econ_gradients_normalized[act][age_group]=v_g_mean * self.econ_params["employment_params"]["eta"]/len(eta_activities)
 
 		return v_employment + v_schooling
 
