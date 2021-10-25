@@ -10,10 +10,11 @@ import matplotlib.pyplot as plt
 current_path = os.path.abspath(getsourcefile(lambda:0))
 current_dir = os.path.dirname(current_path)
 sys.path.insert(0, current_dir+"/heuristics")
+sys.path.insert(0, current_dir+"/decision_tree")
 
 import numpy as np
 from group import SEIR_group, DynamicalModel
-import linearization
+import tree_policy_benchmark
 
 import math
 import pprint

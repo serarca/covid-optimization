@@ -75,6 +75,11 @@ def append_instances_to_csv(csv_file, instances_folder):
 
 	for i,f in enumerate(files_to_process):
 
+		# if instances_folder == "../benchmarks/results/linearization_heuristic_optBouncing=False_initial_uhat=dynamic_gradient/":
+		# 	if i<=906:
+		# 		print(f"File number: {i} not processed for dynamice_gradient")
+		# 		continue
+
 		## If instance is multiple_init_cond change param folders
 		if "multiple_init_cond" in instances_folder:
 			randomInstance = f.split("-")[-1]
@@ -114,8 +119,8 @@ def append_instances_to_csv(csv_file, instances_folder):
 		for act in rel_activities:
 			features[act] = []
 
-		if i >= max_number_files:
-			break
+#		if i >= max_number_files:
+#			break
 		
 		print(i/len(files_to_process))
 		with open(instances_folder+f) as file:
@@ -254,13 +259,13 @@ def main():
 
 	## Dynamic-Gradient-Instances
 
-	instances_folder = "../benchmarks/results/linearization_heuristic_optBouncing=False_initial_uhat=dynamic_gradient_multiple_init_cond-HighBeta/"
+	# instances_folder = "../benchmarks/results/linearization_heuristic_optBouncing=False_initial_uhat=dynamic_gradient_multiple_init_cond-HighBeta/"
 
-	append_instances_to_csv(csv_file, instances_folder)
+	# append_instances_to_csv(csv_file, instances_folder)
 
-	instances_folder = "../benchmarks/results/linearization_heuristic_optBouncing=False_initial_uhat=dynamic_gradient_multiple_init_cond/"
+	# instances_folder = "../benchmarks/results/linearization_heuristic_optBouncing=False_initial_uhat=dynamic_gradient_multiple_init_cond/"
 
-	append_instances_to_csv(csv_file, instances_folder)
+	# append_instances_to_csv(csv_file, instances_folder)
 
 	instances_folder = "../benchmarks/results/linearization_heuristic_optBouncing=False_initial_uhat=dynamic_gradient/"
 

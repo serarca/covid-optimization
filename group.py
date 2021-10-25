@@ -18,7 +18,6 @@ full_open_policy = {
 
 
 def n_contacts(group_g, group_h, alphas, mixing_method):
-
 	n = {"total":0}
 	if mixing_method['name'] == "maxmin":
 		for activity in alphas[group_g.name]:
@@ -76,6 +75,7 @@ class DynamicalModel:
 		self.transport_lb_work_fraction = transport_lb_work_fraction
 		self.start_day = start_day
 		self.age_groups = list(self.parameters['seir-groups'].keys())
+		# self.econ_gradients_normalized = {"work":{},"school":{},"other":{},"leisure":{},"transport":{}} 
 
 		# Modify betas
 		for ag in self.parameters['seir-groups']:
@@ -291,6 +291,38 @@ class DynamicalModel:
 			self.take_time_step(m_tests_vec[t], a_tests_vec[t], alphas_vec[t])
 
 			
+	def calculate_econ_gradients(self, state):
+		econ_activities = ["transport","leisure","other"]
+		eta_activities = ["transport","leisure","other"]
+		
+		self.v_g = {}
+		self.econ_gradients = {"work":{},"school":{},"other":{},"leisure":{},"transport":{}}
+		self.econ_gradients_normalized = {"work":{},"school":{},"other":{},"leisure":{},"transport":{}}
+
+		for age_group in state:
+			v_g = sum([self.econ_params["employment_params"]["v"][age_group][activity] for activity in econ_activities])
+			self.v_g[age_group] = v_g
+			
+			v_g_mean = sum([sum([self.econ_params["employment_params"]["v"][a_g][activity] for activity in econ_activities]) for a_g in self.age_groups]) / len(self.age_groups)
+
+			
+			# Calculate econ gradients
+			self.econ_gradients["work"][age_group]=v_g*self.econ_params["employment_params"]["nu"]*(state[age_group]["S"] + state[age_group]["E"] + state[age_group]["I"] + state[age_group]["R"])
+			self.econ_gradients["school"][age_group]=(self.experiment_params['delta_schooling']*self.econ_params['schooling_params'][age_group]* 
+				(state[age_group]["S"] + state[age_group]["E"] + state[age_group]["I"] + state[age_group]["R"])*self.dt
+			)
+			for act in eta_activities:
+				self.econ_gradients[act][age_group]=v_g_mean * self.econ_params["employment_params"]["eta"]*(state[age_group]["S"] + state[age_group]["E"] + state[age_group]["I"] + state[age_group]["R"])/len(eta_activities)
+
+			# Calculate econ gradients normalized
+			self.econ_gradients_normalized["work"][age_group]=v_g*self.econ_params["employment_params"]["nu"]
+			self.econ_gradients_normalized["school"][age_group]=(self.experiment_params['delta_schooling']*self.econ_params['schooling_params'][age_group])
+			for act in eta_activities:
+				self.econ_gradients_normalized[act][age_group]=v_g_mean * self.econ_params["employment_params"]["eta"]/len(eta_activities)
+
+	
+
+
 
 	# Given a state and set of alphas, returns the economic value
 	def get_economic_value(self, state, alphas):
@@ -584,6 +616,8 @@ class SEIR_group:
 					pop_g = g.N[0] + g.Rq[0]
 				else:
 					pop_g = g.N[t] + g.Rq[t]
+				
+				
 				new_contacts_dict = n_contacts(self, g, alphas, self.mixing_method)
 				new_contacts = new_contacts_dict["total"]
 				assert new_contacts >= 0, (f"New contacts is not nonnnegative: {new_contacts}.")
