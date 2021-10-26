@@ -1,0 +1,42 @@
+/home/groups/daniancu/covid-optimization/covid-optimization/decision_tree/tree_policy_benchmark.py:168: RuntimeWarning: divide by zero encountered in double_scalars
+  "econ_contacts_death_cost_ratio":dynModel.econ_gradients_normalized[act][ag] / (dynModel.parameters["seir-groups"][ag]['parameters']['beta'][0] * np.sum([dynModel.parameters["seir-groups"][other_group]["contacts_spc"][act][ag] for other_group in age_groups]) * (dynModel.experiment_params["xi"]+dynModel.econ_params["econ_cost_death"][ag]) * dynModel.parameters["seir-groups"][ag]['parameters']['sigma'] *dynModel.parameters["seir-groups"][ag]['parameters']['mu']),
+/home/groups/daniancu/covid-optimization/covid-optimization/decision_tree/tree_policy_benchmark.py:168: RuntimeWarning: invalid value encountered in double_scalars
+  "econ_contacts_death_cost_ratio":dynModel.econ_gradients_normalized[act][ag] / (dynModel.parameters["seir-groups"][ag]['parameters']['beta'][0] * np.sum([dynModel.parameters["seir-groups"][other_group]["contacts_spc"][act][ag] for other_group in age_groups]) * (dynModel.experiment_params["xi"]+dynModel.econ_params["econ_cost_death"][ag]) * dynModel.parameters["seir-groups"][ag]['parameters']['sigma'] *dynModel.parameters["seir-groups"][ag]['parameters']['mu']),
+156
+(0.5, 0.0, 2900, 0, (7, 14), 'fitted-scaled', 'econ-scaled', 'oct21-scaled', 0.1, 'ENGINEERED_1_PLUS', 4)
+getting feaures time 0
+Traceback (most recent call last):
+  File "/share/software/user/open/py-pandas/1.0.3_py36/lib/python3.6/site-packages/pandas/core/indexes/base.py", line 2646, in get_loc
+    return self._engine.get_loc(key)
+  File "pandas/_libs/index.pyx", line 111, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/index.pyx", line 138, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1619, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1627, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'error: ENGINEERED_1_PLUS not a feature set name'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "run_tree_heuristic.py", line 290, in <module>
+    main()
+  File "run_tree_heuristic.py", line 130, in main
+    run_tree_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, feature_set, tree_depth)
+  File "run_tree_heuristic.py", line 169, in run_tree_heur_and_save_yaml
+    dynModel = run_tree_heuristic(simulation_params, experiment_params, start_day, feature_set, tree_depth)
+  File "run_tree_heuristic.py", line 277, in run_tree_heuristic
+    tree_policy_benchmark.run_tree_policy(dynModel, tree_file)
+  File "/home/groups/daniancu/covid-optimization/covid-optimization/decision_tree/tree_policy_benchmark.py", line 269, in run_tree_policy
+    alphas = get_alphas(dynModel, state, incidence_rate, incidence_rate_old, sevendays_avg_newICU, newICU, t, tree_file)
+  File "/home/groups/daniancu/covid-optimization/covid-optimization/decision_tree/tree_policy_benchmark.py", line 215, in get_alphas
+    alphas[ag][act] = trees[act].predict(pd.DataFrame([f])[ feature_set])
+  File "/share/software/user/open/py-pandas/1.0.3_py36/lib/python3.6/site-packages/pandas/core/frame.py", line 2800, in __getitem__
+    indexer = self.columns.get_loc(key)
+  File "/share/software/user/open/py-pandas/1.0.3_py36/lib/python3.6/site-packages/pandas/core/indexes/base.py", line 2648, in get_loc
+    return self._engine.get_loc(self._maybe_cast_indexer(key))
+  File "pandas/_libs/index.pyx", line 111, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/index.pyx", line 138, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1619, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1627, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'error: ENGINEERED_1_PLUS not a feature set name'
+srun: error: sh02-01n56: task 0: Exited with exit code 1
+srun: launch/slurm: _step_signal: Terminating StepId=36881453.0
