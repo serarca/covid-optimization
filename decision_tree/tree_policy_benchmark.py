@@ -68,6 +68,15 @@ def get_feature_set_from_name (feature_set_name):
     'contacts_given', 'contacts_given_into_deaths', 'infections_given', 'deaths_given', 'deaths_given_econ',
     'econ_contacts_ratio', 'age']
 
+    engineered_econ_to_contacts_ratio_plus = ['t', 'icu_capacity', 'theta_schooling', 'beta', 'alpha_1_2', 'nu_other_act', 'nu_work',
+    'chi+vg_life', 'p_D', 'R_perc',  'ICU_utilization', 
+    'econ_contacts_ratio', 'ICU_new_daily_admissions', 'ICU_seven_day_avg_daily_admissions',
+    'Infections_new_rate_over_seven_days', 'Infections_new_rate_over_seven_days_elderly', 'age']
+
+    engineered_econ_to_contacts_ratio_minus = ['t', 'icu_capacity', 'theta_schooling', 'beta', 'alpha_1_2', 'nu_other_act', 'nu_work',
+    'chi+vg_life', 'p_D', 'R_perc',  'ICU_utilization', 'ICU_new_daily_admissions', 'ICU_seven_day_avg_daily_admissions',
+    'Infections_new_rate_over_seven_days', 'Infections_new_rate_over_seven_days_elderly', 'age']
+
  # engineered_1 = ['t', 'icu_capacity', 'theta_schooling', 'beta', 'alpha_1_2', 'nu_other_act', 'nu_work',
     # 'chi+vg_life', 'p_D', 'econ_gradient_normalized', 'R_perc',  'ICU_utilization',
     # 'contacts_received', 'contacts_received_into_deaths', 'infections_received', 'deaths_received', 'deaths_received_econ',
@@ -89,6 +98,12 @@ def get_feature_set_from_name (feature_set_name):
     
     if feature_set_name == "SIMPLE_PLUS":
         return simple_plus_features
+
+    if feature_set_name == "ENGINEERED_1_PLUS":
+        return engineered_econ_to_contacts_ratio_plus
+    
+    if feature_set_name == "ENGINEERED_1_MINUS":
+        return engineered_econ_to_contacts_ratio_minus
     
     return f"error: {feature_set_name} not a feature set name"
 
