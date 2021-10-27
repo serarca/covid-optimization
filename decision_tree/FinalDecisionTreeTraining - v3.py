@@ -332,7 +332,7 @@ for activity in ["work", "leisure", "transport", "other", "school"]:
     # CREATE A SUITABLE TRAINING SET
     pydot_graph = {}  #dictionary with graphs for each selected activity
 
-    for var_title in ["ENGINEERED_1_PLUS", "ENGINEERED_1_MINUS"]:
+    for var_title in ["SIMPLE", "SIMPLE_PLUS", "ORIGINAL_PLUS", "ORIGINAL"]:
         
         
         # SELECT THE FEATURES

@@ -63,14 +63,14 @@ def main():
         "econ": ["econ-scaled"],
         "init": ["oct21-scaled"],
         "eta":[0.1],
-        "feature_set": ["ENGINEERED_1_MINUS", "ENGINEERED_1_PLUS", "ORIGINAL", "ORIGINAL_PLUS", "SIMPLE", "SIMPLE_PLUS"], 
+        "feature_set": ["ENGINEERED_1_MINUS", "ENGINEERED_1_PLUS"], 
         "tree_depth": [5]
         # "trust_region_radius":[0.05],
         # "max_inner_iterations_mult":[2],
         # "initial_uhat":["dynamic_gradient"]
         # "full_lockdown", "full_open","dynamic_gradient",
     }
-
+    # , "ORIGINAL", "ORIGINAL_PLUS", "SIMPLE", "SIMPLE_PLUS"
 
     all_instances = list(it.product(*(params_to_try[param] for param in params_to_try)))
 
