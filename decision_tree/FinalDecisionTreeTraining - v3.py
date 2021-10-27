@@ -332,7 +332,7 @@ for activity in ["work", "leisure", "transport", "other", "school"]:
     # CREATE A SUITABLE TRAINING SET
     pydot_graph = {}  #dictionary with graphs for each selected activity
 
-    for var_title in ["SIMPLE", "SIMPLE_PLUS", "ORIGINAL_PLUS", "ORIGINAL"]:
+    for var_title in ["SIMPLE", "SIMPLE_PLUS", "ORIGINAL_PLUS", "ORIGINAL", "ENGINEERED_1_PLUS", "ENGINEERED_1_MINUS"]:
         
         
         # SELECT THE FEATURES
@@ -401,7 +401,7 @@ for activity in ["work", "leisure", "transport", "other", "school"]:
         # TRAIN THE TREE
         # USE CROSS VALIDATION TO SEARCH FOR BEST max_depth
         from sklearn.model_selection import GridSearchCV
-        param_grid = {'max_depth': np.arange(5,6,1), 'random_state' : [123]}
+        param_grid = {'max_depth': np.arange(6,7,1), 'random_state' : [123]}
 
         # Use random_state to set the seed in order to avoid instabilities across different runs due to randomization in the folding
         dt_model = tree.DecisionTreeRegressor(criterion='mse',random_state=0)
