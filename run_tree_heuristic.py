@@ -63,7 +63,7 @@ def main():
         "econ": ["econ-scaled"],
         "init": ["oct21-scaled"],
         "eta":[0.1],
-        "feature_set": ["ENGINEERED_1_MINUS", "ENGINEERED_1_PLUS"], 
+        "feature_set": ["ENGINEERED_1_MINUS", "ENGINEERED_1_PLUS", "SIMPLE", "SIMPLE_PLUS", "ORIGINAL", "ORIGINAL_PLUS"], 
         "tree_depth": [5]
         # "trust_region_radius":[0.05],
         # "max_inner_iterations_mult":[2],
