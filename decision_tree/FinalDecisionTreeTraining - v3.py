@@ -278,7 +278,7 @@ for activity in ["work", "leisure", "transport", "other", "school"]:
     'chi+vg_life', 'p_D', 'R_perc',  'ICU_utilization', 'ICU_new_daily_admissions', 'ICU_seven_day_avg_daily_admissions',
     'Infections_new_rate_over_seven_days', 'Infections_new_rate_over_seven_days_elderly', 'age']
 
-     # engineered_1 = ['t', 'icu_capacity', 'theta_schooling', 'beta', 'alpha_1_2', 'nu_other_act', 'nu_work',
+    # engineered_1 = ['t', 'icu_capacity', 'theta_schooling', 'beta', 'alpha_1_2', 'nu_other_act', 'nu_work',
     # 'chi+vg_life', 'p_D', 'econ_gradient_normalized', 'R_perc',  'ICU_utilization',
     # 'contacts_received', 'contacts_received_into_deaths', 'infections_received', 'deaths_received', 'deaths_received_econ',
     # 'contacts_given', 'contacts_given_into_deaths', 'infections_given', 'deaths_given', 'deaths_given_econ',
@@ -401,7 +401,7 @@ for activity in ["work", "leisure", "transport", "other", "school"]:
         # TRAIN THE TREE
         # USE CROSS VALIDATION TO SEARCH FOR BEST max_depth
         from sklearn.model_selection import GridSearchCV
-        param_grid = {'max_depth': np.arange(6,7,1), 'random_state' : [123]}
+        param_grid = {'max_depth': np.arange(7,8,1), 'random_state' : [123]}
 
         # Use random_state to set the seed in order to avoid instabilities across different runs due to randomization in the folding
         dt_model = tree.DecisionTreeRegressor(criterion='mse',random_state=0)
