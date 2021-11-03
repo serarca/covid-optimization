@@ -63,8 +63,8 @@ def main():
         "econ": ["econ-scaled"],
         "init": ["oct21-scaled"],
         "eta":[0.1],
-        "feature_set": ["ENGINEERED_1_MINUS", "ENGINEERED_1_PLUS", "SIMPLE", "SIMPLE_PLUS", "ORIGINAL", "ORIGINAL_PLUS"], 
-        "tree_depth": [5]
+        "feature_set": ["ALL_2", "NON_TARGETED", "TARGETED_AGE", "TARGETED_P_D","TARGETED_VG_LIFE", "TARGETED_R_PERC","TARGETED_ECON_CONT_RATIO", "TARGETED_ECON_GRAD_NORM", "TARGETED_CONT_GIVEN"], 
+        "tree_depth": [4,5,6,7]
         # "trust_region_radius":[0.05],
         # "max_inner_iterations_mult":[2],
         # "initial_uhat":["dynamic_gradient"]

@@ -8,7 +8,7 @@
 
  
 # there is a max array size - 512 tasks
-#SBATCH --array=0-155
+#SBATCH --array=0-936
 
 #SBATCH -J run_tree_heur_heuristic
 
