@@ -77,6 +77,21 @@ def get_feature_set_from_name (feature_set_name):
     'chi+vg_life', 'p_D', 'R_perc',  'ICU_utilization', 'ICU_new_daily_admissions', 'ICU_seven_day_avg_daily_admissions',
     'Infections_new_rate_over_seven_days', 'Infections_new_rate_over_seven_days_elderly', 'age']
 
+    engineered_2_targetting = ["age", "p_D", "vg_life", "R_perc", "econ_contacts_ratio", 'econ_gradient_normalized', 'contacts_given']
+
+    engineered_2_no_targetting = ['t', 'icu_capacity', 'theta_schooling', 'beta', 'alpha_1_2', 'nu_other_act', 'nu_work',
+    "chi",  'ICU_utilization', 
+    'ICU_new_daily_admissions', 'ICU_seven_day_avg_daily_admissions',
+    'Infections_new_rate_over_seven_days', 'Infections_new_rate_over_seven_days_elderly']
+
+    beta_and_econ_ratio = ["beta", "econ_contacts_ratio"]
+    beta_econ_ratio_time = ["beta", "econ_contacts_ratio", "t"]
+    beta_econ_ratio_time_r_perc = ["beta", "econ_contacts_ratio", "t", "R_perc"]
+
+
+    engineered_2_all = engineered_2_targetting + engineered_2_no_targetting
+
+
  # engineered_1 = ['t', 'icu_capacity', 'theta_schooling', 'beta', 'alpha_1_2', 'nu_other_act', 'nu_work',
     # 'chi+vg_life', 'p_D', 'econ_gradient_normalized', 'R_perc',  'ICU_utilization',
     # 'contacts_received', 'contacts_received_into_deaths', 'infections_received', 'deaths_received', 'deaths_received_econ',
@@ -105,6 +120,54 @@ def get_feature_set_from_name (feature_set_name):
     if feature_set_name == "ENGINEERED_1_MINUS":
         return engineered_econ_to_contacts_ratio_minus
     
+    if feature_set_name == "ALL_2":
+        return engineered_2_all
+    
+
+    if feature_set_name == "NON_TARGETED":
+        return engineered_2_no_targetting
+    
+
+    if feature_set_name == "TARGETED_AGE":
+        return engineered_2_no_targetting + ["age"]
+    
+
+    if feature_set_name == "TARGETED_P_D":
+        return engineered_2_no_targetting + ["p_D"]
+    
+
+    if feature_set_name == "TARGETED_VG_LIFE":
+        return engineered_2_no_targetting + ["vg_life"]
+    
+
+    if feature_set_name == "TARGETED_R_PERC":
+        return engineered_2_no_targetting + ["R_perc"]
+    
+
+    if feature_set_name == "TARGETED_ECON_CONT_RATIO":
+        return engineered_2_no_targetting + ["econ_contacts_ratio"]
+    
+
+    if feature_set_name == "TARGETED_ECON_GRAD_NORM":
+        return engineered_2_no_targetting + ["econ_gradient_normalized"]
+    
+
+    if feature_set_name == "TARGETED_CONT_GIVEN":
+        return engineered_2_no_targetting + ["contacts_given"]
+    
+
+    if feature_set_name == "BETA_ECON_RATIO":
+        return beta_and_econ_ratio
+    
+
+    if feature_set_name == "BETA_ECON_RATIO_TIME":
+        return beta_econ_ratio_time
+    
+
+    if feature_set_name == "BETA_ECON_RATIO_TIME_R_PERC":
+        return beta_econ_ratio_time_r_perc
+    
+
     return f"error: {feature_set_name} not a feature set name"
 
 def get_features(dynModel, state, incidence_rate, incidence_rate_old, sevendays_avg_newICU, newICU, t, tree_file):
@@ -212,7 +275,7 @@ def get_alphas(dynModel, state, incidence_rate, incidence_rate_old, sevendays_av
     
     trees = {}
     for act in rel_activities:
-        with open(f"decision_tree/trees_pickles/{act}_{tree_file}", "rb") as pickle_file:
+        with open(f"decision_tree/trees_pickles/all_activities_{tree_file}", "rb") as pickle_file:
             trees[act] = pickle.load(pickle_file)
     
     features = get_features(dynModel, state, incidence_rate, incidence_rate_old,sevendays_avg_newICU, newICU, t, tree_file)
