@@ -44,15 +44,15 @@ def main():
     # Some paramters to test the linearization heuristic
     scaling = 10000
     money_scaling = 1000
-    xi_mult_values = [0,10,15] + list(range(20, 1000, 98))
-    print(list(range(20, 1000, 10)))
+    xi_mult_values = [0,10,20,30,40,50,60,70,80,90,100,150,250,350,450,550,650,750,850,950] 
+    
     # 0,10,25,50,100,150
     # chain(range(0,200,5), range(0, 1000, 10))
     testing_values = [0]
     # [0, 30000, 60000, 120000]
-    icu_values = [2900]
+    icu_values = [2600, 2900, 3200]
     # [2000, 2300, 2600, 2900, 3200]
-    random_instances=range(1000, 1500)
+    random_instances=range(0, 125)
     # range(0,20)
 
     # eta_inteval_lb = 0
@@ -69,7 +69,7 @@ def main():
     
 
     params_to_try = {
-        "delta_schooling":[0.5,1,5],
+        "delta_schooling":[0.5],
         "xi":[mult * 37199.03 * scaling / money_scaling for mult in xi_mult_values],
         "icus":[ic / scaling for ic in icu_values],
         "mtests":[test_cap / scaling for test_cap in testing_values],
@@ -78,7 +78,7 @@ def main():
         "region":["fitted-scaled"], 
         "econ": ["econ-scaled"],
         "init": ["oct21-scaled"],
-        "eta":[0.1],
+        "eta":[0,0.1,0.2],
         "trust_region_radius":[0.05],
         "max_inner_iterations_mult":[2],
         "initial_uhat":["dynamic_gradient"],
@@ -211,7 +211,7 @@ def run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, 
     dynModel = run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, random_instance, targetActivities, targetGroups, targetTests)
 
     result = {
-            "lockdown_heuristic":f"linearization_heuristic_optBouncing={optimize_bouncing}_initial_uhat={initial_uhat}_multiple_init_cond-HighBeta",
+            "lockdown_heuristic":f"linearization_heuristic_optBouncing={optimize_bouncing}_initial_uhat={initial_uhat}_multiple_init_cond",
             "groups":groups,
             "experiment_params":{
                 "delta_schooling":delta,
