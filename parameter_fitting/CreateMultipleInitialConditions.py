@@ -94,40 +94,36 @@ upper_bound_params = pd.read_excel("./ile-de-france_data_master.xlsx",sheet_name
 
 
 
+lower_beta = 2.8
+upper_beta = 3
+mid_beta = (upper_beta + lower_beta)/2
+
 mean_init_param = {
-    "beta":(0.03923794546657925/2.9)*6.4,
-    "mu":mean_params['mu'].values,
-    "sigma":mean_params['sigma'].values,
-    "p_ICU":mean_params['p_ICU'].values,
-    "p_H":mean_params['p_H'].values,
-    "lambda_ICU":mean_params['lambda_ICU'].values,
-    "lambda_H":mean_params['lambda_H'].values,
-    "p_death":mean_params['p_death_cond_ss'].values,
-    "p_recov":mean_params['p_recov_cond_ss'].values,
+    "beta":(0.03923794546657925/2.9)*mid_beta,
+    "p_ss":mean_params['p_ss'].values,
 }
 
 sigma_init_param = {
-    "beta": (10 - 2.8) * (0.03923794546657925/2.9) / 6,
-    "mu":((upper_bound_params['mu'] - lower_bound_params['mu'])/6).values,
-    "sigma":((upper_bound_params['sigma'] - lower_bound_params['sigma'])/6).values,
-    "p_ICU":((upper_bound_params['p_ICU'] - lower_bound_params['p_ICU'])/6).values,
-    "p_H":((upper_bound_params['p_H'] - lower_bound_params['p_H'])/6).values,
-    "lambda_ICU":((upper_bound_params['lambda_ICU'] - lower_bound_params['lambda_ICU'])/6).values,
-    "lambda_H":((upper_bound_params['lambda_H'] - lower_bound_params['lambda_H'])/6).values,
-    "p_death":((upper_bound_params['p_death_cond_ss'] - lower_bound_params['p_death_cond_ss'])/6).values,
-    "p_recov":((upper_bound_params['p_recov_cond_ss'] - lower_bound_params['p_recov_cond_ss'])/6).values,
+    "beta": (upper_beta - lower_beta) * (0.03923794546657925/2.9) / 4,
+    "p_ss":((upper_bound_params['p_ss'] - lower_bound_params['p_ss'])/4).values
 }
+
+params = pd.read_excel("./ile-de-france_data_master.xlsx",sheet_name="SEIR_params", index_col = 0)
 
 
 
 
 
 start_time = time()
-for sim_i in range(1000, 1500):
+for sim_i in range(0, 125):
 
     np.random.seed(sim_i)
 
-    instance_variation_z = np.random.randn()
+    instance_variation_beta_z = np.random.randn()
+    instance_variation_p_ss_z = np.random.randn()
+    instance_variation_alpha_z = np.random.randn()
+
+
 
     age_groups = ['age_group_0_9', 'age_group_10_19', 'age_group_20_29','age_group_30_39', 'age_group_40_49', 'age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
     old_age_groups = ['age_group_50_59', 'age_group_60_69', 'age_group_70_79', 'age_group_80_plus']
@@ -135,140 +131,44 @@ for sim_i in range(1000, 1500):
     cont = [ 'S', 'E', 'I', 'R', 'N', 'Ia', 'Ips',            'Ims', 'Iss', 'Rq', 'H', 'ICU', 'D' ]
 
 
-#     sigma_epid_params = {
-#         "beta":(2.99 - 2.8) * (0.03923794546657925/2.9) / 6,
-#         "mu":(4.48-3.52)/6,
-#         "sigma":(4.43-3.57)/6,
-#         "p_ICU": {'age_group_0_9': (0.000765 - 0.000192)/6, 
-#                 'age_group_10_19': (0.000765 - 0.000192)/6,
-#                 'age_group_20_29': (0.00132 - 0.000404 )/6,
-#                 'age_group_30_39': (0.00346 - 0.001168)/6,
-#                 'age_group_40_49': (0.006345 - 0.0021)/6,
-#                 'age_group_50_59': (0.015498 - 0.005565)/6,
-#                 'age_group_60_69':,
-#                 'age_group_70_79':,
-#                 'age_group_80_plus'},
-#         "p_H": {'age_group_0_9':, 
-#                 'age_group_10_19':,
-#                 'age_group_20_29':,
-#                 'age_group_30_39':,
-#                 'age_group_40_49:',
-#                 'age_group_50_59':,
-#                 'age_group_60_69':,
-#                 'age_group_70_79':,
-#                 'age_group_80_plus'},
-#         "lambda_ICU":(1/22.6-1/21.38) / 6,
-#         "lambda_H":(1/15.32-1/14.55) / 6,
-#         "p_death": {'age_group_0_9':, 
-#                 'age_group_10_19':,
-#                 'age_group_20_29':,
-#                 'age_group_30_39':,
-#                 'age_group_40_49:',
-#                 'age_group_50_59':,
-#                 'age_group_60_69':,
-#                 'age_group_70_79':,
-#                 'age_group_80_plus'},   
-#     }
 
+    initial_params = {
+        "mu":params['mu'].values,
+        "sigma":params['sigma'].values,
+        "p_ICU":params['p_ICU'].values,
+        "p_H":params['p_H'].values,
+        "lambda_H_R":params['lambda_HR'].values,
+        "lambda_H_D":params['lambda_HD'].values,
+        "lambda_ICU_R":params['lambda_ICUR'].values,
+        "lambda_ICU_D":params['lambda_ICUD'].values,
+        "lambda_ICU":params['lambda_ICU'].values,
+        "lambda_H":params['lambda_H'].values,
+        "p_death":params['p_death_cond_ss'].values,
+        "p_recov":params['p_recov_cond_ss'].values,
+        
+    }
 
-# mean_epid_params = {
-#         "beta":,
-#         "mu":,
-#         "sigma":,
-#         "p_ICU":,
-#         "p_H":,
-#         "lambda_ICU":,
-#         "lambda_H":,
-#         "p_death":,
-#     }
+    print(mean_init_param["p_ss"] + instance_variation_p_ss_z * sigma_init_param["p_ss"])
 
+    print(mean_init_param["p_ss"])
+    print(lower_bound_params['p_ss'].to_list())
 
-    # In[3]:
-
-
-    
-
-    # In[4]:
-
-
-    # Load the data
+    print(np.minimum(np.maximum(mean_init_param["p_ss"]+ instance_variation_p_ss_z * sigma_init_param["p_ss"], lower_bound_params['p_ss'].to_list()), upper_bound_params['p_ss'].to_list()))
 
 
 
-    # In[5]:
+    initial_params["p_ss"] = np.minimum(np.maximum(mean_init_param["p_ss"]+ instance_variation_p_ss_z * sigma_init_param["p_ss"], lower_bound_params['p_ss'].to_list()), upper_bound_params['p_ss'].to_list())
+
+    initial_params["beta"] = np.minimum(np.maximum(mean_init_param["beta"] + instance_variation_beta_z * sigma_init_param["beta"], lower_beta), upper_beta)
+
+    initial_params["p_H"] = initial_params["p_ss"] * (1/(1 + initial_params["p_ICU"]/initial_params["p_H"]))
+
+    initial_params["p_ICU"] = initial_params["p_ss"] - initial_params["p_H"]
+
+    # Estimated Alpha Mixing is 0.39 see table S5
+    alpha_mixing = 0.39 + instance_variation_alpha_z * (0.7-0.1)/4
 
 
-
-
-    # In[7]:
-
-
-    # # Extract days 
-    # data = data[data['jour']<='2020-10-21']
-    # french_days = data[data['reg']==11][data['cl_age90']==0].jour.values
-
-
-    # In[8]:
-
-
-    # # Extract data from french dataset
-    # deaths_real = {
-    #     age_groups[i]:data[data['reg']==11][data['cl_age90']==10*i+9].dc.values for i in range(0,9)
-    # }
-    # deaths_real['age_group_80_plus']+=data[data['reg']==11][data['cl_age90']==90].dc.values
-    # deaths_real['total']=data[data['reg']==11][data['cl_age90']==0].dc.values
-
-
-    # icus_real = {
-    #     age_groups[i]:data[data['reg']==11][data['cl_age90']==10*i+9].rea.values for i in range(0,9)
-    # }
-    # icus_real['age_group_80_plus']+=data[data['reg']==11][data['cl_age90']==90].rea.values
-    # icus_real['total']=data[data['reg']==11][data['cl_age90']==0].rea.values
-
-
-    # beds_real = {
-    #     age_groups[i]:data[data['reg']==11][data['cl_age90']==10*i+9].hosp.values-data[data['reg']==11][data['cl_age90']==10*i+9].rea.values for i in range(0,9)
-    # }
-    # beds_real['age_group_80_plus']+=data[data['reg']==11][data['cl_age90']==90].hosp.values - data[data['reg']==11][data['cl_age90']==90].rea.values
-    # beds_real['total']=data[data['reg']==11][data['cl_age90']==0].hosp.values - data[data['reg']==11][data['cl_age90']==0].rea.values
-
-
-    # In[9]:
-
-
-
-    initial_params = {}
-
-    for param in mean_init_param:
-        initial_params[param] = mean_init_param[param] + instance_variation_z * sigma_init_param[param]
-
-    # In[10]:
-
-
-    # Smooth the french data
-    # start_smooth = datetime.strptime("2020-09-01", '%Y-%m-%d')
-    # end_smooth = datetime.strptime("2020-10-01", '%Y-%m-%d')
-    # for ag in beds_real:
-    #     new_series = []
-    #     for i in range(len(beds_real[ag])):
-    #         day = datetime.strptime(french_days[i], '%Y-%m-%d')
-    #         lower = (day-start_smooth).days
-    #         upper = (end_smooth-day).days
-    #         if lower>=0 and upper>=0:
-    #             n_days_before = min(lower,7)
-    #             n_days_after = min(upper,7)
-    #             avg_value = np.mean(beds_real[ag][(i-n_days_before):(i+1+n_days_after)])
-    #             new_series.append(avg_value)
-    #         else:
-    #             new_series.append(beds_real[ag][i])
-    #     beds_real[ag] = np.array(new_series)
-            
-
-    # plt.figure(1)
-    # plt.plot([datetime.strptime(d, '%Y-%m-%d') for d in french_days],beds_real["total"])
-
-
-    # In[11]:
 
 
     region = "Ile-de-France"
@@ -296,9 +196,6 @@ for sim_i in range(1000, 1500):
     }
 
 
-    # In[12]:
-
-
     # Create relevant dates
     date_1 = datetime.strptime("2020-03-17", '%Y-%m-%d')
     date_2 = datetime.strptime("2020-05-11", '%Y-%m-%d')
@@ -310,10 +207,6 @@ for sim_i in range(1000, 1500):
 
     first_day_google = datetime.strptime("2020-02-15", '%Y-%m-%d')
     days_between_google = (date_1-first_day_google).days
-
-
-    # In[13]:
-
 
     # Fill up the original parameters
     original_beta = initial_params['beta']
@@ -327,22 +220,10 @@ for sim_i in range(1000, 1500):
         )
 
 
-    # In[14]:
-
 
     # Create model
     mixing_method = {}
     dynModel = FastDynamicalModel(universe_params, econ_params, experiment_params, 1, mixing_method, 1e9, 0, 0)
-
-
-    # In[15]:
-
-
-    # # Generate samples
-    # samples = 1+np.random.randn(1,(final_date-date_1).days+150, 5)*0.05/2/np.sqrt(3)
-    
-
-    # In[16]:
 
 
     best_v = 0
@@ -351,42 +232,10 @@ for sim_i in range(1000, 1500):
     # This is the smoothening
     trans_days = 15
 
-
-    # In[6]:
-
-
-    # Create a nominal path
-    # samples = samples*0+1
-    # n_sample = 0
-
-    
-
-    # # Choose the best parameters
-    # list_small_indices = [i for i in range(len(all_results)) if all_results[i]['value']<0.71 ]
-    # print("List of options:", list_small_indices)
-
-
-    # best_error_i = np.argmin([r['value'] for r in all_results])
-    # best_v = all_results[best_error_i]["result"]
-
-    # best_days_ahead = all_results[best_error_i]["days_ahead"]
-    # best_days_switch = all_results[best_error_i]["days_switch"]
-
-
-    # if identifier == 13:
-    #     best_error_i = random.choice(list_small_indices)
-    #     best_v = all_results[best_error_i]["result"]
-    #     best_days_ahead = all_results[best_error_i]["days_ahead"]
-    #     best_days_switch = all_results[best_error_i]["days_switch"]
-
-
-
     #Days Ahead computed as March 17th - Jan 1st
     days_ahead = 76
 
-    # Estimated Alpha Mixing is 0.39 see table S5
-    alpha_mixing = 0.39 + instance_variation_z * (0.68-0.1)/6
-
+   
     # Estimated beta is 0.03923794546657925 from Ile-de France data 
     beta_normal = original_beta
     
@@ -655,52 +504,6 @@ for sim_i in range(1000, 1500):
     # Calculate the days of the model
     days_model = [initial_date+timedelta(days = t) for t in range(total_days + 1)]
 
-    # # Indices where to put the real data
-    # indices = [(datetime.strptime(d, '%Y-%m-%d') - initial_date).days for d in french_days]
-
-    # # Real data
-    # real_data_beds = {ag:[float('nan')]*len(days_model) for ag in age_groups+["total"]}
-    # real_data_icus = {ag:[float('nan')]*len(days_model) for ag in age_groups+["total"]}
-    # real_data_deaths = {ag:[float('nan')]*len(days_model) for ag in age_groups+["total"]}
-
-    # for k,ind in enumerate(indices):
-    #     for ag in age_groups+["total"]:
-    #         real_data_beds[ag][ind] = beds_real[ag][k] if beds_real[ag][k]!=0 else float('nan')
-    #         real_data_icus[ag][ind] = icus_real[ag][k] if icus_real[ag][k]!=0 else float('nan')
-    #         real_data_deaths[ag][ind] = deaths_real[ag][k] if deaths_real[ag][k]!=0 else float('nan')
-
-
-    # tail_constant = 0.5
-    # peak_constant = 0.25
-    # error_beds = 0
-    # error_icus = 0
-    # error_deaths = 0
-
-    # peak_beds = np.nanargmax(np.array(real_data_beds["total"]))
-    # peak_icus = np.nanargmax(np.array(real_data_icus["total"]))
-    # peak_deaths = peak_beds+30
-
-    #         for ag in old_age_groups:
-    #             error_beds += np.nanmean((np.abs(np.array(model_data_beds[ag])-np.array(real_data_beds[ag]))/np.array(real_data_beds[ag]))[0:validation_days-1])
-    #             error_icus += np.nanmean((np.abs(np.array(model_data_icus[ag])-np.array(real_data_icus[ag]))/np.array(real_data_icus[ag]))[0:validation_days-1])
-    #             error_deaths += np.nanmean((np.abs(np.array(model_data_deaths[ag])-np.array(real_data_deaths[ag]))/np.array(real_data_deaths[ag]))[0:validation_days-1])
-    # error_beds_total = np.nanmean((np.abs(np.array(model_data_beds["total"])-np.array(real_data_beds["total"]))/np.array(real_data_beds["total"]))[0:validation_days-14])
-    # error_beds_tail = tail_constant*np.nanmean((np.abs(np.array(model_data_beds["total"])-np.array(real_data_beds["total"]))/np.array(real_data_beds["total"]))[validation_days-14:validation_days])
-    # error_beds_peak = peak_constant*np.nanmean((np.abs(np.array(model_data_beds["total"])-np.array(real_data_beds["total"]))/np.array(real_data_beds["total"]))[peak_beds:peak_beds+1])
-
-    # error_icus_total = 0.5*np.nanmean((np.abs(np.array(model_data_icus["total"])-np.array(real_data_icus["total"]))/np.array(real_data_icus["total"]))[0:validation_days-14])
-    # error_icus_tail = 2*tail_constant*np.nanmean((np.abs(np.array(model_data_icus["total"])-np.array(real_data_icus["total"]))/np.array(real_data_icus["total"]))[validation_days-14:validation_days])
-    # error_icus_peak = 0.5*peak_constant*np.nanmean((np.abs(np.array(model_data_icus["total"])-np.array(real_data_icus["total"]))/np.array(real_data_icus["total"]))[peak_icus:peak_icus+1])
-
-
-    # error_deaths_total = np.nanmean((np.abs(np.array(model_data_deaths["total"])-np.array(real_data_deaths["total"]))/np.array(real_data_deaths["total"]))[0:validation_days-14])
-    # error_deaths_tail = tail_constant*np.nanmean((np.abs(np.array(model_data_deaths["total"])-np.array(real_data_deaths["total"]))/np.array(real_data_deaths["total"]))[validation_days-14:validation_days])
-    # error_deaths_peak = peak_constant*np.nanmean((np.abs(np.array(model_data_deaths["total"])-np.array(real_data_deaths["total"]))/np.array(real_data_deaths["total"]))[peak_deaths:peak_deaths+1])
-    #         error_deaths_total += error_constant/4.0*np.nanmean((np.abs(np.array(model_data_deaths["total"])-np.array(real_data_deaths["total"]))/np.array(real_data_deaths["total"]))[peak_beds:peak_beds+1])
-
-    #overflow = np.array(model_data_icus["total"]) - icu_bound
-    #overflow_error = np.nanmean([max(overflow[i],0) for i in range(len(overflow))])
-
 
     upper_days_model = days_model
 
@@ -872,3 +675,5 @@ print(f"total time: {end_time - start_time}")
 
 
 
+
+# %%

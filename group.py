@@ -118,6 +118,9 @@ class DynamicalModel:
 			self.n_infections = [{g_name1:{g_name2:float('inf') for g_name2 in self.groups} for g_name1 in self.groups} for i in range(self.time_steps)]
 			self.n_infections_act = [{act: {g_name1:{g_name2:float('inf') for g_name2 in self.groups} for g_name1 in self.groups} for act in all_activities} for i in range(self.time_steps)]
 
+		assert(self.parameters['p_H'] + self.parameters['p_ICU'] == self.parameters['p_ss'])
+
+
 	def take_end_steps(self):
 
 		all_m_tests = []
