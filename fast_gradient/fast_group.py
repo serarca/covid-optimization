@@ -8,7 +8,7 @@ import yaml
 # Parameters to try
 with open("../parameters/run_params.yaml") as file:
 	run_params = yaml.load(file, Loader=yaml.FullLoader)
-print(run_params)
+# print(run_params)
 groups = run_params["groups"]
 
 if groups == "all":
@@ -266,6 +266,10 @@ class FastDynamicalModel:
 	def get_flow_H(self):
 		denom = self.p_ICU + self.p_H
 		denom[denom == 0] = 1e-6
+		# print(self.p_H)
+		# print(self.mu)
+		# print(self.state[:,cont.index("I")])
+		# print(self.state[:,cont.index("Iss")])
 		flow = self.mu*self.p_H*(self.state[:,cont.index("I")] + self.state[:,cont.index("Iss")]/denom)
 
 		return flow
