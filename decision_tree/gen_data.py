@@ -137,102 +137,105 @@ def append_instances_to_csv(csv_file, instances_folder):
 
 
 		for t in range(simulation_params['time_periods']):
-			print(f"t is {t}")
 			
-			state = dynModel.get_state(t)
-			result = dynModel.take_time_step(file_result['m_tests'][t], file_result['a_tests'][t], file_result['policy'][t])
+			if t%14 == 0:
 
-			if (t==0):
-				initial_population = np.sum([state[ag]["N"] for ag in age_groups])
-				initial_population_old = np.sum([state[ag]["N"] for ag in ['age_group_60_69', 'age_group_70_79', 'age_group_80_plus']])
+				print(f"t is {t}")
+				
+				state = dynModel.get_state(t)
+				result = dynModel.take_time_step(file_result['m_tests'][t], file_result['a_tests'][t], file_result['policy'][t])
+
+				if (t==0):
+					initial_population = np.sum([state[ag]["N"] for ag in age_groups])
+					initial_population_old = np.sum([state[ag]["N"] for ag in ['age_group_60_69', 'age_group_70_79', 'age_group_80_plus']])
 
 
-			## Compute new infections 
-			# Find incidence rate over last 7 days in overall population
-			newInfections = np.sum([dynModel.groups[ag].parameters['sigma']*state[ag]["E"] for ag in age_groups])
-			sevendays_newInf.append(newInfections)
-			# Drop first entry if larger than 7
-			if len(sevendays_newInf)>7:
-				sevendays_newInf = sevendays_newInf[1:8]
-			incidence_rate = np.sum(sevendays_newInf)/initial_population
-			
-			# Find incidence rate over last 7 days in population aged 60+
-			newInfections_old = np.sum([dynModel.groups[ag].parameters['sigma']*state[ag]["E"] for ag in ['age_group_60_69', 'age_group_70_79', 'age_group_80_plus']])
-			sevendays_newInf_old.append(newInfections_old)
-			# Drop first entry if larger than 7
-			if len(sevendays_newInf_old)>7:
-				sevendays_newInf_old = sevendays_newInf_old[1:8]
-			incidence_rate_old = np.sum(sevendays_newInf_old)/initial_population_old
-			######
-			## Compute new ICU admissions
-			newICU = np.sum([dynModel.groups[ag].parameters['mu']*(dynModel.groups[ag].parameters['p_ICU']*state[ag]["I"] + ((dynModel.groups[ag].parameters['p_ICU'])/(dynModel.groups[ag].parameters['p_H']+dynModel.groups[ag].parameters['p_ICU']))*state[ag]["Iss"]) for ag in age_groups])
-			sevendays_newICU.append(newICU)
-			# Drop first entry if larger than 7
-			if len(sevendays_newICU)>7:
-				sevendays_newICU = sevendays_newICU[1:8]
-			sevendays_avg_newICU = np.sum(sevendays_newICU)/len(sevendays_newICU)
+				## Compute new infections 
+				# Find incidence rate over last 7 days in overall population
+				newInfections = np.sum([dynModel.groups[ag].parameters['sigma']*state[ag]["E"] for ag in age_groups])
+				sevendays_newInf.append(newInfections)
+				# Drop first entry if larger than 7
+				if len(sevendays_newInf)>7:
+					sevendays_newInf = sevendays_newInf[1:8]
+				incidence_rate = np.sum(sevendays_newInf)/initial_population
+				
+				# Find incidence rate over last 7 days in population aged 60+
+				newInfections_old = np.sum([dynModel.groups[ag].parameters['sigma']*state[ag]["E"] for ag in ['age_group_60_69', 'age_group_70_79', 'age_group_80_plus']])
+				sevendays_newInf_old.append(newInfections_old)
+				# Drop first entry if larger than 7
+				if len(sevendays_newInf_old)>7:
+					sevendays_newInf_old = sevendays_newInf_old[1:8]
+				incidence_rate_old = np.sum(sevendays_newInf_old)/initial_population_old
+				######
+				## Compute new ICU admissions
+				newICU = np.sum([dynModel.groups[ag].parameters['mu']*(dynModel.groups[ag].parameters['p_ICU']*state[ag]["I"] + ((dynModel.groups[ag].parameters['p_ICU'])/(dynModel.groups[ag].parameters['p_H']+dynModel.groups[ag].parameters['p_ICU']))*state[ag]["Iss"]) for ag in age_groups])
+				sevendays_newICU.append(newICU)
+				# Drop first entry if larger than 7
+				if len(sevendays_newICU)>7:
+					sevendays_newICU = sevendays_newICU[1:8]
+				sevendays_avg_newICU = np.sum(sevendays_newICU)/len(sevendays_newICU)
 
-			econ_gradients = dynModel.econ_gradients
+				econ_gradients = dynModel.econ_gradients
 
-			# Extract the features
-			for act in rel_activities:
-				for ag in age_groups:
-					p_death = 1 / (universe_params["seir-groups"][ag]['parameters']['lambda_H_R'] / universe_params["seir-groups"][ag]['parameters']['lambda_H_D'] + 1)
+				# Extract the features
+				for act in rel_activities:
+					for ag in age_groups:
+						p_death = 1 / (universe_params["seir-groups"][ag]['parameters']['lambda_H_R'] / universe_params["seir-groups"][ag]['parameters']['lambda_H_D'] + 1)
 
-					
-					features[act].append({
-						"age_group":ag,
-						"activity":act,
-						"t":t,
-						"lockdown":file_result['policy'][t][ag][act],
-						"icu_capacity":experiment_params["icus"],
-						"theta_schooling": experiment_params["delta_schooling"],
-						"beta": universe_params["seir-groups"][ag]['parameters']['beta'][0],
-						"alpha_1_2": universe_params["mixing"]['param_alpha'],
-						"nu_other_act":dynModel.econ_params["employment_params"]["eta"],
-						"nu_work":dynModel.econ_params["employment_params"]['nu'],
-						"chi":experiment_params["xi"],
-						"vg_life":econ_params["econ_cost_death"][ag],
-						"xi+vg_life":experiment_params["xi"]+econ_params["econ_cost_death"][ag],
-						"p_H": universe_params["seir-groups"][ag]['parameters']['p_H'],
-						"p_ICU": universe_params["seir-groups"][ag]['parameters']['p_ICU'],
-						"p_ss": universe_params["seir-groups"][ag]['parameters']['p_ss'],
-						"p_D": p_death,
-						"econ_gradient_normalized":dynModel.econ_gradients_normalized[act][ag],
-						"econ_gradient_not_normalized":econ_gradients[act][ag],
-						"I_perc":np.sum([state[other_group]["I"] for other_group in age_groups])/np.sum([state[other_group]["N"]+state[other_group]["Rq"] for other_group in age_groups]),
-						"R_perc":np.sum([state[other_group]["R"] for other_group in age_groups])/np.sum([state[other_group]["N"]+state[other_group]["Rq"] for other_group in age_groups]),
-						"H_perc":np.sum([state[other_group]["H"] for other_group in age_groups])/np.sum([state[other_group]["N"]+state[other_group]["Rq"] for other_group in age_groups]),
-						"ICU_utilization":np.sum([state[other_group]["ICU"] for other_group in age_groups])/experiment_params["icus"],
-						"contacts_received":np.sum([universe_params["seir-groups"][ag]["contacts_spc"][act][other_group] for other_group in age_groups]),
-						"contacts_received_into_deaths":np.sum([universe_params["seir-groups"][ag]["contacts_spc"][act][other_group]* p_death for other_group in age_groups]),
-						"infections_received":np.sum([universe_params["seir-groups"][ag]["contacts_spc"][act][other_group]*state[other_group]["I"]/(state[other_group]["Rq"]+state[other_group]["N"]) for other_group in age_groups]),
-						"deaths_received":np.sum([universe_params["seir-groups"][ag]["contacts_spc"][act][other_group]*state[other_group]["I"]/(state[other_group]["Rq"]+state[other_group]["N"])*p_death for other_group in age_groups]),
-						"deaths_received_econ":np.sum([universe_params["seir-groups"][ag]["contacts_spc"][act][other_group]*state[other_group]["I"]/(state[other_group]["Rq"]+state[other_group]["N"])*p_death*(experiment_params["xi"]+econ_params["econ_cost_death"][ag]) for other_group in age_groups]),
-						"contacts_given":np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag] for other_group in age_groups]),
-						"contacts_given_into_deaths":np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag] * p_death for other_group in age_groups]),
-						"infections_given":np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag]*state[ag]["I"]/(state[ag]["Rq"]+state[ag]["N"]) for other_group in age_groups]),
-						"deaths_given":np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag]*state[ag]["I"]/(state[ag]["Rq"]+state[ag]["N"]) * p_death for other_group in age_groups]),
-						"deaths_given_econ":np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag]*state[ag]["I"]/(state[ag]["Rq"]+state[ag]["N"]) * p_death *(experiment_params["xi"]+econ_params["econ_cost_death"][other_group]) for other_group in age_groups]),
-						"econ_contacts_ratio": dynModel.econ_gradients_normalized[act][ag] / (np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag] for other_group in age_groups])),
-						"econ_contacts_death_cost_ratio":dynModel.econ_gradients_normalized[act][ag] / (universe_params["seir-groups"][ag]['parameters']['beta'][0] * np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag] for other_group in age_groups]) * (experiment_params["xi"]+econ_params["econ_cost_death"][ag]) * universe_params["seir-groups"][ag]['parameters']['sigma'] *universe_params["seir-groups"][ag]['parameters']['mu']),
-						"ICU_new_daily_admissions": newICU,
-						"ICU_seven_day_avg_daily_admissions": sevendays_avg_newICU,
-						"Infections_new_rate_over_seven_days": incidence_rate,	
-						"Infections_new_rate_over_seven_days_elderly": incidence_rate_old,
-						"S": state[ag]["S"],
-						"E": state[ag]["E"],
-						"I": state[ag]["I"],
-						"Ia": state[ag]["Ia"],
-						"Ims": state[ag]["Ims"],
-						"Ips": state[ag]["Ips"],
-						"Iss": state[ag]["Iss"],
-						"ICU": state[ag]["ICU"],
-						"H": state[ag]["H"],
-						"R": state[ag]["R"], 
-						"Rq": state[ag]["Rq"],
-						"D": state[ag]["D"]
-					})
+						
+						features[act].append({
+							"age_group":ag,
+							"activity":act,
+							"t":t,
+							"lockdown":file_result['policy'][t][ag][act],
+							"icu_capacity":experiment_params["icus"],
+							"theta_schooling": experiment_params["delta_schooling"],
+							"beta": universe_params["seir-groups"][ag]['parameters']['beta'][0],
+							"alpha_1_2": universe_params["mixing"]['param_alpha'],
+							"nu_other_act":dynModel.econ_params["employment_params"]["eta"],
+							"nu_work":dynModel.econ_params["employment_params"]['nu'],
+							"chi":experiment_params["xi"],
+							"vg_life":econ_params["econ_cost_death"][ag],
+							"xi+vg_life":experiment_params["xi"]+econ_params["econ_cost_death"][ag],
+							"p_H": universe_params["seir-groups"][ag]['parameters']['p_H'],
+							"p_ICU": universe_params["seir-groups"][ag]['parameters']['p_ICU'],
+							"p_ss": universe_params["seir-groups"][ag]['parameters']['p_ss'],
+							"p_D": p_death,
+							"econ_gradient_normalized":dynModel.econ_gradients_normalized[act][ag],
+							"econ_gradient_not_normalized":econ_gradients[act][ag],
+							"I_perc":np.sum([state[other_group]["I"] for other_group in age_groups])/np.sum([state[other_group]["N"]+state[other_group]["Rq"] for other_group in age_groups]),
+							"R_perc":np.sum([state[other_group]["R"] for other_group in age_groups])/np.sum([state[other_group]["N"]+state[other_group]["Rq"] for other_group in age_groups]),
+							"H_perc":np.sum([state[other_group]["H"] for other_group in age_groups])/np.sum([state[other_group]["N"]+state[other_group]["Rq"] for other_group in age_groups]),
+							"ICU_utilization":np.sum([state[other_group]["ICU"] for other_group in age_groups])/experiment_params["icus"],
+							"contacts_received":np.sum([universe_params["seir-groups"][ag]["contacts_spc"][act][other_group] for other_group in age_groups]),
+							"contacts_received_into_deaths":np.sum([universe_params["seir-groups"][ag]["contacts_spc"][act][other_group]* p_death for other_group in age_groups]),
+							"infections_received":np.sum([universe_params["seir-groups"][ag]["contacts_spc"][act][other_group]*state[other_group]["I"]/(state[other_group]["Rq"]+state[other_group]["N"]) for other_group in age_groups]),
+							"deaths_received":np.sum([universe_params["seir-groups"][ag]["contacts_spc"][act][other_group]*state[other_group]["I"]/(state[other_group]["Rq"]+state[other_group]["N"])*p_death for other_group in age_groups]),
+							"deaths_received_econ":np.sum([universe_params["seir-groups"][ag]["contacts_spc"][act][other_group]*state[other_group]["I"]/(state[other_group]["Rq"]+state[other_group]["N"])*p_death*(experiment_params["xi"]+econ_params["econ_cost_death"][ag]) for other_group in age_groups]),
+							"contacts_given":np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag] for other_group in age_groups]),
+							"contacts_given_into_deaths":np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag] * p_death for other_group in age_groups]),
+							"infections_given":np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag]*state[ag]["I"]/(state[ag]["Rq"]+state[ag]["N"]) for other_group in age_groups]),
+							"deaths_given":np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag]*state[ag]["I"]/(state[ag]["Rq"]+state[ag]["N"]) * p_death for other_group in age_groups]),
+							"deaths_given_econ":np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag]*state[ag]["I"]/(state[ag]["Rq"]+state[ag]["N"]) * p_death *(experiment_params["xi"]+econ_params["econ_cost_death"][other_group]) for other_group in age_groups]),
+							"econ_contacts_ratio": dynModel.econ_gradients_normalized[act][ag] / (np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag] for other_group in age_groups])),
+							"econ_contacts_death_cost_ratio":dynModel.econ_gradients_normalized[act][ag] / (universe_params["seir-groups"][ag]['parameters']['beta'][0] * np.sum([universe_params["seir-groups"][other_group]["contacts_spc"][act][ag] for other_group in age_groups]) * (experiment_params["xi"]+econ_params["econ_cost_death"][ag]) * universe_params["seir-groups"][ag]['parameters']['sigma'] *universe_params["seir-groups"][ag]['parameters']['mu']),
+							"ICU_new_daily_admissions": newICU,
+							"ICU_seven_day_avg_daily_admissions": sevendays_avg_newICU,
+							"Infections_new_rate_over_seven_days": incidence_rate,	
+							"Infections_new_rate_over_seven_days_elderly": incidence_rate_old,
+							"S": state[ag]["S"],
+							"E": state[ag]["E"],
+							"I": state[ag]["I"],
+							"Ia": state[ag]["Ia"],
+							"Ims": state[ag]["Ims"],
+							"Ips": state[ag]["Ips"],
+							"Iss": state[ag]["Iss"],
+							"ICU": state[ag]["ICU"],
+							"H": state[ag]["H"],
+							"R": state[ag]["R"], 
+							"Rq": state[ag]["Rq"],
+							"D": state[ag]["D"]
+						})
 					
 
 		for act in rel_activities:
