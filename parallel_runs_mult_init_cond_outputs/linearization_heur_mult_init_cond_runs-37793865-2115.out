@@ -1,0 +1,37 @@
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'icus': [3200], 'eta': [0.1], 'tests': [[0, 0]], 'xi': [371990.30000000005], 'testing': ['homogeneous']}}
+results/time_gradient/xi-371990_icus-3200_testing-homogeneous_natests-0_nmtests-0_T-90_startday-0_groups-all_dschool-0.500000_eta-0.100000_freq-90-14_randomInstance-115.yaml
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'xi': [0, 371990.3, 929975.75, 1859951.5, 3719903, 5579854.5], 'icus': [2900], 'tests': [[60000, 0]], 'testing': ['homogeneous'], 'eta': [0.1]}}
+{'groups': 'all', 'params_to_try': {'delta_schooling': [0.5], 'icus': [3200], 'eta': [0.1], 'tests': [[0, 0]], 'xi': [371990.30000000005], 'testing': ['homogeneous']}}
+results/dynamic_gradient/xi-371990_icus-3200_testing-homogeneous_natests-0_nmtests-0_T-90_startday-0_groups-all_dschool-0.500000_eta-0.100000_freq-90-14_randomInstance-115.yaml
+total instances: 22500
+(0.5, 3719903.0, 0.32, 0.0, (7, 14), 'fitted-scaled', 'econ-scaled', 'oct21-scaled', 0.1, 0.05, 2, 'dynamic_gradient', 115)
+The value of T is: 104
+Missing starting point -- Running the initial heuristic.
+/home/groups/daniancu/covid-optimization/covid-optimization
+90
+Total Reward at the start of the inner iterations: 56134958.779652685
+Using license file /share/software/user/restricted/gurobi/9.0.3_py36/licenses/gurobi.lic
+Set parameter TokenServer to value license4.stanford.edu
+Gurobi status: 2
+
+Statistics for model Linearization Heuristic :
+  Linear constraint matrix    : 16026 Constrs, 9360 Vars, 7750665 NZs
+  Matrix coefficient range    : [ 1.00986e-13, 467.93 ]
+  Objective coefficient range : [ 2.27051e-19, 1.32635e+09 ]
+  Variable bound range        : [ 0.0426696, 1 ]
+  RHS coefficient range       : [ 1.58934e-08, 1.26586 ]
+Traceback (most recent call last):
+  File "run_linearization_heuristic_multiple_init_cond.py", line 436, in <module>
+    main()
+  File "run_linearization_heuristic_multiple_init_cond.py", line 172, in main
+    run_lin_heur_and_save_yaml(delta, xi, icus, mtests, atests, n_days, region, test_freq, lockdown_freq, econ, init, eta, groups, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, scaling, money_scaling, random_instance, targetActivities, targetGroups, targetTests)
+  File "run_linearization_heuristic_multiple_init_cond.py", line 211, in run_lin_heur_and_save_yaml
+    dynModel = run_linearization_heuristic(simulation_params, experiment_params, start_day, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, random_instance, targetActivities, targetGroups, targetTests)
+  File "run_linearization_heuristic_multiple_init_cond.py", line 329, in run_linearization_heuristic
+    linearization.run_heuristic_linearization(dynModel, trust_region_radius, max_inner_iterations_mult, initial_uhat, optimize_bouncing, targetActivities, targetGroups, targetTests, deltaFairnessOne, deltaFair, optimizeLockdowns, averageLockConst, pLock, optimizeOnlyDeaths, random_instance)
+  File "/home/groups/daniancu/covid-optimization/covid-optimization/heuristics/linearization.py", line 1947, in run_heuristic_linearization
+    assert(False)
+AssertionError
+srun: error: sh02-08n45: task 0: Exited with exit code 1
+srun: launch/slurm: _step_signal: Terminating StepId=37794093.0

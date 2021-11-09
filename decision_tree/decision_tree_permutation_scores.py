@@ -2,7 +2,7 @@
 # To add a new markdown cell, type '# %% [markdown]'
 
 #@title Import revelant modules and define some useful functions
-from IPython import get_ipython
+
 import os
 import sys
 assert sys.version_info >= (3, 5)   # Python ≥3.5 is required
@@ -38,16 +38,16 @@ mpl.rc('ytick', labelsize=12)
 #!pip install seaborn==0.11.0  &> /dev/null
 import seaborn as sns
 
-from IPython.core.display import display, HTML
-import base64
+
+# import base64
 
 # install graphviz for visualizing decision trees
 # !pip install graphviz
-import graphviz
+# import graphviz
 
 # install pdpbox for partial dependency visualization
 # !pip install pdpbox &> /dev/null
-from pdpbox import info_plots, pdp
+# from pdpbox import info_plots, pdp
 
 # Ignore useless some warnings
 import warnings
@@ -109,7 +109,7 @@ def append_dummies(data, columns):
 print("reading data")
 reading_data_time = time.time()
 
-data = pd.read_csv("./datasets/dataset_training_testing_filtered_dates.csv", index_col=None)
+data = pd.read_csv("./dataset.csv", index_col=None)
 
 end_reading_data_time = time.time()
 print(f"finished reading data, took {end_reading_data_time - reading_data_time} seconds")

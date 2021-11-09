@@ -2,7 +2,7 @@
 # To add a new markdown cell, type '# %% [markdown]'
 
 #@title Import revelant modules and define some useful functions
-from IPython import get_ipython
+# from IPython import get_ipython
 import os
 import sys
 assert sys.version_info >= (3, 5)   # Python ≥3.5 is required
@@ -38,7 +38,7 @@ mpl.rc('ytick', labelsize=12)
 #!pip install seaborn==0.11.0  &> /dev/null
 import seaborn as sns
 
-from IPython.core.display import display, HTML
+# from IPython.core.display import display, HTML
 import base64
 
 # install graphviz for visualizing decision trees
@@ -107,7 +107,7 @@ def append_dummies(data, columns):
 print("reading data")
 reading_data_time = time.time()
 
-data = pd.read_csv("./datasets/dataset_training_testing_filtered_dates.csv", index_col=None)
+data = pd.read_csv("./dataset.csv", index_col=None)
 
 end_reading_data_time = time.time()
 print(f"finished reading data, took {end_reading_data_time - reading_data_time} seconds")
@@ -333,7 +333,7 @@ for var_title in ["ALL_2", "NON_TARGETED", "TARGETED_AGE", "TARGETED_P_D","TARGE
   # TRAIN THE TREE
   # USE CROSS VALIDATION TO SEARCH FOR BEST max_depth
   from sklearn.model_selection import GridSearchCV
-  param_grid = {'max_depth': np.arange(5,6,1), 'random_state' : [123]}
+  param_grid = {'max_depth': np.arange(4,5,1), 'random_state' : [123]}
 
   # Use random_state to set the seed in order to avoid instabilities across different runs due to randomization in the folding
   dt_model = tree.DecisionTreeRegressor(criterion='mse',random_state=0)

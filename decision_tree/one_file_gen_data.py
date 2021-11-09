@@ -56,8 +56,11 @@ def append_instances_to_csv(csv_file, instances_folder):
 
     #TODO: Read CSV file if it exists, extract all instances that have been already read, filter files below for those not processed
 
-    old_dataset = pd.read_csv(csv_file+".csv")
-    processed_files = old_dataset["instance"].unique()
+    processed_files = []
+
+    if os.path.exists(csv_file+".csv"):
+        old_dataset = pd.read_csv(csv_file+".csv")
+        processed_files = old_dataset["instance"].unique()
 
     # Read files
     files = [f for f in listdir(instances_folder) if (isfile(join(instances_folder, f)) and f[0:2]=="xi") and (instances_folder+f not in processed_files)]
@@ -141,13 +144,15 @@ def append_instances_to_csv(csv_file, instances_folder):
 
 
         for t in range(simulation_params['time_periods']):
+
+            result = dynModel.take_time_step(file_result['m_tests'][t], file_result['a_tests'][t], file_result['policy'][t])
             
             if t%14 == 0:
 
                 print(f"t is {t}")
                 
                 state = dynModel.get_state(t)
-                result = dynModel.take_time_step(file_result['m_tests'][t], file_result['a_tests'][t], file_result['policy'][t])
+                
 
                 if (t==0):
                     initial_population = np.sum([state[ag]["N"] for ag in age_groups])
@@ -243,18 +248,18 @@ def append_instances_to_csv(csv_file, instances_folder):
                         })
                     
 
-        for act in rel_activities:
+        
 
-            if not os.path.exists(csv_file+".csv"):
-                useHeader = True
-            else:
-                useHeader = False
+        if not os.path.exists(csv_file+".csv"):
+            useHeader = True
+        else:
+            useHeader = False
             
             
-            pd.DataFrame(features[act]).to_csv(csv_file+".csv", mode='a', header=useHeader, index=False)
+        pd.DataFrame(features).to_csv(csv_file+".csv", mode='a', header=useHeader, index=False)
 
-            with open("log.txt", 'w') as file:
-                file.write(f"Just ran file number {i} from folder {instances_folder}.")
+        with open("log.txt", 'w') as file:
+            file.write(f"Just ran file number {i} from folder {instances_folder}.")
 
 
 
@@ -269,13 +274,13 @@ def main():
 
     # append_instances_to_csv(csv_file, instances_folder)
 
-    # instances_folder = "../benchmarks/results/linearization_heuristic_optBouncing=False_initial_uhat=dynamic_gradient_multiple_init_cond/"
-
-    # append_instances_to_csv(csv_file, instances_folder)
-
-    instances_folder = "../benchmarks/results/linearization_heuristic_optBouncing=False_initial_uhat=dynamic_gradient/"
+    instances_folder = "../benchmarks/results/linearization_heuristic_optBouncing=False_initial_uhat=dynamic_gradient_multiple_init_cond/"
 
     append_instances_to_csv(csv_file, instances_folder)
+
+    # instances_folder = "../benchmarks/results/linearization_heuristic_optBouncing=False_initial_uhat=dynamic_gradient/"
+
+    # append_instances_to_csv(csv_file, instances_folder)
 
     init_param = ["multiplier_beta", "multiplier_p_icu", "multiplier_p_d","multiplier_lambda_h", "multiplier_lambda_icu", "alpha_other","l_school_march", "l_school_may", "l_school_july", "l_school_september", "alpha_mixing", "econ_value", "l_work_april"]
 
