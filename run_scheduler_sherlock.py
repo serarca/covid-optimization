@@ -39,7 +39,7 @@ def calculate_missing_jobs(foldername):
             #     if "srun: error" in file.read():
             #         error_runs.append(int(run_number))
 
-    all_runs = set(range(19500))
+    all_runs = set(range(22500))
 
     if not sorted(list(all_runs.difference(set(runs)))):
         sys.exit("All jobs have been runned!!")

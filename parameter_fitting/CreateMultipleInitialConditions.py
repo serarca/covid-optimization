@@ -86,29 +86,31 @@ google.to_csv('smoothed.csv')
 
 
 # Load the original SEIR parameters
-mean_params = pd.read_excel("./ile-de-france_data_master.xlsx",sheet_name="SEIR_params", index_col = 0)
+mean_params = pd.read_excel("./ile-de-france_data_master.xlsx",sheet_name="SEIR_params", index_col = 0, engine='openpyxl')
 
-lower_bound_params = pd.read_excel("./ile-de-france_data_master.xlsx",sheet_name="SEIR_params_conf_range_lower", index_col = 0)
+lower_bound_params = pd.read_excel("./ile-de-france_data_master.xlsx",sheet_name="SEIR_params_conf_range_lower", index_col = 0, engine='openpyxl')
 
-upper_bound_params = pd.read_excel("./ile-de-france_data_master.xlsx",sheet_name="SEIR_params_conf_range_upper", index_col = 0)
+upper_bound_params = pd.read_excel("./ile-de-france_data_master.xlsx",sheet_name="SEIR_params_conf_range_upper", index_col = 0, engine='openpyxl')
 
 
-
-lower_beta = 2.8
-upper_beta = 3
-mid_beta = (upper_beta + lower_beta)/2
+lower_r0 = 2.8
+upper_r0 = 3
+lower_beta = 2.8 * (0.03923794546657925/2.9)
+upper_beta = 3 * (0.03923794546657925/2.9)
+mid_beta = 0.03923794546657925
+mid_r0 = (upper_r0 + lower_r0)/2
 
 mean_init_param = {
-    "beta":(0.03923794546657925/2.9)*mid_beta,
+    "beta":mid_beta,
     "p_ss":mean_params['p_ss'].values,
 }
 
 sigma_init_param = {
-    "beta": (upper_beta - lower_beta) * (0.03923794546657925/2.9) / 4,
+    "beta": (upper_beta - lower_beta) / 4,
     "p_ss":((upper_bound_params['p_ss'] - lower_bound_params['p_ss'])/4).values
 }
 
-params = pd.read_excel("./ile-de-france_data_master.xlsx",sheet_name="SEIR_params", index_col = 0)
+params = pd.read_excel("./ile-de-france_data_master.xlsx",sheet_name="SEIR_params", index_col = 0, engine='openpyxl')
 
 
 
@@ -135,35 +137,52 @@ for sim_i in range(0, 125):
     initial_params = {
         "mu":params['mu'].values,
         "sigma":params['sigma'].values,
-        "p_ICU":params['p_ICU'].values,
-        "p_H":params['p_H'].values,
-        "lambda_H_R":params['lambda_HR'].values,
-        "lambda_H_D":params['lambda_HD'].values,
-        "lambda_ICU_R":params['lambda_ICUR'].values,
-        "lambda_ICU_D":params['lambda_ICUD'].values,
-        "lambda_ICU":params['lambda_ICU'].values,
-        "lambda_H":params['lambda_H'].values,
-        "p_death":params['p_death_cond_ss'].values,
-        "p_recov":params['p_recov_cond_ss'].values,
+        "p_ICU":params['p_ICU'].values[:9],
+        "p_H":params['p_H'].values[:9],
+        "lambda_H_R":params['lambda_HR'].values[:9],
+        "lambda_H_D":params['lambda_HD'].values[:9],
+        "lambda_ICU_R":params['lambda_ICUR'].values[:9],
+        "lambda_ICU_D":params['lambda_ICUD'].values[:9],
+        "lambda_ICU":params['lambda_ICU'].values[:9],
+        "lambda_H":params['lambda_H'].values[:9],
+        "p_death":params['p_death_cond_ss'].values[:9],
+        "p_recov":params['p_recov_cond_ss'].values[:9],
         
     }
+    
+    # print(mean_init_param["p_ss"][:9])
+    # print(lower_bound_params['p_ss'].to_list())
+    # print(mean_init_param["p_ss"][:9] + instance_variation_p_ss_z * sigma_init_param["p_ss"][:9])
 
-    print(mean_init_param["p_ss"] + instance_variation_p_ss_z * sigma_init_param["p_ss"])
+    # print(mean_init_param["p_ss"])
+    # print(lower_bound_params['p_ss'].to_list())
 
-    print(mean_init_param["p_ss"])
-    print(lower_bound_params['p_ss'].to_list())
-
-    print(np.minimum(np.maximum(mean_init_param["p_ss"]+ instance_variation_p_ss_z * sigma_init_param["p_ss"], lower_bound_params['p_ss'].to_list()), upper_bound_params['p_ss'].to_list()))
+    # print(np.minimum(np.maximum(mean_init_param["p_ss"][:9]+ instance_variation_p_ss_z * sigma_init_param["p_ss"], lower_bound_params['p_ss'].to_list()), upper_bound_params['p_ss'].to_list()))
 
 
 
-    initial_params["p_ss"] = np.minimum(np.maximum(mean_init_param["p_ss"]+ instance_variation_p_ss_z * sigma_init_param["p_ss"], lower_bound_params['p_ss'].to_list()), upper_bound_params['p_ss'].to_list())
+    initial_params["p_ss"] = np.minimum(np.maximum(mean_init_param["p_ss"][:9]+ instance_variation_p_ss_z * sigma_init_param["p_ss"][:9], lower_bound_params['p_ss'].to_list()[:9]), upper_bound_params['p_ss'].to_list()[:9])
 
-    initial_params["beta"] = np.minimum(np.maximum(mean_init_param["beta"] + instance_variation_beta_z * sigma_init_param["beta"], lower_beta), upper_beta)
+    # print(np.minimum(np.maximum(mean_init_param["beta"] + instance_variation_beta_z * sigma_init_param["beta"], lower_beta), upper_beta))
 
-    initial_params["p_H"] = initial_params["p_ss"] * (1/(1 + initial_params["p_ICU"]/initial_params["p_H"]))
+    
+    print(float(mean_init_param["beta"] + instance_variation_beta_z * sigma_init_param["beta"]))
+    print(lower_beta)
+    print(upper_beta)
 
-    initial_params["p_ICU"] = initial_params["p_ss"] - initial_params["p_H"]
+    initial_params["beta"] = float(np.minimum(np.maximum(mean_init_param["beta"] + instance_variation_beta_z * sigma_init_param["beta"], lower_beta), upper_beta))
+
+    initial_params["p_H"] = (initial_params["p_ss"][:9] * (1/(1 + initial_params["p_ICU"][:9]/initial_params["p_H"][:9])))[:9]
+
+    initial_params["p_ICU"] = initial_params["p_ss"][:9] - initial_params["p_H"][:9]
+
+    # initial_params["p_ss"] = list(initial_params["p_ss"])[:9]
+    # initial_params["p_H"] = list(initial_params["p_H"])[:9]
+    # initial_params["p_ICU"] = list(initial_params["p_ICU"])[:9]
+
+    # print(initial_params["p_ss"])
+    # print(initial_params["p_H"])
+    # print(initial_params["p_ICU"])
 
     # Estimated Alpha Mixing is 0.39 see table S5
     alpha_mixing = 0.39 + instance_variation_alpha_z * (0.7-0.1)/4
@@ -564,7 +583,7 @@ for sim_i in range(0, 125):
         del universe_params['seir-groups'][ag]['parameters']['p_death_cond_ss']
         
     with open('../parameters/multiple_initial_conditions/fitted_%d.yaml'%(sim_i), 'w') as file:
-        yaml.dump(universe_params, file)
+        yaml.dump(universe_params, file, encoding='utf-8', allow_unicode=True)
         
         
 
@@ -573,8 +592,8 @@ for sim_i in range(0, 125):
 
 
     # Add economic value parameters
-    contrib = pd.read_excel("./ile-de-france_data_master.xlsx",sheet_name="contributions_normal", index_col = 0)
-    gains = pd.read_excel("./ile-de-france_data_master.xlsx",sheet_name="activity_levels_as_%_of_full", index_col = 0)
+    contrib = pd.read_excel("./ile-de-france_data_master.xlsx",sheet_name="contributions_normal", index_col = 0, engine='openpyxl')
+    gains = pd.read_excel("./ile-de-france_data_master.xlsx",sheet_name="activity_levels_as_%_of_full", index_col = 0,engine='openpyxl')
 
     empl_params = {}
     empl_params["v"] = {}
@@ -651,7 +670,7 @@ for sim_i in range(0, 125):
         "upper_bounds":upper_bounds,
     }
     with open('../parameters/multiple_initial_conditions/econ_%d.yaml'%(sim_i), 'w') as file:
-        yaml.dump(econ_params, file)
+        yaml.dump(econ_params, file, encoding='utf-8', allow_unicode=True)
 
 
     # In[14]:
@@ -666,7 +685,7 @@ for sim_i in range(0, 125):
         return state
 
     with open('../parameters/multiple_initial_conditions/oct21_%d.yaml'%(sim_i), 'w') as file:
-        yaml.dump(matrix_to_state(final_state), file)
+        yaml.dump(matrix_to_state(final_state), file, encoding='utf-8', allow_unicode=True)
 
 
 end_time = time()

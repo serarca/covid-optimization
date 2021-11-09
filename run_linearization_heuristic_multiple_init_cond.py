@@ -107,7 +107,7 @@ def main():
     start_day = 0
     optimize_bouncing = False
 
-    print(len(all_instances))
+    print(f"total instances: {len(all_instances)}")
 
 
     
