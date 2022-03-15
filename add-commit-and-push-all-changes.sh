@@ -7,7 +7,7 @@ git pull &&
 
 while [[ $(git status -s) ]]
 do
-    # git status -s | grep 'M\|??\|A\|U\|D' | cut -c 3- > files_to_commit.txt
+    git status -s | grep 'M\|??\|A\|U\|D' | cut -c 3- > files_to_commit.txt
     while [[ $(cat files_to_commit.txt) ]]
     do
         head -n 1000 files_to_commit.txt | xargs git add -A
