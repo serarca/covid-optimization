@@ -45,7 +45,7 @@ def main():
     # 30 * 37199.03
     # Some paramters to test the linearization heuristic
     
-    xi_mult_values = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 50,75, 100, 125, 150, 175, 200, 250, 300, 400, 500, 600, 700, 800, 900] 
+    xi_mult_values = [0,10,20,30,40,50,60,70,80,90,100,150,250,350,450,550,650,750,850,950] 
     # range(0,205,5)
     testing_values = [0]
     # [0, 30000, 60000, 120000]
@@ -63,8 +63,8 @@ def main():
         "econ": ["econ-scaled"],
         "init": ["oct21-scaled"],
         "eta":[0.1],
-        "feature_set": ["ALL_2", "NON_TARGETED", "TARGETED_AGE", "TARGETED_P_D","TARGETED_VG_LIFE", "TARGETED_R_PERC","TARGETED_ECON_CONT_RATIO", "TARGETED_ECON_GRAD_NORM", "TARGETED_CONT_GIVEN"], 
-        "tree_depth": [4,5,6,7]
+        "feature_set": ["ALL_2", "NON_TARGETED", "TARGETED_AGE", "TARGETED_P_D","TARGETED_VG_LIFE", "TARGETED_R_PERC","TARGETED_ECON_CONT_RATIO", "TARGETED_ECON_GRAD_NORM", "TARGETED_CONT_GIVEN", "TARGETED_ACT", "TARGETED_P_SS" ], 
+        "tree_depth": [4,5,10]
         # "trust_region_radius":[0.05],
         # "max_inner_iterations_mult":[2],
         # "initial_uhat":["dynamic_gradient"]

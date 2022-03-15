@@ -192,6 +192,12 @@ for v in unique_age_groups:
 data = data.astype({'age':int})
 
 
+
+# Hot encoding of Act
+data = pd.get_dummies(data, columns=['activity'], prefix=['act'])
+
+
+
 #     # %%
 #     # data.head(9)
 
@@ -248,8 +254,7 @@ all_features = ['t', 'icu_capacity', 'theta_schooling', 'beta', 'alpha_1_2', 'nu
 # 'econ_contacts_ratio', 'ICU_new_daily_admissions', 'ICU_seven_day_avg_daily_admissions',
 # 'Infections_new_rate_over_seven_days', 'Infections_new_rate_over_seven_days_elderly', 'age']
     
-engineered_2_targetting = ["age", "p_D", "vg_life", "R_perc", "econ_contacts_ratio", 'econ_gradient_normalized', 'contacts_given']
-
+engineered_2_targetting = ["age", "p_D", "vg_life", "R_perc", "econ_contacts_ratio", 'econ_gradient_normalized', 'contacts_given', 'p_ss', 'act_work', 'act_leisure', 'act_other', 'act_school', 'act_transport']
 engineered_2_no_targetting = ['t', 'icu_capacity', 'theta_schooling', 'beta', 'alpha_1_2', 'nu_other_act', 'nu_work',
 "chi",  'ICU_utilization', 
  'ICU_new_daily_admissions', 'ICU_seven_day_avg_daily_admissions',
@@ -267,112 +272,124 @@ engineered_2_all = engineered_2_targetting + engineered_2_no_targetting
 
 #  "TARGETED_ECON_GRAD_NORM", "TARGETED_CONT_GIVEN"
 
-for var_title in ["ALL_2", "NON_TARGETED", "TARGETED_AGE", "TARGETED_P_D","TARGETED_VG_LIFE", "TARGETED_R_PERC","TARGETED_ECON_CONT_RATIO", "TARGETED_ECON_GRAD_NORM", "TARGETED_CONT_GIVEN"]:
+for depth in [4,10]:
+    for var_title in ["ALL_2" ]:
 
-    # SELECT THE FEATURES
-    if var_title == "ALL_2":
-        vars_to_use = engineered_2_all
-    #var_title = "ALL"
+        # SELECT THE FEATURES
+        if var_title == "ALL_2":
+            vars_to_use = engineered_2_all
+        #var_title = "ALL"
 
-    if var_title == "NON_TARGETED":
-        vars_to_use = engineered_2_no_targetting
-    #var_title = "ALL"
+        if var_title == "NON_TARGETED":
+            vars_to_use = engineered_2_no_targetting
+        #var_title = "ALL"
 
-    if var_title == "TARGETED_AGE":
-        vars_to_use = engineered_2_no_targetting + ["age"]
-    #var_title = "ALL"
+        if var_title == "TARGETED_AGE":
+            vars_to_use = engineered_2_no_targetting + ["age"]
+        #var_title = "ALL"
 
-    if var_title == "TARGETED_P_D":
-        vars_to_use = engineered_2_no_targetting + ["p_D"]
-    #var_title = "ALL"
+        if var_title == "TARGETED_P_D":
+            vars_to_use = engineered_2_no_targetting + ["p_D"]
+        #var_title = "ALL"
 
-    if var_title == "TARGETED_VG_LIFE":
-        vars_to_use = engineered_2_no_targetting + ["vg_life"]
-    #var_title = "ALL"
+        if var_title == "TARGETED_VG_LIFE":
+            vars_to_use = engineered_2_no_targetting + ["vg_life"]
+        #var_title = "ALL"
 
-    if var_title == "TARGETED_R_PERC":
-        vars_to_use = engineered_2_no_targetting + ["R_perc"]
-    #var_title = "ALL"
+        if var_title == "TARGETED_R_PERC":
+            vars_to_use = engineered_2_no_targetting + ["R_perc"]
+        #var_title = "ALL"
 
-    if var_title == "TARGETED_ECON_CONT_RATIO":
-        vars_to_use = engineered_2_no_targetting + ["econ_contacts_ratio"]
-    #var_title = "ALL"
+        if var_title == "TARGETED_ECON_CONT_RATIO":
+            vars_to_use = engineered_2_no_targetting + ["econ_contacts_ratio"]
+        #var_title = "ALL"
 
-    if var_title == "TARGETED_ECON_GRAD_NORM":
-        vars_to_use = engineered_2_no_targetting + ["econ_gradient_normalized"]
-    #var_title = "ALL"
+        if var_title == "TARGETED_ECON_GRAD_NORM":
+            vars_to_use = engineered_2_no_targetting + ["econ_gradient_normalized"]
+        #var_title = "ALL"
 
-    if var_title == "TARGETED_CONT_GIVEN":
-        vars_to_use = engineered_2_no_targetting + ["contacts_given"]
-    #var_title = "ALL"
-
-
-
-    print("Building single tree for all activity, using {} features".format(var_title))
-
-    # select the features
-    X_train = data.loc[:, vars_to_use ]
-    y_train = data.loc[:, "lockdown"]
+        if var_title == "TARGETED_CONT_GIVEN":
+            vars_to_use = engineered_2_no_targetting + ["contacts_given"]
+        #var_title = "ALL"
 
 
-    # TRAIN THE TREE
-    # USE CROSS VALIDATION TO SEARCH FOR BEST max_depth
-    from sklearn.model_selection import GridSearchCV
-    param_grid = {'max_depth': np.arange(4,5,1), 'random_state' : [123]}
+        if var_title == "TARGETED_ACT":
+            vars_to_use = engineered_2_no_targetting + ['act_work', 'act_leisure', 'act_other', 'act_school', 'act_transport']
+      
 
-    # Use random_state to set the seed in order to avoid instabilities across different runs due to randomization in the folding
-    dt_model = tree.DecisionTreeRegressor(criterion='mse',random_state=0)
-
-    print("defined grid search")
-    grid_search = GridSearchCV(dt_model, param_grid, cv=2, scoring='neg_mean_squared_error', n_jobs=2, refit=True, return_train_score=True)
-
-    # fit using CV
-    time_pre_fitting = time.time()
-    print(f"fitting using CV")
-    grid_search.fit(X_train, y_train)
-
-    time_post_fitting = time.time()
-
-    print(f"total time fitting: {(time_post_fitting - time_pre_fitting)/60} minutes.")
-
-    # get the best estimator
-    dt_model = grid_search.best_estimator_   
-    max_depth = dt_model.get_params()['max_depth']
-
-    print("Optimal depth: {}".format(max_depth))
-
-    # Get Permutation Importance Scores
-
-    print("getting permutation scores")
-    perm_scores_time_started = time.time()
-
-    result = permutation_importance(dt_model, X_train, y_train, n_repeats=15, random_state=123, n_jobs=30, scoring='neg_mean_squared_error')
-
-    tree_importances_mean = pd.Series(result.importances_mean, index=vars_to_use)
-
-    tree_importances_std = pd.Series(result.importances_std, index=vars_to_use)
-
-    # fig, ax = plt.subplots()
-    # tree_importances_mean.plot.bar(yerr=result.importances_std, ax=ax)
-    # ax.set_title("Feature importances using permutation scores")
-    # ax.set_ylabel("Mean accuracy decrease")
-    # fig.tight_layout()
-
-     # WRITE TO A PDF FILE AND DOWNLOAD IT
-    title = "all_activities"
-
-    # adjust the file name to reflect the tree depth and which vars are used 
-    title += "_Dep_" + str(max_depth)
-    title += '_variables_' + var_title
-
-    # fig.savefig(f"./permutation_scores/perm_scores_{title}.pdf")
-
-    tree_importances_mean.to_csv(f"./permutation_scores/perm_scores_mean_{title}.csv")
-    tree_importances_std.to_csv(f"./permutation_scores/perm_scores_std_{title}.csv")
+        if var_title == "TARGETED_P_SS":
+            vars_to_use = engineered_2_no_targetting + ["p_ss"]
+      
 
 
-    perm_scores_time_end = time.time()
-    print(f"finished getting perm scores, took {(perm_scores_time_end - perm_scores_time_started)/60} minutes")
+
+
+
+        print("Building single tree for all activity, using {} features".format(var_title))
+
+        # select the features
+        X_train = data.loc[:, vars_to_use ]
+        y_train = data.loc[:, "lockdown"]
+
+
+        # TRAIN THE TREE
+        # USE CROSS VALIDATION TO SEARCH FOR BEST max_depth
+        from sklearn.model_selection import GridSearchCV
+        param_grid = {'max_depth': np.arange(depth,depth+1,1), 'random_state' : [123]}
+
+        # Use random_state to set the seed in order to avoid instabilities across different runs due to randomization in the folding
+        dt_model = tree.DecisionTreeRegressor(criterion='mse',random_state=0)
+
+        print("defined grid search")
+        grid_search = GridSearchCV(dt_model, param_grid, cv=2, scoring='neg_mean_squared_error', n_jobs=2, refit=True, return_train_score=True)
+
+        # fit using CV
+        time_pre_fitting = time.time()
+        print(f"fitting using CV")
+        grid_search.fit(X_train, y_train)
+
+        time_post_fitting = time.time()
+
+        print(f"total time fitting: {(time_post_fitting - time_pre_fitting)/60} minutes.")
+
+        # get the best estimator
+        dt_model = grid_search.best_estimator_   
+        max_depth = dt_model.get_params()['max_depth']
+
+        print("Optimal depth: {}".format(max_depth))
+
+        # Get Permutation Importance Scores
+
+        print("getting permutation scores")
+        perm_scores_time_started = time.time()
+
+        result = permutation_importance(dt_model, X_train, y_train, n_repeats=15, random_state=123, n_jobs=30, scoring='neg_mean_squared_error')
+
+        tree_importances_mean = pd.Series(result.importances_mean, index=vars_to_use)
+
+        tree_importances_std = pd.Series(result.importances_std, index=vars_to_use)
+
+        # fig, ax = plt.subplots()
+        # tree_importances_mean.plot.bar(yerr=result.importances_std, ax=ax)
+        # ax.set_title("Feature importances using permutation scores")
+        # ax.set_ylabel("Mean accuracy decrease")
+        # fig.tight_layout()
+
+        # WRITE TO A PDF FILE AND DOWNLOAD IT
+        title = "all_activities"
+
+        # adjust the file name to reflect the tree depth and which vars are used 
+        title += "_Dep_" + str(max_depth)
+        title += '_variables_' + var_title
+
+        # fig.savefig(f"./permutation_scores/perm_scores_{title}.pdf")
+
+        tree_importances_mean.to_csv(f"./permutation_scores/perm_scores_mean_{title}.csv")
+        tree_importances_std.to_csv(f"./permutation_scores/perm_scores_std_{title}.csv")
+
+
+        perm_scores_time_end = time.time()
+        print(f"finished getting perm scores, took {(perm_scores_time_end - perm_scores_time_started)/60} minutes")
 
 
 
