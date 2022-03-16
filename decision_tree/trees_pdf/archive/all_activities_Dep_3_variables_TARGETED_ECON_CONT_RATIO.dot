@@ -1,0 +1,35 @@
+digraph Tree {
+rankdir=LR;
+node [color="black", fontname=helvetica, shape=box, style="filled, rounded"];
+edge [fontname=helvetica];
+0 [fillcolor="0.0 0.0 0.554797", label="econ-to-contacts-ratio <= 0.2929\nsamples = 8,232,210\nactivity level = 55.48%"];
+1 [fillcolor="0.0 0.0 0.010615", fontcolor=white, label="econ-to-contacts-ratio <= 0.1408\nsamples = 3,323,201\nactivity level = 1.06%"];
+0 -> 1  [headlabel="", label="True", labelangle="-45", labeldistance="2.5"];
+2 [fillcolor="0.0 0.0 0.000286", fontcolor=white, label="χ <= 5\nsamples = 3,245,179\nactivity level = 0.03%"];
+1 -> 2;
+3 [fillcolor="0.0 0.0 0.004278", fontcolor=white, label="samples = 187,355\nactivity level = 0.43%"];
+2 -> 3;
+4 [fillcolor="0.0 0.0 4.1e-05", fontcolor=white, label="samples = 3,057,824\nactivity level = 0.00%"];
+2 -> 4;
+5 [fillcolor="0.0 0.0 0.440237", fontcolor=white, label="time <= 63\nsamples = 78,022\nactivity level = 44.02%"];
+1 -> 5;
+6 [fillcolor="0.0 0.0 0.231291", fontcolor=white, label="samples = 55,730\nactivity level = 23.13%"];
+5 -> 6;
+7 [fillcolor="0.0 0.0 0.962601", label="samples = 22,292\nactivity level = 96.26%"];
+5 -> 7;
+8 [fillcolor="0.0 0.0 0.923186", label="econ-to-contacts-ratio <= 0.6206\nsamples = 4,909,009\nactivity level = 92.32%"];
+0 -> 8  [headlabel="", label="False", labelangle=45, labeldistance="2.5"];
+9 [fillcolor="0.0 0.0 0.6139", label="time <= 49\nsamples = 599,984\nactivity level = 61.39%"];
+8 -> 9;
+10 [fillcolor="0.0 0.0 0.383611", fontcolor=white, label="samples = 342,848\nactivity level = 38.36%"];
+9 -> 10;
+11 [fillcolor="0.0 0.0 0.920953", label="samples = 257,136\nactivity level = 92.10%"];
+9 -> 11;
+12 [fillcolor="0.0 0.0 0.966251", label="time <= 7\nsamples = 4,309,025\nactivity level = 96.63%"];
+8 -> 12;
+13 [fillcolor="0.0 0.0 0.843352", label="samples = 615,575\nactivity level = 84.34%"];
+12 -> 13;
+14 [fillcolor="0.0 0.0 0.986734", label="samples = 3,693,450\nactivity level = 98.67%"];
+12 -> 14;
+"" [fillcolor=white, fontcolor=black, fontsize=18, label="Decision tree for all activities\nRMSE: 0.16337", style=bold];
+}

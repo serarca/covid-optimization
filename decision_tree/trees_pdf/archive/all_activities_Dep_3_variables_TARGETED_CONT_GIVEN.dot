@@ -1,0 +1,35 @@
+digraph Tree {
+rankdir=LR;
+node [color="black", fontname=helvetica, shape=box, style="filled, rounded"];
+edge [fontname=helvetica];
+0 [fillcolor="0.0 0.0 0.554797", label="nu_other_act <= 0.05\nsamples = 8,232,210\nactivity level = 55.48%"];
+1 [fillcolor="0.0 0.0 0.166855", fontcolor=white, label="contacts_given <= 4.4676\nsamples = 2,359,665\nactivity level = 16.69%"];
+0 -> 1  [headlabel="", label="True", labelangle="-45", labeldistance="2.5"];
+2 [fillcolor="0.0 0.0 0.051261", fontcolor=white, label="contacts_given <= 1.8243\nsamples = 2,045,043\nactivity level = 5.13%"];
+1 -> 2;
+3 [fillcolor="0.0 0.0 0.0", fontcolor=white, label="samples = 1,677,984\nactivity level = 0.00%"];
+2 -> 3;
+4 [fillcolor="0.0 0.0 0.285598", fontcolor=white, label="samples = 367,059\nactivity level = 28.56%"];
+2 -> 4;
+5 [fillcolor="0.0 0.0 0.918216", label="time <= 7\nsamples = 314,622\nactivity level = 91.82%"];
+1 -> 5;
+6 [fillcolor="0.0 0.0 0.721008", label="samples = 44,946\nactivity level = 72.10%"];
+5 -> 6;
+7 [fillcolor="0.0 0.0 0.951084", label="samples = 269,676\nactivity level = 95.11%"];
+5 -> 7;
+8 [fillcolor="0.0 0.0 0.710677", label="contacts_given <= 1.1836\nsamples = 5,872,545\nactivity level = 71.07%"];
+0 -> 8  [headlabel="", label="False", labelangle=45, labeldistance="2.5"];
+9 [fillcolor="0.0 0.0 0.60955", label="contacts_given <= 1.0055\nsamples = 3,393,026\nactivity level = 60.96%"];
+8 -> 9;
+10 [fillcolor="0.0 0.0 0.675622", label="samples = 2,871,022\nactivity level = 67.56%"];
+9 -> 10;
+11 [fillcolor="0.0 0.0 0.246153", fontcolor=white, label="samples = 522,004\nactivity level = 24.62%"];
+9 -> 11;
+12 [fillcolor="0.0 0.0 0.849061", label="time <= 21\nsamples = 2,479,519\nactivity level = 84.91%"];
+8 -> 12;
+13 [fillcolor="0.0 0.0 0.660882", label="samples = 708,434\nactivity level = 66.09%"];
+12 -> 13;
+14 [fillcolor="0.0 0.0 0.924333", label="samples = 1,771,085\nactivity level = 92.43%"];
+12 -> 14;
+"" [fillcolor=white, fontcolor=black, fontsize=18, label="Decision tree for all activities\nRMSE: 0.36284", style=bold];
+}

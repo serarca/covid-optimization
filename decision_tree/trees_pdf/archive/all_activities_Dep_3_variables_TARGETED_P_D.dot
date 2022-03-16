@@ -1,0 +1,35 @@
+digraph Tree {
+rankdir=LR;
+node [color="black", fontname=helvetica, shape=box, style="filled, rounded"];
+edge [fontname=helvetica];
+0 [fillcolor="0.0 0.0 0.554797", label="nu_other_act <= 0.05\nsamples = 8,232,210\nactivity level = 55.48%"];
+1 [fillcolor="0.0 0.0 0.166855", fontcolor=white, label="p_D <= 0.1898\nsamples = 2,359,665\nactivity level = 16.69%"];
+0 -> 1  [headlabel="", label="True", labelangle="-45", labeldistance="2.5"];
+2 [fillcolor="0.0 0.0 0.214528", fontcolor=white, label="p_D <= 0.0096\nsamples = 1,835,295\nactivity level = 21.45%"];
+1 -> 2;
+3 [fillcolor="0.0 0.0 0.26496", fontcolor=white, label="samples = 524,370\nactivity level = 26.50%"];
+2 -> 3;
+4 [fillcolor="0.0 0.0 0.194356", fontcolor=white, label="samples = 1,310,925\nactivity level = 19.44%"];
+2 -> 4;
+5 [fillcolor="0.0 0.0 0.0", fontcolor=white, label="beta <= 0.00%228\nsamples = 524,370\nactivity level = 0.00%"];
+1 -> 5;
+6 [fillcolor="0.0 0.0 0.0", fontcolor=white, label="samples = 8,400\nactivity level = 0.00%"];
+5 -> 6;
+7 [fillcolor="0.0 0.0 0.0", fontcolor=white, label="samples = 515,970\nactivity level = 0.00%"];
+5 -> 7;
+8 [fillcolor="0.0 0.0 0.710677", label="p_D <= 0.1842\nsamples = 5,872,545\nactivity level = 71.07%"];
+0 -> 8  [headlabel="", label="False", labelangle=45, labeldistance="2.5"];
+9 [fillcolor="0.0 0.0 0.746216", label="time <= 21\nsamples = 4,567,535\nactivity level = 74.62%"];
+8 -> 9;
+10 [fillcolor="0.0 0.0 0.642911", label="samples = 1,305,010\nactivity level = 64.29%"];
+9 -> 10;
+11 [fillcolor="0.0 0.0 0.787538", label="samples = 3,262,525\nactivity level = 78.75%"];
+9 -> 11;
+12 [fillcolor="0.0 0.0 0.586292", label="time <= 7\nsamples = 1,305,010\nactivity level = 58.63%"];
+8 -> 12;
+13 [fillcolor="0.0 0.0 0.521233", label="samples = 186,430\nactivity level = 52.12%"];
+12 -> 13;
+14 [fillcolor="0.0 0.0 0.597135", label="samples = 1,118,580\nactivity level = 59.71%"];
+12 -> 14;
+"" [fillcolor=white, fontcolor=black, fontsize=18, label="Decision tree for all activities\nRMSE: 0.41927", style=bold];
+}

@@ -1,0 +1,35 @@
+digraph Tree {
+rankdir=LR;
+node [color="black", fontname=helvetica, shape=box, style="filled, rounded"];
+edge [fontname=helvetica];
+0 [fillcolor="0.0 0.0 0.554797", label="econ-to-contacts-ratio <= 0.2929\nsamples = 8,232,210\nactivity level = 55.48%"];
+1 [fillcolor="0.0 0.0 0.010615", fontcolor=white, label="econ-to-contacts-ratio <= 0.1408\nsamples = 3,323,201\nactivity level = 1.06%"];
+0 -> 1  [headlabel="", label="True", labelangle="-45", labeldistance="2.5"];
+2 [fillcolor="0.0 0.0 0.000286", fontcolor=white, label="beta <= 0.0235\nsamples = 3,245,179\nactivity level = 0.03%"];
+1 -> 2;
+3 [fillcolor="0.0 0.0 0.000187", fontcolor=white, label="samples = 1,535,541\nactivity level = 0.02%"];
+2 -> 3;
+4 [fillcolor="0.0 0.0 0.000375", fontcolor=white, label="samples = 1,709,638\nactivity level = 0.04%"];
+2 -> 4;
+5 [fillcolor="0.0 0.0 0.440237", fontcolor=white, label="beta <= 0.0235\nsamples = 78,022\nactivity level = 44.02%"];
+1 -> 5;
+6 [fillcolor="0.0 0.0 0.413898", fontcolor=white, label="samples = 49,252\nactivity level = 41.39%"];
+5 -> 6;
+7 [fillcolor="0.0 0.0 0.485326", fontcolor=white, label="samples = 28,770\nactivity level = 48.53%"];
+5 -> 7;
+8 [fillcolor="0.0 0.0 0.923186", label="econ-to-contacts-ratio <= 0.6206\nsamples = 4,909,009\nactivity level = 92.32%"];
+0 -> 8  [headlabel="", label="False", labelangle=45, labeldistance="2.5"];
+9 [fillcolor="0.0 0.0 0.6139", label="econ-to-contacts-ratio <= 0.4144\nsamples = 599,984\nactivity level = 61.39%"];
+8 -> 9;
+10 [fillcolor="0.0 0.0 0.557347", label="samples = 287,623\nactivity level = 55.73%"];
+9 -> 10;
+11 [fillcolor="0.0 0.0 0.665975", label="samples = 312,361\nactivity level = 66.60%"];
+9 -> 11;
+12 [fillcolor="0.0 0.0 0.966251", label="econ-to-contacts-ratio <= 1.9329\nsamples = 4,309,025\nactivity level = 96.63%"];
+8 -> 12;
+13 [fillcolor="0.0 0.0 0.929213", label="samples = 1,642,039\nactivity level = 92.92%"];
+12 -> 13;
+14 [fillcolor="0.0 0.0 0.989054", label="samples = 2,666,986\nactivity level = 98.91%"];
+12 -> 14;
+"" [fillcolor=white, fontcolor=black, fontsize=18, label="Decision tree for all activities\nRMSE: 0.18311", style=bold];
+}
