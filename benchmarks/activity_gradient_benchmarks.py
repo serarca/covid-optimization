@@ -82,16 +82,25 @@ if groups == "all":
         universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
     if args.random_instance > -1:
-        with open(f"../parameters/simulations/fitted_{init_param.index(args.init_param_varying)}_{args.random_instance}.yaml") as file:
+        with open(f"../parameters/multiple_initial_conditions/fitted_{args.random_instance}.yaml") as file:
             universe_params = yaml.load(file, Loader=yaml.FullLoader)
+    
+    # if args.random_instance > -1:
+    #     with open(f"../parameters/simulations/fitted_{init_param.index(args.init_param_varying)}_{args.random_instance}.yaml") as file:
+    #          universe_params = yaml.load(file, Loader=yaml.FullLoader)
 
     # Read initialization
     with open("../initialization/oct21.yaml") as file:
         initialization = yaml.load(file, Loader=yaml.FullLoader)
         start_day = 0
 
+    # if args.random_instance > -1:
+    #     with open(f"../parameters/simulations/oct21_{init_param.index(args.init_param_varying)}_{args.random_instance}.yaml") as file:
+    #         initialization = yaml.load(file, Loader=yaml.FullLoader)
+    #         start_day = 0
+
     if args.random_instance > -1:
-        with open(f"../parameters/simulations/oct21_{init_param.index(args.init_param_varying)}_{args.random_instance}.yaml") as file:
+        with open(f"../parameters/multiple_initial_conditions/oct21_{args.random_instance}.yaml") as file:
             initialization = yaml.load(file, Loader=yaml.FullLoader)
             start_day = 0
 
@@ -99,8 +108,12 @@ if groups == "all":
     with open("../parameters/econ.yaml") as file:
         econ_params = yaml.load(file, Loader=yaml.FullLoader)
 
+    # if args.random_instance > -1:
+    #     with open(f"../parameters/simulations/econ_{init_param.index(args.init_param_varying)}_{args.random_instance}.yaml") as file:
+    #         econ_params = yaml.load(file, Loader=yaml.FullLoader)
+
     if args.random_instance > -1:
-        with open(f"../parameters/simulations/econ_{init_param.index(args.init_param_varying)}_{args.random_instance}.yaml") as file:
+        with open(f"../parameters/multiple_initial_conditions/econ_{args.random_instance}.yaml") as file:
             econ_params = yaml.load(file, Loader=yaml.FullLoader)
 
 # elif groups == "one":
@@ -198,25 +211,42 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
         result["experiment_params"]["policy_freq"],
     )
 
-    if args.random_instance > -1:
-            result["filename"] = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d_initParamVarying-%s_randomInstance-%d"%(
-            result["lockdown_heuristic"],
-            result["experiment_params"]["xi"],
-            result["experiment_params"]["icus"],
-            result["testing_heuristic"],
-            result["experiment_params"]["n_a_tests"],
-            result["experiment_params"]["n_m_tests"],
-            result["experiment_params"]["T"],
-            result["experiment_params"]["start_day"],
-            result["groups"],
-            result["experiment_params"]["delta_schooling"],
-            experiment_params["eta"],
-            result["experiment_params"]["test_freq"],
-            result["experiment_params"]["policy_freq"],
-            args.init_param_varying,
-            args.random_instance
-            )
+    # if args.random_instance > -1:
+    #         result["filename"] = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d_initParamVarying-%s_randomInstance-%d"%(
+    #         result["lockdown_heuristic"],
+    #         result["experiment_params"]["xi"],
+    #         result["experiment_params"]["icus"],
+    #         result["testing_heuristic"],
+    #         result["experiment_params"]["n_a_tests"],
+    #         result["experiment_params"]["n_m_tests"],
+    #         result["experiment_params"]["T"],
+    #         result["experiment_params"]["start_day"],
+    #         result["groups"],
+    #         result["experiment_params"]["delta_schooling"],
+    #         experiment_params["eta"],
+    #         result["experiment_params"]["test_freq"],
+    #         result["experiment_params"]["policy_freq"],
+    #         args.init_param_varying,
+    #         args.random_instance
+    #         )
 
+    if args.random_instance > -1:
+        result["filename"] = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d_randomInstance-%d"%(
+        result["lockdown_heuristic"],
+        result["experiment_params"]["xi"],
+        result["experiment_params"]["icus"],
+        result["testing_heuristic"],
+        result["experiment_params"]["n_a_tests"],
+        result["experiment_params"]["n_m_tests"],
+        result["experiment_params"]["T"],
+        result["experiment_params"]["start_day"],
+        result["groups"],
+        result["experiment_params"]["delta_schooling"],
+        experiment_params["eta"],
+        result["experiment_params"]["test_freq"],
+        result["experiment_params"]["policy_freq"],
+        args.random_instance
+        )
 
     constant_gradients_filename = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d"%(
         "time_gradient",
@@ -234,8 +264,27 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
         14,
     )
     
+    # if args.random_instance > -1:
+    #     constant_gradients_filename = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d_initParamVarying-%s_randomInstance-%d"%(
+    #     "time_gradient",
+    #     result["experiment_params"]["xi"],
+    #     result["experiment_params"]["icus"],
+    #     result["testing_heuristic"],
+    #     result["experiment_params"]["n_a_tests"],
+    #     result["experiment_params"]["n_m_tests"],
+    #     result["experiment_params"]["T"],
+    #     result["experiment_params"]["start_day"],
+    #     result["groups"],
+    #     result["experiment_params"]["delta_schooling"],
+    #     experiment_params["eta"],
+    #     simulation_params['days'],
+    #     14,
+    #     args.init_param_varying,
+    #     args.random_instance
+    #     )
+
     if args.random_instance > -1:
-        constant_gradients_filename = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d_initParamVarying-%s_randomInstance-%d"%(
+        constant_gradients_filename = "%s/xi-%d_icus-%d_testing-%s_natests-%d_nmtests-%d_T-%d_startday-%d_groups-%s_dschool-%f_eta-%f_freq-%d-%d_randomInstance-%d"%(
         "time_gradient",
         result["experiment_params"]["xi"],
         result["experiment_params"]["icus"],
@@ -249,7 +298,6 @@ def gradient_descent(experiment_params, quar_freq, plot=False):
         experiment_params["eta"],
         simulation_params['days'],
         14,
-        args.init_param_varying,
         args.random_instance
         )
 
